@@ -1,0 +1,490 @@
+  /* Allgemeine Dark-Mode-Einstellungen */
+        body {
+            background-color: #1a1a1a; /* Dark background */
+            color: #e6e6e6; /* Helles Grau für Text */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+
+        /* Hauptcontainer */
+        .main-container {
+            width: 100%;
+            max-width: 1280px; /* Begrenzte Breite */
+            margin: 0 auto; /* Zentrierung */
+            padding: 20px;
+            box-sizing: border-box; /* Innenabstand berücksichtigen */
+        }
+
+        /* Navigation oben */
+        .tab-navigation {
+            display: flex;
+            justify-content: space-between; /* Gleicher Abstand zwischen Pfeilen und Titel */
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .tab-arrow {
+            background-color: rgb(103, 45, 236);
+            border: none;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1.2em;
+            transition: background-color 0.3s;
+        }
+
+        .tab-arrow:hover {
+            background-color: rgb(123, 65, 256); /* Hellerer Effekt beim Hover */
+        }
+
+        #tab-name {
+            font-weight: bold;
+            font-size: 1.5em;
+            text-align: center;
+            flex-grow: 1; /* Erzwingt mittige Ausrichtung */
+        }
+
+        /* Inhalt des Containers */
+        .tab-page {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px; /* Abstand zwischen den Elementen */
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #333;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            text-align: left;
+        }
+		.results-container
+        {
+			display: flex; 
+			flex-direction: column;
+            align-items: center;
+		
+		}
+
+        .tab-page button
+         {
+			display: flex; 
+            justify-content: center;
+            align-items: center;
+		
+		}
+        .tab-page.active {
+            display: block; /* Sichtbarer Tab */
+        }
+
+        /* Felder und Labels */
+        label {
+            display: block;
+            text-align: left; /* Linksbündig */
+            margin: 15px auto 5px;
+            max-width: 600px;
+        }
+
+        input,
+        select
+           {
+            display: block;
+            width: calc(100% - 40px); /* Verhindert Überschreiben des Containers */
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 10px;
+            font-size: 1em;
+            background-color: #2a2a2a;
+            color: #e6e6e6;
+            border: 1px solid #555;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: rgb(103, 45, 236);
+            border: none;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1.2em;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: rgb(123, 65, 256);
+        }
+		table {
+			border-spacing: 0;
+			width: 100%;
+			background-color: #2a2a2a;
+			color: #e6e6e6;
+		}
+
+		th {
+			background-color: #444;
+			color: #fff;
+			font-weight: bold;
+		}
+
+		td {
+			text-align: right;
+		}
+		/* Stil für beide Slider (Standard-Styling) */
+input[type="range"] {
+    -webkit-appearance: none; /* Entfernt das Standard-Slider-Design */
+    width: calc(100% - 40px); /* Breite anpassen */
+    max-width: 600px;
+    margin: 10px auto;
+    cursor: pointer;
+}
+
+/* Slider-Spur */
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 4px; /* Breitere Linie */
+    background: #673dec; /* Lila Farbe */
+    border-radius: 2px; /* Leicht abgerundet */
+}
+
+/* Slider-Punkt (Thumb) */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Entfernt Standard-Styling */
+    width: 16px; /* Punktbreite */
+    height: 16px; /* Punkthöhe */
+    background: #ffffff; /* Weißer Punkt */
+    border: 2px solid #673dec; /* Lila Rand */
+    border-radius: 50%; /* Kreisform */
+    cursor: pointer; /* Zeiger beim Hover */
+    box-shadow: 0px 0px 5px rgba(103, 61, 236, 0.7); /* Dezenter Leuchteffekt */
+    margin-top: -6px; /* Vertikale Zentrierung */
+}
+
+/* Hover-Effekt für Slider-Punkt */
+input[type="range"]::-webkit-slider-thumb:hover {
+    background: #673dec; /* Lila Punkt beim Hover */
+    border: 2px solid #ffffff; /* Weißer Rand beim Hover */
+    box-shadow: 0px 0px 10px rgba(103, 61, 236, 1); /* Stärkerer Leuchteffekt */
+}
+
+/* Für Firefox */
+input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #ffffff;
+    border: 2px solid #673dec;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px rgba(103, 61, 236, 0.7);
+}
+
+/* Spur für Firefox */
+input[type="range"]::-moz-range-track {
+    height: 4px;
+    background: #673dec;
+    border-radius: 2px;
+}
+
+/* Für IE */
+input[type="range"]::-ms-thumb {
+    width: 16px;
+    height: 16px;
+    background: #ffffff;
+    border: 2px solid #673dec;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px rgba(103, 61, 236, 0.7);
+    margin-top: -6px;
+}
+
+/* Spur für IE */
+input[type="range"]::-ms-track {
+    height: 4px;
+    background: #673dec;
+    border-radius: 2px;
+    border: none;
+}
+.card-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 90%; /* Optimiert für Smartphones */
+    margin: 0 auto;
+}
+
+.card {
+    background-color: #2a2a2a;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.card-header {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #673dec;
+}
+
+.card-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1em;
+}
+
+.card-row span {
+    font-weight: bold;
+}
+
+select {
+    padding: 10px;
+    background-color: #2a2a2a;
+    color: #e6e6e6;
+    border: 1px solid #555;
+    border-radius: 4px;
+    font-size: 1em;
+}
+select:hover {
+    background-color: #3a3a3a;
+}
+button:hover {
+    background-color: #8a5eff; /* Helleres Lila beim Hover */
+    box-shadow: 0px 4px 8px rgba(103, 61, 236, 0.3);
+}
+
+button:active {
+    background-color: #5526c6; /* Dunkleres Lila beim Klick */
+}
+.question-circle {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    border-radius: 50%;
+    background-color: #673dec;
+    color: white;
+    font-size: 0.8em;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.question-circle:hover {
+    background-color: #8a5eff; /* Hellerer Lila beim Hover */
+}
+
+/* Header-Container */
+header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background-color: #333;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    max-width: 100%; /* Maximale Breite auf 100% beschränken */
+    margin: 0 auto; /* Zentrierung */
+}
+
+/* Einzelne Header-Items */
+.header-item {
+    flex: 1; /* Gleichmäßige Breite */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 150px; /* Mindestbreite */
+    max-width: 300px; /* Maximalbreite für Spalten */
+    padding: 5px 10px;
+    background-color: #444;
+    border-radius: 5px;
+
+}
+
+/* Label-Styling */
+.header-item label {
+    margin-right: 10px;
+    white-space: nowrap;
+    text-align: center;
+    justify-content: center;
+}
+
+/* Input und Select */
+.header-item select,
+.header-item input {
+    flex: 1;
+    padding: 5px;
+    background-color: #555;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* Button */
+.header-button {
+    flex: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #673dec;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+
+/* Responsives Verhalten: Wechsel zu Column */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: center; /* Zentriert die Items */
+    }
+
+    .header-item {
+    width: calc(100% - 40px); /* Volle Breite minus Padding */
+    max-width: 100%; /* Sicherstellen, dass sie nicht breiter als der Header sind */
+    padding: 5px 5px; /* Gleiche Padding-Werte */
+    box-sizing: border-box; /* Padding wird in die Breite eingerechnet */
+}
+
+
+    .header-button {
+        margin-top: 10px; /* Abstand nach oben */
+    }
+    .tab-arrow {
+        padding: 5px 10px; /* Weniger Padding, damit es nicht zu groß wirkt */
+        font-size: 1em; /* Schriftgröße anpassen */
+        height: 100%; /* Passt die Höhe dynamisch an die Schrift an */
+        display: flex;
+        align-items: center; /* Zentriert die Pfeile vertikal */
+    }
+}
+
+.header img {
+    width: 20px;
+    height: 20px;
+	flex-direction: row;
+    padding: 5px 10px; /* Gleiche Padding-Werte */
+}
+.circular-button {
+    background-color: #673dec;
+    border: none;
+    border-radius: 50%; /* Rund */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    margin: 0; /* Entfernt zusätzliche Abstände */
+    vertical-align: middle; /* Gleiche Basislinie wie Text */
+}
+
+.circular-button:hover {
+    background-color: #8a5eff; /* Hover-Effekt */
+}
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.button-group button {
+    background-color: #673dec;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+.button-group button:hover {
+    background-color: #5329ba;
+}
+/* Zentrierung für einzelne Buttons */
+.single-button-container {
+    display: flex;
+    justify-content: center; /* Zentriert horizontal */
+    align-items: center; /* Zentriert vertikal */
+    margin: 10px auto; /* Abstand und automatische Zentrierung */
+}
+
+.single-button-container button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #673dec;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.single-button-container button:hover {
+    background-color: #5329ba;
+}
+.wallet-address-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #333;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    overflow-x: auto; /* Ermöglicht horizontales Scrollen */
+    white-space: nowrap; /* Verhindert Umbruch */
+}
+
+.wallet-address {
+    flex: 1;
+    color: #e6e6e6;
+    font-family: monospace; /* Für klare Darstellung der Adresse */
+    font-size: 1em;
+}
+
+.wallet-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+}
+.tab-description {
+    margin-bottom: 15px;
+    font-size: 1rem;
+    color: #a6a6a6;
+    text-align: center;
+    font-style: italic; /* Optionale stilistische Änderung */
+}
+.tab-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex-grow: 1;
+}
+
+#tab-description {
+    font-size: 0.9rem;
+    color: #a6a6a6;
+    margin-top: 5px; /* Kleiner Abstand zum Tab-Namen */
+    font-style: italic; /* Optional: kursiver Text */
+}
