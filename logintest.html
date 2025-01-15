@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login Test</title>
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/+esm';
-        import { Auth } from 'https://cdn.jsdelivr.net/npm/@supabase/auth-ui@0.1.0/+esm';
 
         const supabaseUrl = "https://umlgbacgghrvzwfvirro.supabase.co";
         const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtbGdiYWNnZ2hydnp3ZnZpcnJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY1MTAzMjQsImV4cCI6MjA1MjA4NjMyNH0.Hv0X4Wy4PtbSJ4yEN-CFszdX4zEoW4CMEHrbRBbX1Ug";
@@ -15,25 +14,13 @@
         document.addEventListener("DOMContentLoaded", () => {
             const container = document.getElementById("auth-container");
 
-            try {
-                Auth.mount(container, {
-                    supabaseClient: supabase,
-                    appearance: {
-                        theme: "dark",
-                        variables: {
-                            default: {
-                                colors: {
-                                    brand: "#6366f1",
-                                    brandAccent: "#4f46e5",
-                                },
-                            },
-                        },
-                    },
-                    redirectTo: "home.html",
-                });
-            } catch (error) {
-                console.error("Fehler beim Laden der Auth UI:", error.message);
-            }
+            supabase.auth.signInWithOAuth({
+                provider: "github", // Optional: Google, Twitter, etc.
+            }).then((result) => {
+                console.log("Erfolgreich eingeloggt:", result);
+            }).catch((error) => {
+                console.error("Login fehlgeschlagen:", error.message);
+            });
         });
     </script>
 </head>
