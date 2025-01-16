@@ -1,8 +1,9 @@
-
 import MinerCard from "./components/MinerCard.js";
 import MinerList from "./components/MinerList.js";
 
 let miners = []; // Global state for miners
+let modalVisible = false; // Global state for modal visibility
+let editingMinerIndex = null; // Tracks the miner being edited (null for new miners)
 
 const App = (container) => {
   let currentView = "cards";
@@ -27,10 +28,12 @@ const App = (container) => {
     container.appendChild(viewSwitch);
 
     if (currentView === "cards") {
-      MinerCard(container, miners, addMiner, editMiner, deleteMiner);
+      MinerCard(container, miners, showModal, editMiner, deleteMiner);
     } else {
-      MinerList(container, miners, addMiner, editMiner, deleteMiner);
+      MinerList(container, miners, showModal, editMiner, deleteMiner);
     }
+
+    renderModal(container);
   };
 
   const switchView = (view) => {
@@ -38,20 +41,78 @@ const App = (container) => {
     render();
   };
 
-  const addMiner = () => {
-    const newMiner = { name: "Neuer Miner", hashrate: 0, efficiency: 0 };
-    miners.push(newMiner);
-    render();
-  };
-
-  const editMiner = (index, updatedMiner) => {
-    miners[index] = { ...miners[index], ...updatedMiner };
+  const addMiner = (newMiner) => {
+    if (editingMinerIndex !== null) {
+      // Edit existing miner
+      miners[editingMinerIndex] = newMiner;
+      editingMinerIndex = null;
+    } else {
+      // Add new miner
+      miners.push(newMiner);
+    }
+    modalVisible = false;
     render();
   };
 
   const deleteMiner = (index) => {
     miners.splice(index, 1);
     render();
+  };
+
+  const editMiner = (index) => {
+    editingMinerIndex = index;
+    showModal(miners[index]);
+  };
+
+  const showModal = (miner = { name: "", hashrate: 0, efficiency: 0 }) => {
+    modalVisible = true;
+    render();
+    populateModal(miner);
+  };
+
+  const closeModal = () => {
+    modalVisible = false;
+    render();
+  };
+
+  const populateModal = (miner) => {
+    document.getElementById("miner-name").value = miner.name || "";
+    document.getElementById("miner-hashrate").value = miner.hashrate || 0;
+    document.getElementById("miner-efficiency").value = miner.efficiency || 0;
+  };
+
+  const renderModal = (container) => {
+    if (!modalVisible) return;
+
+    const modal = document.createElement("div");
+    modal.className = "modal";
+
+    modal.innerHTML = `
+      <div class="modal-content">
+        <h3>${editingMinerIndex !== null ? "Miner bearbeiten" : "Neuer Miner"}</h3>
+        <label>Name:</label>
+        <input type="text" id="miner-name" />
+        <label>Hashrate (H/s):</label>
+        <input type="number" id="miner-hashrate" />
+        <label>Effizienz (%):</label>
+        <input type="number" id="miner-efficiency" />
+        <div class="modal-actions">
+          <button id="save-miner">Speichern</button>
+          <button id="cancel-miner">Abbrechen</button>
+        </div>
+      </div>
+    `;
+
+    modal.querySelector("#save-miner").onclick = () => {
+      const name = document.getElementById("miner-name").value;
+      const hashrate = parseFloat(document.getElementById("miner-hashrate").value);
+      const efficiency = parseFloat(document.getElementById("miner-efficiency").value);
+      addMiner({ name, hashrate, efficiency });
+    };
+
+    modal.querySelector("#cancel-miner").onclick = closeModal;
+
+    container.appendChild(modal);
   };
 
   render();
