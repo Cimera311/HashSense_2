@@ -1,1 +1,77 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
 
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #007bff;
+  color: #fff;
+}
+
+.view-switch button {
+  margin: 0 5px;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  color: #007bff;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.container {
+  padding: 1rem;
+}
+
+.miner-cards {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.miner-card {
+  border: 1px solid #ccc;
+  padding: 16px;
+  width: 200px;
+  position: relative;
+}
+
+.miner-card .actions {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+}
+
+.add-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px dashed #007bff;
+  color: #007bff;
+  height: 150px;
+}
+
+.miner-list {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.miner-list th,
+.miner-list td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+.miner-list td {
+  text-align: center;
+}
+
+.miner-list tr:last-child {
+  cursor: pointer;
+  background-color: #f9f9f9;
+}
