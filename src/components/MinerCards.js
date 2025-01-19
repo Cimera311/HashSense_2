@@ -7,9 +7,13 @@ const MinerCard = (container, miners, onAdd, onEdit, onDelete, onCopy) => {
     card.className = "miner-card";
 
     card.innerHTML = `
-      <h3>${miner.name}</h3>
-      <p>Hashrate: ${miner.hashrate} H/s</p>
-      <p>Effizienz: ${miner.efficiency}%</p>
+      <div class="miner-card-header">${miner.name}</div>
+      <div class="miner-card-row">
+        <span>Hashrate:</span> <span>${miner.hashrate} H/s</span>
+      </div>
+      <div class="miner-card-row">
+        <span>Effizienz:</span> <span>${miner.efficiency}%</span>
+      </div>
     `;
 
     const actions = document.createElement("div");
@@ -35,9 +39,9 @@ const MinerCard = (container, miners, onAdd, onEdit, onDelete, onCopy) => {
     cardsContainer.appendChild(card);
   });
 
-  const addCard = document.createElement("div");
-  addCard.className = "add-card";
-  addCard.textContent = "+";
+const addCard = document.createElement("div");
+  addCard.className = "miner-card miner-card-header";
+  addCard.textContent = "+ Neuer Miner";
   addCard.onclick = onAdd;
 
   cardsContainer.appendChild(addCard);
