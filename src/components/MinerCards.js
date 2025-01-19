@@ -1,5 +1,4 @@
-
-const MinerCard = (container, miners, onAdd, onEdit, onDelete) => {
+const MinerCard = (container, miners, onAdd, onEdit, onDelete, onCopy) => {
   const cardsContainer = document.createElement("div");
   cardsContainer.className = "miner-cards";
 
@@ -18,20 +17,19 @@ const MinerCard = (container, miners, onAdd, onEdit, onDelete) => {
 
     const editButton = document.createElement("button");
     editButton.textContent = "✎";
-    editButton.onclick = () => {
-      const name = prompt("Name:", miner.name);
-      const hashrate = prompt("Hashrate (H/s):", miner.hashrate);
-      const efficiency = prompt("Effizienz (%):", miner.efficiency);
-
-      onEdit(index, { name, hashrate: parseFloat(hashrate), efficiency: parseFloat(efficiency) });
-    };
+    editButton.onclick = () => onEdit(index);
 
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "✖";
     deleteButton.onclick = () => onDelete(index);
 
+    const copyButton = document.createElement("button");
+    copyButton.textContent = "📋";
+    copyButton.onclick = () => onCopy(index);
+
     actions.appendChild(editButton);
     actions.appendChild(deleteButton);
+    actions.appendChild(copyButton);
 
     card.appendChild(actions);
     cardsContainer.appendChild(card);
