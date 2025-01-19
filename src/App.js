@@ -1,5 +1,11 @@
 import MinerCard from "./components/MinerCards.js";
 import MinerList from "./components/MinerList.js";
+import App from "./App.js";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const appContainer = document.getElementById("app");
+  App(appContainer);
+});
 
 let miners = []; // Global state for miners
 let modalVisible = false; // Global state for modal visibility
