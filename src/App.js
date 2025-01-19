@@ -1,4 +1,4 @@
-import MinerCard from "./components/MinerCard.js";
+import MinerCard from "./components/MinerCards.js";
 import MinerList from "./components/MinerList.js";
 
 let miners = []; // Global state for miners
