@@ -241,7 +241,40 @@ input[type="range"]::-ms-track {
 .card-row span {
     font-weight: bold;
 }
+.miner-card-container {
+display: flex;
+flex-direction: column;
+gap: 15px;
+width: 90%; /* Optimiert für Smartphones */
+margin: 0 auto;
+}
 
+.miner-card {
+background-color: #2a2a2a;
+border-radius: 10px;
+padding: 15px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+display: flex;
+flex-direction: column;
+gap: 10px;
+aspect-ratio: 1 / 1; /* Karten quadratisch */
+}
+
+.miner-card-header {
+font-size: 1.2em;
+font-weight: bold;
+color: #673dec;
+}
+
+.miner-card-row {
+display: flex;
+justify-content: space-between;
+font-size: 1em;
+}
+
+.miner-card-row span {
+font-weight: bold;
+}
 select {
     padding: 10px;
     background-color: #2a2a2a;
