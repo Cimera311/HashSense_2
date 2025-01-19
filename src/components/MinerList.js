@@ -1,5 +1,4 @@
-
-const MinerList = (container, miners, onAdd, onEdit, onDelete) => {
+const MinerList = (container, miners, onAdd, onEdit, onDelete, onCopy) => {
   const table = document.createElement("table");
   table.className = "miner-list";
 
@@ -10,6 +9,7 @@ const MinerList = (container, miners, onAdd, onEdit, onDelete) => {
         <th>Hashrate</th>
         <th>Effizienz</th>
         <th>Bearbeiten</th>
+        <th>Kopieren</th>
         <th>Löschen</th>
       </tr>
     </thead>
@@ -28,14 +28,14 @@ const MinerList = (container, miners, onAdd, onEdit, onDelete) => {
     const editCell = document.createElement("td");
     const editButton = document.createElement("button");
     editButton.textContent = "✎";
-    editButton.onclick = () => {
-      const name = prompt("Name:", miner.name);
-      const hashrate = prompt("Hashrate (H/s):", miner.hashrate);
-      const efficiency = prompt("Effizienz (%):", miner.efficiency);
-
-      onEdit(index, { name, hashrate: parseFloat(hashrate), efficiency: parseFloat(efficiency) });
-    };
+    editButton.onclick = () => onEdit(index);
     editCell.appendChild(editButton);
+
+    const copyCell = document.createElement("td");
+    const copyButton = document.createElement("button");
+    copyButton.textContent = "📋";
+    copyButton.onclick = () => onCopy(index);
+    copyCell.appendChild(copyButton);
 
     const deleteCell = document.createElement("td");
     const deleteButton = document.createElement("button");
@@ -44,13 +44,14 @@ const MinerList = (container, miners, onAdd, onEdit, onDelete) => {
     deleteCell.appendChild(deleteButton);
 
     row.appendChild(editCell);
+    row.appendChild(copyCell);
     row.appendChild(deleteCell);
     tbody.appendChild(row);
   });
 
   const addRow = document.createElement("tr");
   addRow.innerHTML = `
-    <td colspan="5" style="text-align: center; cursor: pointer;">+ Neuer Miner hinzufügen</td>
+    <td colspan="6" style="text-align: center; cursor: pointer;">+ Neuer Miner hinzufügen</td>
   `;
   addRow.onclick = onAdd;
 
