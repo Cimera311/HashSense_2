@@ -64,15 +64,17 @@ const App = (container) => {
     showModal(miners[index]);
   };
 
-  const copyMiner = (index) => {
+    const copyMiner = (index) => {
     const minerToCopy = miners[index];
+    const existingNumbers = miners.map(m => parseInt(m.name.match(/#(\d+)/)?.[1] || 0, 10));
+    const newNumber = Math.max(...existingNumbers, 0) + 1;
     const copiedMiner = {
-      ...minerToCopy,
-      name: `${minerToCopy.name} - Kopie`,
+    ...minerToCopy,
+    name: #${newNumber.toString().padStart(4, '0')},
     };
     miners.push(copiedMiner);
     render();
-  };
+    };
 
   const showModal = (miner = { name: "", hashrate: 0, efficiency: 0 }) => {
     modalVisible = true;
