@@ -28,9 +28,9 @@ const App = (container) => {
     container.appendChild(viewSwitch);
 
     if (currentView === "cards") {
-      MinerCard(container, miners, showModal, editMiner, deleteMiner);
+      MinerCard(container, miners, showModal, editMiner, deleteMiner, copyMiner);
     } else {
-      MinerList(container, miners, showModal, editMiner, deleteMiner);
+      MinerList(container, miners, showModal, editMiner, deleteMiner, copyMiner);
     }
 
     renderModal(container);
@@ -64,6 +64,16 @@ const App = (container) => {
     showModal(miners[index]);
   };
 
+  const copyMiner = (index) => {
+    const minerToCopy = miners[index];
+    const copiedMiner = {
+      ...minerToCopy,
+      name: `${minerToCopy.name} - Kopie`,
+    };
+    miners.push(copiedMiner);
+    render();
+  };
+
   const showModal = (miner = { name: "", hashrate: 0, efficiency: 0 }) => {
     modalVisible = true;
     render();
@@ -91,11 +101,11 @@ const App = (container) => {
       <div class="modal-content">
         <h3>${editingMinerIndex !== null ? "Miner bearbeiten" : "Neuer Miner"}</h3>
         <label>Name:</label>
-        <input type="text" id="miner-name" />
+        <input type="text" id="miner-name" value="#0001" />
         <label>Hashrate (H/s):</label>
-        <input type="number" id="miner-hashrate" />
+        <input type="number" id="miner-hashrate" value="1" />
         <label>Effizienz (%):</label>
-        <input type="number" id="miner-efficiency" />
+        <input type="number" id="miner-efficiency" value="20" />
         <div class="modal-actions">
           <button id="save-miner">Speichern</button>
           <button id="cancel-miner">Abbrechen</button>
@@ -119,3 +129,4 @@ const App = (container) => {
 };
 
 export default App;
+
