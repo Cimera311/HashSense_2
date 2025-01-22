@@ -10,45 +10,6 @@
             align-items: center;
             min-height: 100vh;
         }
-.view-container {
-  background-color: #007bff; /* Gleiche Farbe wie Header */
-  color: white;
-  text-align: center;
-  padding: 1rem;
-  border-radius: 10px;
-  margin: 1rem auto;
-  max-width: 600px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.view-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.view-switch {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-.view-button {
-  background-color: white;
-  color: #007bff;
-  border: 2px solid white;
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: bold;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-}
-
-.view-button:hover {
-  background-color: #0056b3;
-  color: white;
-}
 
 
         /* Hauptcontainer */
@@ -527,3 +488,43 @@ header {
     margin-top: 5px; /* Kleiner Abstand zum Tab-Namen */
     font-style: italic; /* Optional: kursiver Text */
 }
+.view-container {
+  background-color: #007bff; /* Gleiche Farbe wie Header */
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 10px;
+  margin: 1rem auto;
+  max-width: 600px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.view-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.view-switch {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.view-button {
+  background-color: white;
+  color: #007bff;
+  border: 2px solid white;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.view-button:hover {
+  background-color: #0056b3;
+  color: white;
+}
+
