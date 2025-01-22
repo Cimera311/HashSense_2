@@ -1,6 +1,8 @@
 import MinerCard from "./components/MinerCards.js";
 import MinerList from "./components/MinerList.js";
 
+
+
 let miners = []; // Global state for miners
 let modalVisible = false; // Global state for modal visibility
 let editingMinerIndex = null; // Tracks the miner being edited (null for new miners)
@@ -61,6 +63,7 @@ const App = (container) => {
     showModal(miners[index]);
   };
 
+  
   const copyMiner = (index) => {
     const minerToCopy = miners[index];
     const existingNumbers = miners.map(m => parseInt(m.name.match(/#(\d+)/)?.[1] || 0, 10));
@@ -72,7 +75,23 @@ const App = (container) => {
     miners.push(copiedMiner);
     render();
   };
-
+  const loadExampleFarm = async () => {
+    try {
+      const response = await fetch('src/data/example-farm.json');
+      if (!response.ok) {
+        throw new Error('Fehler beim Laden der Datei');
+      }
+      const exampleData = await response.json();
+      miners = exampleData;
+      render();
+    } catch (error) {
+      console.error("Fehler beim Laden der Beispiel-Farm:", error);
+    }
+  };
+  
+  // Event-Listener für den Lade-Button hinzufügen
+  document.getElementById("load-sample").addEventListener("click", loadExampleFarm);
+  
   const showModal = (miner = { name: "", hashrate: 0, efficiency: 0 }) => {
     modalVisible = true;
     render();
