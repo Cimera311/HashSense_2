@@ -13,20 +13,34 @@ const App = (container) => {
   const render = () => {
     container.innerHTML = ""; // Clear previous content
 
+     // Neues div für die Button-Leiste hinzufügen
+    const viewContainer = document.createElement("div");
+    viewContainer.className = "view-container";
+
+    const viewTitle = document.createElement("h2");
+    viewTitle.textContent = "Ansicht wechseln";
+    viewTitle.className = "view-title";
+
     const viewSwitch = document.createElement("div");
     viewSwitch.className = "view-switch";
 
     const cardsButton = document.createElement("button");
     cardsButton.textContent = "Kartenansicht";
+    cardsButton.className = "view-button";
     cardsButton.onclick = () => switchView("cards");
 
     const listButton = document.createElement("button");
     listButton.textContent = "Listenansicht";
+    listButton.className = "view-button";
     listButton.onclick = () => switchView("list");
 
     viewSwitch.appendChild(cardsButton);
     viewSwitch.appendChild(listButton);
-    container.appendChild(viewSwitch);
+
+    // Alle Elemente in das neue div einfügen
+    viewContainer.appendChild(viewTitle);
+    viewContainer.appendChild(viewSwitch);
+    container.appendChild(viewContainer);
 
     if (currentView === "cards") {
       MinerCard(container, miners, showModal, editMiner, deleteMiner, copyMiner);
