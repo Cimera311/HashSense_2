@@ -1,6 +1,6 @@
 /* Allgemeine Dark-Mode-Einstellungen */
 body {
-    background-color: #1a1a1a; 
+    background-color: #1e1e1e; 
     color: #e6e6e6; 
     font-family: Arial, sans-serif;
     margin: 0;
@@ -97,126 +97,13 @@ body {
     font-weight: bold;
 }
 
-/* Header Styling */
-header {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
-    background-color: #333;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-    max-width: 100%;
-    margin: 0 auto;
-}
-
-.header-item {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 150px;
-    max-width: 300px;
-    padding: 5px 10px;
-    background-color: #444;
-    border-radius: 5px;
-}
-
-/* Input und Select */
-.header-item select,
-.header-item input {
-    flex: 1;
-    padding: 5px;
-    background-color: #555;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    text-align: center;
-}
-
-/* Button Group */
-.button-group {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.button-group button {
-    background-color: #673dec;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.3s ease;
-}
-
-.button-group button:hover {
-    background-color: #5329ba;
-}
-
-/* Slider Styles */
-input[type="range"] {
-    -webkit-appearance: none;
-    width: calc(100% - 40px);
-    max-width: 600px;
-    margin: 10px auto;
-    cursor: pointer;
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-    height: 4px;
-    background: #673dec;
-    border-radius: 2px;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    background: #ffffff;
-    border: 2px solid #673dec;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0px 0px 5px rgba(103, 61, 236, 0.7);
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .miner-card-container {
         flex-direction: column;
         align-items: center;
     }
-
     .view-container {
         width: 95%;
-    }
-
-    header {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .header-item {
-        width: calc(100% - 40px);
-        max-width: 100%;
-        padding: 5px 5px;
-        box-sizing: border-box;
-    }
-
-    .header-button {
-        margin-top: 10px;
-    }
-
-    .tab-arrow {
-        padding: 5px 10px;
-        font-size: 1em;
-        height: 100%;
-        display: flex;
-        align-items: center;
     }
 }
