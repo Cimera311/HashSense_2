@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gray UI Layout</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #e6e6e6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+        .main-container {
+            width: 95%;
+            max-width: 1200px;
+            background-color: #2a2a2a;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+        .header {
+            background-color: #444;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-radius: 20px 20px 0 0;
+        }
+        .content {
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .card {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 20px;
+            width: 150px;
+            height: 150px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            border: 1px solid #555;
+        }
+        .card-label {
+            position: absolute;
+            top: -15px;
+            left: 10px;
+            background-color: #673dec;
+            z-index: 1;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            border: 1px solid #555;
+        }
+        .farm-card {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 20px;
+            flex-direction: column;
+            width: 90%;
+            text-align: center;
+            margin: 20px auto 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            border: 1px solid #555;
+            position: relative;
+        }
+        .input-container, .input-container-farm {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: 10px;
+        }
+        .input-container label, .input-container-farm label {
+            font-size: 0.9em;
+            color: #e6e6e6;
+            margin-bottom: 3px;
+        }
+        .input-container input, .input-container-farm input {
+            width: 100%;
+            padding: 5px;
+            border-radius: 10px;
+            border: 1px solid #555;
+            background-color: #2a2a2a;
+            color: #e6e6e6;
+            font-size: 1em;
+            text-align: center;
+        }
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: transparent;
+            color: #e6e6e6;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 20px;
+            text-align: center;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 7px;
+            right: 25px;
+            background-color: transparent;
+            color: #e6e6e6;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .copy-btn:hover {
+            color: #673dec;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">Header Section<button onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '30', '35');">Card hinzufügen</button>
+            <button onclick="wechselAnsicht()">Ansicht wechseln</button>
+            <button onclick="speichernCards()">Speichern</button>
+            <button onclick="ladenCards()">Laden</button>
+</div>
+<div class="farm-card" id="farm">
+    <button class="delete-btn" onclick="entfernenFarm()">&times</button>
+    <span class="card-label">Farm</span>
+    <div class="input-container-farm">
+        <label for="farm-power">Power</label>
+        <input type="text" id="farm-power" value="16" oninput="aktualisiereWert('farm', 'power')">
+    </div>   
+    <div class="input-container-farm">
+        <label for="farm-efficiency">Efficiency</label>
+        <input type="text" id="farm-efficiency" value="45" oninput="aktualisiereWert('farm', 'efficiency')">
+    </div>
+</div>
+
+
+        <div class="content">
+
+        </div>
+    </div>
+</body>
+  <script>
+    function hinzufuegenCard(cardId, power, efficiency) {
+    // Zugriff auf das Content-Element
+    let content = document.querySelector('.content');
+
+    // Erstelle die neue Card
+    let card = document.createElement('div');
+    card.className = 'card';
+    card.id = cardId;
+
+    // Card-Label hinzufügen
+    let label = document.createElement('span');
+    label.className = 'card-label';
+    label.innerText = `#${cardId}`;
+    card.appendChild(label);
+
+    let deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.innerHTML = '&times;';
+    deleteBtn.onclick = function() {
+        entfernenCard(cardId);
+    };
+    card.appendChild(deleteBtn);
+    let copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn';
+    copyBtn.innerHTML = '&#x2398;';
+    copyBtn.onclick = function() {
+        kopiereWerte(cardId);
+    };
+    card.appendChild(copyBtn);
+
+    // Power Input mit Label
+    let powerContainer = document.createElement('div');
+    powerContainer.className = 'input-container';
+
+    let powerLabel = document.createElement('label');
+    powerLabel.setAttribute('for', `${cardId}-power`);
+    powerLabel.innerText = 'Power';
+
+    let powerInput = document.createElement('input');
+    powerInput.type = 'text';
+    powerInput.id = `${cardId}-power`;
+    powerInput.value = `${power}`;
+    powerInput.oninput = function() { aktualisiereWert(cardId, 'power'); aktualisiereFarmWerte(); };
+
+    powerContainer.appendChild(powerLabel);
+    powerContainer.appendChild(powerInput);
+    card.appendChild(powerContainer);
+
+    // Efficiency Input mit Label
+    let efficiencyContainer = document.createElement('div');
+    efficiencyContainer.className = 'input-container';
+
+    let efficiencyLabel = document.createElement('label');
+    efficiencyLabel.setAttribute('for', `${cardId}-efficiency`);
+    efficiencyLabel.innerText = 'Efficiency';
+
+    let efficiencyInput = document.createElement('input');
+    efficiencyInput.type = 'text';
+    efficiencyInput.id = `${cardId}-efficiency`;
+    efficiencyInput.value = `${efficiency}`;
+    efficiencyInput.oninput = function() { aktualisiereWert(cardId, 'efficiency'); aktualisiereFarmWerte();};
+
+    efficiencyContainer.appendChild(efficiencyLabel);
+    efficiencyContainer.appendChild(efficiencyInput);
+    card.appendChild(efficiencyContainer);
+
+    // Card zur Content-Sektion hinzufügen
+    content.appendChild(card);
+    aktualisiereFarmWerte();
+
+}
+function entfernenCard(cardId) {
+    let card = document.getElementById(cardId);
+    if (card) {
+        card.remove();
+    } else {
+        console.warn(`Card mit ID ${cardId} existiert nicht.`);
+    }
+    aktualisiereFarmWerte();
+
+}
+function get_highest_card(content) {
+    let highestId = 0;
+    let cards = content.querySelectorAll('.card');
+
+    cards.forEach(card => {
+        let cardId = parseInt(card.id, 10);
+        if (!isNaN(cardId) && cardId > highestId) {
+            highestId = cardId;
+        }
+    });
+
+    return String(highestId + 1).padStart(5, '0'); // Rückgabe als fünfstellige Zahl
+}
+function speichernCards() {
+    let cards = document.querySelectorAll('.card');
+    let cardData = [];
+
+    cards.forEach(card => {
+        let cardId = card.id;
+        let power = document.getElementById(`${cardId}-power`).value;
+        let efficiency = document.getElementById(`${cardId}-efficiency`).value;
+
+        cardData.push({ id: cardId, power, efficiency });
+    });
+
+    localStorage.setItem('cards', JSON.stringify(cardData));
+}
+
+function ladenCards() {
+    let content = document.querySelector('.content');
+    content.innerHTML = '';
+    let savedCards = localStorage.getItem('cards');
+    if (savedCards) {
+        JSON.parse(savedCards).forEach(card => {
+            hinzufuegenCard(card.id, card.power, card.efficiency);
+        });
+    }
+}
+
+// Seite initialisieren
+window.onload = function() {
+    ladenCards();
+    aktualisiereFarmWerte();
+
+};
+
+let ansicht = 'grid';
+
+function wechselAnsicht() {
+    let content = document.querySelector('.content');
+    if (ansicht === 'grid') {
+        content.style.display = 'block';  // Details-Ansicht
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.width = '90%';
+            card.style.display = 'flex';
+            card.style.justifyContent = 'space-between';
+            card.querySelector('.card-label').style.display = 'none';
+        });
+        ansicht = 'list';
+    } else {
+        content.style.display = 'flex';  // Zurück zu großen Symbolen
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.width = '150px';
+            card.style.display = 'block';
+            card.querySelector('.card-label').style.display = 'block';
+        });
+        ansicht = 'grid';
+    }
+}
+function aktualisiereWert(cardId, feld) {
+    let inputElement = document.getElementById(`${cardId}-${feld}`);
+    if (inputElement) {
+        let gespeicherteCards = JSON.parse(localStorage.getItem('cards')) || [];
+        
+        // Finde die richtige Karte und aktualisiere den Wert
+        gespeicherteCards.forEach(card => {
+            if (card.id === cardId) {
+                card[feld] = inputElement.value;
+            }
+        });
+
+        // Aktualisierte Werte speichern
+        localStorage.setItem('cards', JSON.stringify(gespeicherteCards));
+
+
+    }
+}
+function entfernenFarm() {
+    let content = document.querySelector('.content');
+    content.innerHTML = '';
+    aktualisiereFarmWerte();
+
+}
+function aktualisiereFarmWerte() {
+    let content = document.querySelector('.content');
+    let cards = content.querySelectorAll('.card');
+    
+    let totalPower = 0;
+    let totalEfficiency = 0;
+    let count = 0;
+
+    cards.forEach(card => {
+        let powerElement = document.getElementById(`${card.id}-power`);
+        let efficiencyElement = document.getElementById(`${card.id}-efficiency`);
+
+
+        if (powerElement && efficiencyElement) {
+            let powerValue = parseFloat(powerElement.value) || 0;
+            let efficiencyValue = parseFloat(efficiencyElement.value) || 0;
+
+            totalPower += powerValue;
+            totalEfficiency += ( powerValue * efficiencyValue );
+            count++;
+        }
+    });
+
+        let avgEfficiency = count > 0 ? (totalEfficiency / totalPower).toFixed(2) : 0;
+
+        document.getElementById('farm-power').value = totalPower.toFixed(2);
+        document.getElementById('farm-efficiency').value = avgEfficiency;
+    }
+
+    function kopiereWerte(cardId) {
+        let powerValue = document.getElementById(`${cardId}-power`).value;
+        let efficiencyValue = document.getElementById(`${cardId}-efficiency`).value;
+        hinzufuegenCard(get_highest_card(document.querySelector('.content')), powerValue, efficiencyValue)
+   
+
+    }
+
+
+
+
+  </script>
+</html>
