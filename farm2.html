@@ -124,6 +124,23 @@
         .copy-btn:hover {
             color: #673dec;
         }
+        .add-card {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: #e6e6e6;
+            cursor: pointer;
+            background-color: #444; /* Etwas heller als die normalen Cards */
+            border: 2px dashed #673dec; /* Umrandung als Hinweis */
+        }
+        
+        .add-card:hover {
+            border-color: #9333ea;
+            color: #9333ea;
+        }
+
 
     </style>
 </head>
@@ -149,7 +166,9 @@
 
 
         <div class="content">
-
+            <div class="card add-card" onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '30', '35')">
+                <span class="add-icon">+</span>
+            </div>
         </div>
     </div>
 </body>
