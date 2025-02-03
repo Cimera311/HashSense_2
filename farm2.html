@@ -145,12 +145,13 @@
     </style>
 </head>
 <body>
-    <div id="header-container"></div>
+
     <div class="main-container">
-        <div class="header">Header Section<button onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '30', '35');">Card hinzufügen</button>
-            <button onclick="wechselAnsicht()">Ansicht wechseln</button>
-            <button onclick="speichernCards()">Speichern</button>
-            <button onclick="ladenCards()">Laden</button>
+        <div id="header-container"></div>
+        <div class="header"><button onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '30', '35');">add miner</button>
+            <button onclick="wechselAnsicht()">change view</button>
+            <button onclick="speichernCards()">Save</button>
+            <button onclick="ladenCards()">Load</button>
 </div>
 <div class="farm-card" id="farm">
     <button class="delete-btn" onclick="entfernenFarm()">&times</button>
