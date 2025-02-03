@@ -6,7 +6,7 @@
     <script type="module" src="config.js"></script>
     <script src="skript.js"></script>
     <link rel="stylesheet" href="styles.css">
-    
+    <script src="header.js" defer></script>
     <title>HashSense Farm</title>
     <style>
         body {
@@ -145,6 +145,7 @@
     </style>
 </head>
 <body>
+    <div id="header-container"></div>
     <div class="main-container">
         <div class="header">Header Section<button onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '30', '35');">Card hinzufügen</button>
             <button onclick="wechselAnsicht()">Ansicht wechseln</button>
