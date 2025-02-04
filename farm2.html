@@ -353,27 +353,7 @@ window.onload = function() {
 
 let ansicht = 'grid';
 
-function wechselAnsicht() {
-    let content = document.querySelector('.content');
-    if (ansicht === 'grid') {
-        content.style.display = 'block';  // Details-Ansicht
-        document.querySelectorAll('.card').forEach(card => {
-            card.style.width = '90%';
-            card.style.display = 'flex';
-            card.style.justifyContent = 'space-between';
-            card.querySelector('.card-label').style.display = 'none';
-        });
-        ansicht = 'list';
-    } else {
-        content.style.display = 'flex';  // Zurück zu großen Symbolen
-        document.querySelectorAll('.card').forEach(card => {
-            card.style.width = '150px';
-            card.style.display = 'block';
-            card.querySelector('.card-label').style.display = 'block';
-        });
-        ansicht = 'grid';
-    }
-}
+
 function aktualisiereWert(cardId, feld) {
     let inputElement = document.getElementById(`${cardId}-${feld}`);
     if (inputElement) {
