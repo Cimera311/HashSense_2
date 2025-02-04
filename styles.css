@@ -561,3 +561,45 @@ header {
   background-color: #e6e6e6;
   color: #673dec;
 }
+#miner-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #2a2a2a;
+    color: #e6e6e6;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+#miner-table thead {
+    background-color: #673dec;
+    color: white;
+    font-weight: bold;
+}
+
+#miner-table th, #miner-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #444;
+}
+
+#miner-table tbody tr:nth-child(even) {
+    background-color: #333;
+}
+
+#miner-table tbody tr {
+    transition: transform 0.2s ease-in-out;
+}
+
+#miner-table tbody tr:hover {
+    transform: scale(1.02);
+    background-color: #9333ea;
+}
+
+#miner-table th:first-child {
+    border-top-left-radius: 12px;
+}
+
+#miner-table th:last-child {
+    border-top-right-radius: 12px;
+}
