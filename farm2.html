@@ -434,6 +434,72 @@ function aktualisiereFarmWerte() {
    
 
     }
+function wechselAnsicht() {
+    let content = document.getElementById('content');
+
+    if (ansicht === 'grid') {
+        // Speichern bevor gelöscht wird
+        speichernCards();
+
+        // Entferne alle Miner-Cards
+        let cards = document.getElementsByClassName('card');
+        for (let i = cards.length - 1; i >= 0; i--) {
+            cards[i].remove();
+        }
+
+        // Erstelle die Tabelle
+        let table = document.createElement('table');
+        table.id = 'miner-table';
+
+        let thead = document.createElement('thead');
+        thead.innerHTML = `
+            <tr>
+                <th>ID</th>
+                <th>Power (TH)</th>
+                <th>Efficiency (W/TH)</th>
+            </tr>
+        `;
+        table.appendChild(thead);
+
+        let tbody = document.createElement('tbody');
+        tbody.id = 'miner-tbody';
+        table.appendChild(tbody);
+
+        content.appendChild(table);
+
+        // Miner-Daten in Tabelle laden
+        ladenMinerInTabelle();
+
+        ansicht = 'list';
+
+    } else {
+        // Tabelle entfernen
+        let table = document.getElementById('miner-table');
+        if (table) table.remove();
+
+        // Miner wieder als Cards laden
+        ladenCards();
+
+        ansicht = 'grid';
+    }
+}
+function ladenMinerInTabelle() {
+    let savedCards = localStorage.getItem('cards');
+    if (!savedCards) return;
+
+    let minerData = JSON.parse(savedCards);
+    let tbody = document.getElementById('miner-tbody');
+
+    minerData.forEach(miner => {
+        let row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${miner.id}</td>
+            <td>${miner.power} TH</td>
+            <td>${miner.efficiency} W/TH</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
 
 
 
