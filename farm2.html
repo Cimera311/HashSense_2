@@ -197,10 +197,10 @@
         <button class="tab-arrow" onclick="switchTab(1)">&#9654;</button>
     </div>
 </div>
-        <div class="header"><button onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '30', '35');">add miner</button>
+        <div class="header"><button onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '1', '20');">add miner</button>
             <button onclick="wechselAnsicht()">change view</button>
-            <button onclick="speichernCards()">Save</button>
-            <button onclick="ladenCards()">Load</button>
+            <button onclick="speichernDaten()">Save</button>
+            <button onclick="ladenDaten()">Load</button>
         </div>
 <div class="farm-card" id="farm">
     <button class="delete-btn" onclick="entfernenFarm()">&times</button>
@@ -216,10 +216,9 @@
 </div>
 
 
-        <div class="content">
-            <div class="card add-card" onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '30', '35')">
-                <span class="add-icon">+</span>
-            </div>
+        <div class="content" id="content"></div>
+
+
         </div>
     </div>
 </body>
@@ -318,35 +317,118 @@ function get_highest_card(content) {
 
     return String(highestId + 1).padStart(5, '0'); // Rückgabe als fünfstellige Zahl
 }
-function speichernCards() {
-    let cards = document.querySelectorAll('.card');
-    let cardData = [];
+function speichernDaten() {
+    let minerData = [];
 
-    cards.forEach(card => {
-        let cardId = card.id;
-        let power = document.getElementById(`${cardId}-power`).value;
-        let efficiency = document.getElementById(`${cardId}-efficiency`).value;
+    if (ansicht === 'grid') {
+        // **1️⃣ Alle Cards auslesen und speichern**
+        let cards = document.getElementsByClassName('card');
+        for (let i = 0; i < cards.length; i++) {
+            let cardId = cards[i].id;
+            let powerElement = document.getElementById(`${cardId}-power`);
+            let efficiencyElement = document.getElementById(`${cardId}-efficiency`);
 
-        cardData.push({ id: cardId, power, efficiency });
-    });
+            if (powerElement && efficiencyElement) {
+                minerData.push({
+                    id: cardId,
+                    power: powerElement.value,
+                    efficiency: efficiencyElement.value
+                });
+            }
+        }
+    } else if (ansicht === 'list') {
+        // **2️⃣ Falls die Tabelle aktiv ist, Daten aus Tabelle speichern**
+        let rows = document.getElementById('miner-tbody').getElementsByTagName('tr');
+        for (let i = 0; i < rows.length; i++) {
+            let cells = rows[i].getElementsByTagName('td');
+            minerData.push({
+                id: cells[0].innerText,
+                power: cells[1].innerText.replace(' TH', ''), // "TH" entfernen
+                efficiency: cells[2].innerText.replace(' W/TH', '') // "W/TH" entfernen
+            });
+        }
+    }
 
-    localStorage.setItem('cards', JSON.stringify(cardData));
+    // **3️⃣ Miner-Daten in LocalStorage unter "minerData" speichern**
+    localStorage.setItem('minerData', JSON.stringify(minerData));
 }
 
-function ladenCards() {
-    let content = document.querySelector('.content');
-    content.innerHTML = '';
-    let savedCards = localStorage.getItem('cards');
-    if (savedCards) {
-        JSON.parse(savedCards).forEach(card => {
-            hinzufuegenCard(card.id, card.power, card.efficiency);
+
+
+function ladenDaten() {
+    let savedData = localStorage.getItem('minerData');
+    if (!savedData) return; // Falls keine Daten existieren, nichts tun
+
+    let minerData = JSON.parse(savedData);
+
+    if (ansicht === 'grid') {
+        // 2️⃣ Falls die Tabelle existiert, entferne sie
+        entfernenFarm()
+
+        // **1️⃣ Cards löschen**
+        let content = document.getElementById('content');
+        let cards = document.getElementsByClassName('card');
+        for (let i = cards.length - 1; i >= 0; i--) {
+            cards[i].remove();
+        }
+
+        // **2️⃣ Miner als Cards hinzufügen**
+        minerData.forEach(miner => {
+            hinzufuegenCard(miner.id, miner.power, miner.efficiency);
+        });
+
+    } else if (ansicht === 'list') {
+        // 1️⃣ Entferne alle vorhandenen Cards
+        entfernenFarm()
+        // **3️⃣ Falls die Tabelle existiert, erst löschen**
+        let table = document.getElementById('miner-table');
+        if (table) table.remove();
+
+        // **4️⃣ Neue Tabelle erstellen**
+        let content = document.getElementById('content');
+        let tableElement = document.createElement('table');
+        tableElement.id = 'miner-table';
+
+        let thead = document.createElement('thead');
+        thead.innerHTML = `
+            <tr>
+                <th>ID</th>
+                <th>Power (TH)</th>
+                <th>Efficiency (W/TH)</th>
+                <th>ROI +1 TH Upgrade (%)</th>
+               <th>ROI -1 W/TH Upgrade (%)</th>
+
+            </tr>
+        `;
+        tableElement.appendChild(thead);
+
+        let tbody = document.createElement('tbody');
+        tbody.id = 'miner-tbody';
+        tableElement.appendChild(tbody);
+
+        content.appendChild(tableElement);
+
+        // **5️⃣ Miner in die Tabelle einfügen**
+        let tbodyElement = document.getElementById('miner-tbody');
+        minerData.forEach(miner => {
+            let row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${miner.id}</td>
+                <td>${miner.power} TH</td>
+                <td>${miner.efficiency} W/TH</td>
+                <td>- %</td>
+                <td>- %</td>
+            `;
+            tbodyElement.appendChild(row);
         });
     }
 }
 
+
+
 // Seite initialisieren
 window.onload = function() {
-    ladenCards();
+    ladenDaten();
     aktualisiereFarmWerte();
 
 };
@@ -414,55 +496,13 @@ function aktualisiereFarmWerte() {
    
 
     }
-function wechselAnsicht() {
-    let content = document.getElementById('content');
-
-    if (ansicht === 'grid') {
-        // Speichern bevor gelöscht wird
-        speichernCards();
-
-        // Entferne alle Miner-Cards
-        let cards = document.getElementsByClassName('card');
-        for (let i = cards.length - 1; i >= 0; i--) {
-            cards[i].remove();
-        }
-
-        // Erstelle die Tabelle
-        let table = document.createElement('table');
-        table.id = 'miner-table';
-
-        let thead = document.createElement('thead');
-        thead.innerHTML = `
-            <tr>
-                <th>ID</th>
-                <th>Power (TH)</th>
-                <th>Efficiency (W/TH)</th>
-            </tr>
-        `;
-        table.appendChild(thead);
-
-        let tbody = document.createElement('tbody');
-        tbody.id = 'miner-tbody';
-        table.appendChild(tbody);
-
-        content.appendChild(table);
-
-        // Miner-Daten in Tabelle laden
-        ladenMinerInTabelle();
-
-        ansicht = 'list';
-
-    } else {
-        // Tabelle entfernen
-        let table = document.getElementById('miner-table');
-        if (table) table.remove();
-
-        // Miner wieder als Cards laden
-        ladenCards();
-
-        ansicht = 'grid';
+    function wechselAnsicht() {
+        speichernDaten(); // Speichere aktuelle Miner-Daten
+        ansicht = ansicht === 'grid' ? 'list' : 'grid'; // Wechsel der Ansicht
+        ladenDaten(); // Lade die Daten passend zur neuen Ansicht
     }
-}
+
+
 function ladenMinerInTabelle() {
     let savedCards = localStorage.getItem('cards');
     if (!savedCards) return;
