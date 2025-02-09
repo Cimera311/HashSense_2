@@ -502,12 +502,13 @@ function aktualisiereFarmWerte() {
 function ladenMinerInTabelle() {
     let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
     let tbody = document.getElementById('miner-tbody');
-
+    let revenue = calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice, efficiency);
     tbody.innerHTML = ''; // Leere Tabelle vor dem Neuladen
 
     minerData.forEach(miner => {
-        let roiTH = calculateROI_THUpgrade(miner.currentTH, 1, getPricePerTH(miner.efficiency, miner.currentTH), 0.3);
-        let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.currentTH);
+
+        let roiTH = calculateROI_THUpgrade(miner.currentTH, 1, getPricePerTH(miner.efficiency, miner.currentTH), revenue.usd.toFixed(2));
+        //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.currentTH);
 
         let row = document.createElement('tr');
         row.innerHTML = `
@@ -515,7 +516,7 @@ function ladenMinerInTabelle() {
             <td>${miner.currentTH} TH</td>
             <td>${miner.efficiency} W/TH</td>
             <td>${roiTH}%</td>
-            <td>${roiEff}%</td>
+            <td>-%</td>
         `;
         tbody.appendChild(row);
     });
