@@ -149,59 +149,54 @@
 
     <div class="main-container">
         <div class="main-container">
-    <header class="header">
-        <div class="header-item">
-            <img src="https://github.com/Cimera311/Gomining_Calculator/raw/main/Bitcoin.svg.png" alt="BTC">
-            <select id="bitcoin-price-dropdown" onchange="updateBTCPrice();">
-                <option value="10000">10,000 $</option>
-                <option value="20000">20,000 $</option>
-                <option value="30000">30,000 $</option>    
-                <option value="40000">40,000 $</option>
-                <option value="50000">50,000 $</option>
-                <option value="60000">60,000 $</option>   
-                <option value="70000">70,000 $</option>
-                <option value="80000">80,000 $</option>
-                <option value="90000">90,000 $</option>
-                <option id="currentp" value="0">current price</option>
-                <option value="100000">100,000 $</option>
-                <option value="110000">110,000 $</option>
-                <option value="120000">120,000 $</option>
-                <option value="130000">130,000 $</option>
-                <option value="140000">140,000 $</option>
-                <option value="150000">150,000 $</option>
-                <option value="160000">160,000 $</option>
-                <option value="200000">200,000 $</option>
-                <option value="250000">250,000 $</option>
-                <option value="300000">300,000 $</option>
-                <option value="400000">400,000 $</option>   
-            </select>
+            <header class="header">
+                <div class="header-item">
+                    <img src="https://github.com/Cimera311/Gomining_Calculator/raw/main/Bitcoin.svg.png" alt="BTC">
+                    <select id="bitcoin-price-dropdown" onchange="updateBTCPrice();">
+                        <option value="10000">10,000 $</option>
+                        <option value="20000">20,000 $</option>
+                        <option value="30000">30,000 $</option>    
+                        <option value="40000">40,000 $</option>
+                        <option value="50000">50,000 $</option>
+                        <option value="60000">60,000 $</option>   
+                        <option value="70000">70,000 $</option>
+                        <option value="80000">80,000 $</option>
+                        <option value="90000">90,000 $</option>
+                        <option id="currentp" value="0">current price</option>
+                        <option value="100000">100,000 $</option>
+                        <option value="110000">110,000 $</option>
+                        <option value="120000">120,000 $</option>
+                        <option value="130000">130,000 $</option>
+                        <option value="140000">140,000 $</option>
+                        <option value="150000">150,000 $</option>
+                        <option value="160000">160,000 $</option>
+                        <option value="200000">200,000 $</option>
+                        <option value="250000">250,000 $</option>
+                        <option value="300000">300,000 $</option>
+                        <option value="400000">400,000 $</option>   
+                    </select>
+                </div>
+                <div class="header-item">
+                    <img src="https://github.com/Cimera311/Gomining_Calculator/raw/main/GoMining_Logo.webp" alt="GMT">
+                    <input value="0.400" id="gmt-token-price" placeholder="0,400">
+                </div>
+                <div class="header-item">
+                    <label title="how much Satoshi Gomining pays for 1 TH" for="sat-TH">sat per TH:</label>
+                    <input value="58" id="sat-TH">
+                </div>
+                <div class="header-item">
+                    <button class="circular-button" onclick="fetchBTCPrice();fetchGMTPrice();">&#x21BB;</button>
+                </div>
+            </header>
         </div>
-        <div class="header-item">
-            <img src="https://github.com/Cimera311/Gomining_Calculator/raw/main/GoMining_Logo.webp" alt="GMT">
-            <input value="0.400" id="gmt-token-price" placeholder="0,400">
+        <div class="main-container">
+            <div class="header"><button onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '1', '20');">add miner</button>
+                <button onclick="wechselAnsicht()">change view</button>
+                <button onclick="speichernDaten()">Save</button>
+                <button onclick="ladenDaten()">Load</button>
+            </div>
         </div>
-        <div class="header-item">
-            <label title="how much Satoshi Gomining pays for 1 TH" for="sat-TH">sat per TH:</label>
-            <input value="58" id="sat-TH">
-        </div>
-        <div class="header-item">
-            <button class="circular-button" onclick="fetchBTCPrice();fetchGMTPrice();">&#x21BB;</button>
-        </div>
-    </header>
-    <div class="tab-navigation">
-        <button class="tab-arrow" onclick="switchTab(-1)">&#9664;</button>
-        <div class="tab-info">
-            <span id="tab-name">Calc</span>
-            <span id="tab-description">Hier kannst du deine Miner-Einstellungen konfigurieren und deine Einnahmen berechnen.</span>
-        </div>
-        <button class="tab-arrow" onclick="switchTab(1)">&#9654;</button>
-    </div>
-</div>
-        <div class="header"><button onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '1', '20');">add miner</button>
-            <button onclick="wechselAnsicht()">change view</button>
-            <button onclick="speichernDaten()">Save</button>
-            <button onclick="ladenDaten()">Load</button>
-        </div>
+<div class="main-container">
 <div class="farm-card" id="farm">
     <button class="delete-btn" onclick="entfernenFarm()">&times</button>
     <span class="card-label">Farm</span>
@@ -220,6 +215,7 @@
 
 
         </div>
+    </div>
     </div>
 </body>
   <script>
@@ -504,22 +500,59 @@ function aktualisiereFarmWerte() {
 
 
 function ladenMinerInTabelle() {
-    let savedCards = localStorage.getItem('cards');
-    if (!savedCards) return;
-
-    let minerData = JSON.parse(savedCards);
+    let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
     let tbody = document.getElementById('miner-tbody');
 
+    tbody.innerHTML = ''; // Leere Tabelle vor dem Neuladen
+
     minerData.forEach(miner => {
+        let roiTH = calculateROI_THUpgrade(miner.currentTH, 1, getPricePerTH(miner.efficiency, miner.currentTH), 0.3);
+        let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.currentTH);
+
         let row = document.createElement('tr');
         row.innerHTML = `
             <td>${miner.id}</td>
-            <td>${miner.power} TH</td>
+            <td>${miner.currentTH} TH</td>
             <td>${miner.efficiency} W/TH</td>
+            <td>${roiTH}%</td>
+            <td>${roiEff}%</td>
         `;
         tbody.appendChild(row);
     });
 }
+function calculateROI_THUpgrade(currentTH, additionalTH, pricePerTH, dailyRevenuePerTH) {
+    let upgradeCost = additionalTH * pricePerTH; // Gesamtkosten für das Upgrade
+    let additionalDailyRevenue = additionalTH * dailyRevenuePerTH; // Zusätzlicher täglicher Ertrag
+
+    let roiDays = upgradeCost / additionalDailyRevenue; // ROI in Tagen
+    let roiPercent = (365 / roiDays) * 100; // ROI in %
+
+    return roiPercent.toFixed(2); // Rückgabe als Prozentwert
+}
+function getEfficiencyUpgradePrice(currentEfficiency) {
+    if (efficiencyMatrix[currentEfficiency]) {
+        return efficiencyMatrix[currentEfficiency].pricePerW;
+    }
+    return null; // Falls keine Daten vorhanden sind
+}
+function getPricePerTH(efficiency, thAmount) {
+    if (!priceMatrixlocal[efficiency]) {
+        console.error(`Keine Preisdaten für ${efficiency} W/TH gefunden.`);
+        return null;
+    }
+
+    let priceEntries = priceMatrixlocal[efficiency];
+
+    // Finde den passenden Preis für die gegebene TH-Menge
+    for (let i = priceEntries.length - 1; i >= 0; i--) {
+        if (thAmount >= priceEntries[i].minTH) {
+            return priceEntries[i].pricePerTH;
+        }
+    }
+
+    return null; // Falls keine passende Preisstufe gefunden wurde
+}
+
 
 
 
