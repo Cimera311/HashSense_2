@@ -456,43 +456,43 @@
                 return priceMatrix[efficiency];
             }
 
-	const efficiencyMatrix = {
-	    16: { to: 15, pricePerTH: 1.32 },
-	    17: { to: 16, pricePerTH: 1.32 },
-	    18: { to: 17, pricePerTH: 1.32 },
-	    19: { to: 18, pricePerTH: 1.32 },
-	    20: { to: 19, pricePerTH: 1.32 },
-	    21: { to: 20, pricePerTH: 1.02 },
-	    22: { to: 21, pricePerTH: 1.02 },
-	    23: { to: 22, pricePerTH: 1.02 },
-	    24: { to: 23, pricePerTH: 1.02 },
-	    25: { to: 24, pricePerTH: 1.02 },
-	    26: { to: 25, pricePerTH: 1.02 },
-	    27: { to: 26, pricePerTH: 1.02 },
-	    28: { to: 27, pricePerTH: 1.02 },
-	    29: { to: 28, pricePerTH: 0.99 },
-	    30: { to: 29, pricePerTH: 0.99 },
-	    31: { to: 30, pricePerTH: 0.99 },
-	    32: { to: 31, pricePerTH: 0.99 },
-	    33: { to: 32, pricePerTH: 0.99 },
-	    34: { to: 33, pricePerTH: 0.99 },
-	    35: { to: 34, pricePerTH: 0.99 },
-	    36: { to: 35, pricePerTH: 0.27 },
-	    37: { to: 36, pricePerTH: 0.27 },
-	    38: { to: 37, pricePerTH: 0.27 },
-	    39: { to: 38, pricePerTH: 0.27 },
-	    40: { to: 39, pricePerTH: 0.27 },
-	    41: { to: 40, pricePerTH: 0.27 },
-	    42: { to: 41, pricePerTH: 0.27 },
-	    43: { to: 42, pricePerTH: 0.27 },
-	    44: { to: 43, pricePerTH: 0.27 },
-	    45: { to: 44, pricePerTH: 0.27 },
-	    46: { to: 45, pricePerTH: 0.27 },
-	    47: { to: 46, pricePerTH: 0.27 },
-	    48: { to: 47, pricePerTH: 0.27 },
-	    49: { to: 48, pricePerTH: 0.27 },
-	    50: { to: 49, pricePerTH: 0.27 }
-	};
+            const efficiencyMatrix = {
+                16: { to: 15, pricePerW: 1.32 },
+                17: { to: 16, pricePerW: 1.32 },
+                18: { to: 17, pricePerW: 1.32 },
+                19: { to: 18, pricePerW: 1.32 },
+                20: { to: 19, pricePerW: 1.32 },
+                21: { to: 20, pricePerW: 1.02 },
+                22: { to: 21, pricePerW: 1.02 },
+                23: { to: 22, pricePerW: 1.02 },
+                24: { to: 23, pricePerW: 1.02 },
+                25: { to: 24, pricePerW: 1.02 },
+                26: { to: 25, pricePerW: 1.02 },
+                27: { to: 26, pricePerW: 1.02 },
+                28: { to: 27, pricePerW: 1.02 },
+                29: { to: 28, pricePerW: 0.99 },
+                30: { to: 29, pricePerW: 0.99 },
+                31: { to: 30, pricePerW: 0.99 },
+                32: { to: 31, pricePerW: 0.99 },
+                33: { to: 32, pricePerW: 0.99 },
+                34: { to: 33, pricePerW: 0.99 },
+                35: { to: 34, pricePerW: 0.99 },
+                36: { to: 35, pricePerW: 0.27 },
+                37: { to: 36, pricePerW: 0.27 },
+                38: { to: 37, pricePerW: 0.27 },
+                39: { to: 38, pricePerW: 0.27 },
+                40: { to: 39, pricePerW: 0.27 },
+                41: { to: 40, pricePerW: 0.27 },
+                42: { to: 41, pricePerW: 0.27 },
+                43: { to: 42, pricePerW: 0.27 },
+                44: { to: 43, pricePerW: 0.27 },
+                45: { to: 44, pricePerW: 0.27 },
+                46: { to: 45, pricePerW: 0.27 },
+                47: { to: 46, pricePerW: 0.27 },
+                48: { to: 47, pricePerW: 0.27 },
+                49: { to: 48, pricePerW: 0.27 },
+                50: { to: 49, pricePerW: 0.27 }
+            };
 
 
 
@@ -565,7 +565,17 @@
 
                 };
 
-
+                function berechneUpgradeKosten(startEff, zielEff, hashRate) {
+                    let totalCost = 0;
+                
+                    while (startEff > zielEff && efficiencyMatrix[startEff]) {
+                        totalCost += efficiencyMatrix[startEff].pricePerTH * hashRate;
+                        startEff = efficiencyMatrix[startEff].to; // Zum nächsten Effizienz-Level wechseln
+                    }
+                
+                    return totalCost.toFixed(2);
+                }
+                
                 function calculateInvest(investment, efficiency) {
                     if (isNaN(investment) || investment <= 0) {
                         alert("Please enter a valid investment amount.");
