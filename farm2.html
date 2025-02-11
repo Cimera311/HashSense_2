@@ -350,8 +350,8 @@ function speichernDaten() {
             if (powerElement && efficiencyElement) {
                 minerData.push({
                     id: cardId,
-                    power: powerElement.value,
-                    efficiency: efficiencyElement.value
+                    power: parseFloat(powerElement.value) || 0, // Jetzt wird es als Zahl gespeichert
+                    efficiency: parseFloat(efficiencyElement.value) || 0
                 });
             }
         }
@@ -617,7 +617,7 @@ function ladenMinerInTabelle() {
     tbody.innerHTML = ''; // Leere Tabelle vor dem Neuladen
 
     minerData.forEach(miner => {
-        let myTH = parseFloat(miner.power) || 0; // Miner-TH aus `minerData`
+        let myTH = parseFloat(miner.power) ? parseFloat(miner.power) : 0; // Miner-TH aus `minerData`
         let efficiency = parseFloat(miner.efficiency) || 0; // Effizienz aus `minerData`
         let revenue = calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice, efficiency);
         let roiTH = calculateROI_THUpgrade(miner.currentTH, 1, getPricePerTH(miner.efficiency, miner.currentTH), revenue.usd.toFixed(2));
@@ -626,7 +626,7 @@ function ladenMinerInTabelle() {
         let row = document.createElement('tr');
         row.innerHTML = `
             <td>${miner.id}</td>
-            <td>${miner.currentTH} TH</td>
+            <td>${miner.power} TH</td>
             <td>${miner.efficiency} W/TH</td>
             <td>${roiTH}%</td>
             <td>-%</td>
