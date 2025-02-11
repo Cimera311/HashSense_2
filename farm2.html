@@ -579,7 +579,7 @@ function wechselAnsicht(mode) {
     ladenDaten(); // Lädt die Daten für die neue Ansicht
 }
 
-function ladenMinerInTabelle() {
+function ladenMinerInTabellealt() {
     let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
     let tbody = document.getElementById('miner-tbody');
     let revenue = calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice, efficiency);
@@ -603,7 +603,7 @@ function ladenMinerInTabelle() {
 }
 
 
-function ladenMinerInTabellealt() {
+function ladenMinerInTabelle() {
     let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
     let tbody = document.getElementById('miner-tbody');
     
