@@ -588,13 +588,13 @@ function ladenMinerInTabellealt() {
 
     minerData.forEach(miner => {
 
-        let roiTH = calculateROI_THUpgrade(miner.currentTH, 1, getPricePerTH(miner.efficiency, miner.currentTH), revenue.usd.toFixed(2));
-        //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.currentTH);
+        let roiTH = calculateROI_THUpgrade(miner.power, 1, getPricePerTH(miner.efficiency, miner.power), revenue.usd.toFixed(2));
+        //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.power);
 
         let row = document.createElement('tr');
         row.innerHTML = `
             <td>${miner.id}</td>
-            <td>${miner.currentTH} TH</td>
+            <td>${miner.power} TH</td>
             <td>${miner.efficiency} W/TH</td>
             <td>${roiTH}%</td>
             <td>-%</td>
@@ -620,8 +620,8 @@ function ladenMinerInTabelle() {
         let myTH = parseFloat(miner.power) ? parseFloat(miner.power) : 0; // Miner-TH aus `minerData`
         let efficiency = parseFloat(miner.efficiency) || 0; // Effizienz aus `minerData`
         let revenue = calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice, efficiency);
-        let roiTH = calculateROI_THUpgrade(miner.currentTH, 1, getPricePerTH(miner.efficiency, miner.currentTH), revenue.usd.toFixed(2));
-        //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.currentTH);
+        let roiTH = calculateROI_THUpgrade(miner.power, 1, getPricePerTH(miner.efficiency, miner.power), revenue.usd.toFixed(2));
+        //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.power);
 
         let row = document.createElement('tr');
         row.innerHTML = `
@@ -634,7 +634,7 @@ function ladenMinerInTabelle() {
         tbody.appendChild(row);
     });
 }
-function calculateROI_THUpgrade(currentTH, additionalTH, pricePerTH, dailyRevenuePerTH) {
+function calculateROI_THUpgrade(power, additionalTH, pricePerTH, dailyRevenuePerTH) {
     let upgradeCost = additionalTH * pricePerTH; // Gesamtkosten für das Upgrade
     let additionalDailyRevenue = additionalTH * dailyRevenuePerTH; // Zusätzlicher täglicher Ertrag
 
