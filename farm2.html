@@ -568,6 +568,7 @@ function aktualisiereFarmWerte() {
 
     }
 function wechselAnsicht(mode) {
+    speichernDaten(); // Speichert die aktuellen Miner-Daten
     let viewElement = document.getElementById('viewMode');
     viewElement.innerText = mode; // Speichert den aktuellen Modus in HTML
 
@@ -576,8 +577,6 @@ function wechselAnsicht(mode) {
 
     // Setze den aktiven Button basierend auf der gewählten Ansicht
     document.getElementById(`${mode}-btn`).classList.add('active');
-
-    speichernDaten(); // Speichert die aktuellen Miner-Daten
     ladenDaten(); // Lädt die Daten für die neue Ansicht
 }
 
