@@ -616,7 +616,7 @@ function ladenMinerInTabelle() {
     tbody.innerHTML = ''; // Leere Tabelle vor dem Neuladen
 
     minerData.forEach(miner => {
-        let myTH = parseFloat(miner.currentTH) || 0; // Miner-TH aus `minerData`
+        let myTH = parseFloat(miner.power) || 0; // Miner-TH aus `minerData`
         let efficiency = parseFloat(miner.efficiency) || 0; // Effizienz aus `minerData`
         let revenue = calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice, efficiency);
         let roiTH = calculateROI_THUpgrade(miner.currentTH, 1, getPricePerTH(miner.efficiency, miner.currentTH), revenue.usd.toFixed(2));
