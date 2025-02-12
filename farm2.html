@@ -156,6 +156,29 @@
             border-color: #673dec;
             transform: scale(1.1);
         }
+        #currencySwitcher {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .currency-btn {
+            background-color: #444;
+            border: 2px solid #555;
+            padding: 8px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            color: #e6e6e6;
+        }
+
+        .currency-btn.active {
+            background-color: #9333ea;
+            border-color: #673dec;
+            transform: scale(1.1);
+        }
 
 
     </style>
@@ -213,6 +236,14 @@
                     <button class="view-btn" id="grid-btn" onclick="wechselAnsicht('grid')">🔲 Grid</button>
                     <button class="view-btn" id="list-btn" onclick="wechselAnsicht('list')">📋 Liste</button>
                 </div>
+                <div id="currencySwitcher">
+                    <button class="currency-btn" id="btc-btn" onclick="wechselWaehrung('btc')">₿ BTC</button>
+                    <button class="currency-btn" id="usd-btn" onclick="wechselWaehrung('usd')">$ USD</button>
+                    <button class="currency-btn" id="gmt-btn" onclick="wechselWaehrung('gmt')">🪙 GMT</button>
+                </div>
+                
+                <!-- Unsichtbares Element zur Speicherung der aktiven Währung -->
+                <span id="currencyMode" style="display: none;">usd</span>
                 <span id="viewMode" style="display: none;">grid</span>
 
            
@@ -406,10 +437,14 @@ function ladenDaten() {
         thead.innerHTML = `
             <tr>
                 <th>ID</th>
-                <th>Power (TH)</th>
-                <th>Efficiency (W/TH)</th>
-                <th>ROI +1 TH Upgrade (%)</th>
-               <th>ROI -1 W/TH Upgrade (%)</th>
+                <th>TH</th>
+                <th>W/TH</th>
+                <th>revenue</th>
+                <th>electricity</th>
+                <th>service</th>
+                <th>profit</th>
+                <th>ROI +1 TH(%)</th>
+               <th>ROI -1 W/TH(%)</th>
 
             </tr>
         `;
@@ -608,6 +643,10 @@ function ladenMinerInTabelle() {
     let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
     let tbody = document.getElementById('miner-tbody');
     
+    // Aktuelle Währung auslesen
+    let currencyElement = document.getElementById('currencyMode');
+    let waehrung = currencyElement.innerText; // btc, usd oder gmt
+    
     // **1️⃣ Fehlende Variablen aus UI abrufen**
     let satoshiPerTH = parseFloat(document.getElementById('sat-TH').value) || 0; // Satoshi pro TH
     let btcPrice = parseFloat(document.getElementById('bitcoin-price-dropdown').value) || 0; // BTC-Preis
@@ -622,12 +661,23 @@ function ladenMinerInTabelle() {
         let revenue = calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice, efficiency);
         let roiTH = calculateROI_THUpgrade(miner.power, 1, getPricePerTH(miner.efficiency, miner.power), revenue.usd.toFixed(2));
         //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.power);
-
+        let revenueDisplay = '';
+        if (waehrung === 'btc') {
+            revenueDisplay = `${revenue.btc.toFixed(8)} BTC`;
+        } else if (waehrung === 'usd') {
+            revenueDisplay = `$${revenue.usd.toFixed(2)}`;
+        } else if (waehrung === 'gmt') {
+            revenueDisplay = `${revenue.gmt ? revenue.gmt.toFixed(2) : "N/A"} GMT`;
+        }
         let row = document.createElement('tr');
         row.innerHTML = `
             <td>${miner.id}</td>
-            <td>${miner.power} TH</td>
-            <td>${miner.efficiency} W/TH</td>
+            <td>${miner.power}</td>
+            <td>${miner.efficiency}</td>
+            <th>${revenueDisplay}</th>
+            <th>-</th>
+            <th>-</th>
+            <th>-</th>
             <td>${roiTH}%</td>
             <td>-%</td>
         `;
@@ -666,6 +716,25 @@ function getPricePerTH(efficiency, thAmount) {
 
     return null; // Falls keine passende Preisstufe gefunden wurde
 }
+function wechselWaehrung(mode) {
+    let currencyElement = document.getElementById('currencyMode');
+    currencyElement.innerText = mode; // Speichert die Währung im UI
+
+    // Entferne vorherige aktive Markierung
+    document.querySelectorAll('.currency-btn').forEach(btn => btn.classList.remove('active'));
+
+    // Setze den aktiven Button basierend auf der gewählten Währung
+    let activeButton = document.getElementById(`${mode}-btn`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    } else {
+        console.error(`Fehler: Der Button ${mode}-btn existiert nicht.`);
+    }
+
+    // Aktualisiere die Miner-Tabelle mit der neuen Währung
+    ladenDaten();
+}
+
 
             const efficiencyMatrixfarm = {
                 16: { to: 15, pricePerW: 1.32 },
