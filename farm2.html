@@ -439,13 +439,12 @@ function ladenDaten() {
                 <th>ID</th>
                 <th>TH</th>
                 <th>W/TH</th>
+                <th>ROI +1 TH(%)</th>
+                <th>ROI -1 W/TH(%)</th>
                 <th>revenue</th>
                 <th>electricity</th>
                 <th>service</th>
                 <th>profit</th>
-                <th>ROI +1 TH(%)</th>
-               <th>ROI -1 W/TH(%)</th>
-
             </tr>
         `;
         tableElement.appendChild(thead);
@@ -460,75 +459,52 @@ function ladenDaten() {
     }
 }
 
+function ladenMinerInTabelle() {
+    let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
+    let tbody = document.getElementById('miner-tbody');
+    
+    // Aktuelle Währung auslesen
+    let currencyElement = document.getElementById('currencyMode');
+    let waehrung = currencyElement.innerText; // btc, usd oder gmt
+    
+    // **1️⃣ Fehlende Variablen aus UI abrufen**
+    let satoshiPerTH = parseFloat(document.getElementById('sat-TH').value) || 0; // Satoshi pro TH
+    let btcPrice = parseFloat(document.getElementById('bitcoin-price-dropdown').value) || 0; // BTC-Preis
+    let gmtPrice = parseFloat(document.getElementById('gmt-token-price').value) || 0; // GMT-Token-Preis
 
-function ladenDatenalt() {
-    let savedData = localStorage.getItem('minerData');
-    if (!savedData) return; // Falls keine Daten existieren, nichts tun
+    
+    tbody.innerHTML = ''; // Leere Tabelle vor dem Neuladen
 
-    let minerData = JSON.parse(savedData);
-
-    if (ansicht === 'grid') {
-        // 2️⃣ Falls die Tabelle existiert, entferne sie
-        entfernenFarm()
-
-        // **1️⃣ Cards löschen**
-        let content = document.getElementById('content');
-        let cards = document.getElementsByClassName('card');
-        for (let i = cards.length - 1; i >= 0; i--) {
-            cards[i].remove();
+    minerData.forEach(miner => {
+        let myTH = parseFloat(miner.power) ? parseFloat(miner.power) : 0; // Miner-TH aus `minerData`
+        let efficiency = parseFloat(miner.efficiency) || 0; // Effizienz aus `minerData`
+        let revenue = calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice, efficiency);
+        let roiTH = calculateROI_THUpgrade(miner.power, 1, getPricePerTH(miner.efficiency, miner.power), revenue.usd.toFixed(2),miner.efficiency);
+        //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.power);
+        let revenueDisplay = '';
+        if (waehrung === 'btc') {
+            revenueDisplay = `${revenue.btc.toFixed(8)} BTC`;
+        } else if (waehrung === 'usd') {
+            revenueDisplay = `$${revenue.usd.toFixed(2)}`;
+        } else if (waehrung === 'gmt') {
+            revenueDisplay = `${revenue.gmt ? revenue.gmt.toFixed(2) : "N/A"} GMT`;
         }
-
-        // **2️⃣ Miner als Cards hinzufügen**
-        minerData.forEach(miner => {
-            hinzufuegenCard(miner.id, miner.power, miner.efficiency);
-        });
-
-    } else if (ansicht === 'list') {
-        // 1️⃣ Entferne alle vorhandenen Cards
-        entfernenFarm()
-        // **3️⃣ Falls die Tabelle existiert, erst löschen**
-        let table = document.getElementById('miner-table');
-        if (table) table.remove();
-
-        // **4️⃣ Neue Tabelle erstellen**
-        let content = document.getElementById('content');
-        let tableElement = document.createElement('table');
-        tableElement.id = 'miner-table';
-
-        let thead = document.createElement('thead');
-        thead.innerHTML = `
-            <tr>
-                <th>ID</th>
-                <th>Power (TH)</th>
-                <th>Efficiency (W/TH)</th>
-                <th>ROI +1 TH Upgrade (%)</th>
-               <th>ROI -1 W/TH Upgrade (%)</th>
-
-            </tr>
+        let row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${miner.id}</td>
+            <td>${miner.power}</td>
+            <td>${miner.efficiency}</td>
+            <td>${roiTH}%</td>
+            <td>-%</td>
+            <th>${revenueDisplay}</th>
+            <th>-</th>
+            <th>-</th>
+            <th>-</th>
         `;
-        tableElement.appendChild(thead);
-
-        let tbody = document.createElement('tbody');
-        tbody.id = 'miner-tbody';
-        tableElement.appendChild(tbody);
-
-        content.appendChild(tableElement);
-
-        // **5️⃣ Miner in die Tabelle einfügen**
-        let tbodyElement = document.getElementById('miner-tbody');
-        minerData.forEach(miner => {
-            let row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${miner.id}</td>
-                <td>${miner.power} TH</td>
-                <td>${miner.efficiency} W/TH</td>
-                <td>- %</td>
-                <td>- %</td>
-            `;
-            tbodyElement.appendChild(row);
-        });
-    }
+        tbody.appendChild(row);
+    });
 }
+
 
 
 
@@ -615,80 +591,19 @@ function wechselAnsicht(mode) {
     ladenDaten(); // Lädt die Daten für die neue Ansicht
 }
 
-function ladenMinerInTabellealt() {
-    let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
-    let tbody = document.getElementById('miner-tbody');
-    let revenue = calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice, efficiency);
-    tbody.innerHTML = ''; // Tabelle leeren
-
-    minerData.forEach(miner => {
-
-        let roiTH = calculateROI_THUpgrade(miner.power, 1, getPricePerTH(miner.efficiency, miner.power), revenue.usd.toFixed(2));
-        //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.power);
-
-        let row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${miner.id}</td>
-            <td>${miner.power} TH</td>
-            <td>${miner.efficiency} W/TH</td>
-            <td>${roiTH}%</td>
-            <td>-%</td>
-        `;
-        tbody.appendChild(row);
-    });
-}
 
 
-function ladenMinerInTabelle() {
-    let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
-    let tbody = document.getElementById('miner-tbody');
-    
-    // Aktuelle Währung auslesen
-    let currencyElement = document.getElementById('currencyMode');
-    let waehrung = currencyElement.innerText; // btc, usd oder gmt
-    
-    // **1️⃣ Fehlende Variablen aus UI abrufen**
-    let satoshiPerTH = parseFloat(document.getElementById('sat-TH').value) || 0; // Satoshi pro TH
+
+
+function calculateROI_THUpgrade(power, additionalTH, pricePerTH, dailyRevenuePerTH, minerefficency) {
     let btcPrice = parseFloat(document.getElementById('bitcoin-price-dropdown').value) || 0; // BTC-Preis
     let gmtPrice = parseFloat(document.getElementById('gmt-token-price').value) || 0; // GMT-Token-Preis
-
-    
-    tbody.innerHTML = ''; // Leere Tabelle vor dem Neuladen
-
-    minerData.forEach(miner => {
-        let myTH = parseFloat(miner.power) ? parseFloat(miner.power) : 0; // Miner-TH aus `minerData`
-        let efficiency = parseFloat(miner.efficiency) || 0; // Effizienz aus `minerData`
-        let revenue = calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice, efficiency);
-        let roiTH = calculateROI_THUpgrade(miner.power, 1, getPricePerTH(miner.efficiency, miner.power), revenue.usd.toFixed(2));
-        //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.power);
-        let revenueDisplay = '';
-        if (waehrung === 'btc') {
-            revenueDisplay = `${revenue.btc.toFixed(8)} BTC`;
-        } else if (waehrung === 'usd') {
-            revenueDisplay = `$${revenue.usd.toFixed(2)}`;
-        } else if (waehrung === 'gmt') {
-            revenueDisplay = `${revenue.gmt ? revenue.gmt.toFixed(2) : "N/A"} GMT`;
-        }
-        let row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${miner.id}</td>
-            <td>${miner.power}</td>
-            <td>${miner.efficiency}</td>
-            <th>${revenueDisplay}</th>
-            <th>-</th>
-            <th>-</th>
-            <th>-</th>
-            <td>${roiTH}%</td>
-            <td>-%</td>
-        `;
-        tbody.appendChild(row);
-    });
-}
-function calculateROI_THUpgrade(power, additionalTH, pricePerTH, dailyRevenuePerTH) {
     let upgradeCost = additionalTH * pricePerTH; // Gesamtkosten für das Upgrade
     let additionalDailyRevenue = additionalTH * dailyRevenuePerTH; // Zusätzlicher täglicher Ertrag
-
-    let roiDays = upgradeCost / additionalDailyRevenue; // ROI in Tagen
+    let dailyelectricity = calculateDailyElectricity(additionalTH, minerefficency, btcPrice, gmtPrice)
+    let dailyservice = calculateDailyService(additionalTH, btcPrice, gmtPrice)
+    let dailyProfit = additionalDailyRevenue - dailyelectricity.usd - dailyservice.usd
+    let roiDays = upgradeCost / dailyProfit; // ROI in Tagen
     let roiPercent = (365 / roiDays) * 100; // ROI in %
 
     return roiPercent.toFixed(2); // Rückgabe als Prozentwert
