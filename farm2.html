@@ -479,15 +479,30 @@ function ladenMinerInTabelle() {
         let myTH = parseFloat(miner.power) ? parseFloat(miner.power) : 0; // Miner-TH aus `minerData`
         let efficiency = parseFloat(miner.efficiency) || 0; // Effizienz aus `minerData`
         let revenue = calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice, efficiency);
+        let dailyelectricity = calculateDailyElectricity(miner.power, miner.efficency, btcPrice, gmtPrice)
+        let dailyservice = calculateDailyService(miner.power, btcPrice, gmtPrice)
+
         let roiTH = calculateROI_THUpgrade(miner.power, 1, getPricePerTH(miner.efficiency, miner.power), revenue.usd.toFixed(2),miner.efficiency);
         //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.power);
         let revenueDisplay = '';
         if (waehrung === 'btc') {
             revenueDisplay = `${revenue.btc.toFixed(8)} BTC`;
+            electricityDisplay = `${dailyelectricity.btc.toFixed(8)} BTC`;
+            serviceDisplay = `${dailyservice.btc.toFixed(8)} BTC`;
+            let profit = revenueDisplay -electricityDisplay - serviceDisplay;
+            profitDisplay = `${profit.toFixed(8)} BTC`;
         } else if (waehrung === 'usd') {
             revenueDisplay = `$${revenue.usd.toFixed(2)}`;
+            electricityDisplay = `$${dailyelectricity.usd.toFixed(2)}`;
+            serviceDisplay = `$${dailyservice.usd.toFixed(2)} `;
+            let profit = revenueDisplay -electricityDisplay - serviceDisplay;
+            profitDisplay = `$${profit.toFixed(2)} `;
         } else if (waehrung === 'gmt') {
             revenueDisplay = `${revenue.gmt ? revenue.gmt.toFixed(2) : "N/A"} GMT`;
+            electricityDisplay = `${dailyelectricity.gmt.toFixed(2)} GMT`;
+            serviceDisplay = `${dailyservice.gmt.toFixed(2)} GMT`;
+            let profit = revenueDisplay -electricityDisplay - serviceDisplay;
+            profitDisplay = `${profit.toFixed(2)} GMT`;
         }
         let row = document.createElement('tr');
         row.innerHTML = `
@@ -497,9 +512,9 @@ function ladenMinerInTabelle() {
             <td>${roiTH}%</td>
             <td>-%</td>
             <th>${revenueDisplay}</th>
-            <th>-</th>
-            <th>-</th>
-            <th>-</th>
+            <th>${electricityDisplay}</th>
+            <th>${serviceDisplay}</th>
+            <th>${profitDisplay}</th>
         `;
         tbody.appendChild(row);
     });
