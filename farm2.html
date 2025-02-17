@@ -481,8 +481,10 @@ function ladenMinerInTabelle() {
         let revenue = calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice, efficiency);
         let dailyelectricity = calculateDailyElectricity(miner.power, miner.efficency, btcPrice, gmtPrice)
         let dailyservice = calculateDailyService(miner.power, btcPrice, gmtPrice)
+        if miner.efficiency <= 28 then {
+            let roiTH = calculateROI_THUpgrade(miner.power, 1, getPricePerTH(miner.efficiency, miner.power), revenue.usd.toFixed(2), miner.efficiency);
+        } else roiTH = '0';
 
-        let roiTH = calculateROI_THUpgrade(miner.power, 1, getPricePerTH(miner.efficiency, miner.power), revenue.usd.toFixed(2),miner.efficiency);
         //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.power);
         let revenueDisplay = '';
         if (waehrung === 'btc') {
