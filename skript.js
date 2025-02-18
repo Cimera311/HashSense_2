@@ -639,92 +639,23 @@
 
 
 
-					// Füge einen Event Listener hinzu, der das Feld "Daily-Reward" überwacht
-			document.getElementById('Daily-Reward').addEventListener('input', function () {
-				const dailyReward = parseFloat(document.getElementById('Daily-Reward').value); // Wert des Daily-Reward-Feldes
-				const myTH = parseFloat(document.getElementById('My_TH').value); // Wert des My_TH-Feldes
 
-				// Überprüfe, ob beide Werte gültig sind, um eine Division durch 0 zu vermeiden
-				if (!isNaN(dailyReward) && !isNaN(myTH) && myTH > 0) {
-					const satoshiPerTH = dailyReward / myTH; // Berechnung
-					document.getElementById('sat-TH').value = satoshiPerTH.toFixed(2); // Ergebnis einfügen
-				} else {
-					document.getElementById('sat-TH').value = ''; // Leeren, falls ungültig
-				}
-			});
             function copyWalletAddress() {
-    const walletInput = document.querySelector('footer input[type="text"]');
-    walletInput.select();
-    navigator.clipboard.writeText(walletInput.value).then(
-        () => {
-            alert("Wallet address copied to clipboard!");
-        },
-        () => {
-            alert("Failed to copy wallet address.");
-        }
-    );
-}
+                const walletInput = document.querySelector('footer input[type="text"]');
+                walletInput.select();
+                navigator.clipboard.writeText(walletInput.value).then(
+                    () => {
+                        alert("Wallet address copied to clipboard!");
+                    },
+                    () => {
+                        alert("Failed to copy wallet address.");
+                    }
+                );
+            }
             
             
-            
-					// Füge einen Event Listener hinzu, der das Feld "Daily-Reward" überwacht
-			document.getElementById('sat-TH').addEventListener('input', function () {
-				const satpTH = parseFloat(document.getElementById('sat-TH').value); // Wert des Daily-Reward-Feldes
-				const myTH = parseFloat(document.getElementById('My_TH').value); // Wert des My_TH-Feldes
 
-				// Überprüfe, ob beide Werte gültig sind, um eine Division durch 0 zu vermeiden
-				if (!isNaN(satpTH) && !isNaN(myTH) && myTH > 0) {
-					const dailyReward = satpTH * myTH; // Berechnung
-					document.getElementById('Daily-Reward').value = dailyReward.toFixed(2); // Ergebnis einfügen
-				} else {
-					document.getElementById('Daily-Reward').value = '0'; // Leeren, falls ungültig
-				}
-			});	
-					// Füge einen Event Listener hinzu, der das Feld "Daily-Reward" überwacht
-			document.getElementById('My_TH').addEventListener('input', function () {
-				const satpTH = parseFloat(document.getElementById('sat-TH').value); // Wert des Daily-Reward-Feldes
-				const myTH = parseFloat(document.getElementById('My_TH').value); // Wert des My_TH-Feldes
-
-				// Überprüfe, ob beide Werte gültig sind, um eine Division durch 0 zu vermeiden
-				if (!isNaN(satpTH) && !isNaN(myTH) && myTH > 0) {
-					const dailyReward = satpTH * myTH; // Berechnung
-					document.getElementById('Daily-Reward').value = dailyReward.toFixed(2); // Ergebnis einfügen
-				} else {
-					document.getElementById('Daily-Reward').value = '0'; // Leeren, falls ungültig
-				}
-			});
-	    					// Füge einen Event Listener hinzu, der das Feld "Daily-Reward" überwacht
-			document.getElementById('th-slider').addEventListener('input', function () {
-				const satpTH = parseFloat(document.getElementById('sat-TH').value); // Wert des Daily-Reward-Feldes
-				const myTH = parseFloat(document.getElementById('My_TH').value); // Wert des My_TH-Feldes
-
-				// Überprüfe, ob beide Werte gültig sind, um eine Division durch 0 zu vermeiden
-				if (!isNaN(satpTH) && !isNaN(myTH) && myTH > 0) {
-					const dailyReward = satpTH * myTH; // Berechnung
-					document.getElementById('Daily-Reward').value = dailyReward.toFixed(2); // Ergebnis einfügen
-				} else {
-					document.getElementById('Daily-Reward').value = '0'; // Leeren, falls ungültig
-				}
-			});
-			document.addEventListener('DOMContentLoaded', () => {
-			// Füge einen Event Listener für alle Eingabefelder hinzu
-			const inputs = document.querySelectorAll('input');
-
-			inputs.forEach((input, index) => {
-				input.addEventListener('keydown', (event) => {
-					if (event.key === 'Enter') {
-						event.preventDefault(); // Verhindere das Standardverhalten (z. B. Form-Submission)
-						const nextInput = inputs[index + 1]; // Nächstes Feld suchen
-
-						if (nextInput) {
-							nextInput.focus(); // Fokus auf das nächste Feld setzen
-						} else {
-							input.blur(); // Letztes Feld: Tastatur schließen
-						}
-					}
-				});
-			});
-		});
+	
         function setMinerValues(watt) {
                 const pricePerTHField = document.getElementById('price-per-th_ROI');
                 const efficiencyField = document.getElementById('Energy-efficiency_ROI');
@@ -1148,10 +1079,11 @@
                     const myShare = (myTH / clanTH) * 100; // Prozentualer Anteil
                     // Umrechnung von rewardFund in Satoshi und Berechnung des wöchentlichen Miner Wars Rewards
                     const weeklyMWReward = (rewardFund * 100000000 * blockShare / clanTH) * myTH;
-
+                    const bitcoinPrice = parseFloat(document.getElementById('bitcoin-price-dropdown').value);
 
                     // Werte ins Feld schreiben
                     document.getElementById('Weelky-mw-Reward_MW').value = weeklyMWReward.toFixed(0);
+
                     document.getElementById('My-share-MW').value = myShare.toFixed(2);
                 }
                 function updateMyTHMW(change, slider, input) {
