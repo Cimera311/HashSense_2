@@ -15,7 +15,7 @@
         /* Hauptcontainer */
         .main-container {
             width: 100%;
-            max-width: 1280px; /* Begrenzte Breite */
+            max-width: 90%; /* Begrenzte Breite */
             margin: 0 auto; /* Zentrierung */
             padding: 20px;
             box-sizing: border-box; /* Innenabstand berücksichtigen */
