@@ -28,7 +28,7 @@
         }
         .main-container {
             width: 95%;
-            max-width: 1200px;
+            max-width: 90%;
             background-color: #2a2a2a;
             border-radius: 20px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -800,36 +800,37 @@ function ladenMinerInTabelle() {
         let myTH = parseFloat(miner.power) ? parseFloat(miner.power) : 0; // Miner-TH aus `minerData`
         let efficiency = parseFloat(miner.efficiency) || 0; // Effizienz aus `minerData`
         let revenue = calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice, efficiency);
-        let dailyelectricity = calculateDailyElectricity(miner.power, miner.efficency, btcPrice, gmtPrice)
+        let revenueupgrade = calculateDailyRevenue(satoshiPerTH, 1, btcPrice, gmtPrice, efficiency);
+        let dailyelectricity = calculateDailyElectricity(miner.power, miner.efficiency, btcPrice, gmtPrice)
         let dailyservice = calculateDailyService(miner.power, btcPrice, gmtPrice)
         let roiTH;
         if (miner.efficiency <= 28) {
-            roiTH = calculateROI_THUpgrade(miner.power, 1, getPricePerTH(miner.efficiency, miner.power), revenue.usd.toFixed(2), miner.efficiency);
+            roiTH = calculateROI_THUpgrade(miner.power, 1, getPricePerTH(miner.efficiency, miner.power), revenueupgrade, miner.efficiency);
         } else {
             roiTH = '0';
         }
 
 
         //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.power);
+        let profitbtc = revenue.btc - dailyelectricity.btc - dailyservice.btc;
         let revenueDisplay = '';
         if (waehrung === 'btc') {
             revenueDisplay = `${revenue.btc.toFixed(8)} BTC`;
             electricityDisplay = `${dailyelectricity.btc.toFixed(8)} BTC`;
             serviceDisplay = `${dailyservice.btc.toFixed(8)} BTC`;
-            let profit = revenueDisplay -electricityDisplay - serviceDisplay;
-            profitDisplay = `${profit.toFixed(8)} BTC`;
+            profitDisplay = `${profitbtc.toFixed(8)} BTC`;
         } else if (waehrung === 'usd') {
             revenueDisplay = `$${revenue.usd.toFixed(2)}`;
             electricityDisplay = `$${dailyelectricity.usd.toFixed(2)}`;
             serviceDisplay = `$${dailyservice.usd.toFixed(2)} `;
-            let profit = revenueDisplay -electricityDisplay - serviceDisplay;
-            profitDisplay = `$${profit.toFixed(2)} `;
+            let profit = btc2usd(btcPrice, profitbtc);
+            profitDisplay = `$${profit} `;
         } else if (waehrung === 'gmt') {
             revenueDisplay = `${revenue.gmt ? revenue.gmt.toFixed(2) : "N/A"} GMT`;
             electricityDisplay = `${dailyelectricity.gmt.toFixed(2)} GMT`;
             serviceDisplay = `${dailyservice.gmt.toFixed(2)} GMT`;
-            let profit = revenueDisplay -electricityDisplay - serviceDisplay;
-            profitDisplay = `${profit.toFixed(2)} GMT`;
+            let profit = btc2gmt(btcPrice, gmtPrice, profitbtc);
+            profitDisplay = `${profit} GMT`;
         }
         let row = document.createElement('tr');
         row.innerHTML = `
@@ -941,11 +942,13 @@ function calculateROI_THUpgrade(power, additionalTH, pricePerTH, dailyRevenuePer
     let btcPrice = parseFloat(document.getElementById('bitcoin-price-dropdown').value) || 0; // BTC-Preis
     let gmtPrice = parseFloat(document.getElementById('gmt-token-price').value) || 0; // GMT-Token-Preis
     let upgradeCost = additionalTH * pricePerTH; // Gesamtkosten für das Upgrade
-    let additionalDailyRevenue = additionalTH * dailyRevenuePerTH; // Zusätzlicher täglicher Ertrag
+    let additionalDailyRevenuebtc = additionalTH * dailyRevenuePerTH.btc; // Zusätzlicher täglicher Ertrag in BTC
     let dailyelectricity = calculateDailyElectricity(additionalTH, minerefficency, btcPrice, gmtPrice)
     let dailyservice = calculateDailyService(additionalTH, btcPrice, gmtPrice)
-    let dailyProfit = additionalDailyRevenue - dailyelectricity.usd - dailyservice.usd
-    let roiDays = upgradeCost / dailyProfit; // ROI in Tagen
+    let dailyProfitbtc = additionalDailyRevenuebtc - dailyelectricity.btc - dailyservice.btc
+    let dailyProfit = btc2usd(btcPrice, dailyProfitbtc);
+    let upgradecostbtc = usd2btc(upgradeCost ,btcPrice );
+    let roiDays = upgradecostbtc / dailyProfitbtc // ROI in Tagen
     let roiPercent = (365 / roiDays) * 100; // ROI in %
 
     return roiPercent.toFixed(2); // Rückgabe als Prozentwert
@@ -992,6 +995,19 @@ function wechselWaehrung(mode) {
     ladenDaten();
 }
 
+function btc2usd(btcPrice, valueBtc) {
+    return (btcPrice * valueBtc).toFixed(2);
+}
+function usd2btc(usdValue, btcPrice) {
+    return (usdValue / btcPrice).toFixed(8);
+}
+function btc2gmt(btcPrice, gmtPrice, valueBtc) {
+    if (gmtPrice === 0 || isNaN(gmtPrice)) {
+        console.error("Fehler: GMT-Preis ist 0 oder ungültig.");
+        return "N/A";
+    }
+    return ((btcPrice * valueBtc) / gmtPrice).toFixed(2);
+}
 
       
                 const priceMatrixfarmalt = {
