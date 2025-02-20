@@ -561,7 +561,7 @@ header {
   background-color: #e6e6e6;
   color: #673dec;
 }
-#miner-table {
+#miner-table, #farm-table  {
     width: 100%;
     border-collapse: collapse;
     background-color: #2a2a2a;
@@ -571,35 +571,35 @@ header {
     overflow: hidden;
 }
 
-#miner-table thead {
+#miner-table thead, #farm-table thead {
     background-color: #673dec;
     color: white;
     font-weight: bold;
 }
 
-#miner-table th, #miner-table td {
+#miner-table th, #miner-table td, #farm-table th, #farm-table td{
     padding: 12px;
     text-align: center;
     border-bottom: 1px solid #444;
 }
 
-#miner-table tbody tr:nth-child(even) {
+#miner-table tbody tr:nth-child(even), #farm-table tbody tr:nth-child(even)  {
     background-color: #333;
 }
 
-#miner-table tbody tr {
+#miner-table tbody tr, #farm-table tbody tr {
     transition: transform 0.2s ease-in-out;
 }
 
-#miner-table tbody tr:hover {
+#miner-table tbody tr:hover, #farm-table tbody tr:hover  {
     transform: scale(1.02);
     background-color: #9333ea;
 }
 
-#miner-table th:first-child {
+#miner-table th:first-child, #farm-table th:first-child {
     border-top-left-radius: 12px;
 }
 
-#miner-table th:last-child {
+#miner-table th:last-child ,#farm-table th:last-child {
     border-top-right-radius: 12px;
 }
