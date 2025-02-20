@@ -238,12 +238,12 @@
                 <button onclick="speichernDaten()">Save</button>
                 <button onclick="ladenDaten()">Load</button>
                 <div id="viewSwitcher">
-                    <button class="view-btn" id="grid-btn" onclick="wechselAnsicht('grid')">🔲 Grid</button>
+                    <button class="view-btn active" id="grid-btn" onclick="wechselAnsicht('grid')">🔲 Grid</button>
                     <button class="view-btn" id="list-btn" onclick="wechselAnsicht('list')">📋 Liste</button>
                 </div>
                 <div id="currencySwitcher">
                     <button class="currency-btn" id="btc-btn" onclick="wechselWaehrung('btc')">₿ BTC</button>
-                    <button class="currency-btn" id="usd-btn" onclick="wechselWaehrung('usd')">$ USD</button>
+                    <button class="currency-btn active" id="usd-btn" onclick="wechselWaehrung('usd')">$ USD</button>
                     <button class="currency-btn" id="gmt-btn" onclick="wechselWaehrung('gmt')">🪙 GMT</button>
                 </div>
                 
@@ -254,7 +254,7 @@
            
         </div>
 <div class="main-container">
-<div class="farm-card" id="farm">
+<!--<div class="farm-card" id="farm">
     <button class="delete-btn" onclick="entfernenFarm()">&times</button>
     <span class="card-label">Farm</span>
     <div class="input-container-farm">
@@ -265,8 +265,11 @@
         <label for="farm-efficiency">Efficiency</label>
         <input type="text" id="farm-efficiency" value="45" oninput="aktualisiereWert('farm', 'efficiency')">
     </div>
-</div>
+</div> -->
+<div class="content" id="farm-content">
 
+
+</div>
 
         <div class="content" id="content"></div>
 
@@ -732,25 +735,45 @@ function ladenDaten() {
     if (!savedData) return; // Falls keine Daten existieren, nichts tun
 
     let minerData = JSON.parse(savedData);
-
+    
     // Ansicht abhängig vom gespeicherten Modus laden
     let content = document.getElementById('content');
     let table = document.getElementById('miner-table');
-
     if (table) table.remove(); // Falls eine Tabelle existiert, löschen
+
+    // Ansicht abhängig vom gespeicherten Modus laden
+    let contentfarm = document.getElementById('farm-content');
+    let tablefarm = document.getElementById('farm-table');
+    if (tablefarm) tablefarm.remove(); // Falls eine Tabelle existiert, löschen
+
+
+    let cardsfarm = document.getElementsByClassName('farm-card');
+    for (let i = cardsfarm.length - 1; i >= 0; i--) {
+        cardsfarm[i].remove();
+    }
     let cards = document.getElementsByClassName('card');
     for (let i = cards.length - 1; i >= 0; i--) {
         cards[i].remove();
     }
 
+
+
+    // **Zuerst Farm laden (entweder als Card oder als Tabelle)**
+    if (ansicht === 'grid') {
+        ladeFarmCard(minerData); // Farm als Card laden
+    } else {
+        ladeFarmTable(minerData); // Farm als Tabelle laden
+    }
     if (ansicht === 'grid') {
         // Miner als Cards hinzufügen
+
         minerData.forEach(miner => {
             hinzufuegenCard(miner.id, miner.power, miner.efficiency);
         });
 
     } else if (ansicht === 'list') {
         // Erstelle eine Tabelle
+
         let tableElement = document.createElement('table');
         tableElement.id = 'miner-table';
 
@@ -779,6 +802,151 @@ function ladenDaten() {
         ladenMinerInTabelle();
     }
 }
+function ladeFarmTable(minerData) {
+    let farmContent = document.getElementById('farm-content');
+    if (!farmContent) {
+        console.error("Fehler: #farm-content nicht gefunden.");
+        return;
+    }
+
+    // Falls bereits eine Farm-Tabelle existiert, entfernen wir sie
+    let existingTable = document.getElementById('farm-table');
+    if (existingTable) {
+        existingTable.remove();
+    }
+
+    // Neue Farm-Tabelle erstellen
+    let tableElement = document.createElement('table');
+    tableElement.id = 'farm-table';
+
+    // Tabellenkopf hinzufügen
+    let thead = document.createElement('thead');
+    thead.innerHTML = `
+        <tr>
+            <th>Power (TH)</th>
+            <th>Efficiency (W/TH)</th>
+            <th>revenue</th>
+            <th>electricity</th>
+            <th>service</th>
+            <th>profit</th>
+        </tr>
+    `;
+    tableElement.appendChild(thead);
+
+    // Tabellenkörper hinzufügen
+    let tbody = document.createElement('tbody');
+
+    // Berechnung der Gesamtwerte für die Farm
+    let totalPower = 0;
+    let weightedEfficiencySum = 0;
+    let btcPrice = parseFloat(document.getElementById('bitcoin-price-dropdown').value) || 0;
+    let gmtPrice = parseFloat(document.getElementById('gmt-token-price').value) || 0;
+    let satoshiPerTH = parseFloat(document.getElementById('sat-TH').value) || 0;
+    // Aktuelle Währung auslesen
+    let currencyElement = document.getElementById('currencyMode');
+    let waehrung = currencyElement.innerText; // btc, usd oder gmt
+    minerData.forEach(miner => {
+        let power = parseFloat(miner.power) || 0;
+        let efficiency = parseFloat(miner.efficiency) || 0;
+        totalPower += power;
+        weightedEfficiencySum += (power * efficiency);
+    });
+
+    let avgEfficiency = totalPower > 0 ? (weightedEfficiencySum / totalPower).toFixed(2) : 0;
+    let revenue = calculateDailyRevenue(satoshiPerTH, totalPower, btcPrice, gmtPrice, avgEfficiency);
+    let dailyelectricity = calculateDailyElectricity(totalPower, avgEfficiency, btcPrice, gmtPrice);
+    let dailyservice = calculateDailyService(totalPower, btcPrice, gmtPrice)
+
+
+        //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.power);
+        let profitbtc = revenue.btc - dailyelectricity.btc - dailyservice.btc;
+        let revenueDisplay = '';
+        if (waehrung === 'btc') {
+            revenueDisplay = `${revenue.btc.toFixed(8)} BTC`;
+            electricityDisplay = `${dailyelectricity.btc.toFixed(8)} BTC`;
+            serviceDisplay = `${dailyservice.btc.toFixed(8)} BTC`;
+            profitDisplay = `${profitbtc.toFixed(8)} BTC`;
+        } else if (waehrung === 'usd') {
+            revenueDisplay = `$${revenue.usd.toFixed(2)}`;
+            electricityDisplay = `$${dailyelectricity.usd.toFixed(2)}`;
+            serviceDisplay = `$${dailyservice.usd.toFixed(2)} `;
+            let profit = btc2usd(btcPrice, profitbtc);
+            profitDisplay = `$${profit} `;
+        } else if (waehrung === 'gmt') {
+            revenueDisplay = `${revenue.gmt ? revenue.gmt.toFixed(2) : "N/A"} GMT`;
+            electricityDisplay = `${dailyelectricity.gmt.toFixed(2)} GMT`;
+            serviceDisplay = `${dailyservice.gmt.toFixed(2)} GMT`;
+            let profit = btc2gmt(btcPrice, gmtPrice, profitbtc);
+            profitDisplay = `${profit} GMT`;
+        }
+        let row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${totalPower}</td>
+            <td>${avgEfficiency}</td>
+            <td>${revenueDisplay}</td>
+            <td>${electricityDisplay}</td>
+            <td>${serviceDisplay}</td>
+            <td>${profitDisplay}</td>
+        `;
+    tbody.appendChild(row);
+    tableElement.appendChild(tbody);
+
+    // Tabelle in den Farm-Content einfügen
+    farmContent.appendChild(tableElement);
+}
+function ladeFarmCard(minerData) {
+    let farmContent = document.getElementById('farm-content');
+    if (!farmContent) {
+        console.error("Fehler: #farm-content nicht gefunden.");
+        return;
+    }
+
+    // Falls eine bestehende Farm-Card existiert, entfernen
+    let existingFarm = document.getElementById('farm');
+    if (existingFarm) {
+        existingFarm.remove();
+    }
+
+    // Neue Farm-Card erstellen
+    let farmCard = document.createElement('div');
+    farmCard.className = 'farm-card';
+    farmCard.id = 'farm';
+
+    // Farm-Label und Delete-Button
+    farmCard.innerHTML = `
+        <button class="delete-btn" onclick="entfernenFarm()">&times;</button>
+        <span class="card-label">Farm</span>
+    `;
+
+    // Farm-Gesamtwerte berechnen
+    let totalPower = 0;
+    let weightedEfficiencySum = 0;
+
+    minerData.forEach(miner => {
+        let power = parseFloat(miner.power) || 0;
+        let efficiency = parseFloat(miner.efficiency) || 0;
+        totalPower += power;
+        weightedEfficiencySum += (power * efficiency);
+    });
+
+    let avgEfficiency = totalPower > 0 ? (weightedEfficiencySum / totalPower).toFixed(2) : 0;
+
+    // Input-Felder für Power & Efficiency
+    farmCard.innerHTML += `
+        <div class="input-container-farm">
+            <label for="farm-power">Power</label>
+            <input type="text" id="farm-power" value="${totalPower.toFixed(2)}" oninput="aktualisiereWert('farm', 'power')">
+        </div>   
+        <div class="input-container-farm">
+            <label for="farm-efficiency">Efficiency</label>
+            <input type="text" id="farm-efficiency" value="${avgEfficiency}" oninput="aktualisiereWert('farm', 'efficiency')">
+        </div>
+    `;
+
+    // Farm-Card in farm-content einfügen
+    farmContent.appendChild(farmCard);
+}
+
 
 function ladenMinerInTabelle() {
     let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
