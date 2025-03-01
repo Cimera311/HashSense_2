@@ -237,6 +237,10 @@
                 
                 <button onclick="speichernDaten()">Save</button>
                 <button onclick="ladenDaten()">Load</button>
+                <button onclick="speichernMinerSupabase()">💾 Save to Cloud</button>
+                <button onclick="ladenMinerSupabase()">☁️ Load from Cloud</button>
+                <button onclick="loescheMinerSupabase()">🗑️ Delete from Cloud</button>
+
                 <div id="viewSwitcher">
                     <button class="view-btn active" id="grid-btn" onclick="wechselAnsicht('grid')">🔲 Grid</button>
                     <button class="view-btn" id="list-btn" onclick="wechselAnsicht('list')">📋 Liste</button>
@@ -278,21 +282,42 @@
     </div>
     </div>
 </body>
-  <script>
+<script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/+esm';
+
+    const supabaseUrl = "https://umlgbacgghrvzwfvirro.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtbGdiYWNnZ2hydnp3ZnZpcnJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY1MTAzMjQsImV4cCI6MjA1MjA4NjMyNH0.Hv0X4Wy4PtbSJ4yEN-CFszdX4zEoW4CMEHrbRBbX1Ug";
+
+    // Supabase-Client erstellen und global verfügbar machen
+    window.supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Session abrufen
+    const session = JSON.parse(sessionStorage.getItem("supabaseSession"));
+
+    if (session) {
+        window.supabase.auth.setSession(session);
+        console.log("Supabase-Session in farm2.html geladen:", session);
+    } else {
+        console.error("Keine Supabase-Session gefunden. Weiterleitung zur Login-Seite...");
+        window.location.href = "login.html";
+    }
+</script>
+
+<script>
           const efficiencyMatrixfarm = {
                 16: { to: 15, pricePerW: 1.32 },
                 17: { to: 16, pricePerW: 1.32 },
                 18: { to: 17, pricePerW: 1.32 },
                 19: { to: 18, pricePerW: 1.32 },
                 20: { to: 19, pricePerW: 1.32 },
-                21: { to: 20, pricePerW: 1.02 },
-                22: { to: 21, pricePerW: 1.02 },
-                23: { to: 22, pricePerW: 1.02 },
-                24: { to: 23, pricePerW: 1.02 },
-                25: { to: 24, pricePerW: 1.02 },
-                26: { to: 25, pricePerW: 1.02 },
-                27: { to: 26, pricePerW: 1.02 },
-                28: { to: 27, pricePerW: 1.02 },
+                21: { to: 20, pricePerW: 0.69 },
+                22: { to: 21, pricePerW: 0.69 },
+                23: { to: 22, pricePerW: 0.69 },
+                24: { to: 23, pricePerW: 0.69 },
+                25: { to: 24, pricePerW: 0.69 },
+                26: { to: 25, pricePerW: 0.69 },
+                27: { to: 26, pricePerW: 0.69 },
+                28: { to: 27, pricePerW: 0.69 },
                 29: { to: 28, pricePerW: 0.99 },
                 30: { to: 29, pricePerW: 0.99 },
                 31: { to: 30, pricePerW: 0.99 },
@@ -338,6 +363,7 @@
     deleteBtn.innerHTML = '&times;';
     deleteBtn.onclick = function() {
         entfernenCard(cardId);
+        loescheEinzelnenMinerSupabase(cardId)
     };
     card.appendChild(deleteBtn);
     let copyBtn = document.createElement('button');
@@ -909,7 +935,7 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                         { minTH: 8, pricePerTH: 31.33 },
                         { minTH: 16, pricePerTH: 31.25 },
                         { minTH: 32, pricePerTH: 31.17 },
-                        { minTH: 64, pricePerTH: 31.02 },
+                        { minTH: 64, pricePerTH: 30.69 },
                         { minTH: 128, pricePerTH: 30.87 },
                         { minTH: 256, pricePerTH: 30.72 },
                         { minTH: 512, pricePerTH: 30.57 },
@@ -931,6 +957,95 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
 
                 };
 
+                async function speichernMinerSupabase() {
+    const { data: user, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+        console.error("Fehler beim Abrufen des Benutzers:", userError);
+        return;
+    }
+
+    let userId = user.user.id; // Aktuelle User-ID
+    let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
+
+    // Bestehende Miner des Users in Supabase löschen (optional)
+    await supabase.from('miners').delete().eq('user_id', userId);
+
+    // Miner-Daten in Supabase speichern
+    let { data, error } = await supabase.from('miners').insert(
+        minerData.map(miner => ({
+            user_id: userId,
+            miner_id: miner.id,
+            power: miner.power,
+            efficiency: miner.efficiency
+        }))
+    );
+
+    if (error) {
+        console.error("Fehler beim Speichern der Miner in Supabase:", error);
+    } else {
+        console.log("Miner erfolgreich gespeichert:", data);
+    }
+}
+async function ladenMinerSupabase() {
+    const { data: user, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+        console.error("Fehler beim Abrufen des Benutzers:", userError);
+        return;
+    }
+
+    let userId = user.user.id;
+
+    let { data: miners, error } = await supabase
+        .from('miners')
+        .select('miner_id, power, efficiency')
+        .eq('user_id', userId);
+
+    if (error) {
+        console.error("Fehler beim Laden der Miner aus Supabase:", error);
+        return;
+    }
+
+    // Miner in localStorage speichern und laden
+    localStorage.setItem('minerData', JSON.stringify(miners));
+    ladenDaten(); // Miner in UI anzeigen
+}
+async function loescheMinerSupabase() {
+    const { data: user, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+        console.error("Fehler beim Abrufen des Benutzers:", userError);
+        return;
+    }
+
+    let userId = user.user.id;
+
+    let { error } = await supabase.from('miners').delete().eq('user_id', userId);
+
+    if (error) {
+        console.error("Fehler beim Löschen der Miner aus Supabase:", error);
+    } else {
+        console.log("Alle Miner des Nutzers wurden gelöscht.");
+    }
+}
+async function loescheEinzelnenMinerSupabase(minerIdloc) {
+    const { data: user, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+        console.error("Fehler beim Abrufen des Benutzers:", userError);
+        return;
+    }
+
+    let userId = user.user.id;
+
+    let { error } = await supabase
+        .from('miners')
+        .delete()
+        .match({ user_id: userId, miner_id: minerIdloc });
+
+    if (error) {
+        console.error(`Fehler beim Löschen des Miners mit ID ${minerIdloc}:`, error);
+    } else {
+        console.log(`Miner mit ID ${minerIdloc} wurde gelöscht.`);
+    }
+}
 
 
   </script>
