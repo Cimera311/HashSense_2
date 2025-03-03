@@ -983,8 +983,10 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                 
                     if (error) {
                         console.error("Fehler beim Speichern der Miner in Supabase:", error);
+                        alert("Error while saving miners!");
                     } else {
                         console.log("Miner erfolgreich gespeichert:", data);
+                        alert("All miners saved!");
                     }
                 }
                 async function ladenMinerSupabase() {
@@ -1003,12 +1005,14 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                 
                     if (error) {
                         console.error("Fehler beim Laden der Miner aus Supabase:", error);
+                        alert("Error loading miners!");
                         return;
                     }
                 
                     // Miner in localStorage speichern und laden
                     localStorage.setItem('minerData', JSON.stringify(miners));
                     ladenDaten(); // Miner in UI anzeigen
+                    alert("All miners loaded!");
                 }
                 async function loescheMinerSupabase() {
                     const { data: user, error: userError } = await supabase.auth.getUser();
@@ -1025,6 +1029,7 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                         console.error("Fehler beim Löschen der Miner aus Supabase:", error);
                     } else {
                         console.log("Alle Miner des Nutzers wurden gelöscht.");
+                        alert("All miners deleted!");
                     }
                 }
                 async function loescheEinzelnenMinerSupabase(minerIdloc) {
@@ -1043,8 +1048,10 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                 
                     if (error) {
                         console.error(`Fehler beim Löschen des Miners mit ID ${minerIdloc}:`, error);
+                        alert("Error deleting miner!");
                     } else {
                         console.log(`Miner mit ID ${minerIdloc} wurde gelöscht.`);
+                        alert("Miner deleted!");
                     }
 }
 
