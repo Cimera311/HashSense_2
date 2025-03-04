@@ -453,7 +453,7 @@ function speichernDaten() {
 
             if (powerElement && efficiencyElement) {
                 minerData.push({
-                    id: cardId,
+                    miner_id: cardId,
                     power: parseFloat(powerElement.value) || 0, // Jetzt wird es als Zahl gespeichert
                     efficiency: parseFloat(efficiencyElement.value) || 0
                 });
@@ -465,7 +465,7 @@ function speichernDaten() {
         for (let i = 0; i < rows.length; i++) {
             let cells = rows[i].getElementsByTagName('td');
             minerData.push({
-                id: cells[0].innerText,
+                miner_id: cells[0].innerText,
                 power: cells[1].innerText.replace(' TH', ''), // "TH" entfernen
                 efficiency: cells[2].innerText.replace(' W/TH', '') // "W/TH" entfernen
             });
@@ -517,7 +517,7 @@ function ladenDaten() {
         // Miner als Cards hinzufügen
 
         minerData.forEach(miner => {
-            hinzufuegenCard(miner.id, miner.power, miner.efficiency);
+            hinzufuegenCard(miner.miner_id, miner.power, miner.efficiency);
         });
 
     } else if (ansicht === 'list') {
@@ -909,6 +909,7 @@ function wechselWaehrung(mode) {
     }
 
     // Aktualisiere die Miner-Tabelle mit der neuen Währung
+    speichernDaten();
     ladenDaten();
 }
 
@@ -926,36 +927,6 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
     return ((btcPrice * valueBtc) / gmtPrice).toFixed(2);
 }
 
-      
-                const priceMatrixfarmalt = {
-                    "15": [
-                        { minTH: 1, pricePerTH: 31.57, minerCost: 36.99 },
-                        { minTH: 2, pricePerTH: 31.49 },
-                        { minTH: 4, pricePerTH: 31.41 },
-                        { minTH: 8, pricePerTH: 31.33 },
-                        { minTH: 16, pricePerTH: 31.25 },
-                        { minTH: 32, pricePerTH: 31.17 },
-                        { minTH: 64, pricePerTH: 30.69 },
-                        { minTH: 128, pricePerTH: 30.87 },
-                        { minTH: 256, pricePerTH: 30.72 },
-                        { minTH: 512, pricePerTH: 30.57 },
-                        { minTH: 1024, pricePerTH: 30.42 },
-                    ],
-                    "20": [
-                        { minTH: 1, pricePerTH: 23.25, minerCost: 26.99 },
-                        { minTH: 2, pricePerTH: 23.17 },
-                        { minTH: 4, pricePerTH: 23.09 },
-                        { minTH: 8, pricePerTH: 23.01 },
-                        { minTH: 16, pricePerTH: 22.93 },
-                        { minTH: 32, pricePerTH: 22.85 },
-                        { minTH: 64, pricePerTH: 22.70 },
-                        { minTH: 128, pricePerTH: 22.55 },
-                        { minTH: 256, pricePerTH: 22.40 },
-                        { minTH: 512, pricePerTH: 22.25 },
-                        { minTH: 1024, pricePerTH: 22.10 },
-                    ],
-
-                };
 
                 async function speichernMinerSupabase() {
                     speichernDaten();
@@ -975,7 +946,7 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                     let { data, error } = await supabase.from('miners').insert(
                         minerData.map(miner => ({
                             user_id: userId,
-                            miner_id: miner.id,
+                            miner_id: miner.miner_id,
                             power: miner.power,
                             efficiency: miner.efficiency
                         }))
