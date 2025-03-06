@@ -27,8 +27,8 @@
             overflow-y: auto;
         }
         .main-container {
-            width: 95%;
-            max-width: 90%;
+            width: 100%;
+            max-width: 100%;
             background-color: #2a2a2a;
             border-radius: 20px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -77,7 +77,7 @@
             padding: 20px;
             border-radius: 20px;
             flex-direction: column;
-            width: 90%;
+            width: 100%;
             text-align: center;
             margin: 20px auto 0;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -250,7 +250,7 @@
                     <button class="currency-btn active" id="usd-btn" onclick="wechselWaehrung('usd')">$ USD</button>
                     <button class="currency-btn" id="gmt-btn" onclick="wechselWaehrung('gmt')">🪙 GMT</button>
                 </div>
-                
+
                 <!-- Unsichtbares Element zur Speicherung der aktiven Währung -->
                 <span id="currencyMode" style="display: none;">usd</span>
                 <span id="viewMode" style="display: none;">grid</span>
@@ -258,18 +258,7 @@
            
         </div>
 <div class="main-container">
-<!--<div class="farm-card" id="farm">
-    <button class="delete-btn" onclick="entfernenFarm()">&times</button>
-    <span class="card-label">Farm</span>
-    <div class="input-container-farm">
-        <label for="farm-power">Power</label>
-        <input type="text" id="farm-power" value="16" oninput="aktualisiereWert('farm', 'power')">
-    </div>   
-    <div class="input-container-farm">
-        <label for="farm-efficiency">Efficiency</label>
-        <input type="text" id="farm-efficiency" value="45" oninput="aktualisiereWert('farm', 'efficiency')">
-    </div>
-</div> -->
+
 <div class="content" id="farm-content">
 
 
@@ -310,14 +299,14 @@
                 18: { to: 17, pricePerW: 1.32 },
                 19: { to: 18, pricePerW: 1.32 },
                 20: { to: 19, pricePerW: 1.32 },
-                21: { to: 20, pricePerW: 0.69 },
-                22: { to: 21, pricePerW: 0.69 },
-                23: { to: 22, pricePerW: 0.69 },
-                24: { to: 23, pricePerW: 0.69 },
-                25: { to: 24, pricePerW: 0.69 },
-                26: { to: 25, pricePerW: 0.69 },
-                27: { to: 26, pricePerW: 0.69 },
-                28: { to: 27, pricePerW: 0.69 },
+                21: { to: 20, pricePerW: 0.75 },
+                22: { to: 21, pricePerW: 0.75 },
+                23: { to: 22, pricePerW: 0.75 },
+                24: { to: 23, pricePerW: 0.75 },
+                25: { to: 24, pricePerW: 0.75 },
+                26: { to: 25, pricePerW: 0.75 },
+                27: { to: 26, pricePerW: 0.75 },
+                28: { to: 27, pricePerW: 0.75 },
                 29: { to: 28, pricePerW: 0.99 },
                 30: { to: 29, pricePerW: 0.99 },
                 31: { to: 30, pricePerW: 0.99 },
@@ -574,6 +563,7 @@ function ladeFarmTable(minerData) {
         <tr>
             <th>Power (TH)</th>
             <th>Efficiency (W/TH)</th>
+            <th>My Total discount(%)</th>
             <th>revenue</th>
             <th>electricity</th>
             <th>service</th>
@@ -600,7 +590,7 @@ function ladeFarmTable(minerData) {
         totalPower += power;
         weightedEfficiencySum += (power * efficiency);
     });
-
+    let user_data = localStorage.getItem('user_data');
     let avgEfficiency = totalPower > 0 ? (weightedEfficiencySum / totalPower).toFixed(2) : 0;
     let revenue = calculateDailyRevenue(satoshiPerTH, totalPower, btcPrice, gmtPrice, avgEfficiency);
     let dailyelectricity = calculateDailyElectricity(totalPower, avgEfficiency, btcPrice, gmtPrice);
@@ -632,6 +622,7 @@ function ladeFarmTable(minerData) {
         row.innerHTML = `
             <td>${totalPower}</td>
             <td>${avgEfficiency}</td>
+            <th>${user_data.total_discount}</th>
             <td>${revenueDisplay}</td>
             <td>${electricityDisplay}</td>
             <td>${serviceDisplay}</td>
@@ -670,7 +661,7 @@ function ladeFarmCard(minerData) {
     // Farm-Gesamtwerte berechnen
     let totalPower = 0;
     let weightedEfficiencySum = 0;
-
+    let user_data = localStorage.getItem('user_data');
     minerData.forEach(miner => {
         let power = parseFloat(miner.power) || 0;
         let efficiency = parseFloat(miner.efficiency) || 0;
@@ -690,6 +681,11 @@ function ladeFarmCard(minerData) {
             <label for="farm-efficiency">Efficiency</label>
             <input type="text" id="farm-efficiency" value="${avgEfficiency}" oninput="aktualisiereWert('farm', 'efficiency')">
         </div>
+          <div class="input-container-farm">
+        <label for="gomining-discount">My total Discount (%):</label>
+            <input type="number" id="gomining-discount" value="${user_data.total_discount}" min="0" max="20" placeholder="0,0">
+        </div>      
+
     `;
 
     // Farm-Card in farm-content einfügen
@@ -722,32 +718,45 @@ function ladenMinerInTabelle() {
         let dailyservice = calculateDailyService(miner.power, btcPrice, gmtPrice)
         let roiTH;
         if (miner.efficiency <= 28) {
-            roiTH = calculateROI_THUpgrade(miner.power, 1, getPricePerTH(miner.efficiency, miner.power), revenueupgrade, miner.efficiency);
+            roiTH = calculateROI_THUpgrade(miner.power, 1, getPricePerTH(efficiency, myTH), revenueupgrade, efficiency);
         } else {
             roiTH = '0';
         }
-
+        let roiWATT;
+        if (miner.efficiency <= 50) {
+            roiWATT = ROIofWATTUpgrade(getUpgradeCostWATT(efficiency, efficiency -1 , myTH), myTH, efficiency, efficiency-1) ;
+        } else {
+            roiWATT.roi_percent = '0';            
+            roiWATT.profit_increase.btc = 0;
+            roiWATT.profit_increase.usd = 0;
+            roiWATT.profit_increase.gmt = 0;
+        }
 
         //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.power);
         let profitbtc = revenue.btc - dailyelectricity.btc - dailyservice.btc;
         let revenueDisplay = '';
+        let plusTHprofit = 0;
+        let plusWATTprofit = 0;
         if (waehrung === 'btc') {
             revenueDisplay = `${revenue.btc.toFixed(8)} BTC`;
             electricityDisplay = `${dailyelectricity.btc.toFixed(8)} BTC`;
             serviceDisplay = `${dailyservice.btc.toFixed(8)} BTC`;
             profitDisplay = `${profitbtc.toFixed(8)} BTC`;
+            plusWATTprofit =  `${roiWATT.profit_increase.btc.toFixed(8)} BTC`;
         } else if (waehrung === 'usd') {
             revenueDisplay = `$${revenue.usd.toFixed(2)}`;
             electricityDisplay = `$${dailyelectricity.usd.toFixed(2)}`;
             serviceDisplay = `$${dailyservice.usd.toFixed(2)} `;
             let profit = btc2usd(btcPrice, profitbtc);
             profitDisplay = `$${profit} `;
+            plusWATTprofit =  `$${roiWATT.profit_increase.usd}`;
         } else if (waehrung === 'gmt') {
             revenueDisplay = `${revenue.gmt ? revenue.gmt.toFixed(2) : "N/A"} GMT`;
             electricityDisplay = `${dailyelectricity.gmt.toFixed(2)} GMT`;
             serviceDisplay = `${dailyservice.gmt.toFixed(2)} GMT`;
             let profit = btc2gmt(btcPrice, gmtPrice, profitbtc);
             profitDisplay = `${profit} GMT`;
+            plusWATTprofit =  `${roiWATT.profit_increase.gmt} GMT`;
         }
         let row = document.createElement('tr');
         row.innerHTML = `
@@ -755,7 +764,7 @@ function ladenMinerInTabelle() {
             <td>${miner.power}</td>
             <td>${miner.efficiency}</td>
             <td>${roiTH}%</td>
-            <td>-%</td>
+            <td>${roiWATT.roi_percent}% <span style="color: green;">(+${plusWATTprofit})</span></td>
             <td>${revenueDisplay}</td>
             <td>${electricityDisplay}</td>
             <td>${serviceDisplay}</td>
@@ -870,6 +879,87 @@ function calculateROI_THUpgrade(power, additionalTH, pricePerTH, dailyRevenuePer
 
     return roiPercent.toFixed(2); // Rückgabe als Prozentwert
 }
+
+
+// Berechnet den zusätzlichen Profit durch ein TH-Upgrade
+function calculateProfitIncreaseTH(amountTH) {
+    let satoshiPerTH = parseFloat(document.getElementById('sat-TH').value) || 0;
+    let moreSatoshi = satoshiPerTH * amountTH;
+    return moreSatoshi; // Da der Profit pro TH bereits definiert ist
+}
+
+// Berechnet den zusätzlichen Profit durch ein Effizienz-Upgrade
+function calculateProfitIncreaseEfficiency(currentTH, currentEfficiency, newEfficiency) {
+    let satoshiPerTH = parseFloat(document.getElementById('sat-TH').value) || 0;
+    let btcPrice = parseFloat(document.getElementById('bitcoin-price-dropdown').value) || 0;
+    let gmtPrice = parseFloat(document.getElementById('gmt-token-price').value) || 0;
+
+    let currentRevenue = calculateDailyRevenue(satoshiPerTH, currentTH, btcPrice, gmtPrice);
+    let currentElectricity = calculateDailyElectricity(currentTH, currentEfficiency, btcPrice, gmtPrice);
+    let currentService = calculateDailyService(currentTH, btcPrice, gmtPrice);
+    let currentProfitBTC = currentRevenue.btc - currentElectricity.btc - currentService.btc;
+
+    let newRevenue = calculateDailyRevenue(satoshiPerTH, currentTH, btcPrice, gmtPrice);
+    let newElectricity = calculateDailyElectricity(currentTH, newEfficiency, btcPrice, gmtPrice);
+    let newService = calculateDailyService(currentTH, btcPrice, gmtPrice);
+    let newProfitBTC = newRevenue.btc - newElectricity.btc - newService.btc;
+
+    return {
+        btc: newProfitBTC - currentProfitBTC,
+        usd: btc2usd(btcPrice, newProfitBTC - currentProfitBTC),
+        gmt: btc2gmt(btcPrice, gmtPrice, newProfitBTC - currentProfitBTC)
+    };
+}
+
+// Berechnet das ROI eines Upgrades basierend auf den Investitionskosten und dem zusätzlichen Profit
+function ROIofWATTUpgrade(upgradeCost, currentTH, currentEfficiency, newEfficiency) {
+    let profitIncrease = calculateProfitIncreaseEfficiency(currentTH, currentEfficiency, newEfficiency);
+    let btcPrice = parseFloat(document.getElementById('bitcoin-price-dropdown').value) || 0;
+
+    if (profitIncrease.btc <= 0) {
+        return "∞"; // Falls das Upgrade keinen positiven Profit generiert
+    }
+    let upgradeCostBTC = usd2btc(upgradeCost, btcPrice);
+    let roiDays = upgradeCostBTC / profitIncrease.btc;
+    let roiPercent = (365 / roiDays) * 100; // ROI in %
+
+    return {
+        roi_percent: roiPercent.toFixed(2), // Rückgabe als Prozentwert
+        profit_increase: profitIncrease        }
+            }
+
+// Berechnet die Gesamtkosten für ein Effizienz-Upgrade über mehrere Stufen
+function getUpgradeCostWATT(currentEfficiency, newEfficiency, currentTH) {
+    let totalCost = 0;
+
+    // Sicherstellen, dass die Werte korrekt eingegeben sind
+    if (currentEfficiency <= newEfficiency) {
+        console.error("Upgrade nicht möglich: newEfficiency muss kleiner als currentEfficiency sein.");
+        return totalCost;
+    }
+
+    let efficiency = currentEfficiency; // Startwert
+
+    while (efficiency > newEfficiency) {
+        if (efficiencyMatrixfarm[efficiency]) {
+            let costPerW = efficiencyMatrixfarm[efficiency].pricePerW;
+            let nextEfficiency = efficiencyMatrixfarm[efficiency].to;
+            let efficiencyStep = efficiency - nextEfficiency;
+            totalCost += costPerW * efficiencyStep * currentTH;
+            efficiency = nextEfficiency; // Nächstes Effizienz-Level setzen
+        } else {
+            console.error(`Kein Eintrag für Effizienz ${efficiency} in efficiencyMatrixfarm gefunden.`);
+            break;
+        }
+    }
+
+    return totalCost.toFixed(2); // Rückgabe der gesamten Upgrade-Kosten
+}
+
+
+
+
+
 function getEfficiencyUpgradePrice(currentEfficiency) {
     if (efficiencyMatrixfarm[currentEfficiency]) {
         return efficiencyMatrixfarm[currentEfficiency].pricePerW;
@@ -960,6 +1050,32 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                         alert("All miners saved!");
                     }
                 }
+                async function ladenuserdataSupabase() {
+                    const { data: user, error: userError } = await supabase.auth.getUser();
+                    if (userError || !user) {
+                        console.error("Fehler beim Abrufen des Benutzers:", userError);
+                        return;
+                    }
+                
+                    let userId = user.user.id;
+                
+                    let { data: user_data, error } = await supabase
+                        .from('user_data')
+                        .select('total_discount')
+                        .eq('user_id', userId);
+                
+                    if (error) {
+                        console.error("Fehler beim Laden der user_data aus Supabase:", error);
+                        alert("Error loading user_data!");
+                        user_data.total_discount = 0;
+                        localStorage.setItem('user_data', JSON.stringify(user_data));
+                        return;
+                    }
+                
+                    // Miner in localStorage speichern und laden
+                    localStorage.setItem('user_data', JSON.stringify(user_data));
+                    alert("user_data loaded!");
+                }
                 async function ladenMinerSupabase() {
                     const { data: user, error: userError } = await supabase.auth.getUser();
                     if (userError || !user) {
@@ -982,9 +1098,11 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                 
                     // Miner in localStorage speichern und laden
                     localStorage.setItem('minerData', JSON.stringify(miners));
+                    ladenuserdataSupabase()
                     ladenDaten(); // Miner in UI anzeigen
                     alert("All miners loaded!");
                 }
+                
                 async function loescheMinerSupabase() {
                     const { data: user, error: userError } = await supabase.auth.getUser();
                     if (userError || !user) {
