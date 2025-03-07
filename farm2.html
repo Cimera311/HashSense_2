@@ -1028,10 +1028,11 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                 
                     let userId = user.user.id; // Aktuelle User-ID
                     let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
-                
+                    let user_data = JSON.parse(localStorage.getItem('user_data')) || [];              
                     // Bestehende Miner des Users in Supabase löschen (optional)
                     await supabase.from('miners').delete().eq('user_id', userId);
-                
+                    await supabase.from('user_data').delete().eq('user_id', userId);    
+                    
                     // Miner-Daten in Supabase speichern
                     let { data, error } = await supabase.from('miners').insert(
                         minerData.map(miner => ({
@@ -1039,6 +1040,11 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                             miner_id: miner.miner_id,
                             power: miner.power,
                             efficiency: miner.efficiency
+                        }))
+                       let { data, error } = await supabase.from('user_data').insert(
+                        user_data.map(user_data => ({
+                            user_id: userId,
+                            total_discount: user_data.total_discount
                         }))
                     );
                 
