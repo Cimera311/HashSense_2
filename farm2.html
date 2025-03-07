@@ -1041,7 +1041,7 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                             power: miner.power,
                             efficiency: miner.efficiency
                         })));
-                       let { data2, error } = await supabase.from('user_data').insert(
+                       let { data2, error2 } = await supabase.from('user_data').insert(
                         user_data.map(user_data => ({
                             user_id: userId,
                             total_discount: user_data.total_discount
@@ -1050,6 +1050,8 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                     if (error) {
                         console.error("Fehler beim Speichern der Miner in Supabase:", error);
                         alert("Error while saving miners!");
+                    } else if (error2) {
+                     alert("Error while saving user data!");
                     } else {
                         console.log("Miner erfolgreich gespeichert:", data, data2);
                         alert("All miners saved!");
