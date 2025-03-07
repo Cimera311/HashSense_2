@@ -1040,13 +1040,12 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                             miner_id: miner.miner_id,
                             power: miner.power,
                             efficiency: miner.efficiency
-                        }))
+                        })));
                        let { data, error } = await supabase.from('user_data').insert(
                         user_data.map(user_data => ({
                             user_id: userId,
                             total_discount: user_data.total_discount
-                        }))
-                    );
+                        })));
                 
                     if (error) {
                         console.error("Fehler beim Speichern der Miner in Supabase:", error);
