@@ -1032,7 +1032,11 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                     // Bestehende Miner des Users in Supabase löschen (optional)
                     await supabase.from('miners').delete().eq('user_id', userId);
                     await supabase.from('user_data').delete().eq('user_id', userId);    
-                    
+                                    if (!user_data || user_data.length === 0) {
+                                        alert("Keine User-Daten zum Speichern gefunden.");
+                                    } else {
+                                        alert("User-Daten zum Speichern:", user_data);
+                                    }
                     // Miner-Daten in Supabase speichern
                     let { data, error } = await supabase.from('miners').insert(
                         minerData.map(miner => ({
@@ -1041,12 +1045,13 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                             power: miner.power,
                             efficiency: miner.efficiency
                         })));
-                       let { data2, error2 } = await supabase.from('user_data').insert(
-                        user_data.map(user_data => ({
-                            user_id: userId,
-                            total_discount: user_data.total_discount
-                        })));
-                
+                    let { data2, error2 } = await supabase.from('user_data').insert({
+                        user_id: userId,
+                        total_discount: user_data.total_discount
+                    });
+
+
+
                     if (error) {
                         console.error("Fehler beim Speichern der Miner in Supabase:", error);
                         alert("Error while saving miners!");
