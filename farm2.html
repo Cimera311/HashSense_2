@@ -49,28 +49,30 @@
             flex-wrap: wrap;
             justify-content: center;
         }
+        /* Buttons in der MinerCard */
         .card {
-            background-color: #2a2a2a;
-            padding: 20px;
-            border-radius: 20px;
-            width: 150px;
-            height: 150px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            position: relative;
-            border: 1px solid #555;
+            position: relative; /* Notwendig für absolute Positionierung der Buttons */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            border: 2px solid #444;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            min-width: 220px; /* Etwas breiter für bessere Darstellung */
         }
+        /* Stil für den Label-Tag oben (#00001) */
         .card-label {
-            position: absolute;
-            top: -15px;
-            left: 10px;
-            background-color: #673dec;
-            z-index: 1;
+            background-color: #6a5acd;
             color: white;
-            padding: 5px 10px;
-            border-radius: 10px;
+            padding: 4px 10px;
+            border-radius: 6px;
             font-size: 0.9em;
-            border: 1px solid #555;
+            font-weight: bold;
+            position: absolute;
+            top: -12px;
+            left: 10px;
         }
         .farm-card {
             background-color: #333;
@@ -85,50 +87,64 @@
             position: relative;
         }
         .input-container, .input-container-farm {
+            width: 100%;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            margin-top: 10px;
+            align-items: center;
+            margin-bottom: 8px; /* Abstand zwischen den Feldern */
         }
         .input-container label, .input-container-farm label {
-            font-size: 0.9em;
-            color: #e6e6e6;
+            font-size: 0.85em;
+            color: #bbb;
             margin-bottom: 3px;
         }
         .input-container input, .input-container-farm input {
-            width: 100%;
-            padding: 5px;
-            border-radius: 10px;
+            width: 90%;
+            padding: 8px;
+            border-radius: 6px;
             border: 1px solid #555;
             background-color: #2a2a2a;
             color: #e6e6e6;
             font-size: 1em;
             text-align: center;
         }
-        .delete-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background-color: transparent;
-            color: #e6e6e6;
-            border: none;
-            cursor: pointer;
-            font-size: 20px;
-            line-height: 20px;
-            text-align: center;
-        }
+        /* Stil für die Buttons */
+        .delete-btn,
         .copy-btn {
             position: absolute;
-            top: 7px;
-            right: 25px;
+            top: 5px;
             background-color: transparent;
             color: #e6e6e6;
             border: none;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
         }
+        /* X-Button (Löschen) */
+        .delete-btn {
+            right: 10px;
+        }
+
+        /* Kopier-Button */
+        .copy-btn {
+            right: 35px;
+        }
+        /* Button-Hover-Effekt */
+        .delete-btn:hover,
         .copy-btn:hover {
-            color: #673dec;
+            color: #9333ea; /* Lila für besseren Effekt */
+        }
+        /* Stil für die Karte mit den Buttons */
+        .card button {
+            background: none;
+            border: none;
+            color: #bbb;
+            font-size: 1.2em;
+            cursor: pointer;
+            position: absolute;
+        }
+        /* Abstand zwischen den Feldern */
+        .card input:not(:last-child) {
+            margin-bottom: 10px;
         }
         .add-card {
             display: flex;
@@ -185,6 +201,21 @@
             transform: scale(1.1);
         }
 
+        /* Stil für editierbare Tabellenfelder */
+        .editable-field {
+            width: 100%;
+            background-color: #222;
+            color: white;
+            border: 1px solid #444;
+            text-align: center;
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        .editable-field:focus {
+            outline: none;
+            border-color: #673dec; /* Lila Highlight beim Bearbeiten */
+        }
 
     </style>
 </head>
@@ -233,7 +264,7 @@
             </header>
         </div>
         <div class="main-container">
-            <button onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '1', '20');">add miner</button>
+            <button onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '1', '20', '-');">add miner</button>
                 
                 <button onclick="speichernDaten()">Save</button>
                 <button onclick="ladenDaten()">Load</button>
@@ -299,14 +330,14 @@
                 18: { to: 17, pricePerW: 1.32 },
                 19: { to: 18, pricePerW: 1.32 },
                 20: { to: 19, pricePerW: 1.32 },
-                21: { to: 20, pricePerW: 0.75 },
-                22: { to: 21, pricePerW: 0.75 },
-                23: { to: 22, pricePerW: 0.75 },
-                24: { to: 23, pricePerW: 0.75 },
-                25: { to: 24, pricePerW: 0.75 },
-                26: { to: 25, pricePerW: 0.75 },
-                27: { to: 26, pricePerW: 0.75 },
-                28: { to: 27, pricePerW: 0.75 },
+                21: { to: 20, pricePerW: 0.55 },
+                22: { to: 21, pricePerW: 0.55 },
+                23: { to: 22, pricePerW: 0.55 },
+                24: { to: 23, pricePerW: 0.55 },
+                25: { to: 24, pricePerW: 0.55 },
+                26: { to: 25, pricePerW: 0.55 },
+                27: { to: 26, pricePerW: 0.55 },
+                28: { to: 27, pricePerW: 0.55 },
                 29: { to: 28, pricePerW: 0.99 },
                 30: { to: 29, pricePerW: 0.99 },
                 31: { to: 30, pricePerW: 0.99 },
@@ -331,17 +362,14 @@
                 50: { to: 49, pricePerW: 0.27 }
             };
 
-   
-    function hinzufuegenCard(cardId, power, efficiency) {
-    // Zugriff auf das Content-Element
+
+function hinzufuegenCard(cardId, power, efficiency, name = "Miner") {
     let content = document.querySelector('.content');
 
-    // Erstelle die neue Card
     let card = document.createElement('div');
     card.className = 'card';
     card.id = cardId;
 
-    // Card-Label hinzufügen
     let label = document.createElement('span');
     label.className = 'card-label';
     label.innerText = `#${cardId}`;
@@ -350,20 +378,39 @@
     let deleteBtn = document.createElement('button');
     deleteBtn.className = 'delete-btn';
     deleteBtn.innerHTML = '&times;';
-    deleteBtn.onclick = function() {
+    deleteBtn.onclick = function () {
         entfernenCard(cardId);
-        loescheEinzelnenMinerSupabase(cardId)
+        loescheEinzelnenMinerSupabase(cardId);
     };
     card.appendChild(deleteBtn);
+
     let copyBtn = document.createElement('button');
     copyBtn.className = 'copy-btn';
     copyBtn.innerHTML = '&#x2398;';
-    copyBtn.onclick = function() {
+    copyBtn.onclick = function () {
         kopiereWerte(cardId);
     };
     card.appendChild(copyBtn);
 
-    // Power Input mit Label
+    // **Name Input mit Label**
+    let nameContainer = document.createElement('div');
+    nameContainer.className = 'input-container';
+
+    let nameLabel = document.createElement('label');
+    nameLabel.setAttribute('for', `${cardId}-name`);
+    nameLabel.innerText = 'Name';
+
+    let nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.id = `${cardId}-name`;
+    nameInput.value = name;
+    nameInput.oninput = function () { aktualisiereWert(cardId, 'name'); };
+
+    nameContainer.appendChild(nameLabel);
+    nameContainer.appendChild(nameInput);
+    card.appendChild(nameContainer);
+
+    // **Power Input mit Label**
     let powerContainer = document.createElement('div');
     powerContainer.className = 'input-container';
 
@@ -375,13 +422,13 @@
     powerInput.type = 'text';
     powerInput.id = `${cardId}-power`;
     powerInput.value = `${power}`;
-    powerInput.oninput = function() { aktualisiereWert(cardId, 'power'); aktualisiereFarmWerte(); };
+    powerInput.oninput = function () { aktualisiereWert(cardId, 'power'); aktualisiereFarmWerte(); };
 
     powerContainer.appendChild(powerLabel);
     powerContainer.appendChild(powerInput);
     card.appendChild(powerContainer);
 
-    // Efficiency Input mit Label
+    // **Efficiency Input mit Label**
     let efficiencyContainer = document.createElement('div');
     efficiencyContainer.className = 'input-container';
 
@@ -393,17 +440,17 @@
     efficiencyInput.type = 'text';
     efficiencyInput.id = `${cardId}-efficiency`;
     efficiencyInput.value = `${efficiency}`;
-    efficiencyInput.oninput = function() { aktualisiereWert(cardId, 'efficiency'); aktualisiereFarmWerte();};
+    efficiencyInput.oninput = function () { aktualisiereWert(cardId, 'efficiency'); aktualisiereFarmWerte(); };
 
     efficiencyContainer.appendChild(efficiencyLabel);
     efficiencyContainer.appendChild(efficiencyInput);
     card.appendChild(efficiencyContainer);
 
-    // Card zur Content-Sektion hinzufügen
     content.appendChild(card);
     aktualisiereFarmWerte();
-
 }
+
+
 function entfernenCard(cardId) {
     let card = document.getElementById(cardId);
     if (card) {
@@ -431,6 +478,7 @@ function speichernDaten() {
     let viewElement = document.getElementById('viewMode');
     let ansicht = viewElement.innerText; // Holt den aktuellen Modus aus der UI
     let minerData = [];
+    let user_data = {}; // Neues Objekt für User-Daten
 
     if (ansicht === 'grid') {
         // **1️⃣ Alle Cards auslesen und speichern**
@@ -439,14 +487,21 @@ function speichernDaten() {
             let cardId = cards[i].id;
             let powerElement = document.getElementById(`${cardId}-power`);
             let efficiencyElement = document.getElementById(`${cardId}-efficiency`);
-
+            let nameElement = document.getElementById(`${cardId}-name`);
             if (powerElement && efficiencyElement) {
                 minerData.push({
                     miner_id: cardId,
+                    Miner_Name: nameElement.value || "-",
                     power: parseFloat(powerElement.value) || 0, // Jetzt wird es als Zahl gespeichert
                     efficiency: parseFloat(efficiencyElement.value) || 0
                 });
             }
+        }
+
+        // 🔹 **2️⃣ User-Discount aus Farm-Card speichern**
+        let discountElement = document.getElementById("gomining-discount");
+        if (discountElement) {
+            user_data.total_discount = parseFloat(discountElement.value) || 0;
         }
     } else if (ansicht === 'list') {
         // **2️⃣ Falls die Tabelle aktiv ist, Daten aus Tabelle speichern**
@@ -454,15 +509,29 @@ function speichernDaten() {
         for (let i = 0; i < rows.length; i++) {
             let cells = rows[i].getElementsByTagName('td');
             minerData.push({
-                miner_id: cells[0].innerText,
-                power: cells[1].innerText.replace(' TH', ''), // "TH" entfernen
-                efficiency: cells[2].innerText.replace(' W/TH', '') // "W/TH" entfernen
+                miner_id: cells[0].getElementsByTagName('input')[0].value,               
+                Miner_Name: cells[1].getElementsByTagName('input')[0].value,
+                power: cells[2].getElementsByTagName('input')[0].value.replace(' TH', ''), // "TH" entfernen
+                efficiency: cells[3].getElementsByTagName('input')[0].value.replace(' W/TH', '') // "W/TH" entfernen
             });
         }
+
+        let table = document.getElementById("farm-table");
+        if (table) {
+            let rows = table.getElementsByTagName("tr");
+            for (let i = 1; i < rows.length; i++) { // Überspringt den Header (erste Zeile)
+                let cells = rows[i].getElementsByTagName("td");
+                if (cells.length >= 2) { // Sicherheitscheck, dass Spalte existiert
+                    user_data.total_discount = parseFloat(cells[2].innerText) || 0;
+                }
+            }
+        }
+
     }
 
     // **3️⃣ Miner-Daten in LocalStorage unter "minerData" speichern**
     localStorage.setItem('minerData', JSON.stringify(minerData));
+    localStorage.setItem('user_data', JSON.stringify(user_data));
 }
 
 function ladenDaten() {
@@ -475,15 +544,19 @@ function ladenDaten() {
     let minerData = JSON.parse(savedData);
     
     // Ansicht abhängig vom gespeicherten Modus laden
-    let content = document.getElementById('content');
-    let table = document.getElementById('miner-table');
-    if (table) table.remove(); // Falls eine Tabelle existiert, löschen
-
+   // let content = document.getElementById('content');
+   // let table = document.getElementById('miner-table');
+   // if (table) table.remove(); // Falls eine Tabelle existiert, löschen
+    // Lösche bestehende Miner-Tabelle (inkl. Container)
+    let minerTableContainer = document.getElementById('miner-table-container');
+    if (minerTableContainer) minerTableContainer.remove();
     // Ansicht abhängig vom gespeicherten Modus laden
-    let contentfarm = document.getElementById('farm-content');
-    let tablefarm = document.getElementById('farm-table');
-    if (tablefarm) tablefarm.remove(); // Falls eine Tabelle existiert, löschen
-
+   // let contentfarm = document.getElementById('farm-content');
+   // let tablefarm = document.getElementById('farm-table');
+   // if (tablefarm) tablefarm.remove(); // Falls eine Tabelle existiert, löschen
+    // Lösche bestehende Farm-Tabelle (inkl. Container)
+    let farmTableContainer = document.getElementById('farm-table-container');
+    if (farmTableContainer) farmTableContainer.remove();
 
     let cardsfarm = document.getElementsByClassName('farm-card');
     for (let i = cardsfarm.length - 1; i >= 0; i--) {
@@ -506,36 +579,48 @@ function ladenDaten() {
         // Miner als Cards hinzufügen
 
         minerData.forEach(miner => {
-            hinzufuegenCard(miner.miner_id, miner.power, miner.efficiency);
+            hinzufuegenCard(miner.miner_id, miner.power, miner.efficiency, miner.Miner_Name);
         });
 
     } else if (ansicht === 'list') {
-        // Erstelle eine Tabelle
+    // Erstelle den scrollbaren Container
+    let tableContainer = document.createElement('div');
+    tableContainer.className = 'table-container';
+    tableContainer.id = 'miner-table-container'; // ID für gezieltes Löschen
 
-        let tableElement = document.createElement('table');
-        tableElement.id = 'miner-table';
+    // Erstelle die Tabelle
+    let tableElement = document.createElement('table');
+    tableElement.id = 'miner-table';
 
-        let thead = document.createElement('thead');
-        thead.innerHTML = `
-            <tr>
-                <th>ID</th>
-                <th>TH</th>
-                <th>W/TH</th>
-                <th>ROI +1 TH(%)</th>
-                <th>ROI -1 W/TH(%)</th>
-                <th>revenue</th>
-                <th>electricity</th>
-                <th>service</th>
-                <th>profit</th>
-            </tr>
-        `;
-        tableElement.appendChild(thead);
+    // Erstelle den Tabellenkopf (thead)
+    let thead = document.createElement('thead');
+    thead.innerHTML = `
+        <tr>
+            <th>ID</th>
+            <th>Miner Name</th>               
+            <th>TH</th>
+            <th>W/TH</th>
+            <th>ROI +1 TH(%)</th>
+            <th>ROI -1 W/TH(%)</th>
+            <th>Revenue</th>
+            <th>Electricity</th>
+            <th>Service</th>
+            <th>Profit</th>
+        </tr>
+    `;
+    tableElement.appendChild(thead);
 
-        let tbody = document.createElement('tbody');
-        tbody.id = 'miner-tbody';
-        tableElement.appendChild(tbody);
+    // Erstelle den Tabellenkörper (tbody)
+    let tbody = document.createElement('tbody');
+    tbody.id = 'miner-tbody';
+    tableElement.appendChild(tbody);
 
-        content.appendChild(tableElement);
+    // Füge die Tabelle in den Container ein
+    tableContainer.appendChild(tableElement);
+
+    // Füge den Container in den Content-Bereich ein
+    content.appendChild(tableContainer);
+
 
         ladenMinerInTabelle();
     }
@@ -553,6 +638,11 @@ function ladeFarmTable(minerData) {
         existingTable.remove();
     }
 
+    // Erstelle den scrollbaren Container für die Farm-Tabelle
+    let tableContainer = document.createElement('div');
+    tableContainer.className = 'table-container';
+    tableContainer.id = 'farm-table-container'; // ID für gezieltes Löschen
+
     // Neue Farm-Tabelle erstellen
     let tableElement = document.createElement('table');
     tableElement.id = 'farm-table';
@@ -563,17 +653,21 @@ function ladeFarmTable(minerData) {
         <tr>
             <th>Power (TH)</th>
             <th>Efficiency (W/TH)</th>
-            <th>My Total discount(%)</th>
-            <th>revenue</th>
-            <th>electricity</th>
-            <th>service</th>
-            <th>profit</th>
+            <th>My Total Discount (%)</th>
+            <th>Revenue</th>
+            <th>Electricity</th>
+            <th>Service</th>
+            <th>Profit</th>
         </tr>
     `;
     tableElement.appendChild(thead);
 
     // Tabellenkörper hinzufügen
     let tbody = document.createElement('tbody');
+    tbody.id = 'farm-tbody';
+    tableElement.appendChild(tbody);
+
+
 
     // Berechnung der Gesamtwerte für die Farm
     let totalPower = 0;
@@ -590,7 +684,7 @@ function ladeFarmTable(minerData) {
         totalPower += power;
         weightedEfficiencySum += (power * efficiency);
     });
-    let user_data = localStorage.getItem('user_data');
+    let user_data = JSON.parse(localStorage.getItem('user_data')) || { total_discount: 0 };
     let avgEfficiency = totalPower > 0 ? (weightedEfficiencySum / totalPower).toFixed(2) : 0;
     let revenue = calculateDailyRevenue(satoshiPerTH, totalPower, btcPrice, gmtPrice, avgEfficiency);
     let dailyelectricity = calculateDailyElectricity(totalPower, avgEfficiency, btcPrice, gmtPrice);
@@ -622,7 +716,7 @@ function ladeFarmTable(minerData) {
         row.innerHTML = `
             <td>${totalPower}</td>
             <td>${avgEfficiency}</td>
-            <th>${user_data.total_discount}</th>
+            <td>${user_data.total_discount}</td>
             <td>${revenueDisplay}</td>
             <td>${electricityDisplay}</td>
             <td>${serviceDisplay}</td>
@@ -631,8 +725,12 @@ function ladeFarmTable(minerData) {
     tbody.appendChild(row);
     tableElement.appendChild(tbody);
 
-    // Tabelle in den Farm-Content einfügen
-    farmContent.appendChild(tableElement);
+    // Füge die Tabelle in den Container ein
+    tableContainer.appendChild(tableElement);
+
+    // Jetzt den gesamten Container in den Farm-Content-Bereich einfügen
+    farmContent.appendChild(tableContainer);
+
 }
 function ladeFarmCard(minerData) {
     let farmContent = document.getElementById('farm-content');
@@ -661,7 +759,7 @@ function ladeFarmCard(minerData) {
     // Farm-Gesamtwerte berechnen
     let totalPower = 0;
     let weightedEfficiencySum = 0;
-    let user_data = localStorage.getItem('user_data');
+    let user_data = JSON.parse(localStorage.getItem('user_data')) || { total_discount: 0 };
     minerData.forEach(miner => {
         let power = parseFloat(miner.power) || 0;
         let efficiency = parseFloat(miner.efficiency) || 0;
@@ -760,9 +858,10 @@ function ladenMinerInTabelle() {
         }
         let row = document.createElement('tr');
         row.innerHTML = `
-            <td>${miner.miner_id}</td>
-            <td>${miner.power}</td>
-            <td>${miner.efficiency}</td>
+            <td><input type="text" value="${miner.miner_id}"  class="editable-field" data-field="miner_id"></td>
+            <td><input type="text" value="${miner.Miner_Name || 'Miner'}"  class="editable-field" data-field="name"></td>
+            <td><input type="number" value="${miner.power}"  class="editable-field" data-field="power"></td>
+            <td><input type="number" value="${miner.efficiency}"  class="editable-field" data-field="efficiency"></td>
             <td>${roiTH}%</td>
             <td>${roiWATT.roi_percent}% <span style="color: green;">(+${plusWATTprofit})</span></td>
             <td>${revenueDisplay}</td>
@@ -843,7 +942,8 @@ function aktualisiereFarmWerte() {
     function kopiereWerte(cardId) {
         let powerValue = document.getElementById(`${cardId}-power`).value;
         let efficiencyValue = document.getElementById(`${cardId}-efficiency`).value;
-        hinzufuegenCard(get_highest_card(document.querySelector('.content')), powerValue, efficiencyValue)
+        let nameValue = document.getElementById(`${cardId}-name`).value;
+        hinzufuegenCard(get_highest_card(document.querySelector('.content')), powerValue, efficiencyValue, nameValue);
    
 
     }
@@ -1016,78 +1116,105 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
     }
     return ((btcPrice * valueBtc) / gmtPrice).toFixed(2);
 }
+function getTotalDiscount() {
+    let user_data = JSON.parse(localStorage.getItem('user_data')) || {};
+
+    // 🔹 Falls `user_data` ein Array wird, nimm das erste Element
+    if (Array.isArray(user_data) && user_data.length > 0) {
+        return user_data[0].total_discount || 0;
+    }
+    
+    // 🔹 Falls `user_data` noch ein einzelnes Objekt ist, greife direkt darauf zu
+    return user_data.total_discount || 0;
+}
 
 
-                async function speichernMinerSupabase() {
-                    speichernDaten();
-                    const { data: user, error: userError } = await supabase.auth.getUser();
-                    if (userError || !user) {
-                        console.error("Fehler beim Abrufen des Benutzers:", userError);
-                        return;
-                    }
-                
-                    let userId = user.user.id; // Aktuelle User-ID
-                    let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
-                    let user_data = JSON.parse(localStorage.getItem('user_data')) || [];              
-                    // Bestehende Miner des Users in Supabase löschen (optional)
-                    await supabase.from('miners').delete().eq('user_id', userId);
-                    await supabase.from('user_data').delete().eq('user_id', userId);    
-                                    if (!user_data || user_data.length === 0) {
-                                        alert("Keine User-Daten zum Speichern gefunden.");
-                                    } else {
-                                        alert("User-Daten zum Speichern:", user_data);
-                                    }
-                    // Miner-Daten in Supabase speichern
-                    let { data, error } = await supabase.from('miners').insert(
-                        minerData.map(miner => ({
-                            user_id: userId,
-                            miner_id: miner.miner_id,
-                            power: miner.power,
-                            efficiency: miner.efficiency
-                        })));
-                    let { data2, error2 } = await supabase.from('user_data').insert({
+            async function speichernMinerSupabase() {
+                speichernDaten();
+
+                // Benutzer abrufen
+                const { data: user, error: userError } = await supabase.auth.getUser();
+                if (userError || !user) {
+                    console.error("❌ Fehler beim Abrufen des Benutzers:", userError);
+                    return;
+                }
+
+                let userId = user.user.id; // Aktuelle User-ID
+                let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
+
+                // 🔹 User-Daten direkt über `getTotalDiscount()` abrufen
+                let totalDiscount = getTotalDiscount(); 
+
+                // Bestehende Daten in Supabase löschen
+                await supabase.from('miners').delete().eq('user_id', userId);
+                await supabase.from('user_data').delete().eq('user_id', userId);
+
+                // 🔹 Miner-Daten speichern
+                let { data, error } = await supabase.from('miners').insert(
+                    minerData.map(miner => ({
                         user_id: userId,
-                        total_discount: user_data.total_discount
-                    });
+                        miner_id: miner.miner_id,
+                        Miner_Name: miner.Miner_Name,
+                        power: miner.power,
+                        efficiency: miner.efficiency
+                    }))
+                );
 
-
-
-                    if (error) {
-                        console.error("Fehler beim Speichern der Miner in Supabase:", error);
-                        alert("Error while saving miners!");
-                    } else if (error2) {
-                     alert("Error while saving user data!");
-                    } else {
-                        console.log("Miner erfolgreich gespeichert:", data, data2);
-                        alert("All miners saved!");
-                    }
+                // 🔹 User-Daten speichern (total_discount)
+                let data2, error2;
+                if (totalDiscount !== null) {
+                    ({ data: data2, error: error2 } = await supabase.from('user_data').insert({
+                        user_id: userId,
+                        total_discount: totalDiscount
+                    }));
+                } else {
+                    console.warn("❌ Kein total_discount gespeichert.");
                 }
-                async function ladenuserdataSupabase() {
-                    const { data: user, error: userError } = await supabase.auth.getUser();
-                    if (userError || !user) {
-                        console.error("Fehler beim Abrufen des Benutzers:", userError);
-                        return;
-                    }
-                
-                    let userId = user.user.id;
-                
-                    let { data: user_data, error } = await supabase
-                        .from('user_data')
-                        .select('total_discount')
-                        .eq('user_id', userId);
-                
-                    if (error) {
-                        console.error("Fehler beim Laden der user_data aus Supabase:", error);
-                        alert("Error loading user_data!");
-                        user_data.total_discount = 0;
-                        localStorage.setItem('user_data', JSON.stringify(user_data));
-                        return;
-                    }
-                
-                    // Miner in localStorage speichern und laden
-                    localStorage.setItem('user_data', JSON.stringify(user_data));
-                    alert("user_data loaded!");
+
+                // Fehlerhandling
+                if (error) {
+                    console.error("❌ Fehler beim Speichern der Miner in Supabase:", error);
+                    alert("Error while saving miners!");
+                } else if (error2) {
+                    console.error("❌ Fehler beim Speichern der User-Daten in Supabase:", error2);
+                    alert("Error while saving user data!");
+                } else {
+                    console.log("✅ Miner erfolgreich gespeichert:", data);
+                    console.log("✅ User-Daten erfolgreich gespeichert:", data2);
+                    alert("All miners and user data saved!");
                 }
+            }
+
+            async function ladenuserdataSupabase() {
+            const { data: user, error: userError } = await supabase.auth.getUser();
+            if (userError || !user) {
+                console.error("Fehler beim Abrufen des Benutzers:", userError);
+                return;
+            }
+
+            let userId = user.user.id;
+
+            let { data: user_data, error } = await supabase
+                .from('user_data')
+                .select('total_discount')
+                .eq('user_id', userId);
+
+            if (error) {
+                console.error("❌ Fehler beim Laden der user_data aus Supabase:", error);
+                alert("Error loading user_data!");
+                user_data = [{ total_discount: 0 }]; // Falls Fehler: Standardwert setzen
+            }
+
+            // 🔹 Sicherstellen, dass `user_data` nicht leer ist
+            let totalDiscount = (user_data.length > 0) ? user_data[0].total_discount : 0;
+
+            // 🔹 In LocalStorage speichern
+            localStorage.setItem('user_data', JSON.stringify({ total_discount: totalDiscount }));
+
+            console.log("✅ user_data geladen:", totalDiscount);
+            alert("user_data loaded!");
+        }
+
                 async function ladenMinerSupabase() {
                     const { data: user, error: userError } = await supabase.auth.getUser();
                     if (userError || !user) {
@@ -1099,7 +1226,8 @@ function btc2gmt(btcPrice, gmtPrice, valueBtc) {
                 
                     let { data: miners, error } = await supabase
                         .from('miners')
-                        .select('miner_id, power, efficiency')
+                        .select('miner_id, power, efficiency , Miner_Name')
+                        .order('miner_id', { ascending: true }) // Sortierung nach miner_id
                         .eq('user_id', userId);
                 
                     if (error) {
