@@ -561,8 +561,19 @@ header {
   background-color: #e6e6e6;
   color: #673dec;
 }
-#miner-table, #farm-table  {
+/* Container für scrollbare Tabellen */
+.table-container {
     width: 100%;
+    overflow-x: auto; /* Aktiviert horizontales Scrollen */
+    display: block; /* Stellt sicher, dass das div den Inhalt umschließt */
+    max-width: 100%;
+    padding-bottom: 10px; /* Platz für den Scrollbalken */
+}
+
+/* Die eigentliche Tabelle */
+#miner-table, #farm-table {
+    width: max-content; /* Sorgt dafür, dass die Tabelle größer sein kann als der Container */
+    min-width: 100%; /* Verhindert, dass sie zu klein wird */
     border-collapse: collapse;
     background-color: #2a2a2a;
     color: #e6e6e6;
@@ -571,35 +582,47 @@ header {
     overflow: hidden;
 }
 
+/* Tabellenzellen verhindern Umbrüche */
+#miner-table th, #miner-table td, #farm-table th, #farm-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #444;
+    white-space: nowrap; /* Verhindert Umbrüche in den Tabellenzellen */
+}
+
+
+/* Tabellenkopf bleibt fixiert */
 #miner-table thead, #farm-table thead {
     background-color: #673dec;
     color: white;
     font-weight: bold;
 }
 
-#miner-table th, #miner-table td, #farm-table th, #farm-table td{
+/* Tabellenzellen */
+#miner-table th, #miner-table td, #farm-table th, #farm-table td {
     padding: 12px;
     text-align: center;
     border-bottom: 1px solid #444;
+    white-space: nowrap; /* Verhindert Umbrüche in den Tabellenzellen */
 }
 
-#miner-table tbody tr:nth-child(even), #farm-table tbody tr:nth-child(even)  {
+/* Abwechselnde Farben für Zeilen */
+#miner-table tbody tr:nth-child(even), #farm-table tbody tr:nth-child(even) {
     background-color: #333;
 }
 
-#miner-table tbody tr, #farm-table tbody tr {
-    transition: transform 0.2s ease-in-out;
-}
-
-#miner-table tbody tr:hover, #farm-table tbody tr:hover  {
+/* Hover-Effekt für Zeilen */
+#miner-table tbody tr:hover, #farm-table tbody tr:hover {
     transform: scale(1.02);
     background-color: #9333ea;
 }
 
+/* Ecken abrunden */
 #miner-table th:first-child, #farm-table th:first-child {
     border-top-left-radius: 12px;
 }
 
-#miner-table th:last-child ,#farm-table th:last-child {
+#miner-table th:last-child, #farm-table th:last-child {
     border-top-right-radius: 12px;
 }
+
