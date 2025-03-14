@@ -52,14 +52,14 @@
             18: { to: 17, pricePerW: 1.32 },
             19: { to: 18, pricePerW: 1.32 },
             20: { to: 19, pricePerW: 1.32 },
-            21: { to: 20, pricePerW: 1.02 },
-            22: { to: 21, pricePerW: 1.02 },
-            23: { to: 22, pricePerW: 1.02 },
-            24: { to: 23, pricePerW: 1.02 },
-            25: { to: 24, pricePerW: 1.02 },
-            26: { to: 25, pricePerW: 1.02 },
-            27: { to: 26, pricePerW: 1.02 },
-            28: { to: 27, pricePerW: 1.02 },
+            21: { to: 20, pricePerW: 0.55 },
+            22: { to: 21, pricePerW: 0.55 },
+            23: { to: 22, pricePerW: 0.55 },
+            24: { to: 23, pricePerW: 0.55 },
+            25: { to: 24, pricePerW: 0.55 },
+            26: { to: 25, pricePerW: 0.55 },
+            27: { to: 26, pricePerW: 0.55 },
+            28: { to: 27, pricePerW: 0.55 },
             29: { to: 28, pricePerW: 0.99 },
             30: { to: 29, pricePerW: 0.99 },
             31: { to: 30, pricePerW: 0.99 },
@@ -1133,3 +1133,62 @@
                         alert('Failed to copy: ', err);
                     });
                 }
+                function openImportModal() {
+                    document.getElementById("importModal").style.display = "flex";
+                }
+                
+                function closeImportModal() {
+                    document.getElementById("importModal").style.display = "none";
+                }
+                function importMinerData(replaceExisting) {
+                    let text = document.getElementById("minerInput").value;
+                    let minerData = [];
+                    let lines = text.split("\n").map(line => line.trim());
+                    let currentMiner = null;
+                
+                    for (let i = 0; i < lines.length; i++) {
+                        let line = lines[i];
+                
+                        if (line.startsWith("Miner")) {
+                            // Neuer Miner beginnt
+                            if (currentMiner !== null) {
+                                minerData.push(currentMiner); // Letzten Miner speichern
+                            }
+                            currentMiner = { miner_id: "", Miner_Name: "", power: 0, efficiency: 0 };
+                        } else if (line.startsWith("The")) {
+                            // Miner-Typ und Nummer extrahieren
+                            let parts = line.split(" #");
+                            currentMiner.Miner_Name = parts[0].trim();
+                            currentMiner.miner_id = "#" + parts[1].trim();
+                        } else if (line.endsWith("TH")) {
+                            // TH extrahieren
+                            currentMiner.power = parseFloat(line.replace(" TH", "").trim());
+                        } else if (line.endsWith("W/TH")) {
+                            // W/TH extrahieren
+                            currentMiner.efficiency = parseFloat(line.replace(" W/TH", "").trim());
+                        }
+                    }
+                
+                    // Letzten Miner nicht vergessen, falls vorhanden!
+                    if (currentMiner !== null) {
+                        minerData.push(currentMiner);
+                    }
+                
+                    if (replaceExisting) {
+                        // **Ersetze alle vorhandenen Miner mit den importierten**
+                        localStorage.setItem("minerData", JSON.stringify(minerData));
+                    } else {
+                        // **Hole bestehende Miner und füge die neuen hinzu**
+                        let existingData = JSON.parse(localStorage.getItem("minerData")) || [];
+                        let updatedData = existingData.concat(minerData);
+                        localStorage.setItem("minerData", JSON.stringify(updatedData));
+                    }
+                
+                    // **Lade die aktuell gespeicherten Miner aus LocalStorage neu in die Tabelle**
+                    ladeFarmTable(JSON.parse(localStorage.getItem("minerData"))); 
+                
+                    // Schließe das Import-Modal
+                    closeImportModal();
+                }
+                
+                          
