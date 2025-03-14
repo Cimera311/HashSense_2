@@ -276,6 +276,22 @@
                     <button class="view-btn active" id="grid-btn" onclick="wechselAnsicht('grid')">🔲 Grid</button>
                     <button class="view-btn" id="list-btn" onclick="wechselAnsicht('list')">📋 Liste</button>
                 </div>
+                <!-- Button zum Öffnen des Import-Fensters -->
+                <button onclick="openImportModal()">Importieren</button>
+
+                <!-- Modal für Miner-Import -->
+                <div id="importModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeImportModal()">&times;</span>
+                        <h2>Miner-Daten importieren</h2>
+                        <textarea id="minerInput" rows="10" cols="50" placeholder="Hier Miner-Daten einfügen..."></textarea>
+                        <div class="modal-buttons">
+                            <button onclick="importMinerData(true)">Vorhandene Miner ersetzen</button>
+                            <button onclick="importMinerData(false)">Miner hinzufügen</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="currencySwitcher">
                     <button class="currency-btn" id="btc-btn" onclick="wechselWaehrung('btc')">₿ BTC</button>
                     <button class="currency-btn active" id="usd-btn" onclick="wechselWaehrung('usd')">$ USD</button>
