@@ -1191,4 +1191,48 @@
                     closeImportModal();
                 }
                 
-                          
+                
+                function setTableSorting() {
+                    document.querySelectorAll("table").forEach(table => {
+                        const headers = table.querySelectorAll("th");
+                
+                        headers.forEach((header, columnIndex) => {
+                            header.addEventListener("click", function () {
+                                sortTable(table, columnIndex);
+                            });
+                        });
+                    });
+                }
+                
+                function sortTable(table, columnIndex) {
+                    const tbody = table.querySelector("tbody");
+                    const rows = Array.from(tbody.querySelectorAll("tr"));
+                
+                    const ascending = table.dataset.sortOrder !== "asc";
+                    table.dataset.sortOrder = ascending ? "asc" : "desc";
+                
+                    rows.sort((rowA, rowB) => {
+                        const cellA = rowA.cells[columnIndex].innerText.trim();
+                        const cellB = rowB.cells[columnIndex].innerText.trim();
+                        const isNumeric = !isNaN(parseFloat(cellA)) && !isNaN(parseFloat(cellB));
+                
+                        if (isNumeric) {
+                            return ascending
+                                ? parseFloat(cellA) - parseFloat(cellB)
+                                : parseFloat(cellB) - parseFloat(cellA);
+                        } else {
+                            return ascending
+                                ? cellA.localeCompare(cellB)
+                                : cellB.localeCompare(cellA);
+                        }
+                    });
+                
+                    tbody.innerHTML = "";
+                    rows.forEach(row => tbody.appendChild(row));
+                }
+                
+                // Falls eine neue Tabelle dynamisch erstellt wird, erneut das Sortieren aktivieren
+                document.addEventListener("click", function () {
+                    setTableSorting();
+                });
+                               
