@@ -760,3 +760,25 @@ header {
 .modal-buttons button:hover {
     background-color: #5329ba;
 }
+th {
+    cursor: pointer;
+    position: relative;
+}
+
+th::after {
+    content: " ⇅";
+    font-size: 12px;
+    color: #aaa;
+    position: absolute;
+    right: 10px;
+}
+
+th.sorted-asc::after {
+    content: " ▲";
+    color: #fff;
+}
+
+th.sorted-desc::after {
+    content: " ▼";
+    color: #fff;
+}
