@@ -1192,6 +1192,10 @@
                 }
                 
                 
+                document.addEventListener("DOMContentLoaded", function () {
+                    setTableSorting();
+                });
+                
                 function setTableSorting() {
                     document.querySelectorAll("table").forEach(table => {
                         const headers = table.querySelectorAll("th");
@@ -1208,28 +1212,37 @@
                     const tbody = table.querySelector("tbody");
                     const rows = Array.from(tbody.querySelectorAll("tr"));
                 
+                    // Prüfen, ob die Spalte Inputs enthält
+                    const isInputColumn = rows[0].cells[columnIndex].querySelector("input") !== null;
                     const ascending = table.dataset.sortOrder !== "asc";
                     table.dataset.sortOrder = ascending ? "asc" : "desc";
                 
                     rows.sort((rowA, rowB) => {
-                        const cellA = rowA.cells[columnIndex].innerText.trim();
-                        const cellB = rowB.cells[columnIndex].innerText.trim();
-                        const isNumeric = !isNaN(parseFloat(cellA)) && !isNaN(parseFloat(cellB));
+                        let cellA = rowA.cells[columnIndex];
+                        let cellB = rowB.cells[columnIndex];
+                
+                        // Falls die Spalte ein Input enthält, nehme dessen Wert
+                        let valueA = isInputColumn ? cellA.querySelector("input").value.trim() : cellA.innerText.trim();
+                        let valueB = isInputColumn ? cellB.querySelector("input").value.trim() : cellB.innerText.trim();
+                
+                        // Prüfen, ob die Werte numerisch sind
+                        const isNumeric = !isNaN(parseFloat(valueA)) && !isNaN(parseFloat(valueB));
                 
                         if (isNumeric) {
                             return ascending
-                                ? parseFloat(cellA) - parseFloat(cellB)
-                                : parseFloat(cellB) - parseFloat(cellA);
+                                ? parseFloat(valueA) - parseFloat(valueB)
+                                : parseFloat(valueB) - parseFloat(valueA);
                         } else {
                             return ascending
-                                ? cellA.localeCompare(cellB)
-                                : cellB.localeCompare(cellA);
+                                ? valueA.localeCompare(valueB)
+                                : valueB.localeCompare(valueA);
                         }
                     });
                 
                     tbody.innerHTML = "";
                     rows.forEach(row => tbody.appendChild(row));
                 }
+                
                 
                 // Falls eine neue Tabelle dynamisch erstellt wird, erneut das Sortieren aktivieren
                 document.addEventListener("click", function () {
