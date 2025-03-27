@@ -12,211 +12,11 @@
         });
     </script>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
     <title>HashSense Farm</title>
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #1a1a1a;
-            color: #e6e6e6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow-y: auto;
-        }
-        .main-container {
-            width: 100%;
-            max-width: 100%;
-            background-color: #2a2a2a;
-            border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-        }
-        .header {
-            background-color: #444;
-            padding: 20px;
-            text-align: center;
-            font-size: 1.5em;
-            font-weight: bold;
-            border-radius: 20px 20px 0 0;
-        }
-        .content {
-            padding: 20px;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        /* Buttons in der MinerCard */
-        .card {
-            position: relative; /* Notwendig für absolute Positionierung der Buttons */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 15px;
-            background: #1a1a1a;
-            border-radius: 12px;
-            border: 2px solid #444;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-            min-width: 220px; /* Etwas breiter für bessere Darstellung */
-        }
-        /* Stil für den Label-Tag oben (#00001) */
-        .card-label {
-            background-color: #6a5acd;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.9em;
-            font-weight: bold;
-            position: absolute;
-            top: -12px;
-            left: 10px;
-        }
-        .farm-card {
-            background-color: #333;
-            padding: 20px;
-            border-radius: 20px;
-            flex-direction: column;
-            width: 100%;
-            text-align: center;
-            margin: 20px auto 0;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            border: 1px solid #555;
-            position: relative;
-        }
-        .input-container, .input-container-farm {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 8px; /* Abstand zwischen den Feldern */
-        }
-        .input-container label, .input-container-farm label {
-            font-size: 0.85em;
-            color: #bbb;
-            margin-bottom: 3px;
-        }
-        .input-container input, .input-container-farm input {
-            width: 90%;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #555;
-            background-color: #2a2a2a;
-            color: #e6e6e6;
-            font-size: 1em;
-            text-align: center;
-        }
-        /* Stil für die Buttons */
-        .delete-btn,
-        .copy-btn {
-            position: absolute;
-            top: 5px;
-            background-color: transparent;
-            color: #e6e6e6;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-        }
-        /* X-Button (Löschen) */
-        .delete-btn {
-            right: 10px;
-        }
-
-        /* Kopier-Button */
-        .copy-btn {
-            right: 35px;
-        }
-        /* Button-Hover-Effekt */
-        .delete-btn:hover,
-        .copy-btn:hover {
-            color: #9333ea; /* Lila für besseren Effekt */
-        }
-        /* Stil für die Karte mit den Buttons */
-        .card button {
-            background: none;
-            border: none;
-            color: #bbb;
-            font-size: 1.2em;
-            cursor: pointer;
-            position: absolute;
-        }
-        /* Abstand zwischen den Feldern */
-        .card input:not(:last-child) {
-            margin-bottom: 10px;
-        }
-        .add-card {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2em;
-            font-weight: bold;
-            color: #e6e6e6;
-            cursor: pointer;
-            background-color: #444; /* Etwas heller als die normalen Cards */
-            border: 2px dashed #673dec; /* Umrandung als Hinweis */
-        }
-        
-        .add-card:hover {
-            border-color: #9333ea;
-            color: #9333ea;
-        }
-        .view-btn {
-            background-color: #444;
-            border: 2px solid #555;
-            padding: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-        }
-        
-        .view-btn.active {
-            background-color: #9333ea;
-            border-color: #673dec;
-            transform: scale(1.1);
-        }
-        #currencySwitcher {
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        .currency-btn {
-            background-color: #444;
-            border: 2px solid #555;
-            padding: 8px;
-            margin: 5px;
-            cursor: pointer;
-            font-size: 18px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-            color: #e6e6e6;
-        }
-
-        .currency-btn.active {
-            background-color: #9333ea;
-            border-color: #673dec;
-            transform: scale(1.1);
-        }
-
-        /* Stil für editierbare Tabellenfelder */
-        .editable-field {
-            width: 100%;
-            background-color: #222;
-            color: white;
-            border: 1px solid #444;
-            text-align: center;
-            padding: 5px;
-            border-radius: 4px;
-            font-size: 1em;
-        }
-        .editable-field:focus {
-            outline: none;
-            border-color: #673dec; /* Lila Highlight beim Bearbeiten */
-        }
-
+  
     </style>
 </head>
 <body>
@@ -224,108 +24,153 @@
     <div class="main-container">
         <div class="main-container">
             <header class="header">
-                <div class="header-item">
-                    <img src="https://github.com/Cimera311/Gomining_Calculator/raw/main/Bitcoin.svg.png" alt="BTC">
-                    <select id="bitcoin-price-dropdown" onchange="updateBTCPrice();">
-                        <option value="10000">10,000 $</option>
-                        <option value="20000">20,000 $</option>
-                        <option value="30000">30,000 $</option>    
-                        <option value="40000">40,000 $</option>
-                        <option value="50000">50,000 $</option>
-                        <option value="60000">60,000 $</option>   
-                        <option value="70000">70,000 $</option>
-                        <option value="80000">80,000 $</option>
-                        <option value="90000">90,000 $</option>
-                        <option id="currentp" value="0">current price</option>
-                        <option value="100000">100,000 $</option>
-                        <option value="110000">110,000 $</option>
-                        <option value="120000">120,000 $</option>
-                        <option value="130000">130,000 $</option>
-                        <option value="140000">140,000 $</option>
-                        <option value="150000">150,000 $</option>
-                        <option value="160000">160,000 $</option>
-                        <option value="200000">200,000 $</option>
-                        <option value="250000">250,000 $</option>
-                        <option value="300000">300,000 $</option>
-                        <option value="400000">400,000 $</option>   
-                    </select>
+                <div class="card-field">
+                    <div class="card-title">CURRENT BITCOINPRICE</div>
+                    <div class="card-content aligned">
+                        <div class="icon-wrap">
+                         <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="BTC" class="card-icon">
+                        </div>
+                        <div class="value-wrap">
+                            <select id="bitcoin-price-dropdown" onchange="updateBTCPrice();">
+                                <option value="10000">10,000 $</option>
+                                <option value="20000">20,000 $</option>
+                                <option value="30000">30,000 $</option>    
+                                <option value="40000">40,000 $</option>
+                                <option value="50000">50,000 $</option>
+                                <option value="60000">60,000 $</option>   
+                                <option value="70000">70,000 $</option>
+                                <option value="80000">80,000 $</option>
+                                <option value="90000">90,000 $</option>
+                                <option id="currentp" value="0">current price</option>
+                                <option value="100000">100,000 $</option>
+                                <option value="110000">110,000 $</option>
+                                <option value="120000">120,000 $</option>
+                                <option value="130000">130,000 $</option>
+                                <option value="140000">140,000 $</option>
+                                <option value="150000">150,000 $</option>
+                                <option value="160000">160,000 $</option>
+                                <option value="200000">200,000 $</option>
+                                <option value="250000">250,000 $</option>
+                                <option value="300000">300,000 $</option>
+                                <option value="400000">400,000 $</option>   
+                            </select>
+                        </div>
                 </div>
-                <div class="header-item">
-                    <img src="https://github.com/Cimera311/Gomining_Calculator/raw/main/GoMining_Logo.webp" alt="GMT">
-                    <input value="0.400" id="gmt-token-price" placeholder="0,400">
+              </div>
+              <div class="card-field">
+                <div class="card-title">CURRENT GMT PRICE</div>
+                <div class="card-content aligned">
+                    <div class="icon-wrap">
+                        <img src="https://github.com/Cimera311/Gomining_Calculator/raw/main/GoMining_Logo.webp" alt="GMT" class="card-icon">
+                    </div>
+                    <div class="value-wrap">
+                        <input type="number" id="gmt-token-price" placeholder="0.4269" step="0.0001">
+                    </div>
                 </div>
-                <div class="header-item">
-                    <label title="how much Satoshi Gomining pays for 1 TH" for="sat-TH">sat per TH:</label>
-                    <input value="58" id="sat-TH">
-                </div>
-                <div class="header-item">
-                    <button class="circular-button" onclick="fetchBTCPrice();fetchGMTPrice();">&#x21BB;</button>
-                </div>
+                  </div>
+                  <div class="card-field">
+                    <div class="card-title">SAT PER TH</div>
+                    <div class="card-content">
+                        <img src="https://cryptologos.cc/logos/sats-ordinals-sats-logo.png" alt="⚡" class="card-icon">
+                      <input type="number" id="sat-TH" value="58" min="0" step="1">
+                    </div>
+                  </div>
+                  <button class="icon-btn" onclick="fetchBTCPrice(); fetchGMTPrice();"><span class="material-icons">refresh</span></button>
+
             </header>
         </div>
         <div class="main-container">
-            <button onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '1', '20', '-');">add miner</button>
-                
-                <!--<button onclick="speichernDaten()">Save</button>
-                <button onclick="ladenDaten()">Load</button>-->
-                <button onclick="speichernMinerSupabase()">💾 Save to Cloud</button>
-                <button onclick="ladenMinerSupabase()">☁️ Load from Cloud</button>
-                <button onclick="loescheMinerSupabase()">🗑️ Delete from Cloud</button>
+            <header class="header header-actions">
+                <div class="action-center">
+                    <div class="action-icons">
+                    <!-- lila Buttons wie "add miner", "save", etc. -->
+                   <!-- <button class="main-btn" onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '1', '20', '-');">add miner</button>
+                    <button onclick="speichernDaten()">Save</button>
+                    <button onclick="ladenDaten()">Load</button>
+                    <button class="main-btn" onclick="speichernMinerSupabase()">💾 Save to Cloud</button>
+                    <button class="main-btn" onclick="ladenMinerSupabase()">☁️ Load from Cloud</button>
+                    <button class="main-btn" onclick="loescheMinerSupabase()">🗑️ Delete from Cloud</button>
+                    <button class="main-btn" onclick="openImportModal()">Import Miners</button>-->
+                    <button class="icon-btn" title="Add Miner" onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '1', '20', '-');"><span class="material-icons">add</span></button>
+                    <button class="icon-btn" title="Save to Cloud" onclick="speichernMinerSupabase()"><span class="material-icons">save</span></button>
+                    <button class="icon-btn" title="Load from Cloud" onclick="ladenMinerSupabase()"><span class="material-icons">cloud</span></button>
+                    <button class="icon-btn" title="Delete from Cloud" onclick="loescheMinerSupabase()"><span class="material-icons">delete</span></button>
+                    <button class="icon-btn import-btn" onclick="openImportModal()">Import Miners</button>
 
-                <div id="viewSwitcher">
+
+                    <!-- Modal für Miner-Import -->
+                    <div id="importModal" class="modal">
+                        <div class="modal-content">
+                            <span class="close" onclick="closeImportModal()">&times;</span>
+                            <h2>Miner-Data import</h2>
+                            <textarea id="minerInput" rows="10" cols="50" placeholder="Paste miner Data here..."></textarea>
+                            <div class="modal-buttons">
+                                <button onclick="importMinerData(true)">Replace existing miners</button>
+                                <button onclick="importMinerData(false)">Add imported miners</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Kontroll-Modal für importierte Miner -->
+                    <div id="previewModal" class="modal">
+                        <div class="modal-content">
+                            <span class="close" onclick="closePreviewModal()">&times;</span>
+                            <h2>check imported miners</h2>
+                            <div class="table-container">
+                                <table id="preview-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Miner Name</th>
+                                            <th>TH</th>
+                                            <th>W/TH</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="preview-tbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="modal-buttons">
+                                <button onclick="finalizeImport(true)">Import &  replace</button>
+                                <button onclick="finalizeImport(false)">Add miners</button>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                  <div class="action-footer spaced">
+
+                        <div class="view-toggle">
+                            <button class="toggle-btn active" id="grid-btn" onclick="wechselAnsicht('grid')">Grid</button>
+                            <button class="toggle-btn" id="list-btn" onclick="wechselAnsicht('list')">Liste</button>
+                          </div>                          
+
+
+                        <div class="currency-toggle">
+                            <button class="toggle-btn active" id="btc-btn" onclick="wechselWaehrung('btc')">BTC</button>
+                            <button class="toggle-btn" id="usd-btn" onclick="wechselWaehrung('usd')">USD</button>
+                            <button class="toggle-btn" id="gmt-btn" onclick="wechselWaehrung('gmt')">GMT</button>
+                          </div>  
+                </div>
+                
+                
+
+
+             <!--   <div id="viewSwitcher">
                     <button class="view-btn active" id="grid-btn" onclick="wechselAnsicht('grid')">🔲 Grid</button>
                     <button class="view-btn" id="list-btn" onclick="wechselAnsicht('list')">📋 Liste</button>
                 </div>
-                <!-- Button zum Öffnen des Import-Fensters -->
-                <button onclick="openImportModal()">Import Miners</button>
 
-                <!-- Modal für Miner-Import -->
-                <div id="importModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close" onclick="closeImportModal()">&times;</span>
-                        <h2>Miner-Data import</h2>
-                        <textarea id="minerInput" rows="10" cols="50" placeholder="Paste miner Data here..."></textarea>
-                        <div class="modal-buttons">
-                            <button onclick="importMinerData(true)">Replace existing miners</button>
-                            <button onclick="importMinerData(false)">Add imported miners</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Kontroll-Modal für importierte Miner -->
-                <div id="previewModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close" onclick="closePreviewModal()">&times;</span>
-                        <h2>check imported miners</h2>
-                        <div class="table-container">
-                            <table id="preview-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Miner Name</th>
-                                        <th>TH</th>
-                                        <th>W/TH</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="preview-tbody"></tbody>
-                            </table>
-                        </div>
-                        <div class="modal-buttons">
-                            <button onclick="finalizeImport(true)">Import &  replace</button>
-                            <button onclick="finalizeImport(false)">Add miners</button>
-                        </div>
-                    </div>
-                </div>
+
                 <div id="currencySwitcher">
                     <button class="currency-btn" id="btc-btn" onclick="wechselWaehrung('btc')">₿ BTC</button>
                     <button class="currency-btn active" id="usd-btn" onclick="wechselWaehrung('usd')">$ USD</button>
                     <button class="currency-btn" id="gmt-btn" onclick="wechselWaehrung('gmt')">🪙 GMT</button>
                 </div>
+-->
 
-                <!-- Unsichtbares Element zur Speicherung der aktiven Währung -->
                 <span id="currencyMode" style="display: none;">usd</span>
                 <span id="viewMode" style="display: none;">grid</span>
 
-           
+            </header>
         </div>
 <div class="main-container">
 
@@ -335,11 +180,35 @@
 </div>
 
         <div class="content" id="content"></div>
+        <footer style="margin-top: 20px; padding: 20px; background-color: #2a2a2a; color: #e6e6e6; text-align: center; border-top: 1px solid #555;">
+            <h3 style="color: #673dec;">Support Us</h3>
+            <p>If you like our work, feel free to support us by sending GMT tokens on BNB Smart Chain:</p>
+            <div class="wallet-address-container">
+                <img class="wallet-icon" src="https://github.com/Cimera311/Gomining_Calculator/raw/main/GoMining_Logo.webp" alt="Wallet Icon">
+                <span class="wallet-address">0x3229E3118F803d8EaCB52D5f598395F5bf888bad</span>
 
+            </div>
+            <div class="single-button-container">
+            <button onclick="copyToClipboard('0x3229E3118F803d8EaCB52D5f598395F5bf888bad')" style="background-color: #673dec; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer;">Copy adress</button>        
+            </div>
+
+            <p>Or join us through our referral link:</p>
+            <a href="https://gomining.com/?ref=ICjK3" target="_blank" style="display: inline-block; margin: 10px;">
+                <img src="https://cimera311.github.io/Gomining_Calculator/Gomining.jpg" alt="GoMining Referral" style="width: 150px; height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+            </a>
+            <a href="https://app.gomining.com/miner-wars/mining/select-pool?inviteToClan=2232" target="_blank" style="width: 150px; height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+                <img id="bottom-image" src="IMG_5594.jpeg" alt="Join Us!!!" style="width: 150px; height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+            </a>
+            <p>&copy; 2024 HashSense. All rights reserved.</p>
+            <p>This website is for informational purposes only.</p>
+        </footer>
 
         </div>
+
     </div>
+    
     </div>
+    
 </body>
 <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/+esm';
@@ -988,6 +857,14 @@ function aktualisiereFarmWerte() {
 
     }
 function wechselAnsicht(mode) {
+    document.getElementById("grid-btn").classList.remove("active");
+    document.getElementById("list-btn").classList.remove("active");
+
+    if (mode === "grid") {
+        document.getElementById("grid-btn").classList.add("active");
+    } else {
+        document.getElementById("list-btn").classList.add("active");
+    }
     speichernDaten(); // Speichert die aktuellen Miner-Daten
     let viewElement = document.getElementById('viewMode');
     viewElement.innerText = mode; // Speichert den aktuellen Modus in HTML
@@ -1124,6 +1001,19 @@ function getPricePerTH(efficiency, thAmount) {
     return null; // Falls keine passende Preisstufe gefunden wurde
 }
 function wechselWaehrung(mode) {
+    // Alle Buttons manuell über ID deselektieren
+    document.getElementById("btc-btn").classList.remove("active");
+    document.getElementById("usd-btn").classList.remove("active");
+    document.getElementById("gmt-btn").classList.remove("active");
+
+    // Aktiven Button setzen
+    if (mode === "btc") {
+        document.getElementById("btc-btn").classList.add("active");
+    } else if (mode === "usd") {
+        document.getElementById("usd-btn").classList.add("active");
+    } else if (mode === "gmt") {
+        document.getElementById("gmt-btn").classList.add("active");
+    }
     let currencyElement = document.getElementById('currencyMode');
     currencyElement.innerText = mode; // Speichert die Währung im UI
 
