@@ -505,15 +505,15 @@ function ladenDaten() {
     thead.innerHTML = `
         <tr>
             <th>ID</th>
-            <th>Miner Name</th>               
+            <th class="mineral-header">Miner Name</th>               
             <th>TH</th>
             <th>W/TH</th>
             <th>ROI +1 TH(%)</th>
             <th>ROI -1 W/TH(%)</th>
-            <th>Revenue</th>
-            <th>Electricity</th>
-            <th>Service</th>
             <th>Profit</th>
+            <th>= Electricity -</th>
+            <th>Service -</th>
+            <th>Revenue</th>
         </tr>
     `;
     tableElement.appendChild(thead);
@@ -563,10 +563,10 @@ function ladeFarmTable(minerData) {
             <th>Power (TH)</th>
             <th>Efficiency (W/TH)</th>
             <th>My Total Discount (%)</th>
-            <th>Revenue</th>
-            <th>Electricity</th>
-            <th>Service</th>
             <th>Profit</th>
+            <th>= Electricity -</th>
+            <th> Service -</th>
+            <th>Revenue</th>
         </tr>
     `;
     tableElement.appendChild(thead);
@@ -626,10 +626,10 @@ function ladeFarmTable(minerData) {
             <td>${totalPower}</td>
             <td>${avgEfficiency}</td>
             <td>${user_data.total_discount}</td>
-            <td>${revenueDisplay}</td>
+            <td>${profitDisplay}</td>
             <td>${electricityDisplay}</td>
             <td>${serviceDisplay}</td>
-            <td>${profitDisplay}</td>
+            <td>${revenueDisplay}</td>
         `;
     tbody.appendChild(row);
     tableElement.appendChild(tbody);
@@ -767,16 +767,16 @@ function ladenMinerInTabelle() {
         }
         let row = document.createElement('tr');
         row.innerHTML = `
-            <td><input type="text" value="${miner.miner_id}"  class="editable-field" data-field="miner_id"></td>
-            <td><input type="text" value="${miner.Miner_Name || 'Miner'}"  class="editable-field" data-field="name"></td>
-            <td><input type="number" value="${miner.power}"  class="editable-field" data-field="power"></td>
-            <td><input type="number" value="${miner.efficiency}"  class="editable-field" data-field="efficiency"></td>
-            <td>${roiTH}%</td>
-            <td>${roiWATT.roi_percent}% <span style="color: green;">(+${plusWATTprofit})</span></td>
-            <td>${revenueDisplay}</td>
-            <td>${electricityDisplay}</td>
-            <td>${serviceDisplay}</td>
-            <td>${profitDisplay}</td>
+            <td class="id-header"><input type="text" value="${miner.miner_id}"  class="editable-field" data-field="miner_id"></td>
+            <td class="mineral-header"><input type="text" value="${miner.Miner_Name || 'Miner'}"  class="editable-field" data-field="name"></td>
+            <td class="id-header"><input type="number" value="${miner.power}"  class="editable-field" data-field="power"></td>
+            <td class="id-header"><input type="number" value="${miner.efficiency}"  class="editable-field" data-field="efficiency"></td>
+            <td class="id-header">${roiTH}%</td>
+            <td class="id-header">${roiWATT.roi_percent}% <span style="color: green;">(+${plusWATTprofit})</span></td>
+            <td class="id-header">${profitDisplay}</td>
+            <td class="id-header">${electricityDisplay}</td>
+            <td class="id-header">${serviceDisplay}</td>
+            <td class="id-header">${revenueDisplay}</td>         
         `;
         tbody.appendChild(row);
     });
