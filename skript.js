@@ -983,12 +983,35 @@
                         gmt: dailyElectricityGMT
                     };
                 }
-
                 function getDiscount() {
-                        const discountElement = document.getElementById('gomining-discount-I');
-                        const discount = parseFloat(discountElement?.value) || 0; // Fallback zu 0%, falls leer oder ungültig
-                        return Math.max(0, Math.min(discount, 100)) / 100; // Begrenzung zwischen 0% und 100% und in Dezimalform
+                    const discountI = document.getElementById('gomining-discount-I');
+                    const discountFarm = document.getElementById('gomining-discount');
+                    const discountROI = document.getElementById('gomining-discount_ROI');
+                
+                    // Neuer Fallback: aus Tabellenzelle farm2
+                    let discountTable = 0;
+                    try {
+                        const row = document.querySelector('#farm-tbody tr');
+                        const cell = row?.children?.[2]; // 3. Spalte
+                        if (cell) {
+                            discountTable = parseFloat(cell.textContent.trim());
+                        }
+                    } catch (e) {
+                        discountTable = 0;
                     }
+                    let user_data = JSON.parse(localStorage.getItem('user_data')) || { total_discount: 0 };
+                    const value =
+                        parseFloat(discountI?.value) ||
+                        parseFloat(discountFarm?.value) ||
+                        parseFloat(discountROI?.value) ||
+                        discountTable ||
+                        user_data.total_discount ||
+                        0;
+                
+                    return Math.max(0, Math.min(value, 100)) / 100;
+                }
+                
+                
 
                 // Daily Service Cost in USD, BTC und GMT
                 function calculateDailyService(myTH, btcPrice, gmtPrice) {
