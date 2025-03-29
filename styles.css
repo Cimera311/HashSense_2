@@ -225,9 +225,9 @@
         /* Stil für editierbare Tabellenfelder */
         .editable-field {
             width: 100%;
-            background-color: #222;
+            background-color: transparent;
             color: white;
-            border: 1px solid #444;
+            border: 0px solid #444;
             text-align: center;
             padding: 5px;
             border-radius: 4px;
@@ -846,8 +846,8 @@ header {
 
 /* Die eigentliche Tabelle */
 #miner-table, #farm-table {
-    width: max-content; /* Sorgt dafür, dass die Tabelle größer sein kann als der Container */
-    min-width: 100%; /* Verhindert, dass sie zu klein wird */
+    width: 100%; /* Sorgt dafür, dass die Tabelle größer sein kann als der Container */
+    table-layout: auto;
     border-collapse: collapse;
     background-color: #242533;
     color: #e6e6e6;
@@ -856,25 +856,32 @@ header {
     overflow: hidden;
 }
 
-/* Tabellenzellen verhindern Umbrüche */
-#miner-table th, #miner-table td, #farm-table th, #farm-table td {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid #444;
-    white-space: nowrap; /* Verhindert Umbrüche in den Tabellenzellen */
+th.mineral-header,
+td.mineral-header {
+    width: max-content;
+    min-width: 200px;
+    white-space: nowrap;
 }
-
+th.id-header,
+td.id-header {
+    width: max-content;
+    white-space: nowrap;
+    min-width: 60px;
+}
 
 /* Tabellenkopf bleibt fixiert */
 #miner-table thead, #farm-table thead {
+    
     background-color: #673dec;
     color: white;
     font-weight: bold;
+    min-width: fit-content(120%); /* Verhindert, dass sie zu klein wird */
 }
 
 /* Tabellenzellen */
 #miner-table th, #miner-table td, #farm-table th, #farm-table td {
     padding: 12px;
+    min-width: 60px;
     text-align: center;
     border-bottom: 1px solid #444;
     white-space: nowrap; /* Verhindert Umbrüche in den Tabellenzellen */
