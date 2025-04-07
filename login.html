@@ -18,16 +18,23 @@
         /* Registrierung*/
         document.getElementById("signup-form").addEventListener("submit", async (e) => {
             e.preventDefault();
+        
             const username = document.getElementById("signup-username").value;
             const email = document.getElementById("signup-email").value;
             const password = document.getElementById("signup-password").value;
-
+            const passwordRepeat = document.getElementById("signup-password-repeat").value;
+        
+            if (password !== passwordRepeat) {
+                alert("Passwords do not match!");
+                return;
+            }
+        
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: { data: { username } },
             });
-
+        
             if (error) {
                 console.error("Registration failed:", error.message);
                 alert("Registration failed: " + error.message);
@@ -36,6 +43,7 @@
                 alert("Registration successful!");
             }
         });
+
 
         // Login
         document.getElementById("login-form").addEventListener("submit", async (e) => {
@@ -211,7 +219,8 @@
                     <label for="signup-email">Email:</label>
                     <input type="email" id="signup-email" required>
                     <label for="signup-password">Password:</label>
-                    <input type="password" id="signup-password" required>
+                    <input type="password" id="signup-password" placeholder="Password" required>
+                    <input type="password" id="signup-password-repeat" placeholder="Repeat Password" required>
                     <button type="submit">Sign Up</button>
                 </form>
             </section>
