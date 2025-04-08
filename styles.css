@@ -973,6 +973,7 @@ td.id-header {
     background-color: rgba(0, 0, 0, 0.7);
     justify-content: center;
     align-items: center;
+    
 }
 
 /* Inhalt des Modals */
@@ -982,7 +983,12 @@ td.id-header {
     border-radius: 8px;
     width: 450px;
     text-align: center;
+    justify-content: center;
     color: #e6e6e6;
+    max-height: 90vh; /* Begrenze die Höhe auf 90% der Bildschirmhöhe */
+    overflow-y: auto; /* Nur vertikal scrollbar */
+    -webkit-overflow-scrolling: touch; /* Flüssiges Scrollen auf iPhone / iPad */
+    scrollbar-width: none; /* Versteckt Scrollbalken in Firefox */
 }
 
 /* Schließen-Button */
@@ -1314,7 +1320,30 @@ th.sorted-desc::after {
   .icon-btn .material-icons {
     font-size: 20px;
   }
-  
+  .footer {
+    background-color: #242533; /* gleiche Farbe wie die Seite */
+    color: #e6e6e6;
+    margin: 40px auto 0 auto; /* Oben Abstand, zentriert */
+    padding: 20px;
+    width: 100%;
+    
+    border-top: 2px solid #673dec; /* schöner Farbakzent oben */
+    border-radius: 12px 12px 0 0; /* nur oben abgerundet */
+    text-align: center;
+    font-size: 0.95em;
+}
+.footer h3 {
+    color: #673dec; /* Lila Farbe für Überschrift */
+    margin-bottom: 15px;
+}
+.footer a {
+    color: #a7a7ff; /* Schöner Link-Farbton */
+    text-decoration: none;
+}
+.footer a:hover {
+    text-decoration: underline;
+}
+
   
 
   
