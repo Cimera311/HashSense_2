@@ -102,6 +102,7 @@
                     <div id="importModal" class="modal">
                         <div class="modal-content">
                             <span class="close" onclick="closeImportModal()">&times;</span>
+                            <button onclick="openHowToImportModal()">How to Import</button>
                             <h2>Miner-Data import</h2>
                             <textarea id="minerInput" rows="10" cols="50" placeholder="Paste miner Data here..."></textarea>
                             <div class="modal-buttons">
@@ -110,6 +111,20 @@
                             </div>
                         </div>
                     </div>
+                    <div id="howToImportModal" class="modal">
+                        <div class="modal-content">
+                            <span class="close" onclick="closeHowToImportModal()">&times;</span>
+                            <h2>How to Import Miners</h2>
+                            <p>Step 1: Go to "My Farm" in Gomining.</p>
+                            <img src="ClickonUpgrade.jpg" alt="Step 1" style="width: 100%; height: auto; margin: 10px 0; border-radius: 8px;">
+                            <p>Step 2: Mark all your miners or those you wanna import.</p>
+                            <img src="markallyourminers.jpg" alt="Step 2" style="width: 100%; height: auto; margin: 10px 0; border-radius: 8px;">
+                            <p>Step 3: and copy paste them into the import box.</p>
+                            <img src="andpastethem.jpg" alt="Step 3" style="width: 100%; height: auto; margin: 10px 0; border-radius: 8px;">
+                            <p>after the click on import there will be a windows where you can check them all</p>
+                        </div>
+                    </div>
+                    
                     <!-- Kontroll-Modal für importierte Miner -->
                     <div id="previewModal" class="modal">
                         <div class="modal-content">
@@ -139,8 +154,8 @@
                   <div class="action-footer spaced">
 
                         <div class="view-toggle">
-                            <button class="toggle-btn active" id="grid-btn" onclick="wechselAnsicht('grid')">Grid</button>
-                            <button class="toggle-btn" id="list-btn" onclick="wechselAnsicht('list')">Liste</button>
+                            <button class="toggle-btn active" id="grid-btn" onclick="wechselAnsicht('grid')">grid</button>
+                            <button class="toggle-btn" id="list-btn" onclick="wechselAnsicht('list')">list</button>
                           </div>                          
 
 
@@ -180,7 +195,7 @@
 </div>
 
         <div class="content" id="content"></div>
-        <footer style="margin-top: 20px; padding: 20px; background-color: #2a2a2a; color: #e6e6e6; text-align: center; border-top: 1px solid #555;">
+        <footer class="footer">
             <h3 style="color: #673dec;">Support Us</h3>
             <p>If you like our work, feel free to support us by sending GMT tokens on BNB Smart Chain:</p>
             <div class="wallet-address-container">
@@ -508,6 +523,7 @@ function ladenDaten() {
             <th class="mineral-header">Miner Name</th>               
             <th>TH</th>
             <th>W/TH</th>
+            <th>Miner worth $</th>
             <th>ROI +1 TH(%)</th>
             <th>ROI -1 W/TH(%)</th>
             <th>Profit</th>
@@ -563,6 +579,7 @@ function ladeFarmTable(minerData) {
             <th>Power (TH)</th>
             <th>Efficiency (W/TH)</th>
             <th>My Total Discount (%)</th>
+            <th>Farm worth $</th>
             <th>Profit</th>
             <th>= Electricity -</th>
             <th> Service -</th>
@@ -598,7 +615,7 @@ function ladeFarmTable(minerData) {
     let revenue = calculateDailyRevenue(satoshiPerTH, totalPower, btcPrice, gmtPrice, avgEfficiency);
     let dailyelectricity = calculateDailyElectricity(totalPower, avgEfficiency, btcPrice, gmtPrice);
     let dailyservice = calculateDailyService(totalPower, btcPrice, gmtPrice)
-
+    let worth = calculateWorth(getPricePerTH(avgEfficiency, totalPower), totalPower) || 0; // Wert der Farm
 
         //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.power);
         let profitbtc = revenue.btc - dailyelectricity.btc - dailyservice.btc;
@@ -626,6 +643,7 @@ function ladeFarmTable(minerData) {
             <td>${totalPower}</td>
             <td>${avgEfficiency}</td>
             <td>${user_data.total_discount}</td>
+            <td>$${worth}</td>
             <td>${profitDisplay}</td>
             <td>${electricityDisplay}</td>
             <td>${serviceDisplay}</td>
@@ -718,7 +736,10 @@ function ladenMinerInTabelle() {
 
     minerData.forEach(miner => {
         let myTH = parseFloat(miner.power) ? parseFloat(miner.power) : 0; // Miner-TH aus `minerData`
+        
         let efficiency = parseFloat(miner.efficiency) || 0; // Effizienz aus `minerData`
+        let worth = calculateWorth(getPricePerTH(efficiency, myTH), myTH) || 0; // Wert des Miners
+        let upgradeprice = getPricePerTH(efficiency, myTH) || 0; // Preis pro TH
         let revenue = calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice, efficiency);
         let revenueupgrade = calculateDailyRevenue(satoshiPerTH, 1, btcPrice, gmtPrice, efficiency);
         let dailyelectricity = calculateDailyElectricity(miner.power, miner.efficiency, btcPrice, gmtPrice)
@@ -771,6 +792,7 @@ function ladenMinerInTabelle() {
             <td class="mineral-header"><input type="text" value="${miner.Miner_Name || 'Miner'}"  class="editable-field" data-field="name"></td>
             <td class="id-header"><input type="number" value="${miner.power}"  class="editable-field" data-field="power"></td>
             <td class="id-header"><input type="number" value="${miner.efficiency}"  class="editable-field" data-field="efficiency"></td>
+            <td class="id-header">$${worth}<span style="color: green;">(1TH=$${upgradeprice})</span></td>
             <td class="id-header">${roiTH}%</td>
             <td class="id-header">${roiWATT.roi_percent}% <span style="color: green;">(+${plusWATTprofit})</span></td>
             <td class="id-header">${profitDisplay}</td>
@@ -984,6 +1006,7 @@ function getEfficiencyUpgradePrice(currentEfficiency) {
     return null; // Falls keine Daten vorhanden sind
 }
 function getPricePerTH(efficiency, thAmount) {
+    efficiency = Math.round(parseFloat(efficiency)); // Runden auf die nächste ganze Zahl
     if (!priceMatrixdatei[efficiency]) {
         console.error(`Keine Preisdaten für ${efficiency} W/TH gefunden.`);
         return null;
