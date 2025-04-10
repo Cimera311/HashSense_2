@@ -585,20 +585,46 @@ button:active {
 .question-circle:hover {
     background-color: #8a5eff; /* Hellerer Lila beim Hover */
 }
+.footer {
+  
+
+    color: #e6e6e6;
+    margin: 40px auto 0 auto; /* Oben Abstand, zentriert */
+    padding: 20px;
+    background-color: #1e1f2c;
+    max-width: 100%; /* Maximale Breite auf 100% beschränken */
+    justify-content: space-between;
+    border-top: 2px solid #673dec; /* schöner Farbakzent oben */
+    border-radius: 12px 12px 0 0; /* nur oben abgerundet */
+    text-align: center;
+    font-size: 0.95em;
+}
+.footer h3 {
+    color: #673dec; /* Lila Farbe für Überschrift */
+    margin-bottom: 15px;
+}
+.footer a {
+    color: #a7a7ff; /* Schöner Link-Farbton */
+    text-decoration: none;
+}
+.footer a:hover {
+    text-decoration: underline;
+}
 
 /* Header-Container */
-header {
+header  {
+    border-bottom: 2px solid #673dec; /* schöner Farbakzent oben */
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
     padding: 10px;
-    background-color: #333;
+
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
     max-width: 100%; /* Maximale Breite auf 100% beschränken */
-    margin: 0 auto; /* Zentrierung */
+    margin: 2px auto; /* Zentrierung */
 }
 
 /* Einzelne Header-Items */
@@ -655,13 +681,23 @@ header {
     header {
         flex-direction: column;
         align-items: center; /* Zentriert die Items */
-    }
 
+    }
+    header, header * {
+        font-size: 70%;
+      }
+    .card-title{
+       display: none;   /* Versteckt den Titel auf kleinen Bildschirmen */
+    }
+    .card-field{
+        padding: none;
+    }
     .header-item {
     width: calc(100% - 40px); /* Volle Breite minus Padding */
     max-width: 100%; /* Sicherstellen, dass sie nicht breiter als der Header sind */
     padding: 5px 5px; /* Gleiche Padding-Werte */
     box-sizing: border-box; /* Padding wird in die Breite eingerechnet */
+ 
 }
 
 
@@ -756,7 +792,7 @@ header {
     padding: 10px;
     border: 2px solid #555;
     border-radius: 5px;
-    background-color: #333;
+    background-color: #1e1f2c;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     overflow-x: auto; /* Ermöglicht horizontales Scrollen */
     white-space: nowrap; /* Verhindert Umbruch */
@@ -1320,29 +1356,6 @@ th.sorted-desc::after {
   .icon-btn .material-icons {
     font-size: 20px;
   }
-  .footer {
-    background-color: #242533; /* gleiche Farbe wie die Seite */
-    color: #e6e6e6;
-    margin: 40px auto 0 auto; /* Oben Abstand, zentriert */
-    padding: 20px;
-    width: 100%;
-    
-    border-top: 2px solid #673dec; /* schöner Farbakzent oben */
-    border-radius: 12px 12px 0 0; /* nur oben abgerundet */
-    text-align: center;
-    font-size: 0.95em;
-}
-.footer h3 {
-    color: #673dec; /* Lila Farbe für Überschrift */
-    margin-bottom: 15px;
-}
-.footer a {
-    color: #a7a7ff; /* Schöner Link-Farbton */
-    text-decoration: none;
-}
-.footer a:hover {
-    text-decoration: underline;
-}
 
   
 
