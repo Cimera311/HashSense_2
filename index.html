@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <script src="skript.js"></script>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 </head>
 <body>
     <div class="main-container">
-        <div class="main-container">
+        
             <header class="header">
                 <div class="card-field">
                     <div class="card-title">CURRENT BITCOINPRICE</div>
                     <div class="card-content aligned">
                         <div class="icon-wrap">
-                         <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="BTC" class="card-icon">
+                         <img src="bitcoin-910307_1280.webp" alt="BTC" class="card-icon">
                         </div>
                         <div class="value-wrap">
                             <select id="bitcoin-price-dropdown" onchange="updateBTCPrice();">
@@ -47,7 +48,7 @@
                 <div class="card-title">CURRENT GMT PRICE</div>
                 <div class="card-content aligned">
                     <div class="icon-wrap">
-                        <img src="https://github.com/Cimera311/Gomining_Calculator/raw/main/GoMining_Logo.webp" alt="GMT" class="card-icon">
+                        <img src="GoMining_Logo.webp" alt="GMT" class="card-icon">
                     </div>
                     <div class="value-wrap">
                         <input type="number" id="gmt-token-price" placeholder="0.4269" step="0.0001">
@@ -57,19 +58,19 @@
                   <div class="card-field">
                     <div class="card-title">SAT PER TH</div>
                     <div class="card-content">
-                        <img src="https://cryptologos.cc/logos/sats-ordinals-sats-logo.png" alt="⚡" class="card-icon">
+                        <img src="sats-ordinals-sats-logo.png" alt="⚡" class="card-icon">
                       <input type="number" id="sat-TH" value="51" min="0" step="1">
                     </div>
                   </div>
                   <button class="icon-btn" onclick="fetchBTCPrice(); fetchGMTPrice();"><span class="material-icons">refresh</span></button>
 
             </header>
-            <main>
+            <main class="main-content" id="main-content" styles="align-items: center;">
                 <button onclick="window.location.href='login.html'">Login</button>
                 <button onclick="window.location.href='calc.html'">Calculator</button>
                 
             </main>
-         </div>
+         
 
         <footer class="footer">
             <h3 style="color: #673dec;">Support Us</h3>
