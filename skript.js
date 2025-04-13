@@ -1219,4 +1219,133 @@
                 function closeHowToImportModal() {
                     document.getElementById("howToImportModal").style.display = "none";
                 }
+
+                function convertTransactionsToXLSX() {
+                    const input = document.getElementById('transactionInput').value;
+                    const lines = input.split('\n').map(line => line.trim()).filter(line => line !== '');
                 
+                    const today = new Date();
+                    let currentDate = formatDate(today);
+                
+                    const dateMapping = {
+                        "today": 0,
+                        "yesterday": -1,
+                        "2 days ago": -2,
+                        "3 days ago": -3,
+                        "4 days ago": -4
+                    };
+                
+                    let i = 0;
+                    let startReading = false;
+                    const rows = [["Date", "Type", "Value", "Status", "Currency"]];
+                
+                    while (i < lines.length) {
+                        const line = lines[i];
+                
+                        // Skip until "today" appears
+                        if (!startReading) {
+                            if (line.toLowerCase().includes("today")) {
+                                startReading = true;
+                            }
+                            i++;
+                            continue;
+                        }
+                
+                        if (dateMapping.hasOwnProperty(line.toLowerCase())) {
+                            const offset = dateMapping[line.toLowerCase()];
+                            const newDate = new Date();
+                            newDate.setDate(today.getDate() + offset);
+                            currentDate = formatDate(newDate);
+                            i++;
+                            continue;
+                        }
+                
+                        const dateMatch = line.match(/^[A-Za-z]{3} \d{2}$/);
+                        if (dateMatch) {
+                            currentDate = convertToGermanDate(line);
+                            i++;
+                            continue;
+                        }
+                
+                        const type = lines[i];
+                        const amount = lines[i + 1];
+                        const status = lines[i + 2];
+                        const currency = lines[i + 3];
+                
+                        if (type && amount && status && currency) {
+                            rows.push([currentDate, type, parseFloat(amount), status, currency]);
+                            i += 4;
+                        } else {
+                            i++;
+                        }
+                    }
+                
+                    const worksheet = XLSX.utils.aoa_to_sheet(rows);
+                
+                    // Setze die "Value" Spalte (C) auf Währung
+                    const range = XLSX.utils.decode_range(worksheet['!ref']);
+                    for (let R = 1; R <= range.e.r; ++R) {
+                        const cell = worksheet[XLSX.utils.encode_cell({ r: R, c: 2 })]; // 2 = C-Spalte
+                        if (cell && typeof cell.v === 'number') {
+                            cell.t = 'n';
+                            cell.z = '"$"#,##0.00'; // Format: Währung USD
+                        }
+                    }
+                
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, "Transactions");
+                
+                    XLSX.writeFile(workbook, "transactions.xlsx");
+                }
+                
+                function formatDate(date) {
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    return `${day}.${month}.${year}`;
+                }
+                
+                function convertToGermanDate(dateString) {
+                    const months = {
+                        Jan: '01', Feb: '02', Mar: '03', Apr: '04',
+                        May: '05', Jun: '06', Jul: '07', Aug: '08',
+                        Sep: '09', Oct: '10', Nov: '11', Dec: '12'
+                    };
+                    const [monthStr, dayStr] = dateString.split(' ');
+                    const month = months[monthStr];
+                    const day = dayStr.padStart(2, '0');
+                    const year = new Date().getFullYear();
+                    return `${day}.${month}.${year}`;
+                }
+                
+
+    // Tabs umschalten
+    function showTab(tabId) {
+        document.getElementById('transactions-tab').style.display = 'none';
+        document.getElementById('referral-tab').style.display = 'none';
+        document.getElementById(tabId).style.display = 'block';
+    }
+    
+    // Transactions Export
+    function convertTransactionsToCSV() {
+        const input = document.getElementById('transactionInput').value;
+        downloadCSV(input, 'transactions.csv');
+    }
+    
+    // Referral Export
+    function convertReferralToCSV() {
+        const input = document.getElementById('referralInput').value;
+        downloadCSV(input, 'referral.csv');
+    }
+    function clearTransactionInput() {
+        document.getElementById('transactionInput').value = '';
+        showMessage('🧹 Cleared input field.');
+    }
+    function openConvertModal() {
+        document.getElementById("convertModal").style.display = "flex";
+    }
+    
+    function closeConvertModal() {
+        document.getElementById("convertModal").style.display = "none";
+    }
+    
