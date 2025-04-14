@@ -1,12 +1,21 @@
 		let BitcoinPrice = null; // Speichert den Bitcoin-Preis
 		let GMTPrice = null; // Speichert den Gomining-Token-Preis
 		let currentCurrency = 'USD'; // Standardwährung
-		
-		    document.addEventListener('DOMContentLoaded', () => {
+		// Lade den Header und gib ein Promise zurück
+        function loadHeader() {
+            return fetch('header.html')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('header').innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error loading header:', error);
+                });
+        }
+        document.addEventListener("DOMContentLoaded", async function() {
+                await loadHeader();    // ⬅️ Erst auf Header warten
 				fetchBTCPrice();
 				fetchGMTPrice();
-                calculateWeeklyRewardSolo();
-                calculateWeeklyMWReward();
 				});
 		function updateCurrency(currency) {
 				currentCurrency = currency; // Setze die aktuelle Währung
