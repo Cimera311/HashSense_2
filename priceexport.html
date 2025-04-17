@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preis Export</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #e6e6e6;
+            text-align: center;
+        }
+        textarea, input, button {
+            margin: 10px;
+            padding: 10px;
+            width: 80%;
+        }
+        pre {
+            background-color: #222;
+            padding: 10px;
+            text-align: left;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>Preis Export</h1>
+    <label for="efficiency">Watt/TH (15-50):</label>
+    <input type="number" id="efficiency" min="15" max="50" value="28">
+    
+    <label for="inputText">Daten eingeben:</label>
+    <textarea id="inputText" rows="6" placeholder="Hier den Text einfügen..."></textarea>
+    
+    <button onclick="convertData()">Berechnen</button>
+    
+    <h2>Ergebnis</h2>
+    <pre id="outputText">const priceMatrixdatei = {
+</pre>
+    
+    <script>
+        let priceMatrix = {};
+
+        function convertData() {
+            const efficiency = document.getElementById("efficiency").value;
+            const inputText = document.getElementById("inputText").value;
+            const lines = inputText.split('\n');
+            
+            if (!priceMatrix[efficiency]) {
+                priceMatrix[efficiency] = [];
+            }
+            
+            for (let i = 1; i < lines.length; i++) {
+                const parts = lines[i].match(/(\d{1,4},?\d*)\s*TH\s*\$(\d+\.\d+)/);
+                if (parts) {
+                    let minTH = parseFloat(parts[1].replace(/,/g, ''));
+                    let pricePerTH = parseFloat(parts[2]);
+                    let minerCost = priceMatrix[efficiency].length === 0 ? (pricePerTH * minTH).toFixed(2) : null;
+                    let entry = { "minTH": minTH, "pricePerTH": pricePerTH };
+                    if (minerCost) entry["minerCost"] = minerCost;
+                    priceMatrix[efficiency].push(entry);
+                }
+            }
+            
+            let output = "const priceMatrixdatei = {\n";
+            for (const key in priceMatrix) {
+                output += `    "${key}": [\n`;
+                priceMatrix[key].forEach(entry => {
+                    output += `        ${JSON.stringify(entry)},\n`;
+                });
+                output += "    ],\n";
+            }
+            output += "};";
+            document.getElementById("outputText").textContent = output;
+        }
+    </script>
+</body>
+</html>
