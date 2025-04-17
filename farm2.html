@@ -6,6 +6,8 @@
     <script type="module" src="config.js"></script>
     <script src="./priceMatrix.js"></script>
     <script src="skript.js"></script>
+    <script src="skriptreferral.js"></script>
+    <script src="skript.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             console.log("Checking priceMatrixlocal:", window.priceMatrixlocal);
@@ -95,14 +97,54 @@
                     <button class="icon-btn" title="Save to Cloud" onclick="speichernMinerSupabase()"><span class="material-icons">save</span></button>
                     <button class="icon-btn" title="Load from Cloud" onclick="ladenMinerSupabase()"><span class="material-icons">cloud</span></button>
                     <button class="icon-btn" title="Delete from Cloud" onclick="loescheMinerSupabase()"><span class="material-icons">delete</span></button>
-                    <button class="icon-btn import-btn" onclick="openImportModal()">Import Miners</button>
+                    <button class="icon-btn import-btn" onclick="openImportModal()">Imports</button>
 
 
                     <!-- Modal für Miner-Import -->
                     <div id="importModal" class="modal">
                         <div class="modal-content">
-                            <span class="close" onclick="closeImportModal()">&times;</span>
-                            <button onclick="openHowToImportModal()">How to Import</button>
+
+                            <!-- Tab Buttons -->
+                            <div class="button-group">
+                                <button class="main-btn" onclick="showTab('import-tab')">Imports</button>
+                              <button class="main-btn" onclick="showTab('transactions-tab')">Transactions</button>
+                              <button class="main-btn" onclick="showTab('referral-tab')">Referral</button>
+                            </div>
+                          
+                            <!-- Transactions Tab -->
+                            <div class="tab-page" id="transactions-tab">
+                                <span class="close" onclick="closeImportModal('transactions-tab')">&times;</span>
+                                <button onclick="openHowToImportModal('howToImportModal2')">How to Import</button>
+                              <h2>Transactions Export</h2>
+                              <textarea id="transactionInput" rows="15" style="width:90%;" placeholder="Paste your transaction history here..."></textarea>
+
+                              <div class="single-button-container" style="margin-top: 10px;">
+                                  <button onclick="convertTransactionsToXLSX()">Download YourXLSV</button>
+                                  <button onclick="clearTransactionInput()">Clear</button>
+                              </div>
+                              
+                              <!-- Neues Feld für die Meldungen -->
+                              <div id="messageBox" style="margin-top: 20px; padding: 10px; background-color: #2a2a2a; color: #00ff7f; border-radius: 5px; display: none;">
+                                  <!-- Hier werden die Meldungen erscheinen -->
+                              </div>
+                              
+                          
+                            </div>
+                          
+                            <!-- Referral Tab -->
+                            <div class="tab-page" id="referral-tab" style="display:none;">
+                                <span class="close" onclick="closeImportModal('referral-tab')">&times;</span>
+                              <h2>Referral Export</h2>
+                              <textarea id="referralInput" rows="15" placeholder="Paste your referral data here..." style="width:90%;"></textarea>
+                              <div class="single-button-container">
+                                <button class="main-btn" onclick="convertReferralToCSV()">Download Referral CSV</button>
+                              </div>
+                            </div>
+                          
+
+                            <div class="tab-page active" id="import-tab" style="display:none;">
+                            <span class="close" onclick="closeImportModal('import-tab')">&times;</span>
+                            <button onclick="openHowToImportModal('howToImportModal')">How to Import</button>
                             <h2>Miner-Data import</h2>
                             <textarea id="minerInput" rows="10" cols="50" placeholder="Paste miner Data here..."></textarea>
                             <div class="modal-buttons">
@@ -113,7 +155,7 @@
                     </div>
                     <div id="howToImportModal" class="modal">
                         <div class="modal-content">
-                            <span class="close" onclick="closeHowToImportModal()">&times;</span>
+                            <span class="close" onclick="closeHowToImportModal('howToImportModal')">&times;</span>
                             <h2>How to Import Miners</h2>
                             <p>Step 1: Go to "My Farm" in Gomining.</p>
                             <img src="ClickonUpgrade.jpg" alt="Step 1" style="width: 100%; height: auto; margin: 10px 0; border-radius: 8px;">
@@ -121,6 +163,18 @@
                             <img src="markallyourminers.jpg" alt="Step 2" style="width: 100%; height: auto; margin: 10px 0; border-radius: 8px;">
                             <p>Step 3: and copy paste them into the import box.</p>
                             <img src="andpastethem.jpg" alt="Step 3" style="width: 100%; height: auto; margin: 10px 0; border-radius: 8px;">
+                            <p>after the click on import there will be a windows where you can check them all</p>
+                        </div>
+                    </div>
+                    <div id="howToImportModal2" class="modal">
+                        <div class="modal-content">
+                            <span class="close" onclick="closeHowToImportModal('howToImportModal2')">&times;</span>
+                            <h2>How to Import Transactions</h2>
+                            <p>Step 1: Go to my wallet and make the window as narrow as possible and scroll down.</p>
+                            <p>Step 2: Mark all your miners or those you wanna import.</p>
+                            <img src="markyourtransactions.jpg" alt="Step 2" style="width: 100%; height: auto; margin: 10px 0; border-radius: 8px;">
+                            <p>Step 3: and copy paste them into the import box.</p>
+                            <img src="andpastethem2.jpg" alt="Step 3" style="width: 100%; height: auto; margin: 10px 0; border-radius: 8px;">
                             <p>after the click on import there will be a windows where you can check them all</p>
                         </div>
                     </div>
