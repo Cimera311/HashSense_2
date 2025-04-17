@@ -1,143 +1,68 @@
-<input type="file" id="csvInput" accept=".csv">
-<button onclick="processCSV()">Upload and Fix CSV</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="skript.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <title>HashSense Export</title>
+</head>
+<body>
+
+<div class="main-container">
+
+  <!-- Tab Buttons -->
+  <div class="button-group">
+    <button class="main-btn" onclick="showTab('transactions-tab')">Transactions</button>
+    <button class="main-btn" onclick="showTab('referral-tab')">Referral</button>
+  </div>
+
+  <!-- Transactions Tab -->
+  <div class="tab-page active" id="transactions-tab">
+    <h2>Transactions Export</h2>
+    <textarea id="transactionInput" rows="15" style="width:90%;" placeholder="Paste your transaction history here..."></textarea>
+
+    <div class="single-button-container" style="margin-top: 10px;">
+        <button onclick="convertTransactionsToXLSX()">Download YourXLSV</button>
+        <button onclick="clearTransactionInput()">Clear</button>
+    </div>
+    
+    <!-- Neues Feld für die Meldungen -->
+    <div id="messageBox" style="margin-top: 20px; padding: 10px; background-color: #2a2a2a; color: #00ff7f; border-radius: 5px; display: none;">
+        <!-- Hier werden die Meldungen erscheinen -->
+    </div>
+    
+
+  </div>
+
+  <!-- Referral Tab -->
+  <div class="tab-page" id="referral-tab" style="display:none;">
+    <h2>Referral Export</h2>
+    <input type="file" id="csvInput" accept=".csv">
+
+    <div class="single-button-container">
+      <button class="main-btn" onclick="processCSV()">Upload and Fix CSV</button>
+    </div>
+  </div>
+
+</div>
 
 <script>
-function processCSV() {
-  const input = document.getElementById('csvInput');
-  if (!input.files.length) {
-    alert('Bitte eine CSV-Datei auswählen!');
-    return;
-  }
-
-  const file = input.files[0];
-  const reader = new FileReader();
-
-  reader.onload = function (e) {
-    let content = e.target.result;
-
-    const lines = content.split('\n');
-    const fixedLines = [];
-
-    let currentTime = "";
-    let pendingEntry = null;
-
-    lines.forEach((line, index) => {
-      const parts = line.split(';').map(x => x.trim());
-
-      // Header
-      if (index === 0) {
-        fixedLines.push("Time;Date;User ID;Type;Purchase amount;USD amount;Your share;Reward;Status");
-        return;
-      }
-
-      // Uhrzeitzeile
-      if (parts.length === 1 && /^\d{2}:\d{2}:\d{2}$/.test(parts[0])) {
-        currentTime = parts[0];
-        return;
-      }
-
-      // Rewardzeile
-      if (parts.length >= 4 && !parts[0].startsWith("$")) {
-        const date = parts[0];
-        const userId = parts[1];
-        const type = parts[2];
-        const purchaseAmount = parts[3] ? fixDecimalComma(parts[3]) : "";
-        let reward = parts[6] ? parts[6].replace(".", ",") : "";
-        let status = parts[7] || "";
-
-        pendingEntry = {
-          time: currentTime,
-          date,
-          userId,
-          type,
-          purchaseAmount: "", // initial leer
-          usdAmount: "",
-          yourShare: "",
-          reward: fixDecimalComma(reward),
-          status
-        };
-
-        // Type prüfen
-        if (type === "Upgrade" || type === "Purchase" || type === "Boosts") {
-          pendingEntry.purchaseAmount = purchaseAmount;
-
-          // Check, ob nächste Zeile eine $-Zeile ist
-          const nextLine = lines[index + 1];
-          if (nextLine && nextLine.startsWith("$")) {
-            const nextParts = nextLine.split(';').map(x => x.trim());
-
-            pendingEntry.usdAmount = fixDecimalComma(nextParts[0].replace("$", ""));
-            pendingEntry.yourShare = nextParts[2] || "";
-            pendingEntry.reward = nextParts[3] ? fixDecimalComma(nextParts[3]) : "";
-            pendingEntry.status = nextParts[4] || "";
-
-            lines[index + 1] = ""; // $-Zeile als verarbeitet markieren
-          }
-        }
-        // Type prüfen
-        if (type === "Registration") {
-          pendingEntry.reward = "";
-          pendingEntry.status = ""; // 
-
-          }
-        
 
 
 
+</script>
 
-        // Push fertige Zeile
-        fixedLines.push([
-          pendingEntry.time,
-          pendingEntry.date,
-          pendingEntry.userId,
-          pendingEntry.type,
-          pendingEntry.purchaseAmount,
-          pendingEntry.usdAmount,
-          pendingEntry.yourShare,
-          pendingEntry.reward,
-          pendingEntry.status
-        ].join(';'));
+</body>
+</html>
 
-        pendingEntry = null;
-      }
-    });
 
-    // 3. Neue CSV bauen
-    const newContent = fixedLines.join('\n');
+</body>
+  
+</body>
+<script>
 
-    const blob = new Blob([newContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", "referral_transactions_fixed_final.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  reader.readAsText(file, "UTF-8");
-}
-function fixDecimalComma(value) {
-  if (!value) return "";
-
-  // Zähle die Punkte
-  const dotCount = (value.match(/\./g) || []).length;
-
-  if (dotCount === 1) {
-    // Nur ein Punkt: Punkt → Komma
-    return value.replace(".", ",");
-  } else if (dotCount > 1) {
-    // Mehrere Punkte:
-    // 1. Letzten Punkt durch Sonderzeichen ersetzen
-    value = value.replace(/\.(?=[^\.]*$)/, "#");
-    // 2. Alle anderen Punkte löschen
-    value = value.replace(/\./g, "");
-    // 3. Sonderzeichen wieder zu Komma
-    value = value.replace("#", ",");
-    return value;
-  } else {
-    // Kein Punkt vorhanden
-    return value;
-  }
-}
 
 </script>
