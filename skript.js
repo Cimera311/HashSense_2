@@ -1212,11 +1212,11 @@
                     const worth = pricePerTH * myTH;
                     return worth.toFixed(2);
                 }
-                function openHowToImportModal() {
-                    document.getElementById("howToImportModal").style.display = "block";
+                function openHowToImportModal(page) {
+                    document.getElementById(page).style.display = "block";
                 }
                 
-                function closeHowToImportModal() {
-                    document.getElementById("howToImportModal").style.display = "none";
+                function closeHowToImportModal(page) {
+                    document.getElementById(page).style.display = "none";
                 }
                 
