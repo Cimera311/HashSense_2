@@ -6,6 +6,8 @@
     <script type="module" src="config.js"></script>
     <script src="./priceMatrix.js"></script>
     <script src="skript.js"></script>
+    <script src="skriptreferral.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             console.log("Checking priceMatrixlocal:", window.priceMatrixlocal);
@@ -102,13 +104,47 @@
                     <!-- Modal für Miner-Import -->
                     <div id="importModal" class="modal">
                         <div class="modal-content">
-                            <span class="close" onclick="closeImportModal()">&times;</span>
-                            <button onclick="openHowToImportModal()">How to Import</button>
-                            <h2>Miner-Data import</h2>
-                            <textarea id="minerInput" rows="10" cols="50" placeholder="Paste miner Data here..."></textarea>
-                            <div class="modal-buttons">
-                                <button onclick="importMinerData(true)">Replace existing miners</button>
-                                <button onclick="importMinerData(false)">Add imported miners</button>
+                            <div class="button-group">
+                                <button class="main-btn" onclick="showTab('import-tab')">imports</button>
+                                <button class="main-btn" onclick="showTab('transactions-tab')">Transactions</button>
+                                <button class="main-btn" onclick="showTab('referral-tab')">Referral</button>
+                              </div>
+                            
+                              <!-- Transactions Tab -->
+                              <div class="tab-page active" id="transactions-tab">
+                                <h2>Transactions Export</h2>
+                                <textarea id="transactionInput" rows="15" style="width:90%;" placeholder="Paste your transaction history here..."></textarea>
+                            
+                                <div class="single-button-container" style="margin-top: 10px;">
+                                    <button onclick="convertTransactionsToXLSX()">Download YourXLSV</button>
+                                    <button onclick="clearTransactionInput()">Clear</button>
+                                </div>
+                            
+                                <!-- Neues Feld für die Meldungen -->
+                                <div id="messageBox" style="margin-top: 20px; padding: 10px; background-color: #2a2a2a; color: #00ff7f; border-radius: 5px; display: none;">
+                                    <!-- Hier werden die Meldungen erscheinen -->
+                                </div>
+                                
+                            
+                              </div>
+                            
+                              <!-- Referral Tab -->
+                              <div class="tab-page" id="referral-tab" style="display:none;">
+                                <h2>Referral Export</h2>
+                                <input type="file" id="csvInput" accept=".csv">
+                                <div class="single-button-container">
+                                  <button class="main-btn" onclick="processCSV()">Upload and Fix CSV</button>
+                                </div>
+                              </div>
+                                <div class="tab-page" id="import-tab" style="display:none;">                             
+                                        <span class="close" onclick="closeImportModal()">&times;</span>
+                                        <button onclick="openHowToImportModal()">How to Import</button>
+                                        <h2>Miner-Data import</h2>
+                                        <textarea id="minerInput" rows="10" cols="50" placeholder="Paste miner Data here..."></textarea>
+                                        <div class="modal-buttons">
+                                            <button onclick="importMinerData(true)">Replace existing miners</button>
+                                            <button onclick="importMinerData(false)">Add imported miners</button>
+                                </div>
                             </div>
                         </div>
                     </div>
