@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="skript.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <title>HashSense Export</title>
+</head>
+<body>
+
+<div class="main-container">
+
+  <!-- Tab Buttons -->
+  <div class="button-group">
+    <button class="main-btn" onclick="showTab('transactions-tab')">Transactions</button>
+    <button class="main-btn" onclick="showTab('referral-tab')">Referral</button>
+  </div>
+
+  <!-- Transactions Tab -->
+  <div class="tab-page active" id="transactions-tab">
+    <h2>Transactions Export</h2>
+    <textarea id="transactionInput" rows="15" style="width:90%;" placeholder="Paste your transaction history here..."></textarea>
+
+    <div class="single-button-container" style="margin-top: 10px;">
+        <button onclick="convertTransactionsToXLSX()">Download YourXLSV</button>
+        <button onclick="clearTransactionInput()">Clear</button>
+    </div>
+    
+    <!-- Neues Feld für die Meldungen -->
+    <div id="messageBox" style="margin-top: 20px; padding: 10px; background-color: #2a2a2a; color: #00ff7f; border-radius: 5px; display: none;">
+        <!-- Hier werden die Meldungen erscheinen -->
+    </div>
+    
+
+  </div>
+
+  <!-- Referral Tab -->
+  <div class="tab-page" id="referral-tab" style="display:none;">
+    <h2>Referral Export</h2>
+    <textarea id="referralInput" rows="15" placeholder="Paste your referral data here..." style="width:90%;"></textarea>
+    <div class="single-button-container">
+      <button class="main-btn" onclick="convertReferralToCSV()">Download Referral CSV</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+
+
+</script>
+
+</body>
+</html>
