@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Start Mining with GoMining</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css"> <!-- Deine vorhandene Darkmode-Styles -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        .section {
+            padding: 60px 20px;
+            max-width: 900px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .section h2 {
+            color: #673dec;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .section p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        .highlight {
+            color: #8a5eff;
+            font-weight: bold;
+        }
+
+        .cta-button {
+            margin-top: 30px;
+            font-size: 1.2em;
+        }
+
+        .promo-box {
+            background-color: #1e1f2c;
+            padding: 20px;
+            border: 2px dashed #673dec;
+            margin: 30px auto;
+            max-width: 600px;
+            border-radius: 10px;
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+
+        .promo-code {
+            font-size: 2em;
+            color: #8a5eff;
+        }
+
+        .hero {
+            padding: 20px 20px;
+            background: linear-gradient(to right, #1a1b2e, #242533);
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.8em;
+            color: #ffffff;
+        }
+
+        .hero p {
+            color: #ccc;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .main-btn {
+            margin-top: 30px;
+        }
+        .accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.accordion-toggle {
+    background-color: #1e1f2c;
+    color: #e6e6e6;
+    padding: 15px 20px;
+    border: 2px solid #673dec;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    text-align: left;
+    transition: background-color 0.3s ease;
+}
+
+.accordion-toggle:hover {
+    background-color: #2a2a3c;
+}
+
+.accordion-content {
+    background-color: #242533;
+    padding: 15px 20px;
+    border-left: 3px solid #673dec;
+    border-radius: 0 0 8px 8px;
+    color: #ccc;
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+    </style>
+</head>
+<body>
+    <div class="main-container">
+
+        <section class="hero">
+            <h1>Start Bitcoin Mining Today</h1>
+            <p>No documents. No contracts. Just real mining power.</p>
+            <button class="main-btn" onclick="window.location.href='https://gomining.com/?ref=ICjK3'">Start Now</button>
+        </section>
+
+        <section class="section">
+            <h2>How It Works</h2>
+            <p>1. Create a free account at <span class="highlight">GoMining</span><br>
+               2. Choose your ideal mining power (starting at 1 TH/s)<br>
+               3. At checkout, apply your personal discount code:</p>
+
+               <div class="promo-box">
+                Promo Code: <span class="promo-code" id="promoCode">ICjK3</span>
+                <span class="material-icons" onclick="copyPromoCode()" style="cursor: pointer; font-size: 1.2em; vertical-align: middle; margin-left: 10px;">content_copy</span><br>
+                <span style="font-size: 1em;">→ 5% Cashback on your first miner!</span>
+            </div>
+                     
+
+            <button class="main-btn cta-button" onclick="window.location.href='https://gomining.com/?ref=ICjK3'">Already have an account? Log in</button>
+        </section>
+        <section class="section">
+            <img src="trustminer.jpeg" alt="Trust Miner" style="
+                width: 100%;
+                max-width: 900px;
+                border-radius: 30px;
+                display: block;
+                margin: 0 auto;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            ">
+          </section>
+        <section class="section">
+            <h2>More about GoMining</h2>
+        
+            <div class="accordion">
+                <button class="accordion-toggle">🚀 Why GoMining?</button>
+                <div class="accordion-content">
+                    <p>GoMining is a global infrastructure project offering real Bitcoin mining without technical barriers. Your NFT Miner gives you real hashpower – automatically maintained and upgraded if needed.</p>
+                </div>
+        
+                <button class="accordion-toggle">Easy Start with the Task Miner</button>
+
+                <div class="accordion-content">
+                    <p><strong>Level 1:</strong> You get <span class="highlight">5 free days</span> of mining after signing up.</p>
+                    <p>Here’s how it works:</p>
+                
+                    <ol style="text-align: left; max-width: 750px; margin: 20px auto; line-height: 1.7;">
+                        <h4 style="color:#8a5eff; margin-top:20px;">🟣 Level 1 – Getting Started</h4>
+                        <p>Complete these initial tasks to activate your Task Miner and start earning free Bitcoin:</p>
+                        
+                        <ul style="text-align:left; max-width:750px; margin:auto; line-height:1.7;">
+                            <li>🎯 <strong>Activate your Task Miner</strong> → <span class="highlight">+1 day</span></li>
+                            <li>📺 <strong>Follow GoMining on YouTube</strong> → <span class="highlight">+1 day</span></li>
+                            <li>💬 <strong>Join the GoMining Discord</strong> → <span class="highlight">+1 day</span></li>
+                            <li>👛 <strong>Connect your Bitcoin wallet</strong> → <span class="highlight">+1 day</span></li>
+                            <li>🐦 <strong>Follow GoMining on X (Twitter)</strong> → <span class="highlight">+1 day</span></li>
+                            <li>📲 <strong>Follow GoMining on Telegram</strong> → <span class="highlight">+1 day</span></li>
+                        </ul>
+                        
+                        <div style="background: #333; border-radius: 5px; overflow: hidden; margin: 20px 0;">
+                            <div style="width: 100%; background: linear-gradient(to right, #8a5eff, #673dec); padding: 8px 0; color: white; font-size: 0.95em; text-align: center;">
+                                ✅ Level 1 Complete – 6 / 6 Tasks → <strong>+6 days</strong> free mining!
+                            </div>
+                        </div>
+                        
+                        <h4 style="color:#8a5eff; margin-top:30px;">🟣 Level 2 – After Creating Your First Miner</h4>
+                        <p>Once you create your first real miner, new tasks unlock to extend your Task Miner uptime:</p>
+                        
+                        <ul style="text-align:left; max-width:750px; margin:auto; line-height:1.7;">
+                            <li>♻️ <strong>Reinvest in GoMining Token (GMT)</strong> → <span class="highlight">+1 day</span></li>
+                            <li>⚡ <strong>Pay your Maintenance using GMT</strong> → <span class="highlight">+1 day</span></li>
+                            <li>🔧 <strong>Upgrade your Miner (add TH or improve Efficiency)</strong> → <span class="highlight">+5 days</span></li>
+                        </ul>
+                        
+                        <div style="background: #333; border-radius: 5px; overflow: hidden; margin: 20px 0;">
+                            <div style="width: 100%; background: linear-gradient(to right, #8a5eff, #673dec); padding: 8px 0; color: white; font-size: 0.95em; text-align: center;">
+                                ✅ Level 2 Complete – 3 / 3 Tasks → <strong>+7 days</strong> total mining time
+                            </div>
+                        </div>
+                        
+                        <h4 style="color:#8a5eff; margin-top:30px;">🟣 Level 3 – After Upgrading Your Miner</h4>
+                        <p>These final tasks reward you for improving your setup and being active over time:</p>
+                        
+                        <ul style="text-align:left; max-width:750px; margin:auto; line-height:1.7;">
+                            <li>🔩 <strong>Upgrade Efficiency (once)</strong> → <span class="highlight">+1 day</span></li>
+                            <li>📅 <strong>Click the “Service” button 10 days in a row</strong> → <span class="highlight">+1 day</span></li>
+                            <li>📈 <strong>Reach a total power of 10 TH</strong> → <span class="highlight">+5 days</span></li>
+                            <li>💰 <strong>Reinvest your BTC rewards into TH</strong> → <span class="highlight">+1 day</span></li>
+                        </ul>
+                        
+                        <div style="background: #333; border-radius: 5px; overflow: hidden; margin: 20px 0;">
+                            <div style="width: 100%; background: linear-gradient(to right, #8a5eff, #673dec); padding: 8px 0; color: white; font-size: 0.95em; text-align: center;">
+                                ✅ Level 3 Complete – 4 / 4 Tasks → <strong>+8 days</strong> additional uptime
+                            </div>
+                        </div>
+                        
+                    </ol>
+                
+                    <p><strong>Max potential:</strong> <span class="highlight">21 free mining days</span> – enough to test GoMining without spending anything upfront.</p>
+                </div>
+                <img src="taskminer.jpeg" alt="Bonus Miner" style="
+                width: 100%;
+                max-width: 900px;
+                border-radius: 30px;
+                display: block;
+                margin: 0 auto;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            ">
+                <button class="accordion-toggle">🛒 My First Miner</button>
+                <div class="accordion-content">
+                    <p>With just $23.99 and promo code <span class="promo-code">ICjK3</span>, you can get your first 1 TH miner with 5% cashback. Add more TH or improve efficiency step by step. Fully flexible, fully yours.</p>
+                </div>
+                <section class="section">
+                    <img src="promomocode.jpeg" alt="Promo Code ICjK3" style="
+                        width: 100%;
+                        max-width: 900px;
+                        border-radius: 30px;
+                        display: block;
+                        margin: 0 auto;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+                    ">
+                  </section>
+                <button class="accordion-toggle">🎯 What’s the Strategy?</button>
+                <div class="accordion-content">
+                    <p>Start small – even 1 TH generates daily rewards. Reinvest your profits or upgrade your miner to improve efficiency. Over time, your farm grows while your break-even comes closer.</p>
+                </div>
+            </div>
+        </section>
+        
+
+        <footer>
+            &copy; 2025 HashSense. This is a fan-built promo page. Not affiliated with GoMining Ltd.
+        </footer>
+    </div>
+    <!-- Promo-Code Copy + Toast -->
+    <script>
+        function copyPromoCode() {
+            const code = document.getElementById("promoCode").textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showCopiedToast();
+            });
+        }
+    
+        function showCopiedToast() {
+            const toast = document.createElement("div");
+            toast.textContent = "✅ Promo Code copied!";
+            toast.style.position = "fixed";
+            toast.style.top = "30px";
+            toast.style.left = "50%";
+            toast.style.transform = "translateX(-50%)";
+            toast.style.padding = "12px 24px";
+            toast.style.background = "#673dec";
+            toast.style.color = "white";
+            toast.style.borderRadius = "8px";
+            toast.style.zIndex = 9999;
+            toast.style.fontWeight = "bold";
+            toast.style.boxShadow = "0 4px 10px rgba(0,0,0,0.4)";
+            toast.style.fontSize = "1rem";
+            document.body.appendChild(toast);
+    
+            setTimeout(() => {
+                toast.remove();
+            }, 2500);
+        }
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    const toggles = document.querySelectorAll('.accordion-toggle');
+                    toggles.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const content = btn.nextElementSibling;
+                            const isVisible = content.style.display === 'block';
+                            document.querySelectorAll('.accordion-content').forEach(c => c.style.display = 'none');
+                            if (!isVisible) content.style.display = 'block';
+                        });
+                    });
+                });
+
+
+    </script>
+    
+
+</body>
+</html>
