@@ -18,7 +18,7 @@
         /* Registrierung*/
         document.getElementById("signup-form").addEventListener("submit", async (e) => {
             e.preventDefault();
-            alert("Button clicked");
+           
             
             const email = document.getElementById("signup-email").value;
             const password = document.getElementById("signup-password").value;
@@ -36,7 +36,7 @@
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
-                options: { data: { username } },
+                /*options: { data: { username } },*/
             });
         
             if (error) {
