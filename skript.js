@@ -1091,9 +1091,22 @@
                 function openImportModal() {
                     document.getElementById("importModal").style.display = "flex";
                 }
-                
                 function closeImportModal() {
                     document.getElementById("importModal").style.display = "none";
+                }
+                function openConfirmDeleteModal() {
+                    document.getElementById("confirmDeleteModal").style.display = "flex";
+                }
+                
+                function closeConfirmDeleteModal() {
+                    document.getElementById("confirmDeleteModal").style.display = "none";
+                }
+                function openHowToImportModal(page) {
+                    document.getElementById(page).style.display = "block";
+                }
+                
+                function closeHowToImportModal(page) {
+                    document.getElementById(page).style.display = "none";
                 }
                 function importMinerData(replaceExisting) {
                     let text = document.getElementById("minerInput").value;
@@ -1219,4 +1232,5 @@
                 function closeHowToImportModal(page) {
                     document.getElementById(page).style.display = "none";
                 }
-                
+
+                         
