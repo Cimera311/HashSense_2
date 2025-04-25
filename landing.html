@@ -15,6 +15,24 @@
 
         gtag('config', 'AW-16855552693');
     </script>
+    <!-- Event snippet for Kauf conversion page
+    In your html page, add the snippet and call gtag_report_conversion when someone clicks on the chosen link or button. -->
+    <script>
+    function gtag_report_conversion(url) {
+      var callback = function () {
+        if (typeof(url) != 'undefined') {
+          window.location = url;
+        }
+      };
+      gtag('event', 'conversion', {
+          'send_to': 'AW-16855552693/YrKMCMX-rr0aELWlreU-',
+          'transaction_id': '',
+          'event_callback': callback
+      });
+      return false;
+    }
+    </script>
+
     <style>
         .section {
             padding: 60px 20px;
@@ -134,8 +152,10 @@
         <section class="hero">
             <h1>Start Bitcoin Mining Today</h1>
             <p>No documents. No contracts. Just real mining power.</p>
-            <button class="main-btn" onclick="window.location.href='https://gomining.com/?ref=ICjK3'">Start Now</button>
-        </section>
+            <button class="main-btn" onclick="return gtag_report_conversion('https://gomining.com/?ref=ICjK3');">
+              Start Now
+            </button>
+       </section>
 
         <section class="section">
             <h2>How It Works</h2>
@@ -148,10 +168,10 @@
                 <span class="material-icons" onclick="copyPromoCode()" style="cursor: pointer; font-size: 1.2em; vertical-align: middle; margin-left: 10px;">content_copy</span><br>
                 <span style="font-size: 1em;">→ 5% Cashback on your first miner!</span>
             </div>
-                     
-
-            <button class="main-btn cta-button" onclick="window.location.href='https://gomining.com/?ref=ICjK3'">Already have an account? Log in</button>
-        </section>
+            <button class="main-btn cta-button" onclick="return gtag_report_conversion('https://gomining.com/?ref=ICjK3');">
+              Already have an account? Log in
+            </button>
+            </section>
         <section class="section">
             <img src="trustminer.jpeg" alt="Trust Miner" style="
                 width: 100%;
