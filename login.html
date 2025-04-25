@@ -19,11 +19,15 @@
         document.getElementById("signup-form").addEventListener("submit", async (e) => {
             e.preventDefault();
             alert("Button clicked");
-            const username = document.getElementById("signup-username").value;
+            
             const email = document.getElementById("signup-email").value;
             const password = document.getElementById("signup-password").value;
             const passwordRepeat = document.getElementById("signup-password-repeat").value;
-        
+          
+            if (password.length < 6) {
+                alert("Password must be at least 6 characters long!");
+                return;
+            }
             if (password !== passwordRepeat) {
                 alert("Passwords do not match!");
                 return;
