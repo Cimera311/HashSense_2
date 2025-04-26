@@ -143,7 +143,34 @@
     from { opacity: 0; transform: translateY(-5px); }
     to { opacity: 1; transform: translateY(0); }
 }
+     
+/* Standard: Desktop */
+.section {
+  padding: 60px 20px;
+}
 
+/* Mobile Optimierung */
+@media (max-width: 768px) {
+  .section {
+    padding: 30px 15px;
+  }
+
+  .accordion-toggle {
+    padding: 10px 15px;
+    font-size: 1em;
+  }
+
+  .promo-box {
+    margin: 20px auto;
+    padding: 15px;
+  }
+
+  .main-btn, .cta-button {
+    margin-top: 20px;
+    font-size: 1em;
+    padding: 10px 20px;
+  }
+}
     </style>
 </head>
 <body>
