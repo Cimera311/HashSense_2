@@ -5,8 +5,6 @@
 		    document.addEventListener('DOMContentLoaded', () => {
 				fetchBTCPrice();
 				fetchGMTPrice();
-                calculateWeeklyRewardSolo();
-                calculateWeeklyMWReward();
 				});
 		function updateCurrency(currency) {
 				currentCurrency = currency; // Setze die aktuelle Währung
