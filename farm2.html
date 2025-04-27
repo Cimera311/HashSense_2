@@ -153,8 +153,7 @@
                             <h2>Miner-Data import</h2>
                             <textarea id="minerInput" rows="10" cols="50" placeholder="Paste miner Data here..."></textarea>
                             <div class="modal-buttons">
-                                <button onclick="importMinerData(true)">Replace existing miners</button>
-                                <button onclick="importMinerData(false)">Add imported miners</button>
+                                <button onclick="importMinerData()">check the import</button>
                             </div>
                         </div>
                     </div>
@@ -1375,7 +1374,8 @@ function getTotalDiscount() {
                         alert("Miner deleted!");
                     }
 }
-
+let parsedMiners = []; // Temporärer Speicher für geparste Miner
+/*
 function importMinerData(replaceExisting) {
     let text = document.getElementById("minerInput").value;
     let minerData = [];
@@ -1425,10 +1425,10 @@ function importMinerData(replaceExisting) {
 
     // Schließe das Import-Modal
     closeImportModal();
-}
+}*/
 
 
-let parsedMiners = []; // Temporärer Speicher für geparste Miner
+
 
 function importMinerData() {
     let text = document.getElementById("minerInput").value;
