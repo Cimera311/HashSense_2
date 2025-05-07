@@ -1,0 +1,113 @@
+let cancelExport = false; // Global definieren
+
+(async function() {
+    window.cancelGoMiningExport = function() {
+        cancelExport = true;
+        console.log("Export wird nach der aktuellen Seite abgebrochen! 🚫");
+    };
+
+    function getFirstRowKey() {
+        const firstRow = document.querySelector('tbody tr');
+        const date = firstRow?.querySelector('datetime-display span.text-muted')?.innerText.trim() || '';
+        const time = firstRow?.querySelector('datetime-display span.fw-medium')?.innerText.trim() || '';
+        const value = firstRow?.querySelector('[data-qa-column="value"] span.hidden-empty.ms-1 > span')?.innerText.trim() || '';
+        return `${date}_${time}_${value}`;
+    }
+
+    function extractRows() {
+        const rows = document.querySelectorAll('tbody tr');
+        const extracted = [];
+
+        rows.forEach(row => {
+            const time = row.querySelector('datetime-display span.fw-medium')?.innerText.trim() || '';
+            const date = row.querySelector('datetime-display span.text-muted')?.innerText.trim() || '';
+            const type = row.querySelector('[data-qa-column="type"]')?.innerText.trim() || '';
+
+            const valueElement = row.querySelector('[data-qa-column="value"]');
+            let valueText = valueElement?.querySelector('span.hidden-empty.ms-1 > span')?.innerText.trim() || '';
+            let isNegative = valueText.startsWith('-');
+            valueText = valueText.replace('+', '').replace('-', '').replace('.', ',');
+            if (isNegative) {
+                valueText = '-' + valueText;
+            }
+
+            let currency = '';
+            if (valueElement?.querySelector('icon-gmt')) {
+                currency = 'GMT';
+            } else if (valueElement?.querySelector('icon-bitcoin-circle')) {
+                currency = 'BTC';
+            }
+
+            const status = row.querySelector('[data-qa-column="status"]')?.innerText.trim() || '';
+
+            extracted.push({ date, time, type, value: valueText, currency, status });
+        });
+
+        return extracted;
+    }
+
+    function exportToCSV(data) {
+        let csv = "Date-DayMonthYear;Date-Time;Type;Value;Currency;Status\n";
+        data.forEach(item => {
+            csv += `"${item.date}";"${item.time}";"${item.type}";"${item.value}";"${item.currency}";"${item.status}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "gomining_transactions.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    async function goMiningAutoExport() {
+        let allData = [];
+        let previousKey = getFirstRowKey();
+        let pageCounter = 1;
+
+        while (true) {
+            if (cancelExport) {
+                console.log("Export wurde manuell abgebrochen! 🚫");
+                break;
+            }
+
+            console.log(`Verarbeite Seite ${pageCounter}...`);
+            allData = allData.concat(extractRows());
+
+            const icon = document.querySelector('icon-arrow-short[direction="right"]');
+            if (!icon) {
+                console.log("Kein Weiter-Icon mehr gefunden. Abbruch.");
+                break;
+            }
+            const nextButton = icon.closest('button');
+            if (!nextButton || nextButton.disabled) {
+                console.log("Weiter-Button deaktiviert. Abbruch.");
+                break;
+            }
+
+            nextButton.click();
+            await new Promise(r => setTimeout(r, 500));
+
+            const newKey = getFirstRowKey();
+            if (newKey === previousKey) {
+                console.log("Seite hat sich nicht verändert. Speichere letzte Seite...");
+                allData = allData.concat(extractRows());
+                break;
+            }
+
+            previousKey = newKey;
+            pageCounter++;
+        }
+
+        if (allData.length > 0) {
+            console.log(`Exportiere ${allData.length} Transaktionen...`);
+            exportToCSV(allData);
+        } else {
+            console.log("Keine Daten zum Exportieren gesammelt.");
+        }
+    }
+
+    await goMiningAutoExport();
+})();
