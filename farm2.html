@@ -93,10 +93,15 @@
                     <button class="main-btn" onclick="ladenMinerSupabase()">☁️ Load from Cloud</button>
                     <button class="main-btn" onclick="loescheMinerSupabase()">🗑️ Delete from Cloud</button>
                     <button class="main-btn" onclick="openImportModal()">Import Miners</button>-->
-                    <button class="icon-btn" title="Add Miner" onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '1', '20', '-');"><span class="material-icons">add</span></button>
+                    <button class="icon-btn" id="addMinerBtn" title="Add Miner" onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '1', '20', '-');">
+                        <span class="material-icons">add</span>
+                    </button>
+                
                     <button class="icon-btn" title="Save to Cloud" onclick="speichernMinerSupabase()"><span class="material-icons">save</span></button>
                     <button class="icon-btn" title="Load from Cloud" onclick="ladenMinerSupabase()"><span class="material-icons">cloud</span></button>
-                    <button class="icon-btn" title="Delete from Cloud" onclick="loescheMinerSupabase()"><span class="material-icons">delete</span></button>
+                    <button class="icon-btn" id="deleteAllBtn" title="Delete from Cloud" onclick="openConfirmDeleteModal()">
+                        <span class="material-icons">delete</span>
+                    </button>                
                     <button class="icon-btn import-btn" onclick="openImportModal()">Imports</button>
                     <button class="icon-btn import-btn" onclick="window.location.href='HelpingSkripts.html'">Skripts</button>
 
@@ -107,9 +112,9 @@
 
                             <!-- Tab Buttons -->
                             <div class="button-group">
-                                <button class="main-btn" onclick="showTab('import-tab')">Imports</button>
-                              <button class="main-btn" onclick="showTab('transactions-tab')">Transactions</button>
-                              <button class="main-btn" onclick="showTab('referral-tab')">Referral</button>
+                                <button class="main-btn" onclick="showTab('import-tab')">Import your miners</button>
+                              <button class="main-btn" onclick="showTab('transactions-tab')">Transactions (beta)</button>
+                              <button class="main-btn" onclick="showTab('referral-tab')">Referral (beta)</button>
                             </div>
                           
                             <!-- Transactions Tab -->
@@ -149,8 +154,7 @@
                             <h2>Miner-Data import</h2>
                             <textarea id="minerInput" rows="10" cols="50" placeholder="Paste miner Data here..."></textarea>
                             <div class="modal-buttons">
-                                <button onclick="importMinerData(true)">Replace existing miners</button>
-                                <button onclick="importMinerData(false)">Add imported miners</button>
+                                <button onclick="importMinerData()">check the import</button>
                             </div>
                         </div>
                     </div>
@@ -179,7 +183,8 @@
                             <p>after the click on import there will be a windows where you can check them all</p>
                         </div>
                     </div>
-                    
+
+
                     <!-- Kontroll-Modal für importierte Miner -->
                     <div id="previewModal" class="modal">
                         <div class="modal-content">
@@ -204,7 +209,20 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Modal für Bestätigung -->
+
                   </div>
+                  <div id="confirmDeleteModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeConfirmDeleteModal()">&times;</span>
+                        <h2>Delete all miners?</h2>
+                        <p>Are you sure you want to delete <strong>all your miners</strong>? This cannot be undone.</p>
+                        <div class="modal-buttons">
+                            <button onclick="confirmDeleteMiners()">Yes, delete</button>
+                            <button onclick="closeConfirmDeleteModal()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
                 </div>
                   <div class="action-footer spaced">
 
@@ -221,21 +239,7 @@
                           </div>  
                 </div>
                 
-                
-
-
-             <!--   <div id="viewSwitcher">
-                    <button class="view-btn active" id="grid-btn" onclick="wechselAnsicht('grid')">🔲 Grid</button>
-                    <button class="view-btn" id="list-btn" onclick="wechselAnsicht('list')">📋 Liste</button>
-                </div>
-
-
-                <div id="currencySwitcher">
-                    <button class="currency-btn" id="btc-btn" onclick="wechselWaehrung('btc')">₿ BTC</button>
-                    <button class="currency-btn active" id="usd-btn" onclick="wechselWaehrung('usd')">$ USD</button>
-                    <button class="currency-btn" id="gmt-btn" onclick="wechselWaehrung('gmt')">🪙 GMT</button>
-                </div>
--->
+ 
 
                 <span id="currencyMode" style="display: none;">usd</span>
                 <span id="viewMode" style="display: none;">grid</span>
@@ -465,6 +469,33 @@ function hinzufuegenCard(cardId, power, efficiency, name = "Miner") {
     aktualisiereFarmWerte();
 }
 
+async function confirmDeleteMiners() {
+    closeConfirmDeleteModal(); // Erst Modal schließen
+
+    const { data: user, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+        showToast("Error loading user!", "error");
+        return;
+    }
+
+    let userId = user.user.id;
+
+    // ❗ Nur Miner aus Supabase löschen (nicht user_data)
+    const { error } = await supabase.from('miners').delete().eq('user_id', userId);
+
+    if (error) {
+        showToast("Error deleting miners!", "error");
+    } else {
+        localStorage.removeItem('minerData'); // Miner lokal löschen
+        localStorage.removeItem('cards'); // cards lokal löschen
+        // KEIN localStorage.removeItem('user_data');  ❗
+
+        ladenDaten(); // Miner neu laden
+        aktualisiereFarmWerte();
+
+        showToast("✅ All miners successfully deleted!", "success");
+    }
+}
 
 function entfernenCard(cardId) {
     let card = document.getElementById(cardId);
@@ -554,7 +585,13 @@ function ladenDaten() {
     let ansicht = viewElement.innerText; // Holt den aktuellen Modus aus der UI
 
     let savedData = localStorage.getItem('minerData');
-    if (!savedData) return; // Falls keine Daten existieren, nichts tun
+    if (!savedData) {
+        let cards = document.getElementsByClassName('card');
+    for (let i = cards.length - 1; i >= 0; i--) {
+        cards[i].remove();
+        let farmTableContainer = document.getElementById('farm-table-container');
+        if (farmTableContainer) farmTableContainer.remove();
+    }return;} // Falls keine Daten existieren, nichts tun
 
     let minerData = JSON.parse(savedData);
 
@@ -958,8 +995,17 @@ function aktualisiereFarmWerte() {
 
         let avgEfficiency = count > 0 ? (totalEfficiency / totalPower).toFixed(2) : 0;
 
-        document.getElementById('farm-power').value = totalPower.toFixed(2);
-        document.getElementById('farm-efficiency').value = avgEfficiency;
+        let farmPowerInput = document.getElementById('farm-power');
+        if (farmPowerInput) {
+            farmPowerInput.value = isNaN(totalPower) ? "0.00" : totalPower.toFixed(2);
+        }
+
+
+        let farmEfficiencyInput = document.getElementById('farm-efficiency');
+        if (farmEfficiencyInput) {
+            farmEfficiencyInput.value = isNaN(avgEfficiency) ? "0.00" : avgEfficiency;
+        }
+
     }
 
     function kopiereWerte(cardId) {
@@ -989,6 +1035,7 @@ function wechselAnsicht(mode) {
     // Setze den aktiven Button basierend auf der gewählten Ansicht
     document.getElementById(`${mode}-btn`).classList.add('active');
     ladenDaten(); // Lädt die Daten für die neue Ansicht
+    toggleActionButtons(); // <--- hier hinzufügen
 }
 
 
@@ -1328,7 +1375,8 @@ function getTotalDiscount() {
                         alert("Miner deleted!");
                     }
 }
-
+let parsedMiners = []; // Temporärer Speicher für geparste Miner
+/*
 function importMinerData(replaceExisting) {
     let text = document.getElementById("minerInput").value;
     let minerData = [];
@@ -1378,10 +1426,10 @@ function importMinerData(replaceExisting) {
 
     // Schließe das Import-Modal
     closeImportModal();
-}
+}*/
 
 
-let parsedMiners = []; // Temporärer Speicher für geparste Miner
+
 
 function importMinerData() {
     let text = document.getElementById("minerInput").value;
@@ -1450,6 +1498,50 @@ function finalizeImport(replaceExisting) {
     speichernDaten()
     closePreviewModal(); // Kontroll-Modal schließen
     closeImportModal(); // Haupt-Import-Modal schließen
+}
+// Toast-Funktion einbauen
+function showToast(message, type = "success") {
+    // Toast-Container prüfen oder neu erstellen
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.style.position = 'fixed';
+        toast.style.top = '20px';
+        toast.style.right = '20px';
+        toast.style.zIndex = '9999';
+        toast.style.padding = '10px 20px';
+        toast.style.borderRadius = '8px';
+        toast.style.fontWeight = 'bold';
+        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+        toast.style.color = '#fff';
+        toast.style.display = 'none';
+        document.body.appendChild(toast);
+    }
+
+    // Farbe je nach Typ
+    toast.style.backgroundColor = type === "success" ? "#4caf50" : "#f44336";
+
+    toast.textContent = message;
+    toast.style.display = 'block';
+
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3000); // Toast verschwindet nach 3 Sekunden
+}
+function toggleActionButtons() {
+    let viewMode = document.getElementById('viewMode').innerText;
+
+    let addBtn = document.getElementById('addMinerBtn');
+    let deleteBtn = document.getElementById('deleteAllBtn');
+
+    if (viewMode === 'list') {
+        if (addBtn) addBtn.style.display = 'none';
+        if (deleteBtn) deleteBtn.style.display = 'none';
+    } else {
+        if (addBtn) addBtn.style.display = 'inline-flex';
+        if (deleteBtn) deleteBtn.style.display = 'inline-flex';
+    }
 }
 
   </script>

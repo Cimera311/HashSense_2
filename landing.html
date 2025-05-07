@@ -15,6 +15,24 @@
 
         gtag('config', 'AW-16855552693');
     </script>
+    <!-- Event snippet for Kauf conversion page
+    In your html page, add the snippet and call gtag_report_conversion when someone clicks on the chosen link or button. -->
+    <script>
+    function gtag_report_conversion(url) {
+      var callback = function () {
+        if (typeof(url) != 'undefined') {
+          window.location = url;
+        }
+      };
+      gtag('event', 'conversion', {
+          'send_to': 'AW-16855552693/YrKMCMX-rr0aELWlreU-',
+          'transaction_id': '',
+          'event_callback': callback
+      });
+      return false;
+    }
+    </script>
+
     <style>
         .section {
             padding: 60px 20px;
@@ -125,7 +143,34 @@
     from { opacity: 0; transform: translateY(-5px); }
     to { opacity: 1; transform: translateY(0); }
 }
+     
+/* Standard: Desktop */
+.section {
+  padding: 60px 20px;
+}
 
+/* Mobile Optimierung */
+@media (max-width: 768px) {
+  .section {
+    padding: 30px 15px;
+  }
+
+  .accordion-toggle {
+    padding: 10px 15px;
+    font-size: 1em;
+  }
+
+  .promo-box {
+    margin: 20px auto;
+    padding: 15px;
+  }
+
+  .main-btn, .cta-button {
+    margin-top: 20px;
+    font-size: 1em;
+    padding: 10px 20px;
+  }
+}
     </style>
 </head>
 <body>
@@ -134,8 +179,10 @@
         <section class="hero">
             <h1>Start Bitcoin Mining Today</h1>
             <p>No documents. No contracts. Just real mining power.</p>
-            <button class="main-btn" onclick="window.location.href='https://gomining.com/?ref=ICjK3'">Start Now</button>
-        </section>
+            <button class="main-btn" onclick="return gtag_report_conversion('https://gomining.com/?ref=ICjK3');">
+              Start Now
+            </button>
+       </section>
 
         <section class="section">
             <h2>How It Works</h2>
@@ -143,15 +190,15 @@
                2. Choose your ideal mining power (starting at 1 TH/s)<br>
                3. At checkout, apply your personal discount code:</p>
 
-               <div class="promo-box">
+               <div id="promo" class="promo-box">
                 Promo Code: <span class="promo-code" id="promoCode">ICjK3</span>
                 <span class="material-icons" onclick="copyPromoCode()" style="cursor: pointer; font-size: 1.2em; vertical-align: middle; margin-left: 10px;">content_copy</span><br>
                 <span style="font-size: 1em;">→ 5% Cashback on your first miner!</span>
             </div>
-                     
-
-            <button class="main-btn cta-button" onclick="window.location.href='https://gomining.com/?ref=ICjK3'">Already have an account? Log in</button>
-        </section>
+            <button class="main-btn cta-button" onclick="return gtag_report_conversion('https://gomining.com/?ref=ICjK3');">
+              Already have an account? Log in
+            </button>
+            </section>
         <section class="section">
             <img src="trustminer.jpeg" alt="Trust Miner" style="
                 width: 100%;
@@ -163,17 +210,17 @@
             ">
           </section>
         <section class="section">
-            <h2>More about GoMining</h2>
+            <h2 >More about GoMining</h2>
         
             <div class="accordion">
                 <button class="accordion-toggle">🚀 Why GoMining?</button>
-                <div class="accordion-content">
+                <div id="how" class="accordion-content">
                     <p>GoMining is a global infrastructure project offering real Bitcoin mining without technical barriers. Your NFT Miner gives you real hashpower – automatically maintained and upgraded if needed.</p>
                 </div>
         
                 <button class="accordion-toggle">Easy Start with the Task Miner</button>
 
-                <div class="accordion-content">
+                <div id="taskminer" class="accordion-content">
                     <p><strong>Level 1:</strong> You get <span class="highlight">5 free days</span> of mining after signing up.</p>
                     <p>Here’s how it works:</p>
                 
@@ -254,7 +301,7 @@
                     ">
                   </section>
                 <button class="accordion-toggle">🎯 What’s the Strategy?</button>
-                <div class="accordion-content">
+                <div id="strategy" class="accordion-content">
                     <p>Start small – even 1 TH generates daily rewards. Reinvest your profits or upgrade your miner to improve efficiency. Over time, your farm grows while your break-even comes closer.</p>
                 </div>
             </div>
@@ -264,7 +311,32 @@
         <footer>
             &copy; 2025 HashSense. This is a fan-built promo page. Not affiliated with GoMining Ltd.
         </footer>
+        
+        <!-- Datenschutz und Kontakt -->
+<section class="section" style="font-size: 0.9em; color: #888; margin-top: 50px; text-align: center;">
+    <p><strong>Disclaimer:</strong> This website is a private fan project to promote GoMining. It is not officially affiliated with or endorsed by GoMining Ltd.</p>
+    <p><strong>Contact:</strong> For any questions, please email: <a href="mailto:info@hashfarm.me" style="color: #8a5eff;">info@hashfarm.me</a></p>
+    <p><a href="#privacy" style="color: #8a5eff;">Privacy Policy</a></p>
+</section>
+
+<!-- Datenschutzdetails -->
+<section id="privacy" class="section" style="font-size: 0.9em; color: #888; margin-top: 30px; text-align: left; max-width: 800px; margin-left: auto; margin-right: auto;">
+    <h2 style="color: #673dec;">Privacy Policy</h2>
+    <p>This website does not collect or store any personal data directly. If you click on external links (e.g., GoMining), you will be redirected to third-party platforms, and their privacy policies apply.</p>
+    <p>We do not use cookies, trackers, or any analytics tools apart from anonymous aggregated traffic measurement via Google Ads and Google Analytics, solely for the purpose of improving user experience and campaign optimization.</p>
+    <p>For any questions regarding data privacy, you can contact us at <a href="mailto:info@hashfarm.me" style="color: #8a5eff;">info@hashfarm.me</a>.</p>
+</section>
+
+<!-- About Us Bereich -->
+<section class="section" style="font-size: 0.9em; color: #888; margin-top: 30px; text-align: center;">
+    <h2 style="color: #673dec;">About HashSense</h2>
+    <p>Our mission is to empower everyone to mine Bitcoin easily, securely, and transparently.  
+    We believe in making Bitcoin mining accessible to everyone without technical barriers or complexity.</p>
+</section>
+        
+        
     </div>
+   
     <!-- Promo-Code Copy + Toast -->
     <script>
         function copyPromoCode() {
