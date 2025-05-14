@@ -14,12 +14,9 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss-typography@0.5.9/dist/typography.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
-<!-- Nivo.js Integration für Balance Over Time (Dark Mode) -->
-<link rel="stylesheet" href="https://unpkg.com/nivo-slider/nivo-slider.css" />
-<script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.production.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.production.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@nivo/core@0.79.1/dist/nivo-core.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@nivo/line@0.79.1/dist/nivo-line.umd.min.js"></script>
+<!-- ECharts Integration Dark Theme -->
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; }
     .card { background-color: #1e293b; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 0 10px #0ea5e9; }
@@ -109,10 +106,62 @@
       </div>
     </div>
 	
-	<div id="nivo-chart" class="bg-gray-900 p-6 rounded shadow mb-8" style="height: 360px;">
-	  <h3 class="text-xl font-semibold text-cyan-300 mb-4">📈 Nivo Chart: Balance Over Time</h3>
-	  <div id="nivo-render" style="height: 300px;"></div>
-	</div>
+    <div class="card mt-10">
+      <h3 class="text-xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+        <i class="fas fa-chart-line"></i> 📊 ECharts: Balance Over Time
+      </h3>
+      <div class="mb-4 flex flex-wrap gap-4">
+        <div>
+          <label class="block text-sm text-gray-300 mb-1">Diagrammtyp</label>
+          <select id="echart-type" class="bg-gray-800 text-white px-3 py-1 rounded shadow">
+            <option value="line">Linie</option>
+            <option value="bar">Balken</option>
+            <option value="area">Fläche</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-gray-300 mb-1">Währung</label>
+          <select id="echart-currency" class="bg-gray-800 text-white px-3 py-1 rounded shadow">
+            <option value="ALL">Alle</option>
+            <option value="BTC">BTC</option>
+            <option value="USD">USD</option>
+            <option value="GMT">GMT</option>
+          </select>
+        </div>
+      </div>
+      <div id="echart-balance" style="height: 400px; width: 100%; background-color: #0f172a;"></div>
+    </div>
+    <div class="card mt-10">
+      <h3 class="text-xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
+        <i class="fas fa-chart-pie"></i> 📉 Einnahmen vs. Ausgaben (nach Typ)
+      </h3>
+      <div class="flex mb-4">
+        <label class="mr-2 text-sm text-gray-300">Währung:</label>
+        <select id="typeCompareCurrency" class="bg-gray-800 text-white px-3 py-1 rounded">
+          <option value="ALL">Alle</option>
+          <option value="BTC">BTC</option>
+          <option value="USD">USD</option>
+          <option value="GMT">GMT</option>
+        </select>
+      </div>
+      <div id="type-compare-chart" style="height: 400px; width: 100%; background-color: #0f172a;"></div>
+    </div>
+
+    <div class="card mt-10">
+      <h3 class="text-2xl font-bold text-cyan-400 mb-6 flex items-center gap-3">
+        <i class="fas fa-balance-scale"></i> Einnahmen vs. Ausgaben – Executive Overview
+      </h3>
+      <div class="flex justify-between items-center mb-4">
+        <div class="text-sm text-gray-300">Währung wählen:</div>
+        <select id="typeCompareCurrency" class="bg-gray-800 text-white px-3 py-1 rounded shadow border border-cyan-600">
+          <option value="ALL">Alle</option>
+          <option value="BTC">BTC</option>
+          <option value="USD">USD</option>
+          <option value="GMT">GMT</option>
+        </select>
+      </div>
+      <div id="type-compare-chart" style="height: 480px; width: 100%; background-color: #0f172a; border-radius: 0.5rem;"></div>
+    </div>
     <!-- Charts
 	-->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -596,70 +645,147 @@ function calculateAfaTable() {
   }
   document.getElementById('afa-result').classList.remove('hidden');
 }
-function renderNivoChart() {
-  const chartContainer = document.getElementById("nivo-render");
-  if (!chartContainer) return;
+function renderEChart() {
+  const chartType = document.getElementById('echart-type').value;
+  const currency = document.getElementById('echart-currency').value;
+  const chartDom = document.getElementById('echart-balance');
+  const myChart = echarts.init(chartDom, 'dark');
 
   const dataMap = {};
   filteredData.forEach(row => {
-    const d = row.date.toISOString().split("T")[0];
-    if (!dataMap[d]) dataMap[d] = 0;
-    dataMap[d] += row.value;
+    if (currency !== 'ALL' && row.currency !== currency) return;
+    const d = row.date.toISOString().split('T')[0];
+    dataMap[d] = (dataMap[d] || 0) + row.value;
   });
 
-  const chartData = [
-    {
-      id: "Balance",
-      color: "hsl(204, 70%, 50%)",
-      data: Object.entries(dataMap).sort().map(([x, y]) => ({ x, y }))
-    }
-  ];
+  const labels = Object.keys(dataMap).sort();
+  const values = labels.map(k => dataMap[k]);
 
-  ReactDOM.render(
-    React.createElement(nivoLine.ResponsiveLine, {
-      data: chartData,
-      margin: { top: 20, right: 30, bottom: 50, left: 60 },
-      xScale: { type: 'point' },
-      yScale: { type: 'linear', min: 'auto', max: 'auto', stacked: false, reverse: false },
-      curve: 'monotoneX',
-      axisBottom: {
-        orient: 'bottom',
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: -30,
-        legend: 'Datum',
-        legendOffset: 36,
-        legendPosition: 'middle'
+  const option = {
+    title: { text: 'Balance Over Time', left: 'center', textStyle: { color: '#fff' } },
+    tooltip: { trigger: 'axis' },
+    xAxis: { type: 'category', data: labels, axisLabel: { color: '#ccc' } },
+    yAxis: { type: 'value', axisLabel: { color: '#ccc' } },
+    series: [{
+      data: values,
+      type: chartType === 'area' ? 'line' : chartType,
+      areaStyle: chartType === 'area' ? {} : undefined,
+      smooth: true,
+      lineStyle: { width: 2 },
+      itemStyle: { color: '#00e5ff' }
+    }],
+    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    backgroundColor: '#0f172a'
+  };
+
+  myChart.setOption(option);
+}
+
+// Listener Setup
+['echart-type', 'echart-currency'].forEach(id => {
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById(id).addEventListener('change', renderEChart);
+  });
+});
+
+applyDateFilter = (function (original) {
+  return function () {
+    original();
+    renderEChart();
+  };
+})(applyDateFilter);
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('typeCompareCurrency').addEventListener('change', renderTypeCompare);
+});
+
+
+function renderTypeCompare() {
+  const currency = document.getElementById('typeCompareCurrency').value;
+  const chartDom = document.getElementById('type-compare-chart');
+  const chart = echarts.init(chartDom, 'dark');
+
+  const categories = {
+    Einnahmen: ['Reward', 'NFT Reinvestment', 'NFT Game reinvestment', 'Referral Bonus', 'Bounty Program', 'Liquidity provider reward'],
+    Ausgaben: ['Miner maintenance', 'Service Fees']
+  };
+
+  const sums = { Einnahmen: {}, Ausgaben: {} };
+
+  filteredData.forEach(tx => {
+    if (currency !== 'ALL' && tx.currency !== currency) return;
+    const value = Math.abs(tx.value);
+    if (categories.Einnahmen.includes(tx.type)) {
+      sums.Einnahmen[tx.type] = (sums.Einnahmen[tx.type] || 0) + value;
+    }
+    if (categories.Ausgaben.includes(tx.type)) {
+      sums.Ausgaben[tx.type] = (sums.Ausgaben[tx.type] || 0) + value;
+    }
+  });
+
+  const incomeKeys = Object.keys(sums.Einnahmen);
+  const expenseKeys = Object.keys(sums.Ausgaben);
+  const allKeys = [...new Set([...incomeKeys, ...expenseKeys])];
+
+  const incomeData = allKeys.map(k => sums.Einnahmen[k] || 0);
+  const expenseData = allKeys.map(k => sums.Ausgaben[k] || 0);
+
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      backgroundColor: '#1e293b',
+      borderColor: '#0ea5e9',
+      borderWidth: 1,
+      textStyle: { color: '#e0f2fe' }
+    },
+    legend: {
+      data: ['Einnahmen', 'Ausgaben'],
+      textStyle: { color: '#a5f3fc' }
+    },
+    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    xAxis: {
+      type: 'value',
+      axisLine: { lineStyle: { color: '#94a3b8' } },
+      axisLabel: { color: '#e2e8f0' }
+    },
+    yAxis: {
+      type: 'category',
+      data: allKeys,
+      axisLine: { lineStyle: { color: '#94a3b8' } },
+      axisLabel: { color: '#f1f5f9', fontWeight: 'bold' }
+    },
+    series: [
+      {
+        name: 'Einnahmen',
+        type: 'bar',
+        data: incomeData,
+        itemStyle: {
+          color: '#22c55e',
+          borderRadius: [5, 5, 5, 5]
+        },
+        emphasis: { focus: 'series' }
       },
-      axisLeft: {
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: 0,
-        legend: 'BTC / USD / GMT',
-        legendOffset: -40,
-        legendPosition: 'middle'
-      },
-      colors: { scheme: 'nivo' },
-      theme: {
-        background: '#0f172a',
-        textColor: '#e2e8f0',
-        fontSize: 12,
-        axis: { ticks: { line: { stroke: '#e2e8f0' }, text: { fill: '#e2e8f0' } } },
-        grid: { line: { stroke: '#334155', strokeDasharray: '2 2' } }
-      },
-      enableGridX: false,
-      enablePoints: true,
-      useMesh: true,
-      tooltip: ({ point }) => `${point.data.xFormatted}: ${point.data.yFormatted}`
-    }),
-    chartContainer
-  );
+      {
+        name: 'Ausgaben',
+        type: 'bar',
+        data: expenseData,
+        itemStyle: {
+          color: '#ef4444',
+          borderRadius: [5, 5, 5, 5]
+        },
+        emphasis: { focus: 'series' }
+      }
+    ],
+    backgroundColor: '#0f172a'
+  };
+
+  chart.setOption(option);
 }
 
 applyDateFilter = (function (original) {
   return function () {
     original();
-    renderNivoChart();
+    renderTypeCompare();
   };
 })(applyDateFilter);
 </script>
