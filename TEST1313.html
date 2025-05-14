@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HashSense Analytics Suite</title>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+  <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@5/dark.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss-typography@0.5.9/dist/typography.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+<!-- Nivo.js Integration für Balance Over Time (Dark Mode) -->
+<link rel="stylesheet" href="https://unpkg.com/nivo-slider/nivo-slider.css" />
+<script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@nivo/core@0.79.1/dist/nivo-core.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@nivo/line@0.79.1/dist/nivo-line.umd.min.js"></script>
+  <style>
+    body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+    .card { background-color: #1e293b; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 0 10px #0ea5e9; }
+	/* Tooltips besser lesbar machen */
+	.apexcharts-tooltip-title,
+	.apexcharts-tooltip-text,
+	.apexcharts-tooltip-series-group { color: #fff !important; font-size: 13px; }
+  </style>
+</head>
+<body class="p-8">
+  <!-- Menü und Tab-Navigation -->
+  <div class="card mt-4">
+    <h2 class="text-2xl font-bold mb-4 text-cyan-400">📊 HashSense Pro Analytics</h2>
+    <div class="tabs mb-6">
+      <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-300 border-b border-gray-700">
+        <li class="me-2"><a href="#tab-main" onclick="showMainTab('tab-main')" class="inline-block p-4 rounded-t-lg hover:text-white">🏠 Dashboard</a></li>
+        <li class="me-2"><a href="#tab-eur-kategorie" onclick="showMainTab('tab-eur-kategorie')" class="inline-block p-4 rounded-t-lg hover:text-white">1️⃣ Kategorien</a></li>
+        <li class="me-2"><a href="#tab-eur-diagramm" onclick="showMainTab('tab-eur-diagramm')" class="inline-block p-4 rounded-t-lg hover:text-white">2️⃣ EÜR-Diagramm</a></li>
+        <li class="me-2"><a href="#tab-export" onclick="showMainTab('tab-export')" class="inline-block p-4 rounded-t-lg hover:text-white">3️⃣ Export</a></li>
+        <li class="me-2"><a href="#tab-wechselkurs" onclick="showMainTab('tab-wechselkurs')" class="inline-block p-4 rounded-t-lg hover:text-white">4️⃣ Wechselkurs</a></li>
+        <li class="me-2"><a href="#tab-afa" onclick="showMainTab('tab-afa')" class="inline-block p-4 rounded-t-lg hover:text-white">5️⃣ AfA-Rechner</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Dashboard Inhalt -->
+  <div id="tab-main" class="tab-section">
+    <!-- CSV Upload -->
+    <div class="card mb-8">
+      <h2 class="text-xl mb-2">1. Upload Your GoMining Transactions CSV</h2>
+      <input type="file" id="csvInput" class="block w-full text-sm text-gray-200 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-cyan-700 file:text-white hover:file:bg-cyan-600" accept=".csv" />
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10" id="kpiCards">
+      <div class="card"><p class="text-sm text-gray-400">Total Income</p><h3 id="totalIncome" class="text-2xl font-bold">$0</h3></div>
+      <div class="card"><p class="text-sm text-gray-400">Total Maintenance</p><h3 id="totalMaintenance" class="text-2xl font-bold">$0</h3></div>
+      <div class="card"><p class="text-sm text-gray-400">Net Profit</p><h3 id="netProfit" class="text-2xl font-bold">$0</h3></div>
+    </div>
+
+	<!-- Erweiterung für Dashboard-Steuerung -->
+	<div class="card mb-6">
+	  <h3 class="text-xl font-semibold text-cyan-400 mb-4">🎛️ Dashboard-Einstellungen</h3>
+	  <div class="grid md:grid-cols-3 gap-4">
+		<div>
+		  <label class="block text-sm text-gray-300 mb-1">Diagrammtyp</label>
+		  <select id="chartStyle" class="w-full bg-gray-800 text-white px-3 py-2 rounded">
+			<option value="line">Liniendiagramm</option>
+			<option value="bar">Balkendiagramm</option>
+			<option value="area">Flächendiagramm</option>
+		  </select>
+		</div>
+		<div>
+		  <label class="block text-sm text-gray-300 mb-1">Transaktionstyp</label>
+		  <select id="chartFilterType" class="w-full bg-gray-800 text-white px-3 py-2 rounded">
+			<option value="all">Alle</option>
+			<option value="in">Nur Einnahmen</option>
+			<option value="out">Nur Ausgaben</option>
+		  </select>
+		</div>
+		<div>
+		  <label class="block text-sm text-gray-300 mb-1">Währung</label>
+		  <select id="chartCurrency" class="w-full bg-gray-800 text-white px-3 py-2 rounded">
+			<option value="ALL">Alle</option>
+			<option value="BTC">BTC</option>
+			<option value="USD">USD</option>
+			<option value="GMT">GMT</option>
+		  </select>
+		</div>
+	  </div>
+	</div>
+    <!-- Zeitraumfilter -->
+    <div class="card mb-10">
+      <h3 class="text-lg font-semibold mb-2">🗓️ Zeitraumfilter</h3>
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+          <label class="block mb-1 text-sm">Start Date</label>
+          <input type="date" id="startDate" class="input input-bordered w-full bg-gray-700 text-white rounded px-4 py-2" />
+        </div>
+        <div class="flex-1">
+          <label class="block mb-1 text-sm">End Date</label>
+          <input type="date" id="endDate" class="input input-bordered w-full bg-gray-700 text-white rounded px-4 py-2" />
+        </div>
+        <div class="flex items-end">
+          <button onclick="applyDateFilter()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-6 rounded">Filter</button>
+        </div>
+      </div>
+    </div>
+	
+	<div id="nivo-chart" class="bg-gray-900 p-6 rounded shadow mb-8" style="height: 360px;">
+	  <h3 class="text-xl font-semibold text-cyan-300 mb-4">📈 Nivo Chart: Balance Over Time</h3>
+	  <div id="nivo-render" style="height: 300px;"></div>
+	</div>
+    <!-- Charts
+	-->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4">Balance Over Time</h3>
+        <div id="lineChart"></div>
+      </div>
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4">By Transaction Type</h3>
+        <div id="pieChart"></div>
+      </div>
+    </div>
+
+    <!-- Tabelle -->
+    <div class="card mt-10 tab-section">
+      <h3 class="text-lg font-semibold mb-4">All Transactions</h3>
+      <div id="data-table"></div>
+    </div>
+  </div>
+
+  <!-- Weitere Tabs -->
+<div id="tab-eur-kategorie" class="tab-section hidden">
+  <div class="card">
+    <h3 class="text-2xl font-bold mb-6 text-cyan-400 flex items-center gap-2">
+      <i class="fas fa-balance-scale"></i> Einnahmen & Ausgaben (EÜR)
+    </h3>
+
+    <div class="flex justify-end mb-4">
+      <label class="mr-2 text-sm text-gray-300">Währung filtern:</label>
+      <select id="eur-currency-filter" class="bg-gray-800 text-white border border-gray-600 rounded px-3 py-1 text-sm shadow-sm">
+        <option value="ALL">Alle</option>
+        <option value="USD">USD</option>
+        <option value="BTC">BTC</option>
+        <option value="GMT">GMT</option>
+      </select>
+    </div>
+
+    <div id="eur-kategorie-list" class="grid md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+  </div>
+</div>
+<div id="tab-eur-diagramm" class="tab-section hidden">
+  <div class="card">
+    <h3 class="text-2xl font-bold mb-6 text-cyan-400 flex items-center gap-2">
+      <i class="fas fa-chart-bar"></i> EÜR-Diagramm: Einnahmen vs. Ausgaben
+    </h3>
+    <div class="mb-4 flex justify-end">
+      <label class="mr-2 text-sm text-gray-300">Währung:</label>
+      <select id="eur-diagram-currency" class="bg-gray-800 text-white border border-gray-600 rounded px-3 py-1 text-sm shadow-sm">
+        <option value="ALL">Alle</option>
+        <option value="USD">USD</option>
+        <option value="BTC">BTC</option>
+        <option value="GMT">GMT</option>
+      </select>
+    </div>
+    <div id="eurChart" class="mt-6"></div>
+  </div>
+</div>
+<div id="tab-export" class="tab-section hidden">
+  <div class="card">
+    <h3 class="text-2xl font-bold mb-6 text-cyan-400 flex items-center gap-2">
+      <i class="fas fa-file-export"></i> 📤 Exportfunktionen
+    </h3>
+    <div class="flex gap-4 mb-6">
+      <button onclick="exportToExcel()" class="bg-green-600 hover:bg-green-500 text-white font-semibold px-4 py-2 rounded shadow">
+        <i class="fas fa-file-excel"></i> Excel Export
+      </button>
+      <button onclick="exportToPDF()" class="bg-red-600 hover:bg-red-500 text-white font-semibold px-4 py-2 rounded shadow">
+        <i class="fas fa-file-pdf"></i> PDF Export
+      </button>
+    </div>
+    <p class="text-gray-400 text-sm">Es werden alle gefilterten Transaktionen exportiert. Die Werte in GMT werden auf 4 Stellen gerundet (Anzeige), intern jedoch präzise berechnet.</p>
+  </div>
+</div>
+
+  <div id="tab-wechselkurs" class="tab-section hidden">[PLATZHALTER FÜR BTC→EUR KONVERTER]</div>
+<div id="tab-afa" class="tab-section hidden">
+  <div class="card">
+    <h3 class="text-2xl font-bold mb-6 text-cyan-400 flex items-center gap-2">
+      <i class="fas fa-calculator"></i> 🛠️ AfA-Rechner für Miner-Investitionen
+    </h3>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div>
+        <label for="afa-amount" class="block text-sm text-gray-300 mb-1">Kaufpreis des Miners (EUR)</label>
+        <input id="afa-amount" type="number" step="0.01" class="w-full bg-gray-800 text-white border border-gray-600 px-4 py-2 rounded shadow" placeholder="z.B. 1200">
+      </div>
+      <div>
+        <label for="afa-date" class="block text-sm text-gray-300 mb-1">Kaufdatum</label>
+        <input id="afa-date" type="date" class="w-full bg-gray-800 text-white border border-gray-600 px-4 py-2 rounded shadow">
+      </div>
+    </div>
+    <div class="mt-6">
+      <button onclick="calculateAfaTable()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-6 py-2 rounded shadow">
+        Abschreibung berechnen
+      </button>
+    </div>
+    <div class="mt-8 overflow-x-auto">
+      <table id="afa-result" class="min-w-full table-auto text-left text-sm text-gray-200 hidden">
+        <thead class="text-xs uppercase text-gray-400 border-b border-gray-700">
+          <tr>
+            <th class="px-4 py-2">Jahr</th>
+            <th class="px-4 py-2">Abschreibung (1/3)</th>
+            <th class="px-4 py-2">Restwert</th>
+          </tr>
+        </thead>
+        <tbody id="afa-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+  <script>
+      function showMainTab(id) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+    }
+  let rawData = [], filteredData = [];
+
+  document.getElementById('csvInput').addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const lines = e.target.result.split(/\r?\n/).slice(1);
+      rawData = lines.map(line => {
+        const [date, time, type, valueRaw, currency, status] = line.split(';').map(s => s?.replace(/"/g, '').trim());
+        const cleanValue = valueRaw?.replaceAll('.', '').replace(',', '.');
+        const value = parseFloat(cleanValue);
+        const timestamp = new Date(date);
+        return { date: timestamp, time, type, value, currency, status };
+      }).filter(d => d.date instanceof Date && !isNaN(d.date) && !isNaN(d.value));
+
+      if (rawData.length === 0) {
+        alert("⚠️ Keine gültigen Datensätze erkannt. Bitte CSV prüfen.");
+        return;
+      }
+
+      document.getElementById('endDate').value = rawData[0].date.toISOString().split('T')[0];
+      document.getElementById('startDate').value = rawData.at(-1).date.toISOString().split('T')[0];
+
+      applyDateFilter();
+    };
+    reader.readAsText(file);
+  });
+document.addEventListener('DOMContentLoaded', () => {
+  ['chartStyle', 'chartFilterType', 'chartCurrency'].forEach(id => {
+    document.getElementById(id).addEventListener('change', drawCharts);
+  });
+});
+
+function drawCharts() {
+  const chartType = document.getElementById('chartStyle').value;
+  const filterType = document.getElementById('chartFilterType').value;
+  const selectedCurrency = document.getElementById('chartCurrency').value;
+
+  const byDate = {}, byType = {};
+
+  filteredData.forEach(row => {
+    if (selectedCurrency !== 'ALL' && row.currency !== selectedCurrency) return;
+    const isIn = ['Reward', 'NFT Reinvestment', 'NFT Game reinvestment', 'Referral Bonus', 'Bounty Program', 'Liquidity provider reward'].includes(row.type);
+    const isOut = ['Miner maintenance', 'Service Fees'].includes(row.type);
+    if ((filterType === 'in' && !isIn) || (filterType === 'out' && !isOut)) return;
+
+    const d = row.date.toISOString().split('T')[0];
+    byDate[d] = (byDate[d] || 0) + row.value;
+    byType[row.type] = (byType[row.type] || 0) + row.value;
+  });
+
+  const dateLabels = Object.keys(byDate).sort();
+  const dateValues = dateLabels.map(k => byDate[k]);
+  const typeLabels = Object.keys(byType);
+  const typeValues = typeLabels.map(k => byType[k]);
+
+  document.querySelector("#lineChart").innerHTML = '';
+  document.querySelector("#pieChart").innerHTML = '';
+
+  new ApexCharts(document.querySelector("#lineChart"), {
+    chart: { type: chartType, height: 300, foreColor: '#e2e8f0' },
+    series: [{ name: "Summe", data: dateValues }],
+    xaxis: { categories: dateLabels },
+    tooltip: { theme: 'dark' }
+  }).render();
+
+  new ApexCharts(document.querySelector("#pieChart"), {
+    chart: { type: 'donut', height: 300, foreColor: '#e2e8f0' },
+    series: typeValues,
+    labels: typeLabels,
+    tooltip: { theme: 'dark' }
+  }).render();
+}
+  function applyDateFilter() {
+    const start = new Date(document.getElementById('startDate').value);
+    const end = new Date(document.getElementById('endDate').value);
+
+    filteredData = rawData.filter(r => (!isNaN(start) ? r.date >= start : true) && (!isNaN(end) ? r.date <= end : true));
+
+    updateKPIs();
+    drawCharts();
+
+    renderTable();
+	drawTimeComparisons();
+
+  }
+
+  function updateKPIs() {
+    const income = filteredData.filter(r => r.type.toLowerCase().includes('reward') || r.type.toLowerCase().includes('bonus')).reduce((a, b) => a + b.value, 0);
+    const maintenance = filteredData.filter(r => r.type.toLowerCase().includes('maintenance')).reduce((a, b) => a + b.value, 0);
+    const net = income + maintenance;
+
+    document.getElementById('totalIncome').textContent = `$${income.toFixed(2)}`;
+    document.getElementById('totalMaintenance').textContent = `$${maintenance.toFixed(2)}`;
+    document.getElementById('netProfit').textContent = `$${net.toFixed(2)}`;
+  }
+
+  function drawCharts() {
+    const byDate = {}, byType = {};
+
+    filteredData.forEach(row => {
+      const d = row.date.toISOString().split('T')[0];
+      byDate[d] = (byDate[d] || 0) + row.value;
+      byType[row.type] = (byType[row.type] || 0) + row.value;
+    });
+
+    const dateLabels = Object.keys(byDate).sort();
+    const dateValues = dateLabels.map(k => byDate[k]);
+    const typeLabels = Object.keys(byType);
+    const typeValues = typeLabels.map(k => byType[k]);
+
+    document.querySelector("#lineChart").innerHTML = '';
+    document.querySelector("#pieChart").innerHTML = '';
+
+    if (dateLabels.length > 0) {
+      new ApexCharts(document.querySelector("#lineChart"), {
+        chart: { type: 'line', height: 300, foreColor: '#e2e8f0' },
+        series: [{ name: "Net", data: dateValues }],
+        xaxis: { categories: dateLabels }
+      }).render();
+    }
+
+    if (typeLabels.length > 0) {
+      new ApexCharts(document.querySelector("#pieChart"), {
+        chart: { type: 'donut', height: 300, foreColor: '#e2e8f0' },
+        series: typeValues,
+        labels: typeLabels
+      }).render();
+    }
+  }
+
+ 
+
+  function renderTable() {
+    new Tabulator("#data-table", {
+      data: filteredData,
+      layout: "fitColumns",
+      height: 400,
+      pagination: "local",
+      paginationSize: 10,
+      columns: [
+        { title: "Date", field: "date", formatter: cell => cell.getValue().toLocaleDateString() },
+        { title: "Time", field: "time" },
+        { title: "Type", field: "type" },
+        { title: "Value", field: "value", formatter: "money", hozAlign: "right" },
+        { title: "Currency", field: "currency" },
+        { title: "Status", field: "status" }
+      ]
+    });
+  }
+function drawTimeComparisons() {
+  // Alte Charts entfernen
+  ['dailyCompare','weeklyCompare','monthlyCompare','yearlyCompare'].forEach(id => {
+    const old = document.getElementById(id);
+    if (old) old.closest('.card')?.remove();
+  });
+
+  const byDay = {}, byWeek = {}, byMonth = {}, byYear = {};
+
+  filteredData.forEach(row => {
+    const d = row.date;
+    const dayKey = d.toISOString().split('T')[0];
+    const weekKey = `${d.getFullYear()}-KW${Math.ceil(((d - new Date(d.getFullYear(),0,1)) / 86400000 + d.getDay()+1)/7)}`;
+    const monthKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
+    const yearKey = `${d.getFullYear()}`;
+
+    byDay[dayKey] = (byDay[dayKey] || 0) + row.value;
+    byWeek[weekKey] = (byWeek[weekKey] || 0) + row.value;
+    byMonth[monthKey] = (byMonth[monthKey] || 0) + row.value;
+    byYear[yearKey] = (byYear[yearKey] || 0) + row.value;
+  });
+
+  const configs = [
+    { id: 'dailyCompare', data: byDay, title: 'Vergleich: Tage', type: 'line' },
+    { id: 'weeklyCompare', data: byWeek, title: 'Vergleich: Wochen', type: 'line' },
+    { id: 'monthlyCompare', data: byMonth, title: 'Vergleich: Monate', type: 'line' },
+    { id: 'yearlyCompare', data: byYear, title: 'Vergleich: Jahre', type: 'bar' }
+  ];
+
+  configs.forEach(cfg => {
+    const div = document.createElement('div');
+    div.className = 'card mt-10 tab-section';
+    div.innerHTML = `<h3 class="text-lg font-semibold mb-4">📈 ${cfg.title}</h3><div id="${cfg.id}"></div>`;
+    document.body.appendChild(div);
+
+    const labels = Object.keys(cfg.data).sort();
+    const values = labels.map(k => cfg.data[k]);
+
+    new ApexCharts(document.getElementById(cfg.id), {
+      chart: { type: cfg.type, height: 300, foreColor: '#e2e8f0' },
+      series: [{ name: cfg.title, data: values }],
+      xaxis: { categories: labels }
+    }).render();
+  });
+}
+function generateEurKategorisierung() {
+  const container = document.getElementById('eur-kategorie-list');
+  const selectedCurrency = document.getElementById('eur-currency-filter').value;
+  container.innerHTML = '';
+
+  const categories = {
+    'Einnahmen Mining': ['Reward', 'NFT Reinvestment', 'NFT Game reinvestment'],
+    'Einnahmen Referral': ['Referral Bonus', 'Bounty Program'],
+    'Einnahmen Service': ['Liquidity provider reward'],
+    'Betriebsausgaben': ['Miner maintenance', 'Service Fees'],
+    'Investitionen': ['Miner Purchase', 'Upgrade']
+  };
+
+  const grouped = {};
+  for (const key of Object.keys(categories)) {
+    grouped[key] = { USD: 0, BTC: 0, GMT: 0 };
+  }
+
+  filteredData.forEach(tx => {
+    for (const [cat, types] of Object.entries(categories)) {
+      if (types.includes(tx.type)) {
+        if (grouped[cat][tx.currency] !== undefined) {
+          grouped[cat][tx.currency] += tx.value;
+        }
+        break;
+      }
+    }
+  });
+
+  for (const [label, valObj] of Object.entries(grouped)) {
+    let html = `<h4 class='text-lg font-semibold text-cyan-300 mb-2 border-b border-cyan-700 pb-1'>${label}</h4>`;
+    html += '<ul class="text-white text-sm space-y-1">';
+    for (const [cur, val] of Object.entries(valObj)) {
+      if (selectedCurrency !== 'ALL' && cur !== selectedCurrency) continue;
+      const display = cur === 'GMT' ? val.toFixed(4) : val.toFixed(8);
+      html += `<li class='flex justify-between'><span>${cur}</span><span class='font-mono text-right'>${display}</span></li>`;
+    }
+    html += '</ul>';
+
+    const block = document.createElement('div');
+    block.className = 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl p-5 shadow-lg transition transform hover:scale-[1.01]';
+    block.innerHTML = html;
+    container.appendChild(block);
+  }
+}
+
+// Trigger filter change
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('eur-currency-filter').addEventListener('change', generateEurKategorisierung);
+});
+
+applyDateFilter = (function (orig) {
+  return function () {
+    orig();
+    generateEurKategorisierung();
+  }
+})(applyDateFilter);
+function drawEurDiagramm() {
+  const selectedCurrency = document.getElementById('eur-diagram-currency').value;
+  const buckets = {};
+
+  filteredData.forEach(tx => {
+    const monthKey = tx.date.getFullYear() + '-' + String(tx.date.getMonth() + 1).padStart(2, '0');
+    if (!buckets[monthKey]) {
+      buckets[monthKey] = { einnahme: 0, ausgabe: 0, currency: tx.currency };
+    }
+
+    const isEinnahme = ['Reward', 'NFT Reinvestment', 'NFT Game reinvestment', 'Referral Bonus', 'Bounty Program', 'Liquidity provider reward'].includes(tx.type);
+    const isAusgabe = ['Miner maintenance', 'Service Fees'].includes(tx.type);
+
+    if (selectedCurrency === 'ALL' || tx.currency === selectedCurrency) {
+      if (isEinnahme) buckets[monthKey].einnahme += tx.value;
+      if (isAusgabe) buckets[monthKey].ausgabe += Math.abs(tx.value);
+    }
+  });
+
+  const months = Object.keys(buckets).sort();
+  const einnahmen = months.map(m => buckets[m].einnahme);
+  const ausgaben = months.map(m => buckets[m].ausgabe);
+
+  document.getElementById('eurChart').innerHTML = '';
+  new ApexCharts(document.getElementById('eurChart'), {
+    chart: { type: 'bar', height: 360, foreColor: '#e2e8f0', stacked: true },
+    series: [
+      { name: 'Einnahmen', data: einnahmen },
+      { name: 'Ausgaben', data: ausgaben }
+    ],
+    xaxis: { categories: months },
+    plotOptions: { bar: { horizontal: false, columnWidth: '50%' } },
+    colors: ['#22c55e', '#ef4444']
+  }).render();
+}
+
+// initialer Aufruf + Wechsel der Währung
+document.addEventListener('DOMContentLoaded', () => {
+  const select = document.getElementById('eur-diagram-currency');
+  if (select) select.addEventListener('change', drawEurDiagramm);
+});
+
+applyDateFilter = (function (orig) {
+  return function () {
+    orig();
+    drawEurDiagramm();
+  }
+})(applyDateFilter);
+
+function exportToExcel() {
+  const data = filteredData.map(row => ({
+    Date: row.date.toLocaleDateString(),
+    Time: row.time,
+    Type: row.type,
+    Value: row.currency === 'GMT' ? parseFloat(row.value.toFixed(4)) : row.value,
+    Currency: row.currency,
+    Status: row.status
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Transactions");
+  XLSX.writeFile(workbook, "gomining_export.xlsx");
+}
+
+function exportToPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFontSize(12);
+  doc.text("GoMining Transaktionen (Auszug)", 14, 16);
+
+  const rows = filteredData.slice(0, 50).map(row => [
+    row.date.toLocaleDateString(),
+    row.time,
+    row.type,
+    (row.currency === 'GMT' ? parseFloat(row.value.toFixed(4)) : row.value).toString(),
+    row.currency,
+    row.status
+  ]);
+
+  doc.autoTable({
+    startY: 20,
+    head: [["Date", "Time", "Type", "Value", "Currency", "Status"]],
+    body: rows,
+    styles: { fontSize: 8 }
+  });
+
+  doc.save("gomining_export.pdf");
+}
+function calculateAfaTable() {
+  const amount = parseFloat(document.getElementById('afa-amount').value);
+  const date = new Date(document.getElementById('afa-date').value);
+  if (isNaN(amount) || isNaN(date.getTime())) return;
+
+  const year = date.getFullYear();
+  const annualAfa = amount / 3;
+  let remaining = amount;
+
+  const tbody = document.getElementById('afa-body');
+  tbody.innerHTML = '';
+
+  for (let i = 0; i < 3; i++) {
+    const abschreibung = i < 2 ? annualAfa : remaining;
+    remaining -= abschreibung;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class='px-4 py-2'>${year + i}</td>
+      <td class='px-4 py-2'>${abschreibung.toFixed(2)} €</td>
+      <td class='px-4 py-2'>${remaining.toFixed(2)} €</td>
+    `;
+    tbody.appendChild(tr);
+  }
+  document.getElementById('afa-result').classList.remove('hidden');
+}
+function renderNivoChart() {
+  const chartContainer = document.getElementById("nivo-render");
+  if (!chartContainer) return;
+
+  const dataMap = {};
+  filteredData.forEach(row => {
+    const d = row.date.toISOString().split("T")[0];
+    if (!dataMap[d]) dataMap[d] = 0;
+    dataMap[d] += row.value;
+  });
+
+  const chartData = [
+    {
+      id: "Balance",
+      color: "hsl(204, 70%, 50%)",
+      data: Object.entries(dataMap).sort().map(([x, y]) => ({ x, y }))
+    }
+  ];
+
+  ReactDOM.render(
+    React.createElement(nivoLine.ResponsiveLine, {
+      data: chartData,
+      margin: { top: 20, right: 30, bottom: 50, left: 60 },
+      xScale: { type: 'point' },
+      yScale: { type: 'linear', min: 'auto', max: 'auto', stacked: false, reverse: false },
+      curve: 'monotoneX',
+      axisBottom: {
+        orient: 'bottom',
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: -30,
+        legend: 'Datum',
+        legendOffset: 36,
+        legendPosition: 'middle'
+      },
+      axisLeft: {
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        legend: 'BTC / USD / GMT',
+        legendOffset: -40,
+        legendPosition: 'middle'
+      },
+      colors: { scheme: 'nivo' },
+      theme: {
+        background: '#0f172a',
+        textColor: '#e2e8f0',
+        fontSize: 12,
+        axis: { ticks: { line: { stroke: '#e2e8f0' }, text: { fill: '#e2e8f0' } } },
+        grid: { line: { stroke: '#334155', strokeDasharray: '2 2' } }
+      },
+      enableGridX: false,
+      enablePoints: true,
+      useMesh: true,
+      tooltip: ({ point }) => `${point.data.xFormatted}: ${point.data.yFormatted}`
+    }),
+    chartContainer
+  );
+}
+
+applyDateFilter = (function (original) {
+  return function () {
+    original();
+    renderNivoChart();
+  };
+})(applyDateFilter);
+</script>
+</body>
+</html>
