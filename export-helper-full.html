@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GoMining Export Helper</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background-color: #121212;
+            color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        h1 {
+            color: #00ff7f;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #ccc;
+            margin-bottom: 30px;
+        }
+
+        .upload-section {
+            background: #1f1f1f;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px dashed #444;
+            border-radius: 12px;
+            transition: border-color 0.3s ease;
+        }
+
+        .upload-section.valid {
+            border-color: #00cc66;
+        }
+
+        .upload-section.invalid {
+            border-color: #cc0033;
+        }
+
+        .upload-label {
+            display: block;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        input[type="file"] {
+            padding: 6px;
+            background: #2c2c2c;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        .buttons {
+            margin-top: 10px;
+        }
+
+        .btn {
+            background-color: #673dec;
+            color: #fff;
+            padding: 8px 15px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #5a32c4;
+        }
+
+        .footer {
+            margin-top: 40px;
+        }
+
+        .continue-btn {
+            background-color: #00cc66;
+        }
+
+        .continue-btn:hover {
+            background-color: #00a653;
+        }
+    </style>
+</head>
+<body>
+    <h1>📁 GoMining Export Helper</h1>
+    <p>Upload your GoMining CSV exports. Green = valid. Red = missing or invalid.</p>
+
+    
+    <div class="upload-section" id="miners-upload">
+        <label class="upload-label">Upload <strong>miners.csv</strong> – <em>Minerbestand – TH & Effizienz</em></label>
+        <input type="file" id="minersFile" accept=".csv">
+        <div class="buttons">
+            <button class="btn" onclick="alert('Instructions for miners.csv')">How 2 get my File</button>
+        </div>
+    </div>
+    
+    <div class="upload-section" id="transactions-upload">
+        <label class="upload-label">Upload <strong>transactions.csv</strong> – <em>Transaktionen – BTC & Gebühren</em></label>
+        <input type="file" id="transactionsFile" accept=".csv">
+        <div class="buttons">
+            <button class="btn" onclick="alert('Instructions for transactions.csv')">How 2 get my File</button>
+        </div>
+    </div>
+    
+    <div class="upload-section" id="referral-upload">
+        <label class="upload-label">Upload <strong>referral.csv</strong> – <em>Referral-Einnahmen</em></label>
+        <input type="file" id="referralFile" accept=".csv">
+        <div class="buttons">
+            <button class="btn" onclick="alert('Instructions for referral.csv')">How 2 get my File</button>
+        </div>
+    </div>
+    
+    <div class="upload-section" id="purchase-upload">
+        <label class="upload-label">Upload <strong>purchase_history.csv</strong> – <em>Miner- & TH-Käufe</em></label>
+        <input type="file" id="purchaseFile" accept=".csv">
+        <div class="buttons">
+            <button class="btn" onclick="alert('Instructions for purchase_history.csv')">How 2 get my File</button>
+        </div>
+    </div>
+    
+    <div class="upload-section" id="upgrade-upload">
+        <label class="upload-label">Upload <strong>upgrade_history.csv</strong> – <em>Effizienz-Upgrades</em></label>
+        <input type="file" id="upgradeFile" accept=".csv">
+        <div class="buttons">
+            <button class="btn" onclick="alert('Instructions for upgrade_history.csv')">How 2 get my File</button>
+        </div>
+    </div>
+    
+    <div class="upload-section" id="user-upload">
+        <label class="upload-label">Upload <strong>user_data.csv</strong> – <em>Optionale Benutzerdaten (z. B. Rabatt)</em></label>
+        <input type="file" id="userFile" accept=".csv">
+        <div class="buttons">
+            <button class="btn" onclick="alert('Instructions for user_data.csv')">How 2 get my File</button>
+        </div>
+    </div>
+    
+
+    <div class="footer">
+        <button class="btn continue-btn" onclick="checkAndContinue()">✅ Continue to Dashboard</button>
+    </div>
+
+    <script>
+        function markValidity(input, sectionId) {
+            const container = document.getElementById(sectionId);
+            if (input.files.length > 0) {
+                container.classList.remove("invalid");
+                container.classList.add("valid");
+            } else {
+                container.classList.remove("valid");
+                container.classList.add("invalid");
+            }
+        }
+
+        function checkAndContinue() {
+            const requiredFields = ['minersFile', 'transactionsFile', 'referralFile', 'purchaseFile', 'upgradeFile', 'userFile'];
+            const allOK = requiredFields.every(id => document.getElementById(id).files.length > 0);
+
+            if (allOK) {
+                alert("All files OK. Redirecting to dashboard...");
+                // window.location.href = 'dashboard.html';
+            } else {
+                alert("Please upload all required files before continuing.");
+            }
+        }
+
+        ['miners', 'transactions', 'referral', 'purchase', 'upgrade', 'user'].forEach(prefix => {
+            const fileInput = document.getElementById(prefix + 'File');
+            fileInput.addEventListener('change', function () {
+                markValidity(this, prefix + '-upload');
+            });
+        });
+    </script>
+</body>
+</html>
