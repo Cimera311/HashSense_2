@@ -1,0 +1,83 @@
+
+<!-- Modal Container für alle Exporte -->
+<div id="importModal" class="modal">
+    <div class="modal-content">
+        <!-- Tab Buttons -->
+        <div class="button-group">
+            <button class="main-btn" onclick="showTab('import-tab')">Import your miners</button>
+            <button class="main-btn" onclick="showTab('transactions-tab')">Transactions (beta)</button>
+            <button class="main-btn" onclick="showTab('referral-tab')">Referral (beta)</button>
+        </div>
+
+        <!-- Transactions Tab -->
+        <div class="tab-page" id="transactions-tab" style="display:none;">
+            <span class="close" onclick="closeImportModal('transactions-tab')">&times;</span>
+            <button class="main-btn" onclick="openHowToImportModal('howToImportModal2')">How to Import</button>
+            <h2>Transactions Export</h2>
+            <textarea id="transactionInput" rows="15" style="width:90%;" placeholder="Paste your transaction history here..."></textarea>
+            <div class="single-button-container" style="margin-top: 10px;">
+                <button class="main-btn" onclick="convertTransactionsToXLSX()">Download Your XLSX</button>
+                <button class="main-btn" onclick="clearTransactionInput()">Clear</button>
+            </div>
+            <div id="messageBox" style="margin-top: 20px; padding: 10px; background-color: #2a2a2a; color: #00ff7f; border-radius: 5px; display: none;"></div>
+        </div>
+
+        <!-- Referral Tab -->
+        <div class="tab-page" id="referral-tab" style="display:none;">
+            <span class="close" onclick="closeImportModal('referral-tab')">&times;</span>
+            <h2>Referral Export</h2>
+            <textarea id="referralInput" rows="15" placeholder="Paste your referral data here..." style="width:90%;"></textarea>
+            <div class="single-button-container">
+                <button class="main-btn" onclick="convertReferralToCSV()">Download Referral CSV</button>
+            </div>
+        </div>
+
+        <!-- Miner Import Tab -->
+        <div class="tab-page active" id="import-tab" style="display:none;">
+            <span class="close" onclick="closeImportModal('import-tab')">&times;</span>
+            <button onclick="openHowToImportModal('howToImportModal')">How to Import</button>
+            <h2>Miner-Data import</h2>
+            <textarea id="minerInput" rows="10" cols="50" placeholder="Paste miner Data here..."></textarea>
+            <div class="modal-buttons">
+                <button onclick="importMinerData()">Check the import</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How-To Modale -->
+<div id="howToImportModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeHowToImportModal('howToImportModal')">&times;</span>
+        <h2>How to Import Miners</h2>
+        <p>Go to "My Farm", mark all your miners, and copy-paste the text here.</p>
+    </div>
+</div>
+
+<div id="howToImportModal2" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeHowToImportModal('howToImportModal2')">&times;</span>
+        <h2>How to Import Transactions</h2>
+        <p>Go to "My Wallet", narrow the window, mark all lines, and paste here.</p>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div id="previewModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closePreviewModal()">&times;</span>
+        <h2>Check imported miners</h2>
+        <div class="table-container">
+            <table id="preview-table">
+                <thead>
+                    <tr><th>ID</th><th>Miner Name</th><th>TH</th><th>W/TH</th></tr>
+                </thead>
+                <tbody id="preview-tbody"></tbody>
+            </table>
+        </div>
+        <div class="modal-buttons">
+            <button onclick="finalizeImport(true)">Import & replace</button>
+            <button onclick="finalizeImport(false)">Add miners</button>
+        </div>
+    </div>
+</div>
