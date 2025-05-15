@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GoMining Export Helper</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #f0f0f0;
+            padding: 20px;
+        }}
+        h1 {{
+            color: #00ff7f;
+        }}
+        .upload-section {{
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px dashed #555;
+            border-radius: 10px;
+            background-color: #1e1e1e;
+            transition: border-color 0.3s ease;
+        }}
+        .upload-section.valid {{
+            border-color: green;
+        }}
+        .upload-section.invalid {{
+            border-color: red;
+        }}
+        .upload-label {{
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }}
+        .buttons {{
+            margin-top: 10px;
+        }}
+        .btn {{
+            background-color: #673dec;
+            border: none;
+            padding: 10px 15px;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 10px;
+        }}
+    </style>
+</head>
+<body>
+    <h1>📁 GoMining Export Helper</h1>
+    <p>Please upload your GoMining CSV exports below. Each file must match the expected format.</p>
+
+    <div class="upload-section" id="purchase-history-upload">
+        <label class="upload-label">Upload <strong>purchase_history.csv</strong></label>
+        <input type="file" id="purchaseFile" accept=".csv">
+        <div class="buttons">
+            <button class="btn" onclick="alert('Help: How to get purchase_history.csv')">How 2 get my File</button>
+        </div>
+    </div>
+
+    <div class="upload-section" id="upgrade-history-upload">
+        <label class="upload-label">Upload <strong>upgrade_history.csv</strong></label>
+        <input type="file" id="upgradeFile" accept=".csv">
+        <div class="buttons">
+            <button class="btn" onclick="alert('Help: How to get upgrade_history.csv')">How 2 get my File</button>
+        </div>
+    </div>
+
+    <div style="margin-top: 40px;">
+        <button class="btn" onclick="alert('Checking files and continuing to dashboard...')">✅ Continue to Dashboard</button>
+    </div>
+
+    <script>
+        // Placeholder JS for drag & drop visual feedback
+        const checkValid = (input, containerId) => {{
+            const container = document.getElementById(containerId);
+            if (input.files.length > 0) {{
+                container.classList.remove("invalid");
+                container.classList.add("valid");
+            }} else {{
+                container.classList.remove("valid");
+                container.classList.add("invalid");
+            }}
+        }};
+
+        document.getElementById('purchaseFile').addEventListener('change', function() {{
+            checkValid(this, 'purchase-history-upload');
+        }});
+
+        document.getElementById('upgradeFile').addEventListener('change', function() {{
+            checkValid(this, 'upgrade-history-upload');
+        }});
+    </script>
+</body>
+</html>
