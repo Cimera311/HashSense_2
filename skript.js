@@ -1231,4 +1231,11 @@
                     document.getElementById(page).style.display = "none";
                 }
 
-                         
+                    document.addEventListener('DOMContentLoaded', function () {
+			  const toggleBtn = document.getElementById('toggleMode');
+			  if (toggleBtn) {
+				toggleBtn.addEventListener('click', function () {
+				  document.body.classList.toggle('dark');
+				});
+			  }
+			});      
