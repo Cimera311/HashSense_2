@@ -155,6 +155,7 @@
 		}
 		body:not(.dark) .modal-content {
 			color: #1e1e1e;
+			background-color: white;
 		}
 		body:not(.dark) .currency-toggle,
 		body:not(.dark) .view-toggle {
