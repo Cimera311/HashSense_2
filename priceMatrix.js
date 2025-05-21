@@ -18,7 +18,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":27.84},
         {"minTH":1536,"pricePerTH":27.65},
         {"minTH":2560,"pricePerTH":27.46},
-        {"minTH":3584,"pricePerTH":27.28}
+        {"minTH":3584,"pricePerTH":27.28},
     ],
     "16": [
         {"minTH":1,"pricePerTH":29.76},
@@ -39,7 +39,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":26.69},
         {"minTH":1536,"pricePerTH":26.5},
         {"minTH":2560,"pricePerTH":26.31},
-        {"minTH":3584,"pricePerTH":26.12}
+        {"minTH":3584,"pricePerTH":26.12},
     ],
     "17": [
         {"minTH":1,"pricePerTH":28.6},
@@ -60,7 +60,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":25.53},
         {"minTH":1536,"pricePerTH":25.34},
         {"minTH":2560,"pricePerTH":25.15},
-        {"minTH":3584,"pricePerTH":24.96}
+        {"minTH":3584,"pricePerTH":24.96},
     ],
     "18": [
         {"minTH":1,"pricePerTH":27.44},
@@ -81,7 +81,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":24.37},
         {"minTH":1536,"pricePerTH":24.18},
         {"minTH":2560,"pricePerTH":23.99},
-        {"minTH":3584,"pricePerTH":23.8}
+        {"minTH":3584,"pricePerTH":23.8},
     ],
     "19": [
         {"minTH":1,"pricePerTH":26.28},
@@ -102,7 +102,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":23.21},
         {"minTH":1536,"pricePerTH":23.02},
         {"minTH":2560,"pricePerTH":22.83},
-        {"minTH":3584,"pricePerTH":22.64}
+        {"minTH":3584,"pricePerTH":22.64},
     ],
     "20": [
         {"minTH":1,"pricePerTH":25.12,"minerCost":25.99},
@@ -144,7 +144,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":20.92},
         {"minTH":1536,"pricePerTH":20.73},
         {"minTH":2560,"pricePerTH":20.54},
-        {"minTH":3584,"pricePerTH":20.35}
+        {"minTH":3584,"pricePerTH":20.35},
     ],
     "22": [
         {"minTH":1,"pricePerTH":22.86},
@@ -165,7 +165,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":19.79},
         {"minTH":1536,"pricePerTH":19.6},
         {"minTH":2560,"pricePerTH":19.41},
-        {"minTH":3584,"pricePerTH":19.22}
+        {"minTH":3584,"pricePerTH":19.22},
     ],
     "23": [
         {"minTH":1,"pricePerTH":21.73},
@@ -186,7 +186,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":18.66},
         {"minTH":1536,"pricePerTH":18.46},
         {"minTH":2560,"pricePerTH":18.28},
-        {"minTH":3584,"pricePerTH":18.09}
+        {"minTH":3584,"pricePerTH":18.09},
     ],
     "24": [
         {"minTH":1,"pricePerTH":20.59},
@@ -228,7 +228,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":16.39},
         {"minTH":1536,"pricePerTH":16.2},
         {"minTH":2560,"pricePerTH":16.01},
-        {"minTH":3584,"pricePerTH":15.82}
+        {"minTH":3584,"pricePerTH":15.82},
     ],
     "26": [
         {"minTH":1,"pricePerTH":18.33},
@@ -270,7 +270,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":14.12},
         {"minTH":1536,"pricePerTH":13.93},
         {"minTH":2560,"pricePerTH":13.74},
-        {"minTH":3584,"pricePerTH":13.56}
+        {"minTH":3584,"pricePerTH":13.56},
     ],
     "28": [
         {"minTH":1,"pricePerTH":16.06},
@@ -291,7 +291,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":12.99},
         {"minTH":1536,"pricePerTH":12.8},
         {"minTH":2560,"pricePerTH":12.61},
-        {"minTH":3584,"pricePerTH":12.42}
+        {"minTH":3584,"pricePerTH":12.42},
     ],
     "29": [
         {"minTH":1,"pricePerTH":15.34},
@@ -312,7 +312,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":12.27},
         {"minTH":1536,"pricePerTH":12.08},
         {"minTH":2560,"pricePerTH":11.89},
-        {"minTH":3584,"pricePerTH":11.7}
+        {"minTH":3584,"pricePerTH":11.7},
     ],
     "30": [
         {"minTH":1,"pricePerTH":14.62},
@@ -333,7 +333,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":11.55},
         {"minTH":1536,"pricePerTH":11.36},
         {"minTH":2560,"pricePerTH":11.17},
-        {"minTH":3584,"pricePerTH":10.98}
+        {"minTH":3584,"pricePerTH":10.98},
     ],
     "31": [
         {"minTH":1,"pricePerTH":13.9},
@@ -354,7 +354,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":10.83},
         {"minTH":1536,"pricePerTH":10.64},
         {"minTH":2560,"pricePerTH":10.45},
-        {"minTH":3584,"pricePerTH":10.26}
+        {"minTH":3584,"pricePerTH":10.26},
     ],
     "32": [
         {"minTH":1,"pricePerTH":13.18},
@@ -375,7 +375,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":10.11},
         {"minTH":1536,"pricePerTH":9.92},
         {"minTH":2560,"pricePerTH":9.73},
-        {"minTH":3584,"pricePerTH":9.54}
+        {"minTH":3584,"pricePerTH":9.54},
     ],
     "33": [
         {"minTH":1,"pricePerTH":12.46},
@@ -396,7 +396,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":9.39},
         {"minTH":1536,"pricePerTH":9.2},
         {"minTH":2560,"pricePerTH":9.01},
-        {"minTH":3584,"pricePerTH":8.82}
+        {"minTH":3584,"pricePerTH":8.82},
     ],
     "34": [
         {"minTH":1,"pricePerTH":11.74},
@@ -417,7 +417,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":8.67},
         {"minTH":1536,"pricePerTH":8.48},
         {"minTH":2560,"pricePerTH":8.29},
-        {"minTH":3584,"pricePerTH":8.1}
+        {"minTH":3584,"pricePerTH":8.1},
     ],
     "35": [
         {"minTH":1,"pricePerTH":11.02},
@@ -438,7 +438,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":7.95},
         {"minTH":1536,"pricePerTH":7.76},
         {"minTH":2560,"pricePerTH":7.57},
-        {"minTH":3584,"pricePerTH":7.38}
+        {"minTH":3584,"pricePerTH":7.38},
     ],
     "50": [
         {"minTH":1,"pricePerTH":6.63},
@@ -459,6 +459,6 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":3.56},
         {"minTH":1536,"pricePerTH":3.36},
         {"minTH":2560,"pricePerTH":3.18},
-        {"minTH":3584,"pricePerTH":2.99}
+        {"minTH":3584,"pricePerTH":2.99},
     ],
 };
