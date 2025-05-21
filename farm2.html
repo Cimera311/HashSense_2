@@ -879,7 +879,7 @@ function ladenMinerInTabelle() {
             roiTH = '0';
         }
         let roiWATT;
-        if ((miner.efficiency <= 50) and (miner.efficiency > 15)){
+        if (miner.efficiency <= 50 && miner.efficiency > 15) {
             roiWATT = ROIofWATTUpgrade(getUpgradeCostWATT(efficiency, efficiency -1 , myTH), myTH, efficiency, efficiency-1) ;
         } else {
             roiWATT.roi_percent = '0';            
