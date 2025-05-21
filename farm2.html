@@ -878,16 +878,18 @@ function ladenMinerInTabelle() {
         } else {
             roiTH = '0';
         }
-        let roiWATT = {
-          roi_percent: '0',
-          profit_increase: {
-            btc: 0,
-            usd: 0,
-            gmt: 0
-          }
-        };
+        let roiWATT ;
         if (miner.efficiency <= 50 && miner.efficiency > 15) {
-            roiWATT = (getUpgradeCostWATT(efficiency, efficiency -1 , myTH), myTH, efficiency, efficiency-1) ;
+            roiWATT = ROIofWATTUpgrade(getUpgradeCostWATT(efficiency, efficiency -1 , myTH), myTH, efficiency, efficiency-1) ;
+        } else {
+          roiWATT = {
+            roi_percent: '0',
+            profit_increase: {
+              btc: 0,
+              usd: 0,
+              gmt: 0
+            }
+          };
         }
 
         //let roiEff = calculateROI_EfficiencyUpgrade(miner.efficiency, miner.efficiency - 5, miner.power);
