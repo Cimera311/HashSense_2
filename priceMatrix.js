@@ -1,6 +1,6 @@
 const priceMatrixdatei = {
     "15": [
-        {"minTH":1,"pricePerTH":30.91,"minerCost":32,99},
+        {"minTH":1,"pricePerTH":30.91,"minerCost":32.99},
         {"minTH":2,"pricePerTH":30.7},
         {"minTH":4,"pricePerTH":30.48},
         {"minTH":8,"pricePerTH":30.27},
