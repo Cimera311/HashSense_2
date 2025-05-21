@@ -1082,7 +1082,7 @@ header  {
     width: 100%;
     table-layout: auto;
     border-collapse: collapse;
-    color: #1e1e1e;
+
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     border-radius: 12px;
     overflow: hidden;
