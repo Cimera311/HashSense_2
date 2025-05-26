@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Check Miner</title>
+  <style>
+    body { background: #111; color: white; font-family: sans-serif; }
+    #drop {
+      width: 90%;
+      margin: 30px auto 10px auto;
+      padding: 30px;
+      border: 2px dashed #673dec;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 18px;
+      background: #1c1c1c;
+    }
+    #hint {
+      width: 90%;
+      margin: 0 auto 20px auto;
+      font-size: 15px;
+      color: #ccc;
+      background: #222;
+      border-left: 4px solid #673dec;
+      padding: 10px 15px;
+      border-radius: 6px;
+      line-height: 1.6;
+    }
+    #fields {
+      width: 90%;
+      margin: 20px auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 30px;
+    }
+    label { display: block; font-weight: bold; margin-bottom: 5px; }
+    input {
+      width: 100%;
+      padding: 8px;
+      background: #222;
+      color: white;
+      border: 1px solid #555;
+      border-radius: 4px;
+    }
+    .field-block { display: flex; flex-direction: column; }
+    .result-block {
+      width: 90%;
+      margin: 20px auto;
+      padding: 10px;
+      background: #222;
+      color: #fff;
+      border-radius: 6px;
+      border: 1px solid #444;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+<div id="hint">
+    👉 <strong>How to use:</strong><br>
+    Go to the <a href="https://app.gomining.com/marketplace" target="_blank" style="color:#a3d1ff">GoMining Marketplace</a><br>
+    ➤ Click and hold the <strong>BUY</strong> button of any miner<br>
+    ➤ Drag and drop the card into the box above ☝️<br>
+    <em>You will instantly see all miner details and upgrade cost breakdowns</em>
+  </div>
+  <div id="drop">🟪 Drop a GoMining Miner card here…</div>
+
+
+
+  <div id="fields">
+    <div class="field-block">
+      <label for="power">Power (TH):</label>
+      <input id="power" type="number">
+    </div>
+    <div class="field-block">
+      <label for="efficiency">Efficiency (W/TH):</label>
+      <input id="efficiency" type="number">
+    </div>
+    <div class="field-block">
+      <label for="roi">ROI (%):</label>
+      <input id="roi" type="number">
+    </div>
+    <div class="field-block">
+      <label for="name">Miner Name/ID:</label>
+      <input id="name" type="text">
+    </div>
+    <div class="field-block">
+      <label for="gmt">GMT Price:</label>
+      <input id="gmt" type="number">
+    </div>
+    <div class="field-block">
+      <label for="usd">USD Price:</label>
+      <input id="usd" type="number">
+    </div>
+    <div class="field-block">
+      <label for="usdperth">USD / TH:</label>
+      <input id="usdperth" type="number">
+    </div>
+  </div>
+
+  <div class="result-block" id="upgrade-costs"></div>
+
+  <script>
+    const efficiencyMatrix = {
+      16: { to: 15, pricePerW: 1.16 }, 17: { to: 16, pricePerW: 1.16 }, 18: { to: 17, pricePerW: 1.16 },
+      19: { to: 18, pricePerW: 1.16 }, 20: { to: 19, pricePerW: 1.16 }, 21: { to: 20, pricePerW: 1.13 },
+      22: { to: 21, pricePerW: 1.13 }, 23: { to: 22, pricePerW: 1.13 }, 24: { to: 23, pricePerW: 1.13 },
+      25: { to: 24, pricePerW: 1.13 }, 26: { to: 25, pricePerW: 1.13 }, 27: { to: 26, pricePerW: 1.13 },
+      28: { to: 27, pricePerW: 1.13 }, 29: { to: 28, pricePerW: 0.72 }, 30: { to: 29, pricePerW: 0.72 },
+      31: { to: 30, pricePerW: 0.72 }, 32: { to: 31, pricePerW: 0.72 }, 33: { to: 32, pricePerW: 0.72 },
+      34: { to: 33, pricePerW: 0.72 }, 35: { to: 34, pricePerW: 0.72 }, 36: { to: 35, pricePerW: 0.29 },
+      37: { to: 36, pricePerW: 0.29 }, 38: { to: 37, pricePerW: 0.29 }, 39: { to: 38, pricePerW: 0.29 },
+      40: { to: 39, pricePerW: 0.29 }, 41: { to: 40, pricePerW: 0.29 }, 42: { to: 41, pricePerW: 0.29 },
+      43: { to: 42, pricePerW: 0.29 }, 44: { to: 43, pricePerW: 0.29 }, 45: { to: 44, pricePerW: 0.29 },
+      46: { to: 45, pricePerW: 0.29 }, 47: { to: 46, pricePerW: 0.29 }, 48: { to: 47, pricePerW: 0.29 },
+      49: { to: 48, pricePerW: 0.29 }, 50: { to: 49, pricePerW: 0.29 }
+    };
+
+        function calculateUpgradeCost(currentW, targetW, th, logSteps = false) {
+        let cost = 0;
+        let step = Math.floor(currentW);
+        let log = [];
+        while (step > targetW) {
+            if (efficiencyMatrix[step]) {
+            const { to, pricePerW } = efficiencyMatrix[step];
+            const stepDiff = step - to;
+            const stepCost = stepDiff * pricePerW * th;
+            cost += stepCost;
+            if (logSteps) log.push(`(${step} → ${to}) ${stepDiff} * $${pricePerW} * ${th} = $${stepCost.toFixed(2)}`);
+            step = to;
+            } else {
+            break;
+            }
+        }
+        return logSteps ? { cost, log } : cost;
+        }
+
+    const drop = document.getElementById('drop');
+    const upgradeCosts = document.getElementById('upgrade-costs');
+
+    drop.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      drop.textContent = 'Drop now!';
+    });
+
+    drop.addEventListener('dragleave', () => {
+      drop.textContent = 'Drop a GoMining Miner card here…';
+    });
+
+    drop.addEventListener('drop', (e) => {
+      e.preventDefault();
+      drop.textContent = 'Dropped. Parsing…';
+
+      const html = e.dataTransfer.getData('text/html');
+      if (!html) {
+        drop.textContent = 'No HTML content found.';
+        return;
+      }
+
+      const container = document.createElement('div');
+      container.innerHTML = html;
+
+      const extract = (selector, fallback = '') => {
+        const el = container.querySelector(selector);
+        return el ? el.innerText.trim() : fallback;
+      };
+
+      const power = extract('icon-power + span').replace(/[^0-9.]/g, '');
+      const efficiency = extract('icon-electricity + span').replace(/[^0-9.]/g, '');
+      const roiMatch = html.match(/ROI\s*(\d+(\.\d+)?)/);
+      const roi = roiMatch ? roiMatch[1] : '';
+// NEU: robustere Miner-Name-Zusammenführung
+const idMatch = html.match(/#\d{3,6}/);
+const collectionBlock = container.querySelector('.catalog-item-card__item-info');
+let collection = collectionBlock ? collectionBlock.innerText.replace(/#\d{3,6}/, '').trim() : '';
+if (collection.includes("\n")) collection = collection.replace(/\n+/g, ' ').trim();
+const name = `${idMatch ? idMatch[0] : 'Unknown'} ${collection}`.trim();
+
+      const gmt = extract('icon-gmt + span').replace(/[^0-9.]/g, '');
+      const usdBlock = html.match(/\$\d{1,6}\.\d{2}/g);
+// NEU: USD-Wert robust extrahieren inkl. Korrektur für US-Format mit Komma-Trennung bei Tausendern
+let usd = '', usdPerTh = '';
+const usdRawMatches = html.match(/\$\d{1,3}(?:,\d{3})*(?:\.\d{2})?/g);
+if (usdRawMatches && usdRawMatches.length >= 2) {
+  usd = usdRawMatches[0].replace(/[^\d.]/g, '').replace(/,/g, '');
+  usdPerTh = usdRawMatches[1].replace(/[^\d.]/g, '').replace(/,/g, '');
+} else if (usdRawMatches && usdRawMatches.length === 1) {
+  usdPerTh = usdRawMatches[0].replace(/[^\d.]/g, '').replace(/,/g, '');
+}
+      document.getElementById('power').value = power;
+      document.getElementById('efficiency').value = efficiency;
+      document.getElementById('roi').value = roi;
+        document.getElementById('name').value = name;
+      document.getElementById('gmt').value = gmt;
+
+        document.getElementById('usd').value = usd;
+        document.getElementById('usdperth').value = usdPerTh;
+
+      // Upgrade cost calculation
+      const powerTH = parseFloat(power);
+      const eff = parseFloat(efficiency);
+      const marketPrice = parseFloat(usd);
+
+      let result = '';
+      const targets = [28, 20, 15];
+
+      targets.forEach(target => {
+        if (eff > target) {
+        const upgradePaths = [];
+            const eff = parseFloat(efficiency);
+            const powerTH = parseFloat(power);
+            const marketPrice = parseFloat(usd);
+
+            if (eff > 28) {
+            const to28 = calculateUpgradeCost(eff, 28, powerTH, true);
+            const to20 = calculateUpgradeCost(28, 20, powerTH, true);
+            const to15 = calculateUpgradeCost(20, 15, powerTH, true);
+            upgradePaths.push({ from: eff, to: 28, cost: to28.cost, log: to28.log });
+            upgradePaths.push({ from: 28, to: 20, cost: to20.cost, log: to20.log });
+            upgradePaths.push({ from: 20, to: 15, cost: to15.cost, log: to15.log });
+            } else if (eff > 20) {
+            const to20 = calculateUpgradeCost(eff, 20, powerTH, true);
+            const to15 = calculateUpgradeCost(20, 15, powerTH, true);
+            upgradePaths.push({ from: eff, to: 20, cost: to20.cost, log: to20.log });
+            upgradePaths.push({ from: 20, to: 15, cost: to15.cost, log: to15.log });
+            } else if (eff > 15) {
+            const to15 = calculateUpgradeCost(eff, 15, powerTH, true);
+            upgradePaths.push({ from: eff, to: 15, cost: to15.cost, log: to15.log });
+            }
+
+            let result = '';
+            let cumulativeTotal = marketPrice;
+            let totalUpgrades = 0;
+
+            upgradePaths.forEach((up, index) => {
+            cumulativeTotal += up.cost;
+            totalUpgrades += up.cost;
+            const costPerTH = (cumulativeTotal / powerTH).toFixed(2);
+
+            result += `→ Upgrade from ${up.from}W to ${up.to} W/TH:\n`;
+            result += up.log.map(l => `   ${l}`).join("\n") + "\n";
+            result += `   Upgrade Total: $${up.cost.toFixed(2)}\n`;
+            result += `   Market Price: $${marketPrice.toFixed(2)}\n`;
+            result += `   Final Total: $${cumulativeTotal.toFixed(2)} → $/TH: $${costPerTH}\n`;
+
+            if (index > 0) {
+                result += `   Total Upgrades so far: $${totalUpgrades.toFixed(2)}\n`;
+            }
+
+            result += "\n";
+            });
+
+
+            upgradeCosts.textContent = result || 'No upgrade needed.';
+                }
+      });
+
+
+      drop.textContent = 'Drop a GoMining Miner card here…';
+    });
+  </script>
+</body>
+</html>
