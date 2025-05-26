@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Miner Check | HashFarm</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .drop-zone {
+      border: 2px dashed #673dec;
+      padding: 30px;
+      text-align: center;
+      border-radius: 12px;
+      background-color: rgba(255,255,255,0.03);
+      color: #ccc;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 700px;
+    }
+    .drop-zone.dragover {
+      background-color: rgba(103, 61, 236, 0.1);
+      border-color: #a88bff;
+      color: #fff;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 500px;
+      margin: 20px auto;
+    }
+    .input-group label {
+      font-weight: bold;
+    }
+    .input-group input {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #555;
+      background-color: #1c1c1c;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <header class="header">
+      <h1 style="text-align:center">Secondary Miner ROI Check</h1>
+    </header>
+
+    <div class="drop-zone" id="drop-zone">
+      Drop a Miner from the Marketplace here
+    </div>
+
+    <div class="input-group">
+      <label for="miner-name">Miner</label>
+      <input type="text" id="miner-name" placeholder="#2251 The East Collection">
+
+      <label for="power">Power</label>
+      <input type="text" id="power" placeholder="32 TH">
+
+      <label for="efficiency">Efficiency</label>
+      <input type="text" id="efficiency" placeholder="31 W/TH">
+
+      <label for="roi">ROI</label>
+      <input type="text" id="roi" placeholder="39.82%">
+
+      <label for="gmt-price">GMT Price</label>
+      <input type="text" id="gmt-price" placeholder="1,578.48">
+
+      <label for="usd-price">USD Price</label>
+      <input type="text" id="usd-price" placeholder="$667.07">
+
+      <label for="usd-per-th">USD / TH</label>
+      <input type="text" id="usd-per-th" placeholder="$20.85">
+    </div>
+  </div>
+
+  <script>
+    const dropZone = document.getElementById('drop-zone');
+
+    dropZone.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const data = e.dataTransfer.getData('text/plain');
+
+      // Beispiel: "32 TH\n31 W/TH\nROI 39.82%\n#2251 The East Collection • BSC\n1,578.48\n $667.07 • $20.85 / TH\n Buy"
+      const lines = data.split(/\n|\r/).map(s => s.trim()).filter(s => s);
+
+      let power = lines.find(l => l.includes('TH'));
+      let efficiency = lines.find(l => l.includes('W/TH'));
+      let roi = lines.find(l => l.includes('ROI'));
+      let name = lines.find(l => l.startsWith('#'));
+      let gmt = lines.find(l => /^\d+[,.]?\d*$/g.test(l.replace(',', '')));
+      let usdPrice = lines.find(l => l.includes('$') && l.includes('.') && !l.includes('/'));
+      let usdTH = lines.find(l => l.includes('/ TH'));
+
+      document.getElementById('miner-name').value = name || '';
+      document.getElementById('power').value = power || '';
+      document.getElementById('efficiency').value = efficiency || '';
+      document.getElementById('roi').value = roi ? roi.replace('ROI ', '') : '';
+      document.getElementById('gmt-price').value = gmt || '';
+      document.getElementById('usd-price').value = usdPrice || '';
+      document.getElementById('usd-per-th').value = usdTH ? usdTH.split('•').pop().trim() : '';
+    });
+  </script>
+</body>
+</html>
