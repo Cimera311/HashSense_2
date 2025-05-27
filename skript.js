@@ -398,34 +398,33 @@
                 }
                 }
 
-                let priceMatrix = null; // Variable für die Price-Matrix
+let priceMatrix = null;
 
-        async function loadPriceMatrix() {
-            try {
-                const response = await fetch('https://raw.githubusercontent.com/Cimera311/Gomining_Calculator/main/priceMatrix.json');
-                if (!response.ok) {
-                    throw new Error('Failed to load price matrix.');
-                }
-                priceMatrix = await response.json();
-                console.log('Price matrix loaded:', priceMatrix);
-            } catch (error) {
-                console.error('Error loading price matrix:', error);
-            }
+async function loadPriceMatrix() {
+    try {
+        const response = await fetch('./priceMatrix.js'); // Lokale JSON-Datei im gleichen Verzeichnis
+        if (!response.ok) throw new Error('Failed to load priceMatrix.js');
+        priceMatrix = await response.json();
+        console.log('✅ Price matrix loaded from JSON file:', priceMatrix);
+    } catch (error) {
+        console.warn('⚠️ Error loading priceMatrix.js – using fallback priceMatrixlocal.', error);
+        if (typeof priceMatrixlocal !== 'undefined') {
+            priceMatrix = priceMatrixlocal;
+        } else {
+            console.error('❌ No fallback available: priceMatrixlocal is undefined.');
         }
+    }
+}
 
-        // Beispiel, wie die Funktion aufgerufen wird
-        //document.addEventListener('DOMContentLoaded', loadPriceMatrix);
+function getPriceMatrix(efficiency) {
+    if (!priceMatrix) {
+        console.error('❌ Price matrix not loaded yet.');
+        return null;
+    }
+    return priceMatrix[efficiency] || null;
+}
 
-        function getPriceMatrix(efficiency) {
-            // Falls `priceMatrixlocal` existiert, direkt darauf zugreifen
-            if (typeof priceMatrixlocal === 'undefined' || !priceMatrixlocal) {
-                console.error('Price matrix is not loaded yet.');
-                return null;
-            }
-        
-            // Gebe die Preisdaten für die gewünschte Effizienz zurück oder `null`, falls nicht vorhanden
-            return priceMatrixlocal[efficiency] || null;
-        }
+
         
 
 
