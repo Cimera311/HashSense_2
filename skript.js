@@ -400,19 +400,13 @@
 
 let priceMatrix = null;
 
-async function loadPriceMatrix() {
-    try {
-        const response = await fetch('./priceMatrix.js'); // Lokale JSON-Datei im gleichen Verzeichnis
-        if (!response.ok) throw new Error('Failed to load priceMatrix.js');
-        priceMatrix = await response.json();
-        console.log('✅ Price matrix loaded from JSON file:', priceMatrix);
-    } catch (error) {
-        console.warn('⚠️ Error loading priceMatrix.js – using fallback priceMatrixlocal.', error);
-        if (typeof priceMatrixlocal !== 'undefined') {
-            priceMatrix = priceMatrixlocal;
-        } else {
-            console.error('❌ No fallback available: priceMatrixlocal is undefined.');
-        }
+function loadPriceMatrix() {
+    if (typeof priceMatrixdatei !== 'undefined' && Object.keys(priceMatrixdatei).length > 0) {
+        priceMatrix = priceMatrixdatei;
+        console.log('✅ Price matrix loaded from priceMatrix.js (priceMatrixdatei):', priceMatrix);
+    } else {
+        console.warn('⚠️ priceMatrixdatei is not defined or empty.');
+        priceMatrix = null;
     }
 }
 
@@ -423,6 +417,7 @@ function getPriceMatrix(efficiency) {
     }
     return priceMatrix[efficiency] || null;
 }
+
 
 
         
