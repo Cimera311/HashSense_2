@@ -515,7 +515,10 @@
     </div>
 		
 	<script>
-							// Füge einen Event Listener hinzu, der das Feld "Daily-Reward" überwacht
+			
+		document.addEventListener('DOMContentLoaded', loadPriceMatrix);
+
+		// Füge einen Event Listener hinzu, der das Feld "Daily-Reward" überwacht
 			document.getElementById('Daily-Reward').addEventListener('input', function () {
 				const dailyReward = parseFloat(document.getElementById('Daily-Reward').value); // Wert des Daily-Reward-Feldes
 				const myTH = parseFloat(document.getElementById('My_TH').value); // Wert des My_TH-Feldes
