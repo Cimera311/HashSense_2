@@ -100,13 +100,13 @@
 					<label for="My_TH" title="Die Anzahl der Terahashes, die dein Miner produziert.">My TH: 
 							<span class="question-circle" title="Die Anzahl der Terahashes, die dein Miner produziert.">?</span>
 					</label>
-					<input type="number" id="My_TH" value="216" placeholder="10" oninput="syncFieldAndSlider(event, 'th-slider', 'My_TH'); calculateCost();">
+					<input type="number" id="My_TH" value="500" placeholder="10" oninput="syncFieldAndSlider(event, 'th-slider', 'My_TH'); calculateCost();">
 					<input type="range" id="th-slider" min="1" max="5000" step="1" value="200" oninput="syncFieldAndSlider(event, 'th-slider', 'My_TH'); calculateCost();">
 					<label for="Energy-efficiency">Energy-efficiency (W/TH):</label>
-					<input type="number" id="Energy-efficiency" value="26.14" placeholder="z.B. 20" oninput="syncFieldAndSlider(event, 'Energy-efficiency', 'efficiency-slider')">
+					<input type="number" id="Energy-efficiency" value="23.88" placeholder="z.B. 20" oninput="syncFieldAndSlider(event, 'Energy-efficiency', 'efficiency-slider')">
 					<input type="range" id="efficiency-slider" min="15" max="35" step="0.01" value="27.71" oninput="syncFieldAndSlider(event, 'Energy-efficiency', 'efficiency-slider'); calculateCost();">
 					<label for="gomining-discount">Gomining Maintenance Discount (%):</label>
-					<input type="number" id="gomining-discount" value="0" min="0" max="20" step="1" oninput="syncFieldAndSlider(event, 'gomining-discount', 'gomining-discount-slider')" placeholder="0%">
+					<input type="number" id="gomining-discount" value="10.41" min="0" max="20" step="1" oninput="syncFieldAndSlider(event, 'gomining-discount', 'gomining-discount-slider')" placeholder="0%">
 					<input type="range" id="gomining-discount-slider" min="0" max="20" step="0.1" value="0" oninput="syncFieldAndSlider(event, 'gomining-discount', 'gomining-discount-slider'); calculateCost();">
 					<label for="Daily-Reward">My Daily Reward:</label>
 					<input type="number" id="Daily-Reward" value="12400" placeholder="z.B. 6500">
