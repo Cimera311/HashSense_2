@@ -1,11 +1,36 @@
-// Globale Abbruch-Variable
-globalThis.cancelExport = false;
+// ==UserScript==
+// @name         GoMining Transaction Export (Console Script)
+// @namespace    http://tampermonkey.net/
+// @version      1.2
+// @description  Extracts transaction history from GoMining and exports it as CSV via console injection
+// @author       ChatGPT x User
+// @match        https://app.gomining.com/*
+// @grant        none
+// ==/UserScript==
 
-(async function() {
-    window.cancelGoMiningExport = function() {
-        cancelExport = true;
-        console.log("Export wird nach der aktuellen Seite abgebrochen! 🚫");
+(async function goMiningAutoExport() {
+    console.log("⚡ Starting GoMining Export Script...");
+
+    if (globalThis.cancelExport) {
+        console.warn("⛔ An export is already in progress. Aborting...");
+        return;
+    }
+    globalThis.cancelExport = false;
+    window.cancelGoMiningExport = function () {
+        globalThis.cancelExport = true;
+        console.log("Export will be cancelled after the current page. 🚫");
     };
+
+    const config = {
+        delayBetweenPages: 250,
+        delayAfter10Pages: 1500,
+        fallbackWaitOnButton: 3000,
+        retryWaitOnSameKey: 2000
+    };
+
+    function wait(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     function getFirstRowKey() {
         const firstRow = document.querySelector('tbody tr');
@@ -31,9 +56,7 @@ globalThis.cancelExport = false;
             let isNegative = valueText.startsWith('-');
             valueText = valueText.replace('.', '#').replace(/[.,]/g, '').replace('#', ',');
             valueText = valueText.replace('+', '').replace('-', '');
-            if (isNegative) {
-                valueText = '-' + valueText;
-            }
+            if (isNegative) valueText = '-' + valueText;
 
             let currency = '';
             if (valueElement?.querySelector('icon-gmt')) {
@@ -63,6 +86,7 @@ globalThis.cancelExport = false;
                 .trim()
                 .replace(/\s+/g, '_')
                 .replace(/[,]/g, '')
+                .replace(/[^ -~]/g, '')
                 .replace(/[^\w\-]/g, '');
             filename = `gomining_${dateText}.csv`;
         }
@@ -77,67 +101,63 @@ globalThis.cancelExport = false;
         document.body.removeChild(link);
     }
 
-    async function goMiningAutoExport() {
-        let allData = [];
-        let previousKey = getFirstRowKey();
-        let pageCounter = 1;
+    let allData = [];
+    let previousKey = getFirstRowKey();
+    let pageCounter = 1;
 
-        while (true) {
-            if (cancelExport) {
-                console.log("Export wurde manuell abgebrochen! 🚫");
-                break;
-            }
+    while (true) {
+        if (cancelExport) {
+            console.log("Export was manually cancelled! 🚫");
+            break;
+        }
 
-            console.log(`Verarbeite Seite ${pageCounter}...`);
-            allData = allData.concat(extractRows());
+        console.log(`📄 Processing page ${pageCounter}...`);
+        allData = allData.concat(extractRows());
 
-            let icon = document.querySelector('icon-arrow-short[direction="right"]');
-            let nextButton = icon?.closest('button');
+        let icon = document.querySelector('icon-arrow-short[direction="right"]');
+        let nextButton = icon?.closest('button');
+
+        if (!nextButton || nextButton.disabled) {
+            console.log("➡️ Next button not ready. Waiting 5 seconds and retrying...");
+            await wait(config.fallbackWaitOnButton);
+            icon = document.querySelector('icon-arrow-short[direction="right"]');
+            nextButton = icon?.closest('button');
 
             if (!nextButton || nextButton.disabled) {
-                console.log("Weiter-Button nicht bereit. Warte 5 Sekunden und versuche es erneut...");
-                await new Promise(r => setTimeout(r, 5000));
-                icon = document.querySelector('icon-arrow-short[direction="right"]');
-                nextButton = icon?.closest('button');
-
-                if (!nextButton || nextButton.disabled) {
-                    console.log("Weiter-Button weiterhin deaktiviert. Abbruch.");
-                    break;
-                }
+                console.log("🛑 Next button still disabled. Stopping export.");
+                break;
             }
-
-            nextButton.click();
-            if (pageCounter % 10 === 0) {
-                console.log(`Kurze Pause nach Seite ${pageCounter}...`);
-                await new Promise(r => setTimeout(r, 2000));
-            } else {
-                await new Promise(r => setTimeout(r, 500));
-            }
-
-            let newKey = getFirstRowKey();
-            if (newKey === previousKey) {
-                console.log("Seite hat sich scheinbar nicht verändert. Warte 2 Sekunden und prüfe erneut...");
-                await new Promise(r => setTimeout(r, 2000));
-                newKey = getFirstRowKey();
-
-                if (newKey === previousKey) {
-                    console.log("Seite hat sich wirklich nicht verändert. Speichere letzte Seite...");
-                    allData = allData.concat(extractRows());
-                    break;
-                }
-            }
-
-            previousKey = newKey;
-            pageCounter++;
         }
 
-        if (allData.length > 0) {
-            console.log(`Exportiere ${allData.length} Transaktionen...`);
-            exportToCSV(allData);
+        nextButton.click();
+        if (pageCounter % 10 === 0) {
+            console.log(`⏳ Short pause after page ${pageCounter}...`);
+            await wait(config.delayAfter10Pages);
         } else {
-            console.log("Keine Daten zum Exportieren gesammelt.");
+            await wait(config.delayBetweenPages);
         }
+
+        let newKey = getFirstRowKey();
+        if (newKey === previousKey) {
+            console.log("🔄 Page content seems unchanged. Waiting again...");
+            await wait(config.retryWaitOnSameKey);
+            newKey = getFirstRowKey();
+
+            if (newKey === previousKey) {
+                console.log("📌 Confirmed: same page. Saving last page and exiting...");
+                allData = allData.concat(extractRows());
+                break;
+            }
+        }
+
+        previousKey = newKey;
+        pageCounter++;
     }
 
-    await goMiningAutoExport();
+    if (allData.length > 0) {
+        console.log(`💾 Exporting ${allData.length} transactions...`);
+        exportToCSV(allData);
+    } else {
+        console.log("⚠️ No data collected for export.");
+    }
 })();
