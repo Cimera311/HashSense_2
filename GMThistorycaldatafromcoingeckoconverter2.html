@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GMT Preis-Konverter</title>
+  <style>
+    body {
+      background: #121212;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+    .upload-box {
+      border: 2px dashed #8a5eff;
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      width: 90%;
+      max-width: 500px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    .upload-box:hover {
+      background-color: #1e1e1e;
+    }
+    #fileInput {
+      display: none;
+    }
+    #output {
+      width: 100%;
+      max-width: 800px;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #8a5eff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Gomining Preis CSV → JS Konverter</h1>
+  
+  <label class="upload-box" for="fileInput">
+    📁 CSV-Datei hier ablegen oder klicken zum Auswählen
+    <input type="file" id="fileInput" accept=".csv" />
+  </label>
+
+  <button class="btn" onclick="convertCSVtoJS()">In JS umwandeln</button>
+  <button class="btn" onclick="downloadJS()">Download JS-Datei</button>
+
+  <h3>JS-Ergebnis:</h3>
+  <div id="output">Noch nichts umgewandelt...</div>
+
+  <script>
+    let csvData = "";
+
+    document.getElementById("fileInput").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        csvData = event.target.result;
+        document.getElementById("output").innerText = "✅ CSV erfolgreich geladen. Bereit zur Umwandlung.";
+      };
+      if (file) reader.readAsText(file);
+    });
+
+    function convertCSVtoJS() {
+  if (!csvData) {
+    alert("Bitte lade zuerst eine CSV-Datei hoch.");
+    return;
+  }
+
+  const lines = csvData.trim().split("\n");
+  const outputArray = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const parts = lines[i].split(",");
+    if (parts.length < 2) continue;
+
+    const dateRaw = parts[0].trim(); // z. B. "2025-05-29 00:00:00 UTC"
+    const price = parseFloat(parts[1]);
+
+    // Datum kürzen auf nur YYYY-MM-DD
+    const date = dateRaw.slice(0, 10);
+
+    if (!isNaN(price)) {
+      outputArray.push(`  { date: '${date}', price: ${price} }`);
+    }
+  }
+
+  const finalJS = `const gmtPriceHistory = [\n${outputArray.join(',\n')}\n];`;
+  document.getElementById("output").innerText = finalJS;
+}
+function downloadJS() {
+  const filename = "gmtPriceHistory.js";
+  const text = document.getElementById("output").innerText;
+
+  const blob = new Blob([text], { type: "application/javascript" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+}
+
+  </script>
+</body>
+</html>
