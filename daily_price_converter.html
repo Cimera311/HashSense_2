@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transaction Price Converter</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="main-container">
+    <header class="header header-actions">
+      <div class="action-center">
+        <div class="action-icons">
+          <button id="lang-en" class="main-btn active">EN</button>
+          <button id="lang-de" class="main-btn">DE</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="content" id="content">
+      <div id="drop-area" class="drop-area">
+        <h2>Drop your <code>transactions.csv</code> file here</h2>
+        <input type="file" id="fileElem" accept=".csv" hidden>
+        <label class="button" for="fileElem">Browse File</label>
+        <div id="file-info"></div>
+      </div>
+      
+      <div id="output" class="output hidden">
+        <h3>Processed File</h3>
+        <button id="downloadCsv" class="main-btn">Download CSV</button>
+        <pre id="preview"></pre>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('fileElem').addEventListener('change', handleFile, false);
+      document.getElementById('drop-area').addEventListener('drop', function(e) {
+        e.preventDefault();
+        document.getElementById('fileElem').files = e.dataTransfer.files;
+        handleFile();
+      });
+      document.getElementById('drop-area').addEventListener('dragover', e => e.preventDefault());
+
+      async function handleFile() {
+        const file = document.getElementById('fileElem').files[0];
+        if (!file) return;
+        const text = await file.text();
+        const lines = text.split(/\r?\n/);
+        const header = lines[0];
+        const dataLines = lines.slice(1).filter(line => line.trim() !== '');
+
+        const result = [header + ';GMT Price USD;USD Value;EUR Rate;EUR Value'];
+
+        for (const line of dataLines) {
+          const parts = line.split(';');
+          const [date, , , value, currency] = parts;
+
+          const valueFloat = parseFloat(value.replace(',', '.'));
+
+          let dateParts;
+          if (date.includes('.')) {
+            dateParts = date.split('.'); // DD.MM.YYYY
+          } else if (date.includes('/')) {
+            const [m, d, y] = date.split('/');
+            dateParts = [d.padStart(2, '0'), m.padStart(2, '0'), y]; // force DD.MM.YYYY
+          } else {
+            continue; // skip malformed date
+          }
+
+          const isoDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+
+          let gmtPrice = 0;
+          if (currency === 'GMT') {
+            gmtPrice = await fetchPrice('gomining-token', isoDate);
+          } else if (currency === 'BTC') {
+            gmtPrice = await fetchPrice('bitcoin', isoDate);
+          }
+
+          const eurRate = await fetchEURRate(isoDate);
+
+          const usdValue = valueFloat * gmtPrice;
+          const eurValue = usdValue * eurRate;
+
+          result.push(`${line};${gmtPrice.toFixed(6)};${usdValue.toFixed(2)};${eurRate.toFixed(4)};${eurValue.toFixed(2)}`);
+        }
+
+        const csvContent = result.join('\n');
+        document.getElementById('preview').textContent = csvContent;
+        document.getElementById('output').classList.remove('hidden');
+
+        document.getElementById('downloadCsv').onclick = () => {
+          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.setAttribute("href", url);
+          link.setAttribute("download", "transactions_dailyprices.csv");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        };
+      }
+
+      async function fetchPrice(coinId, date) {
+        const url = `https://api.coingecko.com/api/v3/coins/${coinId}/history?date=${formatDateForCoingecko(date)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        return data?.market_data?.current_price?.usd || 0;
+      }
+
+      async function fetchEURRate(date) {
+        const res = await fetch(`https://api.exchangerate.host/${date}?base=USD&symbols=EUR`);
+        const data = await res.json();
+        return data?.rates?.EUR || 1;
+      }
+
+      function formatDateForCoingecko(date) {
+        const [y, m, d] = date.split('-');
+        return `${d}-${m}-${y}`;
+      }
+    </script>
+  </div>
+</body>
+</html>
