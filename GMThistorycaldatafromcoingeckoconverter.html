@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GMT Price CSV → JS Converter</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #111; color: #eee; }
+    textarea, pre { width: 100%; min-height: 300px; font-family: monospace; }
+    button { padding: 0.5em 1em; margin-top: 1em; font-size: 1em; }
+    .output { background: #222; border: 1px solid #444; padding: 1em; margin-top: 1em; }
+  </style>
+</head>
+<body>
+  <h1>Coingecko CSV → <code>gmtPricesFallback</code> Generator</h1>
+  <p>Paste your CSV content below (from Coingecko export):</p>
+
+  <textarea id="csvInput" placeholder="snapped_at,price,...\n2021-06-01,0.150441,..."></textarea>
+  <button onclick="convertCSV()">Convert to JS Object</button>
+
+  <div class="output">
+    <h3>Resulting JS Snippet:</h3>
+    <pre id="jsOutput">// Result appears here...</pre>
+  </div>
+
+  <script>
+    function convertCSV() {
+      const input = document.getElementById('csvInput').value;
+      const lines = input.trim().split(/\r?\n/);
+      const output = {};
+      for (let i = 1; i < lines.length; i++) {
+        const [dateRaw, price] = lines[i].split(',');
+        const date = dateRaw.split(' ')[0]; // get YYYY-MM-DD only
+        if (date && price) {
+          output[date] = parseFloat(price).toFixed(6);
+        }
+      }
+      const js = 'const gmtPricesFallback = ' + JSON.stringify(output, null, 2) + ';';
+      document.getElementById('jsOutput').textContent = js;
+    }
+  </script>
+</body>
+</html>
