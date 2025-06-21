@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Check Miner</title>
+  <script src="skript-prices.js"></script>
   <style>
     body { background: #111; color: white; font-family: sans-serif; }
     #drop {
@@ -101,7 +102,7 @@
   <div class="result-block" id="upgrade-costs"></div>
 
   <script>
-    const efficiencyMatrix = {
+ /*   const efficiencyMatrix = {
       16: { to: 15, pricePerW: 1.16 }, 17: { to: 16, pricePerW: 1.16 }, 18: { to: 17, pricePerW: 1.16 },
       19: { to: 18, pricePerW: 1.16 }, 20: { to: 19, pricePerW: 1.16 }, 21: { to: 20, pricePerW: 1.13 },
       22: { to: 21, pricePerW: 1.13 }, 23: { to: 22, pricePerW: 1.13 }, 24: { to: 23, pricePerW: 1.13 },
@@ -114,7 +115,7 @@
       43: { to: 42, pricePerW: 0.29 }, 44: { to: 43, pricePerW: 0.29 }, 45: { to: 44, pricePerW: 0.29 },
       46: { to: 45, pricePerW: 0.29 }, 47: { to: 46, pricePerW: 0.29 }, 48: { to: 47, pricePerW: 0.29 },
       49: { to: 48, pricePerW: 0.29 }, 50: { to: 49, pricePerW: 0.29 }
-    };
+    };*/
 
         function calculateUpgradeCost(currentW, targetW, th, logSteps = false) {
         let cost = 0;
