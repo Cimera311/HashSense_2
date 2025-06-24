@@ -17,7 +17,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":27.84},
         {"minTH":1536,"pricePerTH":27.65},
         {"minTH":2560,"pricePerTH":27.46},
-        {"minTH":3584,"pricePerTH":27.28},
+        {"minTH":3584,"pricePerTH":27.28}
     ],
     "16": [
         {"minTH":2,"pricePerTH":29.54},
@@ -37,7 +37,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":26.69},
         {"minTH":1536,"pricePerTH":26.5},
         {"minTH":2560,"pricePerTH":26.31},
-        {"minTH":3584,"pricePerTH":26.12},
+        {"minTH":3584,"pricePerTH":26.12}
     ],
     "17": [
         {"minTH":2,"pricePerTH":28.38},
@@ -57,7 +57,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":25.53},
         {"minTH":1536,"pricePerTH":25.34},
         {"minTH":2560,"pricePerTH":25.15},
-        {"minTH":3584,"pricePerTH":24.96},
+        {"minTH":3584,"pricePerTH":24.96}
     ],
     "18": [
         {"minTH":2,"pricePerTH":27.22},
@@ -77,7 +77,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":24.37},
         {"minTH":1536,"pricePerTH":24.18},
         {"minTH":2560,"pricePerTH":23.99},
-        {"minTH":3584,"pricePerTH":23.8},
+        {"minTH":3584,"pricePerTH":23.8}
     ],
     "19": [
         {"minTH":2,"pricePerTH":26.06},
@@ -97,7 +97,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":23.21},
         {"minTH":1536,"pricePerTH":23.02},
         {"minTH":2560,"pricePerTH":22.83},
-        {"minTH":3584,"pricePerTH":22.64},
+        {"minTH":3584,"pricePerTH":22.64}
     ],
     "20": [
         {"minTH":2,"pricePerTH":24.91,"minerCost":25.99},
@@ -117,7 +117,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":22.05},
         {"minTH":1536,"pricePerTH":21.86},
         {"minTH":2560,"pricePerTH":21.67},
-        {"minTH":3584,"pricePerTH":21.49},
+        {"minTH":3584,"pricePerTH":21.49}
     ],
     "21": [
         {"minTH":2,"pricePerTH":23.49},
@@ -137,7 +137,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":20.64},
         {"minTH":1536,"pricePerTH":20.45},
         {"minTH":2560,"pricePerTH":20.26},
-        {"minTH":3584,"pricePerTH":20.07},
+        {"minTH":3584,"pricePerTH":20.07}
     ],
     "22": [
         {"minTH":2,"pricePerTH":22.08},
@@ -157,7 +157,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":19.22},
         {"minTH":1536,"pricePerTH":19.03},
         {"minTH":2560,"pricePerTH":18.84},
-        {"minTH":3584,"pricePerTH":18.66},
+        {"minTH":3584,"pricePerTH":18.66}
     ],
     "23": [
         {"minTH":2,"pricePerTH":20.66},
@@ -177,7 +177,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":17.81},
         {"minTH":1536,"pricePerTH":17.62},
         {"minTH":2560,"pricePerTH":17.43},
-        {"minTH":3584,"pricePerTH":17.24},
+        {"minTH":3584,"pricePerTH":17.24}
     ],
     "24": [
         {"minTH":2,"pricePerTH":19.25},
@@ -197,7 +197,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":16.39},
         {"minTH":1536,"pricePerTH":16.2},
         {"minTH":2560,"pricePerTH":16.01},
-        {"minTH":3584,"pricePerTH":15.83},
+        {"minTH":3584,"pricePerTH":15.83}
     ],
     "25": [
         {"minTH":2,"pricePerTH":17.83},
@@ -217,7 +217,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":14.98},
         {"minTH":1536,"pricePerTH":14.79},
         {"minTH":2560,"pricePerTH":14.6},
-        {"minTH":3584,"pricePerTH":14.41},
+        {"minTH":3584,"pricePerTH":14.41}
     ],
     "26": [
         {"minTH":2,"pricePerTH":16.42},
@@ -237,7 +237,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":13.56},
         {"minTH":1536,"pricePerTH":13.37},
         {"minTH":2560,"pricePerTH":13.18},
-        {"minTH":3584,"pricePerTH":13},
+        {"minTH":3584,"pricePerTH":13}
     ],
     "27": [
         {"minTH":2,"pricePerTH":15},
@@ -257,7 +257,7 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":12.15},
         {"minTH":1536,"pricePerTH":11.96},
         {"minTH":2560,"pricePerTH":11.77},
-        {"minTH":3584,"pricePerTH":11.58},
+        {"minTH":3584,"pricePerTH":11.58}
     ],
     "28": [
         {"minTH":2,"pricePerTH":13.59},
@@ -277,6 +277,174 @@ const priceMatrixdatei = {
         {"minTH":1024,"pricePerTH":10.73},
         {"minTH":1536,"pricePerTH":10.54},
         {"minTH":2560,"pricePerTH":10.35},
-        {"minTH":3584,"pricePerTH":10.17},
-    ]
+        {"minTH":3584,"pricePerTH":10.17}
+    ],
+    "29": [
+        {"minTH":1,"pricePerTH":15.34},
+        {"minTH":2,"pricePerTH":15.12},
+        {"minTH":4,"pricePerTH":14.91},
+        {"minTH":8,"pricePerTH":14.69},
+        {"minTH":16,"pricePerTH":14.48},
+        {"minTH":32,"pricePerTH":14.27},
+        {"minTH":48,"pricePerTH":14.06},
+        {"minTH":64,"pricePerTH":13.86},
+        {"minTH":96,"pricePerTH":13.65},
+        {"minTH":128,"pricePerTH":13.45},
+        {"minTH":192,"pricePerTH":13.25},
+        {"minTH":256,"pricePerTH":13.05},
+        {"minTH":384,"pricePerTH":12.85},
+        {"minTH":512,"pricePerTH":12.66},
+        {"minTH":768,"pricePerTH":12.46},
+        {"minTH":1024,"pricePerTH":12.27},
+        {"minTH":1536,"pricePerTH":12.08},
+        {"minTH":2560,"pricePerTH":11.89},
+        {"minTH":3584,"pricePerTH":11.7}
+    ],
+    "30": [
+        {"minTH":1,"pricePerTH":14.62},
+        {"minTH":2,"pricePerTH":14.4},
+        {"minTH":4,"pricePerTH":14.19},
+        {"minTH":8,"pricePerTH":13.97},
+        {"minTH":16,"pricePerTH":13.76},
+        {"minTH":32,"pricePerTH":13.55},
+        {"minTH":48,"pricePerTH":13.34},
+        {"minTH":64,"pricePerTH":13.14},
+        {"minTH":96,"pricePerTH":12.93},
+        {"minTH":128,"pricePerTH":12.73},
+        {"minTH":192,"pricePerTH":12.53},
+        {"minTH":256,"pricePerTH":12.33},
+        {"minTH":384,"pricePerTH":12.13},
+        {"minTH":512,"pricePerTH":11.94},
+        {"minTH":768,"pricePerTH":11.74},
+        {"minTH":1024,"pricePerTH":11.55},
+        {"minTH":1536,"pricePerTH":11.36},
+        {"minTH":2560,"pricePerTH":11.17},
+        {"minTH":3584,"pricePerTH":10.98}
+    ],
+    "31": [
+        {"minTH":1,"pricePerTH":13.9},
+        {"minTH":2,"pricePerTH":13.68},
+        {"minTH":4,"pricePerTH":13.47},
+        {"minTH":8,"pricePerTH":13.25},
+        {"minTH":16,"pricePerTH":13.04},
+        {"minTH":32,"pricePerTH":12.83},
+        {"minTH":48,"pricePerTH":12.62},
+        {"minTH":64,"pricePerTH":12.42},
+        {"minTH":96,"pricePerTH":12.21},
+        {"minTH":128,"pricePerTH":12.01},
+        {"minTH":192,"pricePerTH":11.81},
+        {"minTH":256,"pricePerTH":11.61},
+        {"minTH":384,"pricePerTH":11.41},
+        {"minTH":512,"pricePerTH":11.22},
+        {"minTH":768,"pricePerTH":11.02},
+        {"minTH":1024,"pricePerTH":10.83},
+        {"minTH":1536,"pricePerTH":10.64},
+        {"minTH":2560,"pricePerTH":10.45},
+        {"minTH":3584,"pricePerTH":10.26}
+    ],
+    "32": [
+        {"minTH":1,"pricePerTH":13.18},
+        {"minTH":2,"pricePerTH":12.96},
+        {"minTH":4,"pricePerTH":12.75},
+        {"minTH":8,"pricePerTH":12.53},
+        {"minTH":16,"pricePerTH":12.32},
+        {"minTH":32,"pricePerTH":12.11},
+        {"minTH":48,"pricePerTH":11.9},
+        {"minTH":64,"pricePerTH":11.7},
+        {"minTH":96,"pricePerTH":11.49},
+        {"minTH":128,"pricePerTH":11.29},
+        {"minTH":192,"pricePerTH":11.09},
+        {"minTH":256,"pricePerTH":10.89},
+        {"minTH":384,"pricePerTH":10.69},
+        {"minTH":512,"pricePerTH":10.5},
+        {"minTH":768,"pricePerTH":10.3},
+        {"minTH":1024,"pricePerTH":10.11},
+        {"minTH":1536,"pricePerTH":9.92},
+        {"minTH":2560,"pricePerTH":9.73},
+        {"minTH":3584,"pricePerTH":9.54}
+    ],
+    "33": [
+        {"minTH":1,"pricePerTH":12.46},
+        {"minTH":2,"pricePerTH":12.24},
+        {"minTH":4,"pricePerTH":12.03},
+        {"minTH":8,"pricePerTH":11.81},
+        {"minTH":16,"pricePerTH":11.6},
+        {"minTH":32,"pricePerTH":11.39},
+        {"minTH":48,"pricePerTH":11.18},
+        {"minTH":64,"pricePerTH":10.98},
+        {"minTH":96,"pricePerTH":10.77},
+        {"minTH":128,"pricePerTH":10.57},
+        {"minTH":192,"pricePerTH":10.37},
+        {"minTH":256,"pricePerTH":10.17},
+        {"minTH":384,"pricePerTH":9.97},
+        {"minTH":512,"pricePerTH":9.78},
+        {"minTH":768,"pricePerTH":9.58},
+        {"minTH":1024,"pricePerTH":9.39},
+        {"minTH":1536,"pricePerTH":9.2},
+        {"minTH":2560,"pricePerTH":9.01},
+        {"minTH":3584,"pricePerTH":8.82}
+    ],
+    "34": [
+        {"minTH":1,"pricePerTH":11.74},
+        {"minTH":2,"pricePerTH":11.52},
+        {"minTH":4,"pricePerTH":11.31},
+        {"minTH":8,"pricePerTH":11.09},
+        {"minTH":16,"pricePerTH":10.88},
+        {"minTH":32,"pricePerTH":10.67},
+        {"minTH":48,"pricePerTH":10.46},
+        {"minTH":64,"pricePerTH":10.26},
+        {"minTH":96,"pricePerTH":10.05},
+        {"minTH":128,"pricePerTH":9.85},
+        {"minTH":192,"pricePerTH":9.65},
+        {"minTH":256,"pricePerTH":9.45},
+        {"minTH":384,"pricePerTH":9.25},
+        {"minTH":512,"pricePerTH":9.06},
+        {"minTH":768,"pricePerTH":8.86},
+        {"minTH":1024,"pricePerTH":8.67},
+        {"minTH":1536,"pricePerTH":8.48},
+        {"minTH":2560,"pricePerTH":8.29},
+        {"minTH":3584,"pricePerTH":8.1}
+    ],
+    "35": [
+        {"minTH":1,"pricePerTH":11.02},
+        {"minTH":2,"pricePerTH":10.8},
+        {"minTH":4,"pricePerTH":10.59},
+        {"minTH":8,"pricePerTH":10.37},
+        {"minTH":16,"pricePerTH":10.16},
+        {"minTH":32,"pricePerTH":9.95},
+        {"minTH":48,"pricePerTH":9.74},
+        {"minTH":64,"pricePerTH":9.54},
+        {"minTH":96,"pricePerTH":9.33},
+        {"minTH":128,"pricePerTH":9.13},
+        {"minTH":192,"pricePerTH":8.93},
+        {"minTH":256,"pricePerTH":8.73},
+        {"minTH":384,"pricePerTH":8.53},
+        {"minTH":512,"pricePerTH":8.34},
+        {"minTH":768,"pricePerTH":8.14},
+        {"minTH":1024,"pricePerTH":7.95},
+        {"minTH":1536,"pricePerTH":7.76},
+        {"minTH":2560,"pricePerTH":7.57},
+        {"minTH":3584,"pricePerTH":7.38}
+    ],
+    "50": [
+        {"minTH":1,"pricePerTH":6.63},
+        {"minTH":2,"pricePerTH":6.41},
+        {"minTH":4,"pricePerTH":6.19},
+        {"minTH":8,"pricePerTH":5.98},
+        {"minTH":16,"pricePerTH":5.77},
+        {"minTH":32,"pricePerTH":5.56},
+        {"minTH":48,"pricePerTH":5.35},
+        {"minTH":64,"pricePerTH":5.14},
+        {"minTH":96,"pricePerTH":4.94},
+        {"minTH":128,"pricePerTH":4.74},
+        {"minTH":192,"pricePerTH":4.53},
+        {"minTH":256,"pricePerTH":4.34},
+        {"minTH":384,"pricePerTH":4.14},
+        {"minTH":512,"pricePerTH":3.94},
+        {"minTH":768,"pricePerTH":3.75},
+        {"minTH":1024,"pricePerTH":3.56},
+        {"minTH":1536,"pricePerTH":3.36},
+        {"minTH":2560,"pricePerTH":3.18},
+        {"minTH":3584,"pricePerTH":2.99}
+    ],
 };
