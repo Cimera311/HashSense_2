@@ -446,5 +446,5 @@ const priceMatrixdatei = {
         {"minTH":1536,"pricePerTH":3.36},
         {"minTH":2560,"pricePerTH":3.18},
         {"minTH":3584,"pricePerTH":2.99}
-    ],
+    ]
 };
