@@ -6,12 +6,31 @@
   <style>
     body { font-family: monospace; background: #111; color: #eee; padding: 2rem; }
     textarea { width: 100%; height: 400px; margin-top: 1rem; background: #222; color: #0f0; padding: 1rem; border: none; resize: vertical; }
+    input[type="number"] { width: 6rem; padding: 0.3rem; margin-right: 1rem; }
     button { padding: 0.75rem 1.5rem; margin-top: 1rem; font-weight: bold; }
+    .price-fields { margin-top: 1rem; }
   </style>
 </head>
 <body>
 <h2>🔧 Generiere priceMatrix.js von 15W bis 50W</h2>
 <p>Stelle sicher, dass <strong>skript-prices.js</strong> und <strong>priceMatrix15.js</strong> im selben Ordner wie diese Datei liegen.</p>
+
+<div class="price-fields">
+  <p>📝 Manuell eintragbare Kaufpreise für bestimmte Wattstufen (optional):</p>
+  <div>
+    Wattstufe: <input type="number" id="watt1" min="15" max="50" placeholder="z. B. 20">
+    Kaufpreis: <input type="number" id="preis1" step="0.01" placeholder="z. B. 25.99">
+  </div>
+  <div>
+    Wattstufe: <input type="number" id="watt2" min="15" max="50">
+    Kaufpreis: <input type="number" id="preis2" step="0.01">
+  </div>
+  <div>
+    Wattstufe: <input type="number" id="watt3" min="15" max="50">
+    Kaufpreis: <input type="number" id="preis3" step="0.01">
+  </div>
+</div>
+
 <button onclick="generateMatrix()">✅ Neue priceMatrix.js generieren</button>
 <textarea id="output" placeholder="Hier erscheint die neue priceMatrix.js"></textarea>
 <a id="download" style="display:none" download="priceMatrix.js">📎 priceMatrix.js herunterladen</a>
@@ -47,11 +66,23 @@ function calculateCumulativeDiff(matrix) {
 }
 
 function parseMatrix15(jsText) {
-    const jsonPart = jsText.substring(jsText.indexOf("{")).replace(/const .*?=\s*/, "").replace(/;$/, "");
+    const jsonPart = jsText.substring(jsText.indexOf("{"));
     return JSON.parse(jsonPart);
 }
 
-function generateNewMatrix(matrix15, diffs) {
+function getManualPrices() {
+    const entries = [];
+    for (let i = 1; i <= 3; i++) {
+        const watt = parseInt(document.getElementById(`watt${i}`).value);
+        const preis = parseFloat(document.getElementById(`preis${i}`).value);
+        if (!isNaN(watt) && !isNaN(preis)) {
+            entries.push({ watt, preis });
+        }
+    }
+    return entries;
+}
+
+function generateNewMatrix(matrix15, diffs, customPrices) {
     const base = matrix15["15"];
     const output = {};
     for (let eff = 15; eff <= 50; eff++) {
@@ -61,10 +92,15 @@ function generateNewMatrix(matrix15, diffs) {
                 minTH: row.minTH,
                 pricePerTH: parseFloat((row.pricePerTH + delta).toFixed(2))
             };
-            if (row.minerCost)
-                obj.minerCost = parseFloat((obj.pricePerTH * row.minTH).toFixed(2));
             return obj;
         });
+    }
+
+    for (const entry of customPrices) {
+        if (output[entry.watt] && output[entry.watt][0]) {
+            const minTH = output[entry.watt][0].minTH || 1;
+            output[entry.watt][0].minerCost = parseFloat(entry.preis.toFixed(2));
+        }
     }
     return output;
 }
@@ -84,7 +120,8 @@ async function generateMatrix() {
         const matrixData = parseMatrix15(priceMatrix15);
         const effMatrix = parseEfficiencyMatrix(scriptPrices);
         const diffs = calculateCumulativeDiff(effMatrix);
-        const result = generateNewMatrix(matrixData, diffs);
+        const customPrices = getManualPrices();
+        const result = generateNewMatrix(matrixData, diffs, customPrices);
         const finalText = "const priceMatrix = " + JSON.stringify(result, null, 4) + ";";
         document.getElementById("output").value = finalText;
         exportFile(finalText, "priceMatrix.js");
