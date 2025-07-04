@@ -66,9 +66,11 @@ function calculateCumulativeDiff(matrix) {
 }
 
 function parseMatrix15(jsText) {
-    const jsonPart = jsText.substring(jsText.indexOf("{"));
-    return JSON.parse(jsonPart);
+    const match = jsText.match(/=\\s*({[\\s\\S]*?});?$/);
+    if (!match) throw new Error("priceMatrixdatei nicht gefunden");
+    return JSON.parse(match[1]);
 }
+
 
 function getManualPrices() {
     const entries = [];
