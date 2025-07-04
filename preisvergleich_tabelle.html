@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gomining Preisvergleich</title>
+  <style>
+    body {
+      background-color: #0f0f0f;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+    }
+    h1 {
+      color: #00e599;
+      text-align: center;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 2rem;
+      background: #1a1a1a;
+      box-shadow: 0 0 12px #00e599;
+      overflow-x: auto;
+    }
+    th, td {
+      border: 1px solid #2e2e2e;
+      padding: 0.5rem 0.75rem;
+      text-align: center;
+      white-space: nowrap;
+    }
+    th {
+      background-color: #111;
+      color: #00e599;
+    }
+    tr:nth-child(even) {
+      background-color: #151515;
+    }
+    tr:nth-child(odd) {
+      background-color: #1e1e1e;
+    }
+    .diff-row {
+      background-color: #222222;
+      color: #ffaa00;
+      font-style: italic;
+    }
+    @media screen and (max-width: 768px) {
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Gomining Preisvergleich (generiert aus priceMatrix.js + skript-prices.js)</h1>
+  <table>
+    <thead id="price-table-head">
+      <tr>
+        <th>W/TH</th>
+      </tr>
+    </thead>
+    <tbody id="price-table-body"></tbody>
+  </table>
+
+  <script type="module">
+    import('./priceMatrix.js').then(({ priceMatrixdatei }) => {
+      import('./skript-prices.js').then(({ efficiencyMatrix }) => {
+        const baseEff = 15;
+        const basePrices = priceMatrixdatei[baseEff];
+        const table = {};
+        table[baseEff] = basePrices.map(x => ({ ...x }));
+
+        for (let eff = 16; eff <= 50; eff++) {
+          const prevEff = efficiencyMatrix[eff]?.to;
+          const factor = efficiencyMatrix[eff]?.pricePerW;
+          if (!prevEff || !factor || !table[prevEff]) continue;
+          const prevPrices = table[prevEff];
+          table[eff] = prevPrices.map(p => ({
+            minTH: p.minTH,
+            pricePerTH: +(p.pricePerTH - factor).toFixed(2)
+          }));
+        }
+
+        const thKeys = [...new Set(basePrices.map(p => p.minTH))];
+
+        const theadRow = document.querySelector('#price-table-head tr');
+        thKeys.forEach(th => {
+          theadRow.innerHTML += `<th>${th}</th><th></th>`;
+        });
+
+        const tbody = document.getElementById('price-table-body');
+
+        for (let eff = baseEff; eff <= 50; eff++) {
+          const prices = table[eff];
+          if (!prices) continue;
+
+          const row = document.createElement('tr');
+          row.innerHTML = `<td>${eff} W/TH</td>`;
+          thKeys.forEach(th => {
+            const match = prices.find(p => p.minTH === th);
+            if (match) {
+              row.innerHTML += `<td>${match.pricePerTH.toFixed(2).replace('.', ',')}</td><td>0,21</td>`;
+            } else {
+              row.innerHTML += `<td></td><td></td>`;
+            }
+          });
+          tbody.appendChild(row);
+
+          if (efficiencyMatrix[eff + 1]) {
+            const next = table[eff + 1];
+            if (!next) continue;
+            const diff = document.createElement('tr');
+            diff.classList.add('diff-row');
+            diff.innerHTML = `<td>${eff}→${eff + 1}</td>`;
+            thKeys.forEach(th => {
+              const current = prices.find(p => p.minTH === th);
+              const nextP = next.find(p => p.minTH === th);
+              if (current && nextP) {
+                const d = (current.pricePerTH / nextP.pricePerTH).toFixed(2).replace('.', ',');
+                diff.innerHTML += `<td>${d}</td><td></td>`;
+              } else {
+                diff.innerHTML += `<td></td><td></td>`;
+              }
+            });
+            tbody.appendChild(diff);
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
