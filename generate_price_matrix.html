@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Generate priceMatrix.js</title>
+  <style>
+    body { font-family: monospace; background: #111; color: #eee; padding: 2rem; }
+    textarea { width: 100%; height: 400px; margin-top: 1rem; background: #222; color: #0f0; padding: 1rem; border: none; resize: vertical; }
+    button { padding: 0.75rem 1.5rem; margin-top: 1rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+<h2>🔧 Generiere priceMatrix.js von 15W bis 50W</h2>
+<p>Stelle sicher, dass <strong>skript-prices.js</strong> und <strong>priceMatrix15.js</strong> im selben Ordner wie diese Datei liegen.</p>
+<button onclick="generateMatrix()">✅ Neue priceMatrix.js generieren</button>
+<textarea id="output" placeholder="Hier erscheint die neue priceMatrix.js"></textarea>
+<a id="download" style="display:none" download="priceMatrix.js">📎 priceMatrix.js herunterladen</a>
+
+<script>
+async function loadScriptFile(fileName) {
+    const response = await fetch(fileName);
+    const text = await response.text();
+    return text;
+}
+
+function parseEfficiencyMatrix(jsText) {
+    const match = jsText.match(/efficiencyMatrix\s*=\s*{([\s\S]*?)};/);
+    if (!match) throw new Error("efficiencyMatrix nicht gefunden");
+    let jsonLike = "{" + match[1] + "}";
+    jsonLike = jsonLike.replace(/(\d+):/g, '"$1":');
+    jsonLike = jsonLike.replace(/(\w+):/g, '"$1":');
+    return JSON.parse(jsonLike);
+}
+
+function calculateCumulativeDiff(matrix) {
+    const result = {};
+    for (let i = 15; i <= 50; i++) {
+        let diff = 0;
+        let current = i;
+        while (matrix[current]) {
+            diff += matrix[current].pricePerW;
+            current = matrix[current].to;
+        }
+        result[i] = parseFloat(diff.toFixed(2));
+    }
+    return result;
+}
+
+function parseMatrix15(jsText) {
+    const jsonPart = jsText.substring(jsText.indexOf("{")).replace(/const .*?=\s*/, "").replace(/;$/, "");
+    return JSON.parse(jsonPart);
+}
+
+function generateNewMatrix(matrix15, diffs) {
+    const base = matrix15["15"];
+    const output = {};
+    for (let eff = 15; eff <= 50; eff++) {
+        const delta = diffs[eff];
+        output[eff] = base.map(row => {
+            const obj = {
+                minTH: row.minTH,
+                pricePerTH: parseFloat((row.pricePerTH + delta).toFixed(2))
+            };
+            if (row.minerCost)
+                obj.minerCost = parseFloat((obj.pricePerTH * row.minTH).toFixed(2));
+            return obj;
+        });
+    }
+    return output;
+}
+
+function exportFile(text, fileName) {
+    const blob = new Blob([text], { type: 'application/javascript' });
+    const url = URL.createObjectURL(blob);
+    const a = document.getElementById("download");
+    a.href = url;
+    a.style.display = "inline-block";
+}
+
+async function generateMatrix() {
+    try {
+        const scriptPrices = await loadScriptFile("skript-prices.js");
+        const priceMatrix15 = await loadScriptFile("priceMatrix15.js");
+        const matrixData = parseMatrix15(priceMatrix15);
+        const effMatrix = parseEfficiencyMatrix(scriptPrices);
+        const diffs = calculateCumulativeDiff(effMatrix);
+        const result = generateNewMatrix(matrixData, diffs);
+        const finalText = "const priceMatrix = " + JSON.stringify(result, null, 4) + ";";
+        document.getElementById("output").value = finalText;
+        exportFile(finalText, "priceMatrix.js");
+    } catch (err) {
+        alert("Fehler: " + err.message);
+    }
+}
+</script>
+</body>
+</html>
