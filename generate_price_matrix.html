@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>Generate priceMatrix.js</title>
+      <script src="priceMatrix15.js"></script>
+
+    <script src="skript-prices.js"></script>
   <style>
     body { font-family: monospace; background: #111; color: #eee; padding: 2rem; }
     textarea { width: 100%; height: 400px; margin-top: 1rem; background: #222; color: #0f0; padding: 1rem; border: none; resize: vertical; }
@@ -92,7 +95,7 @@ function generateNewMatrix(matrix15, diffs, customPrices) {
         output[eff] = base.map(row => {
             const obj = {
                 minTH: row.minTH,
-                pricePerTH: parseFloat((row.pricePerTH + delta).toFixed(2))
+                pricePerTH: parseFloat((row.pricePerTH - delta).toFixed(2))
             };
             return obj;
         });
@@ -106,7 +109,30 @@ function generateNewMatrix(matrix15, diffs, customPrices) {
     }
     return output;
 }
+function generateNewMatrix2(matrix15, effMatrix, customPrices) {
+    const base = matrix15["15"];
+    const output = {};
+    for (let eff = 15; eff <= 50; eff++) {
+        // Summe aller pricePerW von 16 bis eff
+        let diffSum = 0;
+        let current = eff;
+        while (current > 15 && effMatrix[current]) {
+            diffSum += effMatrix[current].pricePerW;
+            current = effMatrix[current].to;
+        }
+        output[eff] = base.map(row => ({
+            minTH: row.minTH,
+            pricePerTH: Math.round((row.pricePerTH - diffSum) * 100) / 100
+        }));
+    }
 
+    for (const entry of customPrices) {
+        if (output[entry.watt] && output[entry.watt][0]) {
+            output[entry.watt][0].minerCost = parseFloat(entry.preis.toFixed(2));
+        }
+    }
+    return output;
+}
 function exportFile(text, fileName) {
     const blob = new Blob([text], { type: 'application/javascript' });
     const url = URL.createObjectURL(blob);
@@ -117,14 +143,16 @@ function exportFile(text, fileName) {
 
 async function generateMatrix() {
     try {
-        const scriptPrices = await loadScriptFile("skript-prices.js");
-        const priceMatrix15 = await loadScriptFile("priceMatrix15.js");
-        const matrixData = parseMatrix15(priceMatrix15);
-        const effMatrix = parseEfficiencyMatrix(scriptPrices);
+        // Use global variables directly
+        const matrixData = priceMatrixdatei; // from priceMatrix.js
+        const effMatrix = efficiencyMatrix; // from skript-prices.js
         const diffs = calculateCumulativeDiff(effMatrix);
         const customPrices = getManualPrices();
-        const result = generateNewMatrix(matrixData, diffs, customPrices);
-        const finalText = "const priceMatrix = " + JSON.stringify(result, null, 4) + ";";
+        const result = generateNewMatrix2(matrixData, effMatrix, customPrices);
+        //const finalText = "const priceMatrix = " + JSON.stringify(result, null, 4) + ";";
+        const finalText = "const priceMatrix = " +
+    JSON.stringify(result, null, 0).replace(/},/g, '},\n') +
+    ";";
         document.getElementById("output").value = finalText;
         exportFile(finalText, "priceMatrix.js");
     } catch (err) {
