@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GoMining Price Matrix</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('https://www.transparenttextures.com/patterns/carbon_fibre.png'), rgba(0, 0, 0, 0.65);
+      background-blend-mode: overlay;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      backdrop-filter: blur(10px);
+    }
+    h1 {
+      text-align: center;
+      padding: 1rem;
+    }
+    .glass-box {
+      background: rgba(255, 255, 255, 0.05);
+      margin: 2rem auto;
+      padding: 1rem;
+      border-radius: 16px;
+      width: 95%;
+      max-width: 1400px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 0.7rem;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      white-space: nowrap;
+    }
+    thead {
+      background-color: rgba(255,255,255,0.1);
+    }
+    th {
+      font-weight: bold;
+    }
+	td:hover {
+	  background: rgba(255,255,255,0.1);
+	  transform: scale(1.02);
+	  transition: 0.2s ease;
+	  border-radius: 8px;
+	}
+	td:nth-child(2n) {
+	  background-color: rgba(255,255,255,0.03);
+	}
+	thead {
+	  background: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0));
+	  position: sticky;
+	  top: 0;
+	  backdrop-filter: blur(4px);
+	}
+
+	  .scroll-zone {
+    overflow-x: auto;
+    cursor: grab;
+    padding-bottom: 1rem;
+  }
+  .scroll-zone:active {
+    cursor: grabbing;
+  }
+  .glass-box {
+    background: rgba(255, 255, 255, 0.05);
+    margin: 2rem auto;
+    padding: 1rem;
+    border-radius: 16px;
+    width: 95%;
+    max-width: 1600px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.4);
+    backdrop-filter: blur(8px);
+  }
+  td.delta-positive {
+  color: #4caf50;
+		}
+		td.delta-negative {
+		  color: #f44336;
+		}
+
+	@keyframes scrollBG {
+	  from { background-position: 0 0; }
+	  to { background-position: 1000px 0; }
+	}
+
+  </style>
+</head>
+<body>
+  <h1>GoMining Price Matrix</h1>
+
+  <div class="glass-box">
+    <div class="scroll-zone" id="scrollZone">
+		<table id="priceTable">
+		  <thead id="tableHead">
+			<!-- Kopfzeile wird per JS erzeugt -->
+		  </thead>
+		  <tbody>
+			<!-- Inhalt wird per JS geladen -->
+		  </tbody>
+		</table>
+	  </div>
+	 </div>
+
+  <script src="priceMatrix.js"></script>
+  <script>
+    const tableHead = document.querySelector('#tableHead');
+    const tableBody = document.querySelector('#priceTable tbody');
+    const pm = priceMatrixdatei;
+    const wattKeys = Object.keys(pm).sort((a, b) => parseInt(a) - parseInt(b));
+
+    // Kopfzeile erstellen
+    const headerRow = document.createElement('tr');
+    headerRow.innerHTML = '<th>TH</th>';
+    for (let i = 0; i < wattKeys.length; i++) {
+      const watt = wattKeys[i];
+      headerRow.innerHTML += `<th>${watt} W/TH</th>`;
+      if (i < wattKeys.length - 1) {
+        const nextWatt = wattKeys[i + 1];
+        headerRow.innerHTML += `<th>Δ (${watt}→${nextWatt})</th>`;
+      }
+    }
+    tableHead.appendChild(headerRow);
+
+    // Anzahl Zeilen ermitteln
+    const rowCount = Math.min(...wattKeys.map(w => pm[w].length));
+
+    for (let i = 0; i < rowCount; i++) {
+      const thValue = pm[wattKeys[0]][i].minTH;
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${thValue}</td>`;
+
+      for (let j = 0; j < wattKeys.length; j++) {
+        const watt = wattKeys[j];
+        const price = pm[watt][i].pricePerTH;
+        row.innerHTML += `<td>${price}</td>`;
+
+        if (j < wattKeys.length - 1) {
+          const nextWatt = wattKeys[j + 1];
+          const delta = (price - pm[nextWatt][i].pricePerTH).toFixed(2);
+          row.innerHTML += `<td>${delta}</td>`;
+        }
+      }
+      tableBody.appendChild(row);
+    }
+	  const scrollZone = document.getElementById('scrollZone');
+  let isDown = false;
+  let startX;
+  let scrollLeft;
+
+  scrollZone.addEventListener('mousedown', (e) => {
+    isDown = true;
+    scrollZone.classList.add('active');
+    startX = e.pageX - scrollZone.offsetLeft;
+    scrollLeft = scrollZone.scrollLeft;
+  });
+  scrollZone.addEventListener('mouseleave', () => {
+    isDown = false;
+  });
+  scrollZone.addEventListener('mouseup', () => {
+    isDown = false;
+  });
+  scrollZone.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - scrollZone.offsetLeft;
+    const walk = (x - startX) * 1.2; // scroll speed
+    scrollZone.scrollLeft = scrollLeft - walk;
+  });
+  const delta = (price - pm[nextWatt][i].pricePerTH).toFixed(2);
+	const deltaClass = delta >= 0 ? 'delta-positive' : 'delta-negative';
+	row.innerHTML += `<td class=\"${deltaClass}\">${delta}</td>`;
+
+  </script>
+</body>
+</html>
