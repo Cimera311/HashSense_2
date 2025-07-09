@@ -271,8 +271,8 @@ globalThis.cancelExport = false;
             let nextButton = icon?.closest('button');
 
             if (!nextButton || nextButton.disabled) {
-                console.log("button not ready yet. waiting 2 seconds and try again...");
-                await new Promise(r => setTimeout(r, 2000));
+                console.log("button not ready yet. waiting 5 seconds and try again...");
+                await new Promise(r => setTimeout(r, 5000));
                 icon = document.querySelector('icon-arrow-short[direction="right"]');
                 nextButton = icon?.closest('button');
 
@@ -285,15 +285,15 @@ globalThis.cancelExport = false;
             nextButton.click();
             if (pageCounter % 10 === 0) {
                 console.log(`Kurze Pause nach Seite ${pageCounter}...`);
-                await new Promise(r => setTimeout(r, 2000));
+                await new Promise(r => setTimeout(r, 5000));
             } else {
-                await new Promise(r => setTimeout(r, 300));
+                await new Promise(r => setTimeout(r, 350));
             }
 
             let newKey = getFirstRowKey();
             if (newKey === previousKey) {
-                console.log("Seite hat sich scheinbar nicht verändert. Warte 2 Sekunden und prüfe erneut...");
-                await new Promise(r => setTimeout(r, 2000));
+                console.log("Seite hat sich scheinbar nicht verändert. Warte 5 Sekunden und prüfe erneut...");
+                await new Promise(r => setTimeout(r, 5000));
                 newKey = getFirstRowKey();
 
                 if (newKey === previousKey) {
