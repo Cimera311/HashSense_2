@@ -178,11 +178,11 @@
     drop.addEventListener('dragover', (e) => {
       e.preventDefault();
       drop.textContent = 'Drop now!';
-    });
+    })
 
     drop.addEventListener('dragleave', () => {
       drop.textContent = 'Drop a GoMining Miner card here…';
-    });
+    })
 
     drop.addEventListener('drop', (e) => {
       e.preventDefault();
@@ -202,155 +202,185 @@
         return el ? el.innerText.trim() : fallback;
       };
 
-      const power = extract('icon-power + span').replace(/[^0-9.]/g, '');
-      const efficiency = extract('icon-electricity + span').replace(/[^0-9.]/g, '');
-      const roiMatch = html.match(/ROI\s*(\d+(\.\d+)?)/);
-      const roi = roiMatch ? roiMatch[1] : '';
-// NEU: robustere Miner-Name-Zusammenführung
-const idMatch = html.match(/#\d{3,6}/);
-const collectionBlock = container.querySelector('.catalog-item-card__item-info');
-let collection = collectionBlock ? collectionBlock.innerText.replace(/#\d{3,6}/, '').trim() : '';
-if (collection.includes("\n")) collection = collection.replace(/\n+/g, ' ').trim();
-const name = `${idMatch ? idMatch[0] : 'Unknown'} ${collection}`.trim();
+		  const power = extract('icon-power + span').replace(/[^0-9.]/g, '');
+		  const efficiency = extract('icon-electricity + span').replace(/[^0-9.]/g, '');
+		  const roiMatch = html.match(/ROI\s*(\d+(\.\d+)?)/);
+		  const roi = roiMatch ? roiMatch[1] : '';
+		// NEU: robustere Miner-Name-Zusammenführung
+		const idMatch = html.match(/#\d{3,6}/);
+		const collectionBlock = container.querySelector('.catalog-item-card__item-info');
+		let collection = collectionBlock ? collectionBlock.innerText.replace(/#\d{3,6}/, '').trim() : '';
+		if (collection.includes("\n")) collection = collection.replace(/\n+/g, ' ').trim();
+		const name = `${idMatch ? idMatch[0] : 'Unknown'} ${collection}`.trim();
 
       const gmt = extract('icon-gmt + span').replace(/[^0-9.]/g, '');
       const usdBlock = html.match(/\$\d{1,6}\.\d{2}/g);
-// NEU: USD-Wert robust extrahieren inkl. Korrektur für US-Format mit Komma-Trennung bei Tausendern
-let usd = '', usdPerTh = '';
-const usdRawMatches = html.match(/\$\d{1,3}(?:,\d{3})*(?:\.\d{2})?/g);
-if (usdRawMatches && usdRawMatches.length >= 2) {
-  usd = usdRawMatches[0].replace(/[^\d.]/g, '').replace(/,/g, '');
-  usdPerTh = usdRawMatches[1].replace(/[^\d.]/g, '').replace(/,/g, '');
-} else if (usdRawMatches && usdRawMatches.length === 1) {
-  usdPerTh = usdRawMatches[0].replace(/[^\d.]/g, '').replace(/,/g, '');
-}
-      document.getElementById('power').value = power;
-      document.getElementById('efficiency').value = efficiency;
-      document.getElementById('roi').value = roi;
-        document.getElementById('name').value = name;
-      document.getElementById('gmt').value = gmt;
+		// NEU: USD-Wert robust extrahieren inkl. Korrektur für US-Format mit Komma-Trennung bei Tausendern
+		let usd = '', usdPerTh = '';
+		const usdRawMatches = html.match(/\$\d{1,3}(?:,\d{3})*(?:\.\d{2})?/g);
+		if (usdRawMatches && usdRawMatches.length >= 2) {
+		  usd = usdRawMatches[0].replace(/[^\d.]/g, '').replace(/,/g, '');
+		  usdPerTh = usdRawMatches[1].replace(/[^\d.]/g, '').replace(/,/g, '');
+		} else if (usdRawMatches && usdRawMatches.length === 1) {
+		  usdPerTh = usdRawMatches[0].replace(/[^\d.]/g, '').replace(/,/g, '');
+		}
 
-        document.getElementById('usd').value = usd;
-        document.getElementById('usdperth').value = usdPerTh;
-
+		updateFields(name, power, efficiency, roi, gmt, usd, usdPerTh);
+		runUpgradeCalculation(power, efficiency, usd)
+    })
+	 function runUpgradeCalculation(power, efficency, usd) {
       // Upgrade cost calculation
-      const powerTH = parseFloat(power);
-      const eff = parseFloat(efficiency);
+      let powerTH = parseFloat(power);
+      const eff = parseFloat(efficency);
       const marketPrice = parseFloat(usd);
-
+		upgradeCosts.textContent = 'No upgrade needed.';
       let result = '';
       const targets = [28, 20, 15];
 
       targets.forEach(target => {
         if (eff > target) {
-        const upgradePaths = [];
-            const eff = parseFloat(efficiency);
-            const powerTH = parseFloat(power);
-            const marketPrice = parseFloat(usd);
+					const upgradePaths = [];
+					const eff = parseFloat(efficency);
+					const powerTH = parseFloat(power);
+					const marketPrice = parseFloat(usd);
 
-            if (eff > 28) {
-            const to28 = calculateUpgradeCost(eff, 28, powerTH, true);
-            const to20 = calculateUpgradeCost(28, 20, powerTH, true);
-            const to15 = calculateUpgradeCost(20, 15, powerTH, true);
-            upgradePaths.push({ from: eff, to: 28, cost: to28.cost, log: to28.log });
-            upgradePaths.push({ from: 28, to: 20, cost: to20.cost, log: to20.log });
-            upgradePaths.push({ from: 20, to: 15, cost: to15.cost, log: to15.log });
-            } else if (eff > 20) {
-            const to20 = calculateUpgradeCost(eff, 20, powerTH, true);
-            const to15 = calculateUpgradeCost(20, 15, powerTH, true);
-            upgradePaths.push({ from: eff, to: 20, cost: to20.cost, log: to20.log });
-            upgradePaths.push({ from: 20, to: 15, cost: to15.cost, log: to15.log });
-            } else if (eff > 15) {
-            const to15 = calculateUpgradeCost(eff, 15, powerTH, true);
-            upgradePaths.push({ from: eff, to: 15, cost: to15.cost, log: to15.log });
-            }
+					if (eff > 28) {
+					const to28 = calculateUpgradeCost(eff, 28, powerTH, true);
+					const to20 = calculateUpgradeCost(28, 20, powerTH, true);
+					const to15 = calculateUpgradeCost(20, 15, powerTH, true);
+					upgradePaths.push({ from: eff, to: 28, cost: to28.cost, log: to28.log });
+					upgradePaths.push({ from: 28, to: 20, cost: to20.cost, log: to20.log });
+					upgradePaths.push({ from: 20, to: 15, cost: to15.cost, log: to15.log });
+					} else if (eff > 20) {
+					const to20 = calculateUpgradeCost(eff, 20, powerTH, true);
+					const to15 = calculateUpgradeCost(20, 15, powerTH, true);
+					upgradePaths.push({ from: eff, to: 20, cost: to20.cost, log: to20.log });
+					upgradePaths.push({ from: 20, to: 15, cost: to15.cost, log: to15.log });
+					} else if (eff > 15) {
+					const to15 = calculateUpgradeCost(eff, 15, powerTH, true);
+					upgradePaths.push({ from: eff, to: 15, cost: to15.cost, log: to15.log });
+					}
 
-            let result = '';
-            let cumulativeTotal = marketPrice;
-            let totalUpgrades = 0;
+					let result = '';
+					let cumulativeTotal = marketPrice;
+					let totalUpgrades = 0;
 
-            upgradePaths.forEach((up, index) => {
-            cumulativeTotal += up.cost;
-            totalUpgrades += up.cost;
-            const costPerTH = (cumulativeTotal / powerTH).toFixed(2);
+					upgradePaths.forEach(
+											(up, index) => {
+																cumulativeTotal += up.cost;
+																totalUpgrades += up.cost;
+																const costPerTH = (cumulativeTotal / powerTH).toFixed(2);
 
-            result += `→ Upgrade from ${up.from}W to ${up.to} W/TH:\n`;
-            result += up.log.map(l => `   ${l}`).join("\n") + "\n";
-            result += `   Upgrade Total: $${up.cost.toFixed(2)}\n`;
-            result += `   Market Price: $${marketPrice.toFixed(2)}\n`;
-            result += `   Final Total: $${cumulativeTotal.toFixed(2)} → $/TH: $${costPerTH}\n`;
+																result += `→ Upgrade from ${up.from}W to ${up.to} W/TH:\n`;
+																result += up.log.map(l => `   ${l}`).join("\n") + "\n";
+																result += `   Upgrade Total: $${up.cost.toFixed(2)}\n`;
+																result += `   Market Price: $${marketPrice.toFixed(2)}\n`;
+																result += `   Final Total: $${cumulativeTotal.toFixed(2)} → $/TH: $${costPerTH}\n`;
 
-            if (index > 0) {
-                result += `   Total Upgrades so far: $${totalUpgrades.toFixed(2)}\n`;
-            }
+																if (index > 0) {
+																	result += `   Total Upgrades so far: $${totalUpgrades.toFixed(2)}\n`;
+																}
 
-            result += "\n";
-            });
+																result += "\n";
+															}
+
+										);
+					upgradeCosts.textContent = result || 'No upgrade needed.';
+                };
+		})
 
 
-            upgradeCosts.textContent = result || 'No upgrade needed.';
-                }
-      });
+		  drop.textContent = 'Drop a GoMining Miner card here…';
+		}
 
-
-      drop.textContent = 'Drop a GoMining Miner card here…';
-    });
-    function analyzePastedMiner() {
-  const data = document.getElementById('paste-area').value;
-  if (data && typeof data === 'string') parseMinerData(data);
+function parse_power(str) {
+  return str?.match(/[\d.,]+/)?.[0].replace(',', '.') || '';
 }
 
-function parseMinerData(data) {
-  const lines = data.split(/\n|\r/).map(s => s.trim()).filter(s => s);
-
-  const power = lines.find(l => /\d+[.,]?\d*\s*TH/.test(l));
-  const efficiency = lines.find(l => /\d+[.,]?\d*\s*W\/TH/.test(l));
-  let roi = '';
-const roiIndex = lines.findIndex(l => /^ROI$/i.test(l));
-if (roiIndex !== -1) {
-  roi = lines[roiIndex + 1] || '';
-} else {
-  const roiLine = lines.find(l => /ROI\s*\d+[.,]?\d*%?/.test(l.toUpperCase()));
-  if (roiLine) roi = roiLine.replace(/.*ROI\s*/i, '');
+function parse_efficiency(str) {
+  return str?.match(/[\d.,]+/)?.[0].replace(',', '.') || '';
 }
 
-  const nameIndex = lines.findIndex(l => l.startsWith('#') || /#\d+/.test(l));
-    let name = '';
-    if (nameIndex !== -1) {
-      name = lines[nameIndex] + ' ' + (lines[nameIndex + 1] || '');
-    }
-
-  const gmt = lines.find(l => /^\d{1,3}(,\d{3})*(\.\d+)?$/.test(l));
-  const usdPrice = lines.find(l => /\$\d{1,3}(,\d{3})*(\.\d+)?(?!\s*\/)/.test(l));
-const usdTH = lines.reverse().find(l => /\$\d+[.,]?\d*\s*\/\s*TH/.test(l));
-
-
-
-  document.getElementById('name').value = name || '';
-  document.getElementById('power').value = power || '';
-  document.getElementById('efficiency').value = efficiency || '';
-  document.getElementById('roi').value = roi ? roi.replace(/ROI\s*/i, '') : '';
-  document.getElementById('gmt').value = gmt || '';
-  document.getElementById('usd').value = usdPrice || '';
-  document.getElementById('usdperth').value = usdTH || '';
-
-
-  try {
-    if (usdTH && usdTH.includes('•') && usdTH.includes('/ TH')) {
-      const parts = usdTH.split('•');
-      const final = parts[parts.length - 1];
-      document.getElementById('usdperth').value = final.trim();
-    } else if (usdTH && /\$\d/.test(usdTH)) {
-      document.getElementById('usdperth').value = usdTH.trim();
-    } else {
-      document.getElementById('usdperth').value = '';
-    }
-  } catch (err) {
-    console.warn("Error parsing USD/TH value:", err);
-    document.getElementById('usdperth').value = '';
+function parse_roi(lines) {
+  const roiIndex = lines.findIndex(l => /^ROI$/i.test(l));
+  if (roiIndex !== -1) {
+    return lines[roiIndex + 1]?.replace('%', '').replace(',', '.').trim() || '';
+  } else {
+    const line = lines.find(l => /ROI\s*\d+[.,]?\d*%?/.test(l.toUpperCase()));
+    return line ? line.replace(/.*ROI\s*/i, '').replace('%', '').replace(',', '.').trim() : '';
   }
 }
 
+function parse_name(lines) {
+  const i = lines.findIndex(l => l.startsWith('#') || /#\d+/.test(l));
+  return i !== -1 ? lines[i] + ' ' + (lines[i + 1] || '') : '';
+}
+
+function parse_usd_matches(raw) {
+  const matches = raw.match(/\$\d{1,3}(?:,\d{3})*(?:\.\d+)?/g);
+  let usd = '', usdPerTh = '';
+  if (matches && matches.length >= 2) {
+    usd = matches[0].replace(/[^\d.]/g, '').replace(/,/g, '');
+    usdPerTh = matches[1].replace(/[^\d.]/g, '').replace(/,/g, '');
+  } else if (matches && matches.length === 1) {
+    usdPerTh = matches[0].replace(/[^\d.]/g, '').replace(/,/g, '');
+  }
+  return { usd, usdPerTh };
+}
+
+function parse_gmt(str) {
+  if (!str) return '';
+  // Entfernt $ und andere Nicht-Zahlenzeichen außer Punkt & Komma
+  let cleaned = str.replace(/[^\d.,]/g, '');
+
+  // Falls Komma als Dezimaltrenner verwendet wird, ersetze es durch Punkt
+  // und entferne alle anderen Punkte als Tausendertrennzeichen
+  if (cleaned.includes(',') && cleaned.includes('.')) {
+    // US-Format: 1,234.56 → 1234.56
+    cleaned = cleaned.replace(/,/g, '');
+  } else if (cleaned.includes(',') && !cleaned.includes('.')) {
+    // EU-Format: 1.234,56 → 1234.56
+    cleaned = cleaned.replace(/\./g, '').replace(',', '.');
+  }
+
+  return cleaned.trim();
+}
+
+
+function parseMinerData(data) {
+
+  const lines = data.split(/\n|\r/).map(l => l.trim()).filter(Boolean);
+
+  const powerRaw = lines.find(l => /\d+[.,]?\d*\s*TH/.test(l));
+  const effRaw = lines.find(l => /\d+[.,]?\d*\s*W\/TH/.test(l));
+  const gmtRaw = lines.find(l => /^\d{1,3}(,\d{3})*(\.\d+)?$/.test(l));
+
+  const name = parse_name(lines);
+  const power = parse_power(powerRaw);
+  const efficiency = parse_efficiency(effRaw);
+  const roi = parse_roi(lines);
+  const gmt = parse_gmt(gmtRaw);
+  const { usd, usdPerTh } = parse_usd_matches(data);
+ applyParsedMinerData2(name, power, efficiency, roi, gmt, usd, usdPerTh)
+
+}
+function updateFields( name, power, efficiency, roi, gmt, usd, usdperth ) {
+  document.getElementById('name').value = name || '';
+  document.getElementById('power').value = power || '';
+  document.getElementById('efficiency').value = efficiency || '';
+  document.getElementById('roi').value = roi || '';
+  document.getElementById('gmt').value = gmt || '';
+  document.getElementById('usd').value = usd || '';
+  document.getElementById('usdperth').value = usdperth || '';
+}
+function applyParsedMinerData2(name, power, efficiency, roi, gmt, usd, usdperth) {
+  updateFields(name, power, efficiency, roi, gmt, usd, usdperth);
+  runUpgradeCalculation(power, efficiency, usd);
+}
+function analyzePastedMiner() {
+  const data = document.getElementById('paste-area').value;
+  if (data && typeof data === 'string') parseMinerData(data);
+};
   </script>
 </body>
 </html>
