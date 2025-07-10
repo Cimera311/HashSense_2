@@ -89,10 +89,23 @@
       cursor: pointer;
       margin-top: 10px;
     }
+	button {
+  margin: 10px 0;
+  background: #444;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+button:hover {
+  background: #666;
+}
   </style>
 </head>
 <body>
-  <div class="input-group">
+<button onclick="showOnly('drag-group')">🟪 Use Drag & Drop</button>  <button onclick="showOnly('paste-group')">📋 Paste Miner Info</button>
+  <div class="input-group" id="drag-group">
 <div id="hint">
     <label for="hint">Drag and Drop</label>
     👉 <strong>How to use:</strong><br>
@@ -103,7 +116,8 @@
   </div>
   <div id="drop">🟪 Drop a GoMining Miner card here…</div>
   </div>
-  <div class="input-group">
+
+  <div class="input-group" id="paste-group" style="display:none">
 
     <div id="hint">
         <label for="hint">Paste Miner Info (from GoMining)</label>
@@ -152,7 +166,15 @@
   <div class="result-block" id="upgrade-costs"></div>
 
   <script>
-
+  function showOnly(idToShow) {
+    const groups = ['drag-group', 'paste-group'];
+    groups.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.display = (id === idToShow) ? 'block' : 'none';
+      }
+    });
+  }
         function calculateUpgradeCost(currentW, targetW, th, logSteps = false) {
         let cost = 0;
         let step = Math.floor(currentW);
