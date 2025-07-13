@@ -316,8 +316,31 @@ button:hover {
 		}
 
 function parse_power(str) {
-  return str?.match(/[\d.,]+/)?.[0].replace(',', '.') || '';
+  if (!str) return '';
+
+  const raw = str.match(/[\d.,]+/)?.[0] || '';
+
+  // Entferne alle Nicht-Ziffern, aber merke uns die letzte Position von Punkt oder Komma
+  const commaIndex = raw.lastIndexOf(',');
+  const dotIndex = raw.lastIndexOf('.');
+  const lastSeparatorIndex = Math.max(commaIndex, dotIndex);
+
+  // Berechne Abstand vom Ende
+  const distanceFromEnd = raw.length - lastSeparatorIndex - 1;
+
+  let cleaned = raw.replace(/[.,]/g, ''); // entferne alle Punkte und Kommas
+
+  // Falls Separator 3 Stellen vor Ende → ist ein Dezimalzeichen → fügen wir ihn wieder ein
+  if (lastSeparatorIndex !== -1 && distanceFromEnd === 2) {
+    cleaned = 
+      raw.slice(0, lastSeparatorIndex).replace(/[.,]/g, '') +
+      '.' +
+      raw.slice(lastSeparatorIndex + 1).replace(/[.,]/g, '');
+  }
+
+  return cleaned;
 }
+
 
 function parse_efficiency(str) {
   return str?.match(/[\d.,]+/)?.[0].replace(',', '.') || '';
