@@ -1,4 +1,4 @@
-const priceMatrixdatei = {
+/*const priceMatrixdatei = {
   "15": [
     { minTH: 1, pricePerTH: 30.916 },
     { minTH: 2, pricePerTH: 30.7 },
@@ -20,4 +20,27 @@ const priceMatrixdatei = {
     { minTH: 2560, pricePerTH: 27.46 },
     { minTH: 3584, pricePerTH: 27.28 }
   ]
+};*/
+const priceMatrixdatei = {
+    "15": [
+        {"minTH":1,"pricePerTH":30.93},
+        {"minTH":2,"pricePerTH":30.71},
+        {"minTH":4,"pricePerTH":30.5},
+        {"minTH":8,"pricePerTH":30.28},
+        {"minTH":16,"pricePerTH":30.07},
+        {"minTH":32,"pricePerTH":29.86},
+        {"minTH":48,"pricePerTH":29.65},
+        {"minTH":64,"pricePerTH":29.44},
+        {"minTH":96,"pricePerTH":29.24},
+        {"minTH":128,"pricePerTH":29.03},
+        {"minTH":192,"pricePerTH":28.83},
+        {"minTH":256,"pricePerTH":28.63},
+        {"minTH":384,"pricePerTH":28.43},
+        {"minTH":512,"pricePerTH":28.23},
+        {"minTH":768,"pricePerTH":28.04},
+        {"minTH":1024,"pricePerTH":27.85},
+        {"minTH":1536,"pricePerTH":27.65},
+        {"minTH":2560,"pricePerTH":27.46},
+        {"minTH":3584,"pricePerTH":27.27},
+    ],
 };
