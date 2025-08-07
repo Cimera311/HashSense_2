@@ -53,54 +53,175 @@
 
 <h2>Purchase</h2>
 <textarea id="purchaseInput" placeholder="Paste purchase data here..."></textarea>
+<button onclick="parsePurchase()">Vorschau aktualisieren</button>
 <button onclick="downloadCSV(purchaseData, 'purchase.csv')">Download Purchase CSV</button>
+<button onclick="resetPreview('purchase')">Vorschau leeren</button>
+
 <div id="purchasePreview"></div>
 
 <h2>Upgrade</h2>
 <textarea id="upgradeInput" placeholder="Paste upgrade data here..."></textarea>
+<button onclick="parseUpgrade()">Vorschau aktualisieren</button>
 <button onclick="downloadCSV(upgradeData, 'upgrade.csv')">Download Upgrade CSV</button>
+<button onclick="resetPreview('upgrade')">Vorschau leeren</button>
+
 <div id="upgradePreview"></div>
 
 <h2>Selling</h2>
 <textarea id="sellingInput" placeholder="Paste selling data here..."></textarea>
+<button onclick="parseSelling()">Vorschau aktualisieren</button>
 <button onclick="downloadCSV(sellingData, 'selling.csv')">Download Selling CSV</button>
+<button onclick="resetPreview('selling')">Vorschau leeren</button>
+
 <div id="sellingPreview"></div>
+<h3>🧠 Miner History (kombiniert)</h3>
+<button onclick="generateMinerHistoryData()">Generate Miner History</button>
+<button onclick="downloadCSV(minerHistoryData, 'miner_history.csv')">Download CSV</button>
+<div id="minerHistoryPreview" class="table-container"></div>
 
 <script>
 globalThis.dateFormat = 'eu'; // 'us' für mm/dd/yyyy
 
-const safe = v => (v || '').toString().trim();
 
-const normalizeNumber = txt => {
-  txt = safe(txt)
-    .replace(/[^0-9.,]/g, '')
-    .replace(/(?<=\\d),(?=\\d{3})/g, '')
-    .replace(/(?<=\\d)\\.(?=\\d{3})/g, '')
+function safe(value) {
+  return (value || '').toString().trim();
+}
+
+function normalizeNumber(input) {
+  input = safe(input).replace(/[^0-9.,]/g, '');
+
+  // Fall 1: Enthält einen Dezimalteil mit mehr als 2 Ziffern → Dezimalpunkt behalten
+  const decimalMatch = input.match(/([.,]\d{1,4})$/);
+  
+  if (decimalMatch) {
+    // Tausendertrenner vorher entfernen
+    input = input
+      .replace(/(?<=\d),(?=\d{3}(\D|$))/g, '') // ,123
+      .replace(/(?<=\d)\.(?=\d{3}(\D|$))/g, ''); // .123 (nur wenn es 3er Block ist)
+    
+    // Dezimalpunkt zu Komma
+    input = input.replace(/,/, '.'); // erst alles zu Punkt
+    const num = parseFloat(input);
+    return isNaN(num) ? '' : num.toFixed(decimalMatch[1].length - 1).replace('.', ',');
+  }
+
+  // Fall 2: Kein spezieller langer Dezimalteil → Standard-Logik
+  input = input
+    .replace(/(?<=\d),(?=\d{3})/g, '')
+    .replace(/(?<=\d)\.(?=\d{3})/g, '')
     .replace(/,/g, '.');
-  const num = parseFloat(txt);
+
+  const num = parseFloat(input);
   return isNaN(num) ? '' : num.toFixed(2).replace('.', ',');
-};
+}
 
-const formatDate = d => {
-  const [m, d2, y] = d.split('/');
-  return globalThis.dateFormat === 'eu' ? \`\${d2}.\${m}.\${y}\` : d;
-};
 
-const extractBlocks = input => {
-  const lines = input.split('\\n').map(l => l.trim()).filter(Boolean);
+function formatDate(dateStr) {
+  const [month, day, year] = dateStr.split('/');
+  return globalThis.dateFormat === 'eu' ? `${day}.${month}.${year}` : dateStr;
+}
+
+function extractBlocks(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
   const blocks = [];
-  let current = [];
+  let currentBlock = [];
+
+  const timeRegex = /^\d{1,2}:\d{2}:\d{2}$/;
+  const validStatuses = ["Success", "Sold", "Delisted", "Canceled", "On sale"];
+
   for (const line of lines) {
-    if (/\\d{1,2}\\/\\d{1,2}\\/\\d{4}/.test(line)) {
-      if (current.length) blocks.push(current);
-      current = [line];
+    if (timeRegex.test(line)) {
+      if (currentBlock.length && validStatuses.includes(currentBlock.at(-1))) {
+        blocks.push(currentBlock);
+      }
+      currentBlock = [line]; // neuer Block startet
     } else {
-      current.push(line);
+      currentBlock.push(line);
     }
   }
-  if (current.length) blocks.push(current);
+
+  // Letzten Block prüfen
+  if (currentBlock.length && validStatuses.includes(currentBlock.at(-1))) {
+    blocks.push(currentBlock);
+  }
+
   return blocks;
-};
+}
+function extractUpgradeBlocks(text) {
+  const lines = text
+    .split('\n')
+    .map(l => l.trim())
+    .filter(Boolean)
+    .filter(line => !/^Date(\s|\t|$)/i.test(line)); // optional Header raus
+
+  const blocks = [];
+  for (let i = 0; i <= lines.length - 7; i++) {
+    const slice = lines.slice(i, i + 7);
+    const lastLine = slice[6];
+
+    if (["Success", "Canceled", "Sold", "Delisted", "On sale"].includes(lastLine)) {
+      blocks.push(slice);
+      i += 6; // Block ist 7 Zeilen lang → weiterspringen
+    }
+  }
+  return blocks;
+}
+function extractSellingBlocks(text) {
+  const lines = text
+    .split('\n')
+    .map(l => l.trim())
+    .filter(Boolean)
+    .filter(line => !/^Listing date(\s|\t|$)/i.test(line)); // Header raus
+
+  const blocks = [];
+
+  for (let i = 0; i <= lines.length - 8; i++) {
+    const slice = lines.slice(i, i + 8);
+    const lastLine = slice[7];
+
+    if (lastLine === "Sold") {
+      blocks.push(slice);
+      i += 7; // Weiter zum nächsten Block
+    }
+  }
+
+  return blocks;
+}
+
+
+function parsePurchase() {
+  const input = document.getElementById("purchaseInput").value;
+  const blocks = extractBlocks(input);
+  blocks.forEach(parsePurchaseBlock);
+  renderTable(purchaseData, "purchasePreview");
+ /* document.getElementById("purchaseInput").value = "";*/
+}
+function parseUpgrade() {
+  const input = document.getElementById("upgradeInput").value;
+  const blocks = extractUpgradeBlocks(input);
+  blocks.forEach(parseUpgradeBlock);
+  renderTable(upgradeData, "upgradePreview");
+ /* document.getElementById("upgradeInput").value = ""; */
+}
+function parseSelling() {
+  const input = document.getElementById("sellingInput").value;
+  const blocks = extractSellingBlocks(input);
+  blocks.forEach(parseSellingBlock);
+  renderTable(sellingData, "sellingPreview");
+ /*  document.getElementById("sellingInput").value = ""; */
+}
+function resetPreview(type) {
+  if (type === 'purchase') {
+    purchaseData.length = 0;
+    document.getElementById("purchasePreview").innerHTML = '';
+  } else if (type === 'upgrade') {
+    upgradeData.length = 0;
+    document.getElementById("upgradePreview").innerHTML = '';
+  } else if (type === 'selling') {
+    sellingData.length = 0;
+    document.getElementById("sellingPreview").innerHTML = '';
+  }
+}
 
 const purchaseData = [];
 const upgradeData = [];
@@ -108,47 +229,71 @@ const sellingData = [];
 
 const parsePurchaseBlock = b => {
   if (b.length < 8) return;
-  purchaseData.push({
-    Date: formatDate(b[1]),
-    Time: b[0],
+  const newEntry = {
+    Date: formatDate(b[1]), 
+    Time: safe(b[0]),  
     Miner: b[3],
     TH: normalizeNumber(b[4]),
     WTH: normalizeNumber(b[5]),
     Price: normalizeNumber(b[6]),
     Status: b[7]
-  });
+ };
+
+  const newEntryKey = Object.values(newEntry).join('|');
+
+  const alreadyExists = purchaseData.some(entry =>
+    Object.values(entry).join('|') === newEntryKey
+  );
+
+  if (!alreadyExists) {
+    purchaseData.push(newEntry);
+  }
 };
 
 const parseUpgradeBlock = b => {
   if (b.length < 7) return;
+
   const entry = {
     Date: formatDate(b[0]),
     Miner: b[2],
-    Price: normalizeNumber(b[5]),
-    Status: b[6],
     "TH before": "",
     "TH": "",
     "W/TH before": "",
     "W/TH": "",
-    "Upgrade Type": ""
+    "Upgrade Type": "",
+    Price: normalizeNumber(b[5]),
+    Status: b[6]
   };
+
   const fromVal = b[3];
   const toVal = b[4];
-  if (fromVal.includes("TH")) {
-    entry["TH before"] = normalizeNumber(fromVal);
-    entry["TH"] = normalizeNumber(toVal);
-    entry["Upgrade Type"] = "Power";
-  } else {
+  const isEfficiency = fromVal.endsWith("W/TH") && toVal.endsWith("W/TH");
+
+  if (isEfficiency) {
     entry["W/TH before"] = normalizeNumber(fromVal);
     entry["W/TH"] = normalizeNumber(toVal);
     entry["Upgrade Type"] = "Efficiency";
+  } else {
+    entry["TH before"] = normalizeNumber(fromVal);
+    entry["TH"] = normalizeNumber(toVal);
+    entry["Upgrade Type"] = "Power";
   }
-  upgradeData.push(entry);
+
+  const newKey = Object.values(entry).join('|');
+
+  const alreadyExists = upgradeData.some(existing =>
+    Object.values(existing).join('|') === newKey
+  );
+
+  if (!alreadyExists) {
+    upgradeData.push(entry);
+  }
 };
 
 const parseSellingBlock = b => {
   if (b.length < 8) return;
-  sellingData.push({
+
+  const entry = {
     Date: formatDate(b[0]),
     Miner: b[2],
     TH: normalizeNumber(b[3]),
@@ -156,8 +301,19 @@ const parseSellingBlock = b => {
     PriceBuyer: normalizeNumber(b[5]),
     YouGet: normalizeNumber(b[6]),
     Status: b[7]
-  });
+  };
+
+  const newKey = Object.values(entry).join('|');
+
+  const alreadyExists = sellingData.some(existing =>
+    Object.values(existing).join('|') === newKey
+  );
+
+  if (!alreadyExists) {
+    sellingData.push(entry);
+  }
 };
+
 
 const renderTable = (data, containerId) => {
   if (!data.length) return;
@@ -181,28 +337,90 @@ const downloadCSV = (data, filename) => {
   a.click();
   URL.revokeObjectURL(url);
 };
+let minerHistoryData = [];
+
+function generateMinerHistoryData() {
+  minerHistoryData = [];
+
+  // PURCHASE
+  for (const p of purchaseData) {
+    minerHistoryData.push({
+      Date: p.Date,
+      Time: p.Time,
+      Miner: p.Miner,
+      Action: "Purchase",
+      "TH before": "",
+      TH: p.TH,
+      "W/TH before": "",
+      "W/TH": p.WTH,
+      Price: p.Price,
+      Note: "Miner gekauft"
+    });
+  }
+
+  // UPGRADE
+  for (const u of upgradeData) {
+    minerHistoryData.push({
+      Date: u.Date,
+      Time: "",
+      Miner: u.Miner,
+      Action: "Upgrade " + u["Upgrade Type"],
+      "TH before": u["TH before"],
+      TH: u["TH"],
+      "W/TH before": u["W/TH before"],
+      "W/TH": u["W/TH"],
+      Price: u.Price,
+      Note: ""
+    });
+  }
+
+  // SELLING
+  for (const s of sellingData) {
+    minerHistoryData.push({
+      Date: s.Date,
+      Time: "",
+      Miner: s.Miner,
+      Action: "Sold",
+      "TH before": s.TH,
+      TH: "",
+      "W/TH before": s.WTH,
+      "W/TH": "",
+      Price: s.YouGet,
+      Note: "Miner verkauft"
+    });
+  }
+
+  // Sortieren nach Datum + Uhrzeit (falls vorhanden)
+  minerHistoryData.sort((a, b) => {
+    const aDate = new Date(a.Date + ' ' + (a.Time || "00:00:00"));
+    const bDate = new Date(b.Date + ' ' + (b.Time || "00:00:00"));
+    return aDate - bDate;
+  });
+
+  renderTable(minerHistoryData, "minerHistoryPreview");
+}
 
 document.getElementById("purchaseInput").addEventListener("paste", e => {
   setTimeout(() => {
     extractBlocks(e.target.value).forEach(parsePurchaseBlock);
     renderTable(purchaseData, "purchasePreview");
-    e.target.value = "";
+    /* e.target.value = ""; */
   }, 100);
 });
 
 document.getElementById("upgradeInput").addEventListener("paste", e => {
   setTimeout(() => {
-    extractBlocks(e.target.value).forEach(parseUpgradeBlock);
+    extractUpgradeBlocks(e.target.value).forEach(parseUpgradeBlock);
     renderTable(upgradeData, "upgradePreview");
-    e.target.value = "";
+    /* e.target.value = ""; */
   }, 100);
 });
 
 document.getElementById("sellingInput").addEventListener("paste", e => {
   setTimeout(() => {
-    extractBlocks(e.target.value).forEach(parseSellingBlock);
+    extractSellingBlocks(e.target.value).forEach(parseSellingBlock);
     renderTable(sellingData, "sellingPreview");
-    e.target.value = "";
+    /* e.target.value = ""; */
   }, 100);
 });
 </script>
