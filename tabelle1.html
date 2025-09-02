@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>3-Year Investment Comparison</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Optional: slightly tighter table cells for mobile screenshots */
+    .td-pad { padding: 0.6rem 0.75rem; }
+    .th-pad { padding: 0.55rem 0.75rem; }
+  </style>
+</head>
+<body class="h-full antialiased bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
+  <!-- 9:16 stage -->
+  <div class="mx-auto my-0 w-[1080px] h-[1920px] flex items-center justify-center">
+    <!-- Card -->
+    <div class="w-[980px] rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-10 shadow-2xl">
+      <!-- Header -->
+      <div class="mb-6">
+        <h1 class="text-3xl font-bold tracking-tight">3-Year Investment Comparison</h1>
+        <p class="mt-2 text-sm text-slate-300">
+          Base case: BTC $110k, reward 49 sats/TH/day, power $0.05/kWh, service $0.0089/TH/day.
+        </p>
+      </div>
+
+      <!-- Table -->
+      <div class="overflow-hidden rounded-xl ring-1 ring-white/10">
+        <table class="min-w-full text-left text-sm">
+          <thead class="bg-white/10 text-slate-200">
+            <tr class="[&>th]:th-pad">
+              <th scope="col" class="font-semibold">Investment Option</th>
+              <th scope="col" class="font-semibold text-right">Initial Investment</th>
+              <th scope="col" class="font-semibold text-right">3Y Cashflow</th>
+              <th scope="col" class="font-semibold text-right">Residual Value</th>
+              <th scope="col" class="font-semibold text-right">Total Value 3Y</th>
+              <th scope="col" class="font-semibold text-right">ROI (3Y)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5">
+            <!-- Row 1 -->
+            <tr class="odd:bg-white/5 even:bg-white/0">
+              <td class="td-pad font-medium">GoMining Miner (384 TH)</td>
+              <td class="td-pad text-right">$11,234</td>
+              <td class="td-pad text-right">$11,400</td>
+              <td class="td-pad text-right">$7,864</td>
+              <td class="td-pad text-right font-semibold text-emerald-300">$22,264</td>
+              <td class="td-pad text-right font-semibold text-emerald-300">+98%</td>
+            </tr>
+            <!-- Row 2 -->
+            <tr class="odd:bg-white/5 even:bg-white/0">
+              <td class="td-pad font-medium">Dividend ETF</td>
+              <td class="td-pad text-right">$11,000</td>
+              <td class="td-pad text-right">$1,350</td>
+              <td class="td-pad text-right">$11,000</td>
+              <td class="td-pad text-right">$12,350</td>
+              <td class="td-pad text-right">+12%</td>
+            </tr>
+            <!-- Row 3 -->
+            <tr class="odd:bg-white/5 even:bg-white/0">
+              <td class="td-pad font-medium">Corporate Bond</td>
+              <td class="td-pad text-right">$11,000</td>
+              <td class="td-pad text-right">$1,450</td>
+              <td class="td-pad text-right">$11,000</td>
+              <td class="td-pad text-right">$12,450</td>
+              <td class="td-pad text-right">+13%</td>
+            </tr>
+            <!-- Row 4 -->
+            <tr class="odd:bg-white/5 even:bg-white/0">
+              <td class="td-pad font-medium">Real Estate (REIT)</td>
+              <td class="td-pad text-right">$11,000</td>
+              <td class="td-pad text-right">$1,650</td>
+              <td class="td-pad text-right">$10,000</td>
+              <td class="td-pad text-right">$11,650</td>
+              <td class="td-pad text-right">+6%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footnote -->
+      <div class="mt-4 text-[12px] text-slate-400 leading-snug">
+        Notes: GoMining case assumes 384 TH @ 15 W/TH, net CF ≈ $3.8k/y; residual value ~70% after 3 years.
+        Halving assumption (sats ↓ ~50%, BTC ↑ ~100%) keeps USD cashflows broadly stable while accumulated BTC appreciates.
+        Risks: BTC volatility, difficulty, regulation, platform dependency.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
