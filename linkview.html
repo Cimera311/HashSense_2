@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HashFarm Referral Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-6">
+
+  <div class="w-full max-w-xl">
+    <h1 class="text-3xl font-bold mb-4 text-center">🔗 HashFarm Referral Organizer</h1>
+
+    <div class="flex gap-2 mb-6">
+      <input
+        id="referralInput"
+        type="url"
+        placeholder="Paste your GoMining referral link here…"
+        class="flex-grow px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+      />
+      <button
+        onclick="addReferralLink()"
+        class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-white font-semibold"
+      >
+        Add
+      </button>
+    </div>
+
+    <div id="cardsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+  </div>
+
+  <template id="cardTemplate">
+    <div class="group relative bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-lg cursor-pointer transition hover:shadow-purple-500/50">
+      <img src="" alt="Preview" class="w-full h-40 object-cover" />
+      <div class="p-4">
+        <p class="text-sm text-gray-300 truncate"></p>
+      </div>
+      <div class="absolute inset-0 bg-black bg-opacity-70 text-green-400 text-lg font-semibold flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+        ✅ Copied!
+      </div>
+    </div>
+  </template>
+
+  <script>
+    async function addReferralLink() {
+      const input = document.getElementById("referralInput");
+      const url = input.value.trim();
+      if (!url) return;
+
+      try {
+        const response = await fetch(`https://jsonlink.io/api/extract?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+
+        const title = data.title || "GoMining Referral";
+        const image = data.images?.[0] || "https://gomining.com/favicon.ico";
+
+        const template = document.getElementById("cardTemplate");
+        const card = template.content.cloneNode(true);
+
+        const img = card.querySelector("img");
+        const p = card.querySelector("p");
+        img.src = image;
+        img.alt = title;
+        p.textContent = title;
+
+        const cardElement = card.querySelector(".group");
+        cardElement.onclick = () => {
+          navigator.clipboard.writeText(url);
+          const overlay = cardElement.querySelector(".absolute");
+          overlay.classList.add("opacity-100");
+          setTimeout(() => overlay.classList.remove("opacity-100"), 1000);
+        };
+
+        document.getElementById("cardsContainer").appendChild(card);
+        input.value = "";
+      } catch (err) {
+        alert("❌ Invalid or unreachable URL");
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
