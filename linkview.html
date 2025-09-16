@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HashFarm Referral Manager</title>
+  <title>HashFarm Referral Organizer</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-6">
 
-  <div class="w-full max-w-xl">
+  <div class="w-full max-w-3xl">
     <h1 class="text-3xl font-bold mb-4 text-center">🔗 HashFarm Referral Organizer</h1>
 
     <!-- Eingabefeld -->
@@ -20,7 +20,7 @@
         class="flex-grow px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
       />
       <button
-        onclick="addReferralLink()"
+        id="addBtn"
         class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-white font-semibold"
       >
         Add
@@ -28,71 +28,103 @@
     </div>
 
     <!-- Cards -->
-    <div id="cardsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+    <div id="cardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
   </div>
 
   <!-- Template -->
   <template id="cardTemplate">
     <div class="group relative bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-lg cursor-pointer transition hover:shadow-purple-500/50">
-      <img src="" alt="Preview" class="w-full h-40 object-cover" />
-      <div class="p-4">
-        <p class="text-sm text-gray-300 truncate"></p>
+      <div class="w-full h-40 bg-gray-700 flex items-center justify-center">
+        <img src="" alt="Preview" class="w-full h-full object-cover hidden" />
+        <span class="text-xs text-gray-300">No image</span>
       </div>
-      <div class="absolute inset-0 bg-black bg-opacity-70 text-green-400 text-lg font-semibold flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+      <div class="p-4">
+        <p class="text-sm font-semibold truncate"></p>
+        <p class="text-xs text-gray-400 line-clamp-2"></p>
+      </div>
+      <div class="absolute inset-0 bg-black bg-opacity-70 text-green-400 text-lg font-semibold flex items-center justify-center opacity-0 group-active:opacity-100 transition">
         ✅ Copied!
       </div>
     </div>
   </template>
 
   <script>
+    const FN_URL = "https://umlgbacgghrvzwfvirro.supabase.co/functions/v1/get-og";
+
+    const input = document.getElementById("referralInput");
+    const addBtn = document.getElementById("addBtn");
+    const container = document.getElementById("cardsContainer");
+    const tpl = document.getElementById("cardTemplate");
+
+    addBtn.addEventListener("click", addReferralLink);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") addReferralLink();
+    });
+
     async function addReferralLink() {
-      const input = document.getElementById("referralInput");
-      const url = input.value.trim();
+      const url = (input.value || "").trim();
       if (!url) return;
 
-      let title = "Referral Link";
-      let image = "https://gomining.com/favicon.ico";
+      // Ladeanzeige
+      const oldText = addBtn.textContent;
+      addBtn.disabled = true;
+      addBtn.textContent = "Fetching…";
 
       try {
-        // Spezielle Behandlung für GoMining Links
-        if (url.includes("gomining.com")) {
-          title = "GoMining Referral Link";
-          image = "https://gomining.com/assets/opengraph-image.png"; // Beispielbild
-        } else {
-          // Versuch mit jsonlink.io
-          const response = await fetch(
-            `https://jsonlink.io/api/extract?url=${encodeURIComponent(url)}`
-          );
-          const data = await response.json();
-          title = data.title || title;
-          if (data.images && data.images.length > 0) {
-            image = data.images[0];
-          }
+        const res = await fetch(FN_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url })
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data?.success) {
+          throw new Error(data?.error || "Failed to get OG data");
         }
+
+        renderCard({
+          url,
+          title: data.ogTitle || "Referral Link",
+          description: data.ogDescription || "",
+          image: data.ogImage || null,
+        });
+
+        input.value = "";
       } catch (err) {
-        console.warn("Fallback auf Default-Image", err);
+        alert("❌ Fehler beim Laden der OG-Daten. Siehe Konsole.");
+        console.error(err);
+      } finally {
+        addBtn.disabled = false;
+        addBtn.textContent = oldText;
+      }
+    }
+
+    function renderCard({ url, title, description, image }) {
+      const node = tpl.content.cloneNode(true);
+      const img = node.querySelector("img");
+      const imgBox = node.querySelector(".w-full.h-40");
+      const titleEl = node.querySelector("p.text-sm");
+      const descEl = node.querySelector("p.text-xs");
+      const cardEl = node.querySelector(".group");
+
+      titleEl.textContent = title;
+      descEl.textContent = description;
+
+      if (image) {
+        img.src = image;
+        img.alt = title;
+        img.classList.remove("hidden");
+        imgBox.querySelector("span")?.classList.add("hidden");
       }
 
-      // Card erzeugen
-      const template = document.getElementById("cardTemplate");
-      const card = template.content.cloneNode(true);
-
-      const img = card.querySelector("img");
-      const p = card.querySelector("p");
-      img.src = image;
-      img.alt = title;
-      p.textContent = title;
-
-      const cardElement = card.querySelector(".group");
-      cardElement.onclick = () => {
+      cardEl.addEventListener("click", () => {
         navigator.clipboard.writeText(url);
-        const overlay = cardElement.querySelector(".absolute");
+        const overlay = cardEl.querySelector(".absolute");
         overlay.classList.add("opacity-100");
-        setTimeout(() => overlay.classList.remove("opacity-100"), 1000);
-      };
+        setTimeout(() => overlay.classList.remove("opacity-100"), 900);
+      });
 
-      document.getElementById("cardsContainer").appendChild(card);
-      input.value = "";
+      container.prepend(node);
     }
   </script>
 </body>
