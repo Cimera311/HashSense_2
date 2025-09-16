@@ -32,21 +32,33 @@
   </div>
 
   <!-- Template -->
-  <template id="cardTemplate">
+<template id="cardTemplate">
+  <div class="group relative bg-gray-800 border border-gray-700 rounded-lg overflow-hidden shadow-lg transition hover:shadow-purple-500/50">
+
+    <!-- X-Button -->
+    <button class="absolute top-2 right-2 z-10 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 delete-btn">
+      ✕
+    </button>
+
+    <!-- Bildbereich -->
     <div class="w-full aspect-video bg-gray-700 flex items-center justify-center overflow-hidden">
       <img src="" alt="Preview" class="w-full h-full object-cover hidden" />
       <span class="text-xs text-gray-300">No image</span>
     </div>
 
-      <div class="p-4">
-        <p class="text-sm font-semibold truncate"></p>
-        <p class="text-xs text-gray-400 line-clamp-2"></p>
-      </div>
-      <div class="absolute inset-0 bg-black bg-opacity-70 text-green-400 text-lg font-semibold flex items-center justify-center opacity-0 group-active:opacity-100 transition">
-        ✅ Copied!
-      </div>
+    <!-- Textbereich -->
+    <div class="p-4">
+      <p class="text-sm font-semibold truncate"></p>
+      <p class="text-xs text-gray-400 line-clamp-2"></p>
     </div>
-  </template>
+
+    <!-- Overlay beim Kopieren -->
+    <div class="absolute inset-0 bg-black/70 text-green-400 text-lg font-semibold flex items-center justify-center opacity-0 group-[.copied]:opacity-100 transition">
+      ✅ Copied!
+    </div>
+  </div>
+</template>
+
 
   <script>
     const FN_URL = "https://umlgbacgghrvzwfvirro.supabase.co/functions/v1/get-og";
@@ -99,33 +111,44 @@
       }
     }
 
-    function renderCard({ url, title, description, image }) {
-      const node = tpl.content.cloneNode(true);
-      const img = node.querySelector("img");
-      const imgBox = node.querySelector(".w-full.h-40");
-      const titleEl = node.querySelector("p.text-sm");
-      const descEl = node.querySelector("p.text-xs");
-      const cardEl = node.querySelector(".group");
+function renderCard({ url, title, description, image }) {
+  const node = tpl.content.cloneNode(true);
+  const img = node.querySelector("img");
+  const imgBox = node.querySelector(".w-full.aspect-video");
+  const titleEl = node.querySelector("p.text-sm");
+  const descEl = node.querySelector("p.text-xs");
+  const cardEl = node.querySelector(".group");
 
-      titleEl.textContent = title;
-      descEl.textContent = description;
+  titleEl.textContent = title;
+  descEl.textContent = description;
 
-      if (image) {
-        img.src = image;
-        img.alt = title;
-        img.classList.remove("hidden");
-        imgBox.querySelector("span")?.classList.add("hidden");
-      }
+  if (image) {
+    img.src = image;
+    img.alt = title;
+    img.classList.remove("hidden");
+    imgBox.querySelector("span")?.classList.add("hidden");
+  }
 
-      cardEl.addEventListener("click", () => {
-        navigator.clipboard.writeText(url);
-        const overlay = cardEl.querySelector(".absolute");
-        overlay.classList.add("opacity-100");
-        setTimeout(() => overlay.classList.remove("opacity-100"), 900);
-      });
+  // Klick auf Card = Link kopieren
+  cardEl.addEventListener("click", (e) => {
+    // Wenn X-Button geklickt -> nicht kopieren
+    if (e.target.classList.contains("delete-btn")) return;
 
-      container.prepend(node);
-    }
+    navigator.clipboard.writeText(url);
+    cardEl.classList.add("copied");
+    setTimeout(() => cardEl.classList.remove("copied"), 900);
+  });
+
+  // Klick auf X-Button = Card löschen
+  const deleteBtn = node.querySelector(".delete-btn");
+  deleteBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // verhindert, dass Card-Klick auch ausgelöst wird
+    cardEl.remove();
+  });
+
+  container.prepend(node);
+}
+
   </script>
 </body>
 </html>
