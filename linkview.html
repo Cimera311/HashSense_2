@@ -218,6 +218,29 @@ async function loadUserLinks() {
     await addCardFromLink(link.url, link.id);
   }
 }
+async function addCardFromLink(url, id) {
+  try {
+    const res = await fetch(FN_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url })
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data?.success) {
+      throw new Error(data?.error || "Failed to fetch OG data");
+    }
+
+    renderCard({
+      url,
+      title: data.ogTitle || "Referral Link",
+      description: data.ogDescription || "",
+      image: data.ogImage || null,
+    }, id);
+  } catch (err) {
+    console.error("Error fetching OG data for", url, err);
+  }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   loadUserLinks();
