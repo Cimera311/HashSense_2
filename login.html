@@ -62,10 +62,10 @@
                 alert("Login failed: " + error.message);
             } else {
                 console.log("Login successful:", data);
-                alert("Login successful!");
+                //alert("Login successful!");
                     // Speichere Session in sessionStorage
                 sessionStorage.setItem("supabaseSession", JSON.stringify(data.session));
-                window.location.href = "farm2.html"; // Weiterleitung nach dem Login
+                window.location.href = "services.html"; // Weiterleitung nach dem Login
             }
         });
 
