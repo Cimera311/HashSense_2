@@ -94,43 +94,61 @@
       if (e.key === "Enter") addReferralLink();
     });
 
-    async function addReferralLink() {
-      const url = (input.value || "").trim();
-      if (!url) return;
+   async function addReferralLink() {
+  const url = (input.value || "").trim();
+  if (!url) return;
 
-      // Ladeanzeige
-      const oldText = addBtn.textContent;
-      addBtn.disabled = true;
-      addBtn.textContent = "Fetching…";
+  // Ladeanzeige
+  const oldText = addBtn.textContent;
+  addBtn.disabled = true;
+  addBtn.textContent = "Fetching…";
 
-      try {
-        const res = await fetch(FN_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url })
-        });
-        const data = await res.json();
+  try {
+    const res = await fetch(FN_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url })
+    });
+    const data = await res.json();
 
-        if (!res.ok || !data?.success) {
-          throw new Error(data?.error || "Failed to get OG data");
-        }
+    if (!res.ok || !data?.success) {
+      throw new Error(data?.error || "Failed to get OG data");
+    }
 
-        renderCard({
-          url,
-          title: data.ogTitle || "Referral Link",
-          description: data.ogDescription || "",
-          image: data.ogImage || null,
-        });
+    // 1. Card sofort anzeigen
+    renderCard({
+      url,
+      title: data.ogTitle || "Referral Link",
+      description: data.ogDescription || "",
+      image: data.ogImage || null,
+    });
 
-        input.value = "";
-      } catch (err) {
-        alert("❌ Fehler beim Laden der OG-Daten. Siehe Konsole.");
-        console.error(err);
-      } finally {
-        addBtn.disabled = false;
-        addBtn.textContent = oldText;
+    // 2. Link in Supabase speichern
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: inserted, error } = await supabase
+        .from("referral_links")
+        .insert([{ user_id: user.id, url }])
+        .select("id")
+        .single();
+
+      if (error) {
+        console.error("Error saving link:", error);
+      } else {
+        console.log("Saved link:", inserted);
       }
     }
+
+    input.value = "";
+  } catch (err) {
+    alert("❌ Fehler beim Laden der OG-Daten. Siehe Konsole.");
+    console.error(err);
+  } finally {
+    addBtn.disabled = false;
+    addBtn.textContent = oldText;
+  }
+}
+
 
 function renderCard({ url, title, description, image }, id) {
   const node = tpl.content.cloneNode(true);
@@ -200,25 +218,7 @@ async function loadUserLinks() {
     await addCardFromLink(link.url, link.id);
   }
 }
-const { data: { user } } = await supabase.auth.getUser();
-if (user) {
-  const { data: inserted, error } = await supabase
-    .from("referral_links")
-    .insert([{ user_id: user.id, url }])
-    .select("id")
-    .single();
 
-  if (error) {
-    console.error("Error saving link:", error);
-  } else {
-    renderCard({
-      url,
-      title: data.ogTitle || "Referral Link",
-      description: data.ogDescription || "",
-      image: data.ogImage || null,
-    }, inserted.id);
-  }
-}
 
   </script>
 </body>
