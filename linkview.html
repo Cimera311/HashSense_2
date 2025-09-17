@@ -111,7 +111,7 @@
       }
     }
 
-function renderCard({ url, title, description, image }) {
+function renderCard({ url, title, description, image }, id) {
   const node = tpl.content.cloneNode(true);
   const img = node.querySelector("img");
   const imgBox = node.querySelector(".w-full.aspect-video");
@@ -129,24 +129,74 @@ function renderCard({ url, title, description, image }) {
     imgBox.querySelector("span")?.classList.add("hidden");
   }
 
-  // Klick auf Card = Link kopieren
+  // Copy on click (außer X)
   cardEl.addEventListener("click", (e) => {
-    // Wenn X-Button geklickt -> nicht kopieren
     if (e.target.classList.contains("delete-btn")) return;
-
     navigator.clipboard.writeText(url);
     cardEl.classList.add("copied");
     setTimeout(() => cardEl.classList.remove("copied"), 900);
   });
 
-  // Klick auf X-Button = Card löschen
+  // Delete Button
   const deleteBtn = node.querySelector(".delete-btn");
-  deleteBtn.addEventListener("click", (e) => {
-    e.stopPropagation(); // verhindert, dass Card-Klick auch ausgelöst wird
+  deleteBtn.addEventListener("click", async (e) => {
+    e.stopPropagation();
     cardEl.remove();
+
+    if (id) {
+      const { error } = await supabase
+        .from("referral_links")
+        .delete()
+        .eq("id", id);
+      if (error) console.error("Error deleting link:", error);
+    }
   });
 
   container.prepend(node);
+}
+
+async function loadUserLinks() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    console.log("Not logged in");
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("referral_links")
+    .select("id, url")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error loading links:", error);
+    return;
+  }
+
+  container.innerHTML = "";
+  for (const link of data) {
+    // OG-Daten live abrufen
+    await addCardFromLink(link.url, link.id);
+  }
+}
+const { data: { user } } = await supabase.auth.getUser();
+if (user) {
+  const { data: inserted, error } = await supabase
+    .from("referral_links")
+    .insert([{ user_id: user.id, url }])
+    .select("id")
+    .single();
+
+  if (error) {
+    console.error("Error saving link:", error);
+  } else {
+    renderCard({
+      url,
+      title: data.ogTitle || "Referral Link",
+      description: data.ogDescription || "",
+      image: data.ogImage || null,
+    }, inserted.id);
+  }
 }
 
   </script>
