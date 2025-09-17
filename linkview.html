@@ -5,6 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HashFarm Referral Organizer</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/+esm';
+
+  const supabaseUrl = "https://umlgbacgghrvzwfvirro.supabase.co";
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtbGdiYWNnZ2hydnp3ZnZpcnJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY1MTAzMjQsImV4cCI6MjA1MjA4NjMyNH0.Hv0X4Wy4PtbSJ4yEN-CFszdX4zEoW4CMEHrbRBbX1Ug";
+
+  // Supabase-Client erstellen und global verfügbar machen
+  window.supabase = createClient(supabaseUrl, supabaseKey);
+
+  // Session abrufen
+  const session = JSON.parse(sessionStorage.getItem("supabaseSession"));
+
+  if (session) {
+      window.supabase.auth.setSession(session);
+      console.log("Supabase-Session in linkview.html geladen:", session);
+  } else {
+      console.error("Keine Supabase-Session gefunden. Weiterleitung zur Login-Seite...");
+      window.location.href = "login.html";
+  }
+</script>
+
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-6">
 
