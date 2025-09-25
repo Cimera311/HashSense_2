@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HashFarm - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Open Graph Meta -->
+  <meta property="og:title" content="HashFarm – Bitcoin Mining Tools">
+  <meta property="og:description" content="Track, calculate and optimize your Bitcoin mining ROI with HashFarm.">
+  <meta property="og:image" content="https://hashfarm.me/assets/preview.png">
+  <meta property="og:url" content="https://hashfarm.me/">
+  <meta property="og:type" content="website">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+
+  <!-- Android/Chrome -->
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/android-chrome-512x512.png">
+
+  <!-- Apple iOS -->
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="assets/site.webmanifest">
+
+<script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/+esm';
+
+    const supabaseUrl = "https://umlgbacgghrvzwfvirro.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtbGdiYWNnZ2hydnp3ZnZpcnJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY1MTAzMjQsImV4cCI6MjA1MjA4NjMyNH0.Hv0X4Wy4PtbSJ4yEN-CFszdX4zEoW4CMEHrbRBbX1Ug";
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    console.log("Supabase-Client verfügbar:", supabase);
+
+    window.addEventListener('DOMContentLoaded', () => {
+
+
+    
+        /* Registrierung*/
+        document.getElementById("signup-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+           
+            
+            const email = document.getElementById("signup-email").value;
+            const password = document.getElementById("signup-password").value;
+            const passwordRepeat = document.getElementById("signup-password-repeat").value;
+          
+            if (password.length < 6) {
+                alert("Password must be at least 6 characters long!");
+                return;
+            }
+            if (password !== passwordRepeat) {
+                alert("Passwords do not match!");
+                return;
+            }
+        
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                /*options: { data: { username } },*/
+            });
+        
+            if (error) {
+                console.error("Registration failed:", error.message);
+                alert("Registration failed: " + error.message);
+            } else {
+                console.log("Registration successful:", data);
+                alert("Registration successful! Please Check your Spam sorry ^^");
+            }
+        });
+
+
+        // Login
+        document.getElementById("login-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("login-email").value;
+            const password = document.getElementById("login-password").value;
+
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                console.error("Login failed:", error.message);
+                alert("Login failed: " + error.message);
+            } else {
+                console.log("Login successful:", data);
+                //alert("Login successful!");
+                    // Speichere Session in sessionStorage
+                sessionStorage.setItem("supabaseSession", JSON.stringify(data.session));
+                window.location.href = "services.html"; // Weiterleitung nach dem Login
+            }
+        });
+
+        /* Passwort zurücksetzen*/
+        document.getElementById("forgot-password-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("forgot-email").value;
+
+            const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+
+            if (error) {
+                console.error("Password reset failed:", error.message);
+                alert("Password reset failed: " + error.message);
+            } else {
+                console.log("Password reset email sent:", data);
+                alert("Password reset email sent!");
+            }
+        });
+
+</script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #282c34;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .main-container {
+            width: 400px;
+            background-color: #3c3f4a;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #1c1e24;
+            border-bottom: 2px solid #444;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .tab-header {
+            display: flex;
+            background-color: #1c1e24;
+        }
+
+        .tab-header div {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            color: #888;
+            font-weight: bold;
+        }
+
+        .tab-header div.active {
+            border-bottom: 2px solid #61dafb;
+            color: #ffffff;
+        }
+
+        .tab-content {
+            padding: 20px;
+        }
+
+        section {
+            display: none;
+        }
+
+        section.active {
+            display: block;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin: 10px 0 5px;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background-color: #2e3238;
+            color: #ffffff;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #61dafb;
+            color: #ffffff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #52b8e4;
+        }
+    </style>
+
+
+
+
+
+   
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    
+<div class="main-container">
+    <div class="main-container">
+        <header>
+            <h1>Login to Mining App</h1>
+        </header>
+
+        <div class="tab-header">
+            <div id="tab-login" class="active">Login</div>
+            <div id="tab-signup">Sign Up</div>
+            <div id="tab-forgot">Forgot Password</div>
+        </div>
+
+        <div class="tab-content">
+            <section id="login" class="active">
+                <form id="login-form">
+                    <label for="login-email">Email:</label>
+                    <input type="email" id="login-email" required>
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password" required>
+                    <button type="submit">Login</button>
+                </form>
+            </section>
+
+            <section id="signup">
+                <form id="signup-form">
+                    <!--<label for="signup-username">Username:</label>
+                    <input type="text" id="signup-username" required> -->
+                    <label for="signup-email">Email:</label>
+                    <input type="email" id="signup-email" required>
+                    <label for="signup-password">Password:</label>
+                    <input type="password" id="signup-password" placeholder="Password" required>
+                    <input type="password" id="signup-password-repeat" placeholder="Repeat Password" required>
+                    <button type="submit">Sign Up</button>
+                </form>
+            </section>
+
+            <section id="forgot-password">
+                <form id="forgot-password-form">
+                    <label for="forgot-email">Email:</label>
+                    <input type="email" id="forgot-email" required>
+                    <button type="submit">Reset Password</button>
+                </form>
+            </section>
+        </div>
+    </div>
+</div>
+
+    <script>
+        const tabs = document.querySelectorAll('.tab-header div');
+        const sections = document.querySelectorAll('section');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                tabs.forEach(tab => tab.classList.remove('active'));
+                // Hide all sections
+                sections.forEach(section => section.classList.remove('active'));
+                // Add active class to the clicked tab
+                tab.classList.add('active');
+                // Show corresponding section
+                const sectionId = tab.id.replace('tab-', '');
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+    </script>
+
+
+    
+</body>
+</html>
