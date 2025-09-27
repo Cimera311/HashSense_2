@@ -404,23 +404,31 @@ function getPriceMatrix(efficiency) {
                         return;
                     }
 
-                    const result = calculateTHAndCostForEfficiency(investment, efficiency);
+                    // Get discount and bonus values
+                    const discountPercent = parseFloat(document.getElementById('discount-code-I').value) || 0;
+                    const thBonusPercent = parseFloat(document.getElementById('th-bonus-I').value) || 0;
+                    
+                    // Calculate with discount applied to miner prices (not investment)
+                    const result = calculateTHAndCostForEfficiency(investment, efficiency, discountPercent);
+                    
+                    // Apply TH bonus
+                    const bonusedTH = result.th * (1 + thBonusPercent / 100);
 
                     // Ergebnisse anzeigen
-                    document.getElementById('My-Th-I').textContent = result.th; // Total TH
-                    document.getElementById('Total-Invest').textContent = `$${result.cost.toFixed(2)}`; // Invested Amount
+                    document.getElementById('My-Th-I').textContent = bonusedTH.toFixed(1); // Total TH with bonus
+                    document.getElementById('Total-Invest').textContent = `$${result.cost.toFixed(2)}`; // Actually spent amount
                     document.getElementById('Unused-Budget').textContent = `$${result.remainingInvestment.toFixed(2)}`; // Remaining Budget
 
-                    const averagePrice = calculateAveragePrice(result.cost, result.th);
+                    const averagePrice = calculateAveragePrice(result.cost, bonusedTH);
                     document.getElementById('average-price-th').textContent = `$${averagePrice.toFixed(2)}`;
 
 
-                    // ROI berechnen und anzeigen
+                    // ROI berechnen und anzeigen (mit bonusierter TH-Anzahl, aber original Investment für ROI)
                     const satoshiPerTH = parseFloat(document.getElementById('sat-TH').value);
                     const btcPrice = parseFloat(document.getElementById('bitcoin-price-dropdown').value);
                     
 
-                    const roiResult = calculate_ROI_I(satoshiPerTH, result.th, efficiency, result.cost, btcPrice);
+                    const roiResult = calculate_ROI_I(satoshiPerTH, bonusedTH, efficiency, investment, btcPrice);
 
 
                     document.getElementById('daily-revenue-usd-I').textContent = `$${roiResult.dailyRevenueUSD}`;
@@ -488,7 +496,7 @@ function getPriceMatrix(efficiency) {
                 }
 
 
-                function calculateTHAndCostForEfficiency(investment, efficiency) {
+                function calculateTHAndCostForEfficiency(investment, efficiency, discountPercent = 0) {
                         const matrix = getPriceMatrix(efficiency); // Wählt die Preismatrix für die Effizienzklasse
                         
                         if (!matrix) {
@@ -500,7 +508,10 @@ function getPriceMatrix(efficiency) {
                             };
                         }
                         
-                        const minerBaseCost = matrix[0].minerCost; // Grundpreis für den ersten TH
+                        // Calculate discount multiplier once
+                        const discountMultiplier = 1 - (discountPercent / 100);
+                        
+                        const minerBaseCost = matrix[0].minerCost * discountMultiplier; // Apply discount to base cost
 
                         // Prüfen, ob das Investment kleiner als der Minerpreis ist
                         if (investment < minerBaseCost) {
@@ -511,13 +522,13 @@ function getPriceMatrix(efficiency) {
                             };
                         }
 
-                        let remainingInvestment = investment - minerBaseCost; // Ziehe Minerpreis ab
+                        let remainingInvestment = investment - minerBaseCost; // Ziehe discounted Minerpreis ab
                         let totalTH = 1; // Start mit 1 TH (im Minerpreis enthalten)
-                        let totalCost = minerBaseCost; // Minerpreis initial setzen
+                        let totalCost = minerBaseCost; // Discounted Minerpreis initial setzen
                         let usedPricePerTH = minerBaseCost; // Zuletzt genutzter Preis
 
                         for (let i = 1; i < matrix.length; i++) {
-                            const pricePerTH = matrix[i].pricePerTH;
+                            const pricePerTH = matrix[i].pricePerTH * discountMultiplier; // Apply discount here
                             const nextTH = (i + 1 < matrix.length) ? matrix[i + 1].minTH : Infinity;
 
                             // Berechne, wie viele TH in dieser Preisstufe gekauft werden können
