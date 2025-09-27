@@ -1,597 +1,1113 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="module" src="config.js"></script>
-    <script src="skript.js"></script>
-	   <script src="skript-prices.js"></script>
+    <title>HashSense - Mining Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="priceMatrix.js"></script>
-    <link rel="stylesheet" href="styles.css">
-    <title>HashSense</title>
+    <script src="skript.js"></script>
+    <script src="skript-prices.js"></script>
+    <script src="skript-tables.js"></script>
+    <script src="skriptreferral.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
+    <!-- Open Graph Meta -->
+    <meta property="og:title" content="HashFarm – Bitcoin Mining Tools">
+    <meta property="og:description" content="Track, calculate and optimize your Bitcoin mining ROI with HashFarm.">
+    <meta property="og:image" content="https://hashfarm.me/assets/preview.png">
+    <meta property="og:url" content="https://hashfarm.me/">
+    <meta property="og:type" content="website">
 
-</head>
-<body>
-    <div class="main-container">
-        <!-- Navigationsleiste -->
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 
-            <!-- Bitcoin Preis Dropdown -->
-			<header class="header">
-                <div class="card-field">
-                    <div class="card-title">CURRENT BITCOINPRICE</div>
-                    <div class="card-content aligned">
-                        <div class="icon-wrap">
-                         <img src="bitcoin-910307_1280.webp" alt="BTC" class="card-icon">
-                        </div>
-                        <div class="value-wrap">
-                            <select id="bitcoin-price-dropdown" onchange="updateBTCPrice();">
-                                <option value="10000">10,000 $</option>
-                                <option value="20000">20,000 $</option>
-                                <option value="30000">30,000 $</option>    
-                                <option value="40000">40,000 $</option>
-                                <option value="50000">50,000 $</option>
-                                <option value="60000">60,000 $</option>   
-                                <option value="70000">70,000 $</option>
-                                <option value="80000">80,000 $</option>
-                                <option value="90000">90,000 $</option>
-                                <option id="currentp" value="0">current price</option>
-                                <option value="100000">100,000 $</option>
-                                <option value="110000">110,000 $</option>
-                                <option value="120000">120,000 $</option>
-                                <option value="130000">130,000 $</option>
-                                <option value="140000">140,000 $</option>
-                                <option value="150000">150,000 $</option>
-                                <option value="160000">160,000 $</option>
-                                <option value="200000">200,000 $</option>
-                                <option value="250000">250,000 $</option>
-                                <option value="300000">300,000 $</option>
-                                <option value="400000">400,000 $</option>   
-                            </select>
-                        </div>
-                </div>
-              </div>
-              <div class="card-field">
-                <div class="card-title">CURRENT GMT PRICE</div>
-                <div class="card-content aligned">
-                    <div class="icon-wrap">
-                        <img src="GoMining_Logo.webp" alt="GMT" class="card-icon">
-                    </div>
-                    <div class="value-wrap">
-                        <input type="number" id="gmt-token-price" placeholder="0.4269" step="0.0001">
-                    </div>
-                </div>
-                  </div>
-                  <div class="card-field">
-                    <div class="card-title">SAT PER TH</div>
-                    <div class="card-content">
-                        <img src="sats-ordinals-sats-logo.png" alt="⚡" class="card-icon">
-                      <input type="number" id="sat-TH" value="44" min="0" step="1">
-                    </div>
-                  </div>
-                  <button class="refresh-btn" onclick="fetchBTCPrice(); fetchGMTPrice();">🔄</button>
+    <!-- Android/Chrome -->
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/android-chrome-512x512.png">
 
-            </header>
-                
+    <!-- Apple iOS -->
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="assets/site.webmanifest">
+
+    <!-- Google Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    <style>
+        /* RANGE SLIDER ANTI-SCROLL FIX */
+        input[type="range"] {
+            outline: none !important;
+            scroll-margin: 0 !important;
+            scroll-padding: 0 !important;
+            /* Completely disable focus capability */
+            pointer-events: auto;
+        }
         
-            <div class="tab-navigation">
-                <button class="tab-arrow" onclick="switchTab(-1)">&#9664;</button>
-                <div class="tab-info">
-                    <span id="tab-name">Calc</span>
-                    <span id="tab-description">Hier kannst du deine Miner-Einstellungen konfigurieren und deine Einnahmen berechnen.</span>
-                </div>
-                <button class="tab-arrow" onclick="switchTab(1)">&#9654;</button>
-            </div>
+        input[type="range"]:focus {
+            outline: none !important;
+            scroll-margin: 0 !important;
+            scroll-padding: 0 !important;
+            /* Force blur immediately */
+            filter: none;
+        }
+        
+        /* Override any focus styles */
+        input[type="range"]:focus-visible {
+            outline: none !important;
+        }
+        
+        /* Prevent ALL automatic scrolling globally 
+        html {
+            scroll-behavior: auto !important;
+        }*/
+        
+        /* Prevent automatic scrolling on focus for ALL elements 
+        *, *:focus, *:active, *:hover {
+            scroll-margin: 0 !important;
+            scroll-padding: 0 !important;
+        }*/
+        
+        
+        /* Specifically target input fields 
+        input:focus, select:focus, textarea:focus {
+            scroll-margin: 0 !important;
+            scroll-padding: 0 !important;
+        }
+    
+        
+        /* Disable scroll behavior for navigation buttons 
+        .nav-item:focus, .nav-item:active {
+            outline: none !important;
+            scroll-behavior: auto !important;
+        } */
+        
+        /* Prevent focus outline and scrolling for all buttons 
+        button:focus, button:active {
+            outline: none !important;
+            scroll-margin: 0 !important;
+            scroll-padding: 0 !important;
+        }*/
+        
+        /* Override any scroll-into-view behavior 
+        .content-section * {
+            scroll-margin: 0 !important;
+            scroll-padding: 0 !important;
+        }
+        */
+        /* Sidebar animations */
+        .sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+    </style>
+
+    <script>
+        // Global variables for prices
+        window.btcPrice = 100000; // Default BTC price
+        window.gmtPrice = 0.4269; // Default GMT price
+        
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("Checking priceMatrixlocal:", window.priceMatrixlocal);
             
+            // Load price matrix for Investment Optimizer
+            if (typeof loadPriceMatrix === 'function') {
+                loadPriceMatrix();
+            } else {
+                console.warn('⚠️ loadPriceMatrix function not found');
+            }
+        });
+    </script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
 
-			<!-- Tab Inhalte -->
-			<div id="tab-content">
-				<!-- Investment Calculator Tab -->
-				<div class="tab-page active" id="Calc">
-                 
-                    <div class="button-group">
-                        <button onclick="updateMyTHMW(-100,'th-slider','My_TH')">-100 TH</button>
-                        <button onclick="updateMyTHMW(-10,'th-slider','My_TH')">-10 TH</button>
-                        <button onclick="updateMyTHMW(-1,'th-slider','My_TH')">-1 TH</button>
-                        <button onclick="updateMyTHMW(1,'th-slider','My_TH')">+1 TH</button>
-                        <button onclick="updateMyTHMW(10,'th-slider','My_TH')">+10 TH</button>
-                        <button onclick="updateMyTHMW(100,'th-slider','My_TH')">+100 TH</button>
+    <!-- Header with Price Cards -->
+    <header class="bg-gray-800 p-4">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header with Burger Button -->
+            <div class="flex items-center justify-between mb-4">
+                <button onclick="toggleSidebar()" 
+                        class="bg-gray-700 hover:bg-gray-600 p-2 rounded-lg transition-colors duration-200">
+                    <span class="material-icons text-white">menu</span>
+                </button>
+                <h1 class="text-xl font-bold text-white">HashSense Mining Dashboard</h1>
+                <div class="w-10"></div> <!-- Spacer for centering -->
+            </div>
+            <!-- Price Cards Grid -->
+            <div class="grid gap-4 md:grid-cols-3 mb-4">
+                <!-- BTC Price Card -->
+                <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                    <h2 class="text-sm font-semibold mb-3 text-gray-300">CURRENT BITCOIN PRICE</h2>
+                    <div class="flex items-center gap-3">
+                        <img src="bitcoin-910307_1280.webp" alt="BTC" class="w-10 h-10">
+                        <select id="bitcoin-price-dropdown" onchange="updateBTCPrice();" 
+                                class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="10000">10,000 $</option>
+                            <option value="20000">20,000 $</option>
+                            <option value="30000">30,000 $</option>    
+                            <option value="40000">40,000 $</option>
+                            <option value="50000">50,000 $</option>
+                            <option value="60000">60,000 $</option>   
+                            <option value="70000">70,000 $</option>
+                            <option value="80000">80,000 $</option>
+                            <option value="90000">90,000 $</option>
+                            <option id="currentp" value="0">current price</option>
+                            <option value="100000">100,000 $</option>
+                            <option value="110000">110,000 $</option>
+                            <option value="120000">120,000 $</option>
+                            <option value="130000">130,000 $</option>
+                            <option value="140000">140,000 $</option>
+                            <option value="150000">150,000 $</option>
+                            <option value="160000">160,000 $</option>
+                            <option value="200000">200,000 $</option>
+                            <option value="250000">250,000 $</option>
+                            <option value="300000">300,000 $</option>
+                            <option value="400000">400,000 $</option>   
+                        </select>
                     </div>
-					<label for="My_TH" title="Die Anzahl der Terahashes, die dein Miner produziert.">My TH: 
-							<span class="question-circle" title="Die Anzahl der Terahashes, die dein Miner produziert.">?</span>
-					</label>
-					<input type="number" id="My_TH" value="500" placeholder="10" oninput="syncFieldAndSlider(event, 'th-slider', 'My_TH'); calculateCost();">
-					<input type="range" id="th-slider" min="1" max="5000" step="1" value="200" oninput="syncFieldAndSlider(event, 'th-slider', 'My_TH'); calculateCost();">
-					<label for="Energy-efficiency">Energy-efficiency (W/TH):</label>
-					<input type="number" id="Energy-efficiency" value="23.88" placeholder="z.B. 20" oninput="syncFieldAndSlider(event, 'Energy-efficiency', 'efficiency-slider')">
-					<input type="range" id="efficiency-slider" min="15" max="35" step="0.01" value="27.71" oninput="syncFieldAndSlider(event, 'Energy-efficiency', 'efficiency-slider'); calculateCost();">
-					<label for="gomining-discount">Gomining Maintenance Discount (%):</label>
-					<input type="number" id="gomining-discount" value="10.41" min="0" max="20" step="1" oninput="syncFieldAndSlider(event, 'gomining-discount', 'gomining-discount-slider')" placeholder="0%">
-					<input type="range" id="gomining-discount-slider" min="0" max="20" step="0.1" value="0" oninput="syncFieldAndSlider(event, 'gomining-discount', 'gomining-discount-slider'); calculateCost();">
-					<label for="Daily-Reward">My Daily Reward:</label>
-					<input type="number" id="Daily-Reward" value="24500" placeholder="z.B. 6500">
-					<div class="single-button-container">
-                        <button onclick="calculateCost()">Calculate</button>
+                </div>
+
+                <!-- GMT Price Card -->
+                <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                    <h2 class="text-sm font-semibold mb-3 text-gray-300">CURRENT GMT PRICE</h2>
+                    <div class="flex items-center gap-3">
+                        <img src="GoMining_Logo.webp" alt="GMT" class="w-10 h-10">
+                        <input type="number" id="gmt-token-price" placeholder="0.4269" step="0.0001"
+                               class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
                     </div>
-                    
+                </div>
 
-					<table id="results-table" style="width: 100%; margin-top: 20px; border-collapse: collapse;">
-						<thead>
-							<tr>
-								<th style="border: 1px solid #555; padding: 10px; text-align: left;">Description</th>
-								<th style="border: 1px solid #555; padding: 10px; text-align: right;">Value ($)</th>
-								<th style="border: 1px solid #555; padding: 10px; text-align: right;">Value (BTC)</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td style="border: 1px solid #555; padding: 10px;">Daily Revenue</td>
-								<td id="daily-rewards" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-								<td id="daily-rewards-btc" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-							</tr>
-							<tr>
-								<td style="border: 1px solid #555; padding: 10px;">Daily Electricity Cost</td>
-								<td id="electricity-cost" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-								<td id="electricity-cost-btc" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-							</tr>
-							<tr>
-								<td style="border: 1px solid #555; padding: 10px;">Daily Service Cost</td>
-								<td id="service-cost" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-								<td id="service-cost-btc" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-							</tr>
-							<tr>
-								<td style="border: 1px solid #555; padding: 10px;">Daily Total Maintenance Cost</td>
-								<td id="daily-maintenance-cost" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-								<td id="daily-maintenance-cost-btc" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-							</tr>
-							<tr>
-								<td style="border: 1px solid #555; padding: 10px;">Daily Net Profit</td>
-								<td id="daily-net-profit" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-								<td id="daily-net-profit-btc" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-							</tr>
-                            <tr>
-								<td style="border: 1px solid #555; padding: 10px;">weekly Revenue</td>
-								<td id="weekly-rewards" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-								<td id="weekly-rewards-btc" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-							</tr>
-							<tr>
-								<td style="border: 1px solid #555; padding: 10px;">weekly Total Maintenance Cost</td>
-								<td id="weekly-maintenance-cost" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-								<td id="weekly-maintenance-cost-btc" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-							</tr>
-							<tr>
-								<td style="border: 1px solid #555; padding: 10px;">weekly Net Profit</td>
-								<td id="weekly-net-profit" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-								<td id="weekly-net-profit-btc" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-							</tr>
-							<tr>
-								<td style="border: 1px solid #555; padding: 10px;">Monthly Revenue</td>
-								<td id="monthly-rewards" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-								<td id="monthly-rewards-btc" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-							</tr>
-							<tr>
-								<td style="border: 1px solid #555; padding: 10px;">Monthly Total Maintenance Cost</td>
-								<td id="monthly-maintenance-cost" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-								<td id="monthly-maintenance-cost-btc" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-							</tr>
-							<tr>
-								<td style="border: 1px solid #555; padding: 10px;">Monthly Net Profit</td>
-								<td id="monthly-net-profit" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-								<td id="monthly-net-profit-btc" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-							</tr>
-							<tr>
-								<td style="border: 1px solid #555; padding: 10px;">Maintenance Cost (%)</td>
-								<td id="maintenance" style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-								<td style="border: 1px solid #555; padding: 10px; text-align: right;">-</td>
-							</tr>
-							
-						</tbody>
-					</table>
-					
-					<footer style="margin-top: 20px; padding: 10px; background-color: #2a2a2a; color: #e6e6e6; font-size: 0.9em; text-align: left; border-top: 1px solid #555;">
-						<h3 style="margin-bottom: 10px; color: #673dec;">Formulas Used</h3>
-						<ul style="list-style-type: none; padding: 0;">
-							<li>
-								<strong>Revenue:</strong> <code>(SAT per TH * BTC Price) / 1e8 * TH</code>
-							</li>
-							<li>
-								<strong>Electricity Cost:</strong> <code>(Efficiency (W/TH) * TH * Cost per kWh * 24) / 1000</code>
-							</li>
-							<li>
-								<strong>Service Cost:</strong> <code>0.0089 $ / BTC Price * TH</code>
-							</li>
-							<li>
-								<strong>Net Revenue:</strong> <code>Revenue - (Electricity Cost + Service Cost)</code>
-							</li>
-							<li>
-								<strong>Net Revenue %:</strong> <code>(Net Revenue / Revenue) * 100</code>
-							</li>
-						</ul>
-
-
-					</footer>
-				</div>
-				
-				<div class="tab-page" id="ROI" >
-                        <div class="button-group">
-                            <button onclick="updateMyTHMW(-100,'th-slider_ROI','My_TH_ROI')">-100 TH</button>
-                            <button onclick="updateMyTHMW(-10,'th-slider_ROI','My_TH_ROI')">-10 TH</button>
-                            <button onclick="updateMyTHMW(-1,'th-slider_ROI','My_TH_ROI')">-1 TH</button>
-                            <button onclick="updateMyTHMW(1,'th-slider_ROI','My_TH_ROI')">+1 TH</button>
-                            <button onclick="updateMyTHMW(10,'th-slider_ROI','My_TH_ROI')">+10 TH</button>
-                            <button onclick="updateMyTHMW(100,'th-slider_ROI','My_TH_ROI')">+100 TH</button>
-                        </div>
-						<label for="My_TH_ROI">My TH:</label>
-						<input type="number" id="My_TH_ROI" value="1" placeholder="10" oninput="syncFieldAndSlider(event, 'My_TH_ROI', 'th-slider_ROI')">
-						<input type="range" id="th-slider_ROI" min="1" max="5000" step="1" value="200" oninput="syncFieldAndSlider(event, 'My_TH_ROI', 'th-slider_ROI'); calculateROI();">
-
-						<div class="button-group" style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
-							<button onclick="setMinerValues(15)" style="background-color: #673dec; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-								15 W/TH
-							</button>
-							<button onclick="setMinerValues(20)" style="background-color: #673dec; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-								20 W/TH
-							</button>
-							<button onclick="setMinerValues(28)" style="background-color: #673dec; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-								28 W/TH
-							</button>
-							<button onclick="setMinerValues(35)" style="background-color: #673dec; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-								35 W/TH
-							</button>
-						</div>
-						
-						
-
-						<label for="Energy-efficiency_ROI">Energy-efficiency (W/TH):</label>
-						<input type="number" id="Energy-efficiency_ROI" value="20" placeholder="z.B. 20" oninput="syncFieldAndSlider(event, 'Energy-efficiency_ROI', 'efficiency-slider_ROI')">
-						<input type="range" id="efficiency-slider_ROI" min="15" max="35" step="0.01" value="27.71" oninput="syncFieldAndSlider(event, 'Energy-efficiency_ROI', 'efficiency-slider_ROI'); calculateROI();">
-
-						<label for="gomining-discount_ROI">Gomining Maintenance Discount (%):</label>
-						<input type="number" id="gomining-discount_ROI" value="0" min="0" max="20" step="1" oninput="syncFieldAndSlider(event, 'gomining-discount_ROI', 'gomining-discount-slider_ROI')">
-						<input type="range" id="gomining-discount-slider_ROI" min="0" max="20" step="0.1" value="0" oninput="syncFieldAndSlider(event, 'gomining-discount_ROI', 'gomining-discount-slider_ROI'); calculateROI();">
-
-						<label for="price-per-TH_ROI">Price per TH ($):</label>
-						<input type="number" id="price-per-th_ROI" value="22.93" placeholder="e.g., 22.93">
-                        <div class="single-button-container">
-                            <button onclick="calculateROI();">Calculate ROI</button>
-                        </div>
-						
-
-						<!-- ROI Results -->
-						<div class="results-container" style="margin-top: 20px;">
-							<p><strong>Total Investment:</strong> <span id="total-investment_ROI">$0.00</span></p>
-							<p><strong>Daily Profit:</strong> <span id="daily-profit_ROI">$0.00</span></p>
-							<p><strong>Monthly Profit:</strong> <span id="monthly-profit_ROI">$0.00</span></p>
-							<p><strong>Yearly Profit:</strong> <span id="yearly-profit_ROI">$0.00</span></p>
-							<p><strong>Days of ROI:</strong> <span id="days-of-roi_ROI">0 Days</span></p>
-							<p><strong>% of ROI (for a year):</strong> <span id="roi-percentage_ROI">0%</span></p>
-							<p><strong>Yearly Net BTC:</strong> <span id="yearly-net-btc_ROI">0.00000000 BTC</span></p>
-
-						</div>
-				</div>
-
-
-                <div class="tab-page" id="miner wars">
-
-                        <div>
-                            <label  for="Reward-fund_MW">Estimated reward fund cycle:</label>
-                            <input  id="Reward-fund_MW" value="6,32095969">
-                        </div>
-                        <div class="button-group">
-                            <button onclick="updateMyTHMW(-100,'th-slider_MW','My_TH_MW')">-100 TH</button>
-                            <button onclick="updateMyTHMW(-10,'th-slider_MW','My_TH_MW')">-10 TH</button>
-                            <button onclick="updateMyTHMW(-1,'th-slider_MW','My_TH_MW')">-1 TH</button>
-                            <button onclick="updateMyTHMW(1,'th-slider_MW','My_TH_MW')">+1 TH</button>
-                            <button onclick="updateMyTHMW(10,'th-slider_MW','My_TH_MW')">+10 TH</button>
-                            <button onclick="updateMyTHMW(100,'th-slider_MW','My_TH_MW')">+100 TH</button>
-                        </div>
-                        <label for="My_TH_MW" title="Die Anzahl der Terahashes, die dein Miner produziert.">My TH: 
-                                <span class="question-circle" title="Die Anzahl der Terahashes, die dein Miner produziert.">?</span>
-                        </label>   
-                        <input type="number" id="My_TH_MW" value="207" placeholder="10" oninput="syncFieldAndSlider(event, 'th-slider_MW', 'My_TH_MW'); calculateWeeklyRewardSolo(); calculateWeeklyMWReward();">
-                        <input type="range" id="th-slider_MW" min="1" max="5000" step="1" value="207" oninput="syncFieldAndSlider(event, 'th-slider_MW', 'My_TH_MW'); calculateWeeklyRewardSolo();calculateWeeklyMWReward() ;">
-                        <label for="My-share-MW">MY TH share (%):</label>
-                        <input type="number" id="My-share-MW" value="10" min="0" max="100" step="0,01" oninput="syncFieldAndSlider(event, 'Blocksshare_MW', 'Blocksshare-slider_MW'); calculateWeeklyMWReward();" placeholder="0%">
-                        <label for="My-Clan_MW">TH of my clan:</label>
-                        <input type="number" id="My-Clan_MW" value="318114" placeholder="z.B. 150000" oninput="syncFieldAndSlider(event, 'My-Clan_MW', 'My-Clan-slider_MW'); calculateWeeklyMWReward();">
-                        <input type="range" id="My-Clan-slider_MW" min="1" max="500000" step="1000" value="318114" oninput="syncFieldAndSlider(event, 'My-Clan_MW', 'My-Clan-slider_MW'); calculateWeeklyMWReward();">
-                        <label for="gomining-discount_MW">Blocks share (%):</label>
-                        <input type="number" id="Blocksshare_MW" value="22.78" min="0" max="100" step="0,01" oninput="syncFieldAndSlider(event, 'Blocksshare_MW', 'Blocksshare-slider_MW'); calculateWeeklyMWReward() ;highlightLargerInput();" placeholder="0%">
-                        <input type="range" id="Blocksshare-slider_MW" min="0" max="100" step="0.01" value="20" oninput="syncFieldAndSlider(event, 'Blocksshare_MW', 'Blocksshare-slider_MW');calculateWeeklyMWReward() ;highlightLargerInput();">
-                        <label for="Weekly-Solo-Reward_MW">My weekly solo reward:</label>
-                        <input type="number" id="Weelky-Solo-Reward_MW" value="90097" placeholder="z.B. 50000" oninput="highlightLargerInput();">
-                        <label for="Weekly-mw-Reward_MW">My weekly miner wars reward:</label>
-                        <input type="number" id="Weelky-mw-Reward_MW" value="12400" placeholder="z.B. 6500" oninput="highlightLargerInput();">
-                        
-
-
-                        <footer style="margin-top: 20px; padding: 10px; background-color: #2a2a2a; color: #e6e6e6; font-size: 0.9em; text-align: left; border-top: 1px solid #555;">
-                            <h3 style="margin-bottom: 10px; color: #673dec;">Formulas Used</h3>
-                            <ul style="list-style-type: none; padding: 0;">
-                                <li>
-                                    <strong>Weekly Solo Reward:</strong> <code>(SAT/TH * My TH * 7 days)</code>
-                                </li>
-                                <li>
-                                    <strong>Weekly Miner Wars Reward:</strong> <code>((Reward Fund in Satoshi * Block Share %) / Clan TH) * My TH</code>
-                                </li>
-                                <li>
-                                    <strong>Block Share:</strong> <code>My TH / Clan TH</code>
-                                </li>
-                                <li>
-                                    <strong>Reward Fund Conversion:</strong> <code>Reward Fund (Satoshi) * 0.00000001 = Reward Fund in BTC</code>
-                                </li>
-                            </ul>
-                        </footer>
-
-				</div>
-
-                <div class="tab-page" id="New Miner Invest">
-
-                    <span id="tab-description">Calculated by Buying a new 1TH miner and Upgrading it. Price Updated 22.04.2025</span>
-					<label for="Energy-efficiency-I">Secondary NFT Miner Energy-efficiency (W/TH) Level:</label>
-					<select type="number" id="Energy-efficiency-I" value="20" >
-                        <option value="15">15 W/TH</option>
-                        <option value="20">20 W/TH</option>
-                    </select>
-                    <label for="gomining-discount">Investment:</label>
-					<input type="number" id="Investment-I" value="1000" min="0" max="10000" step="1" oninput="syncFieldAndSlider(event, 'Investment-I', 'Investment-slider-I')" >
-					<input type="range" id="Investment-slider-I" min="1" max="10000" step="100" value="1000" oninput="syncFieldAndSlider(event, 'Investment-I', 'Investment-slider-I'); calculateInvest(parseFloat(document.getElementById('Investment-I').value),parseFloat(document.getElementById('Energy-efficiency-I').value));">
-					<label for="gomining-discount">Gomining Maintenance Discount (%):</label>
-					<input type="number" id="gomining-discount-I" value="0" min="0" max="20" step="1" oninput="syncFieldAndSlider(event, 'gomining-discount-I', 'gomining-discount-slider-I')" placeholder="0%">
-					<input type="range" id="gomining-discount-slider-I" min="0" max="20" step="0.1" value="0" oninput="syncFieldAndSlider(event, 'gomining-discount-I', 'gomining-discount-slider-I'); calculateInvest(parseFloat(document.getElementById('Investment-I').value),parseFloat(document.getElementById('Energy-efficiency-I').value));">
-                    <div class="single-button-container">
-                        <button  onclick="calculateInvest(parseFloat(document.getElementById('Investment-I').value),parseFloat(document.getElementById('Energy-efficiency-I').value))" >Calculate</button>
+                <!-- SAT per TH Card -->
+                <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                    <h2 class="text-sm font-semibold mb-3 text-gray-300">SAT PER TH</h2>
+                    <div class="flex items-center gap-3">
+                        <img src="sats-ordinals-sats-logo.png" alt="⚡" class="w-10 h-10">
+                        <input type="number" id="sat-TH" value="44" min="0" step="1" oninput="calculateDailyReward();"
+                               class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
                     </div>
+                </div>
+            </div>
 
+    </header>
 
-                    
-
-					<div class="card-container">
-						<!-- Daily Revenue Card -->
-                        <div class="card">
-							<div class="card-row">
-								<span title="Final-TH">Final TH level</span>
-								<span id="My-Th-I">1</span>
-							</div>
-							<div class="card-row">
-								<span title="used Invest for full TH Purchase">Total Invest ($):</span>
-								<span id="Total-Invest">$0</span>
-							</div>
-                            <div class="card-row">
-								<span title="Not enough for a full TH">Unused Invest</span>
-								<span id="Unused-Budget">$0</span>
-							</div>
-                            <div class="card-row">
-                                <span title="Average Price per TH">Ø Price per TH</span>
-                                <span id="average-price-th">$0</span>
-                            </div>                            
-                            <div class="card-row">
-								<span title="Return of invest">ROI</span>
-								<span id="roi-percentage-I">0 %</span>
-							</div>
-                            <div class="card-row">
-								<span title="Return of invest in days">ROI in Days</span>
-								<span id="roi-days-I">0 days</span>
-							</div>
-						</div>
-						<div class="card">
-							<div class="card-header">Daily</div>
-							<div class="card-row">
-								<span title="Power costs for your TH/s a day">Electricity (C1):</span>
-								<span id="daily-electricity-usd-I">$0</span>
-							</div>
-							<div class="card-row">
-								<span title="Service costs for your TH/s a day">Service(C2):</span>
-								<span id="daily-service-usd-I">$0</span>
-							</div>
-							<div class="card-row">
-								<span title="Amount of Satoshi accrued to the token holder at a rate of your TH/s a day.">Reward (PR):</span>
-								<span id="daily-revenue-usd-I">$0</span>
-							</div>
-                            <div class="card-row">
-								<span title="PR - C1 - C2 = Profit">Profit:</span>
-								<span id="daily-net-profit-I">$0</span>
-							</div>
-						</div>
-
-					</div>
-
-					<footer style="margin-top: 20px; padding: 10px; background-color: #2a2a2a; color: #e6e6e6; font-size: 0.9em; text-align: left; border-top: 1px solid #555;">
-						<h3 style="margin-bottom: 10px; color: #673dec;">Formulas Used</h3>
-						<ul style="list-style-type: none; padding: 0;">
-							<li>
-								<strong>Revenue:</strong> <code>(SAT per TH * BTC Price) / 1e8 * TH</code>
-							</li>
-							<li>
-								<strong>Electricity Cost:</strong> <code>(Efficiency (W/TH) * TH * Cost per kWh * 24) / 1000</code>
-							</li>
-							<li>
-								<strong>Service Cost:</strong> <code>0.0089 $ / BTC Price * TH</code>
-							</li>
-							<li>
-								<strong>Net Revenue:</strong> <code>Revenue - (Electricity Cost + Service Cost)</code>
-							</li>
-							<li>
-								<strong>Net Revenue %:</strong> <code>(Net Revenue / Revenue) * 100</code>
-							</li>
-						</ul>
-
-
-					</footer>
-				</div>
-				<div class="tab-page" id="MobileView">
-					<h2>Mobile Optimized View</h2>
-					<div class="card-container">
-						<!-- Daily Revenue Card -->
-						<div class="card">
-							<div class="card-header">Daily</div>
-							<div class="card-row">
-								<span>Revenue:</span>
-								<span id="daily-revenue">$123.45</span>
-							</div>
-							<div class="card-row">
-								<span>Maintenance:</span>
-								<span id="daily-maintenance">$23.45</span>
-							</div>
-							<div class="card-row">
-								<span>Net Revenue:</span>
-								<span id="daily-net">$100.00</span>
-							</div>
-						</div>
-						<!-- Weekly Revenue Card -->
-						<div class="card">
-							<div class="card-header">Weekly</div>
-							<div class="card-row">
-								<span>Revenue:</span>
-								<span id="weekly-revenue">$863.15</span>
-							</div>
-							<div class="card-row">
-								<span>Maintenance:</span>
-								<span id="weekly-maintenance">$164.15</span>
-							</div>
-							<div class="card-row">
-								<span>Net Revenue:</span>
-								<span id="weekly-net">$699.00</span>
-							</div>
-						</div>
-						<!-- Monthly Revenue Card -->
-						<div class="card">
-							<div class="card-header">Monthly</div>
-							<div class="card-row">
-								<span>Revenue:</span>
-								<span id="monthly-revenue">$3703.50</span>
-							</div>
-							<div class="card-row">
-								<span>Maintenance:</span>
-								<span id="monthly-maintenance">$704.50</span>
-							</div>
-							<div class="card-row">
-								<span>Net Revenue:</span>
-								<span id="monthly-net">$2999.00</span>
-							</div>
-						</div>
-					</div>
-				</div>
-				
-				<!-- Gomining Verdienst Tab -->
-				<div class="tab-page" id="worth">
-					<div style="text-align: center; margin-bottom: 20px;">
-						<button onclick="updateCurrency('USD')">USD ($)</button>
-						<button onclick="updateCurrency('BTC')">BTC (₿)</button>
-						<button onclick="updateCurrency('GMT')">GMT</button>
-					</div>
-					<table id="revenue-summary" style="width: 100%; border-collapse: collapse;">
-						<thead>
-							<!-- Dynamischer Tabellenkopf -->
-						</thead>
-						<tbody>
-							<!-- Dynamische Zeilen -->
-						</tbody>
-					</table>
-					
-				</div>
-
-				<footer style="margin-top: 20px; padding: 20px; background-color: #2a2a2a; color: #e6e6e6; text-align: center; border-top: 1px solid #555;">
-					<h3 style="color: #673dec;">Support Us</h3>
-					<p>If you like our work, feel free to support us by sending GMT tokens on BNB Smart Chain:</p>
-					<div class="wallet-address-container">
-						<img class="wallet-icon" src="https://github.com/Cimera311/Gomining_Calculator/raw/main/GoMining_Logo.webp" alt="Wallet Icon">
-						<span class="wallet-address">0x3229E3118F803d8EaCB52D5f598395F5bf888bad</span>
-
-					</div>
-					<div class="single-button-container">
-					<button onclick="copyToClipboard('0x3229E3118F803d8EaCB52D5f598395F5bf888bad')" style="background-color: #673dec; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer;">Copy adress</button>        
-					</div>
-
-					<p>Or join us through our referral link:</p>
-					<a href="https://gomining.com/?ref=ICjK3" target="_blank" style="display: inline-block; margin: 10px;">
-						<img src="https://cimera311.github.io/Gomining_Calculator/Gomining.jpg" alt="GoMining Referral" style="width: 150px; height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
-					</a>
-					<p>&copy; 2024 HashSense. All rights reserved.</p>
-					<p>This website is for informational purposes only.</p>
-				</footer>
-
+    <!-- Sidebar -->
+    <aside class="sidebar fixed left-0 top-0 w-64 h-full bg-gray-800 z-40 shadow-xl" id="sidebar">
+        <div class="p-4">
+            <h2 class="text-xl font-bold mb-6 text-purple-400">HashSense</h2>
+            <nav class="space-y-2">
+                <button onclick="showSection('calc', event)" 
+                        class="nav-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 bg-purple-600">
+                    <span class="material-icons text-purple-400">calculate</span>
+                    <span>Mining Calculator</span>
+                </button>
+                <button onclick="showSection('roi', event)" 
+                        class="nav-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+                    <span class="material-icons text-green-400">trending_up</span>
+                    <span>ROI Calculator</span>
+                </button>
+                <button onclick="showSection('wars', event)" 
+                        class="nav-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+                    <span class="material-icons text-red-400">military_tech</span>
+                    <span>Miner Wars</span>
+                </button>
+                <button onclick="showSection('invest', event)" 
+                        class="nav-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+                    <span class="material-icons text-yellow-400">savings</span>
+                    <span>Investment Optimizer</span>
+                </button>
+                
+                <!-- Divider -->
+                <div class="border-t border-gray-600 my-4"></div>
+                
+                <!-- Price Refresh Button -->
+                <button onclick="refreshPrices()" 
+                        class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-blue-400">refresh</span>
+                    <div class="flex-1">
+                        <span class="block text-white font-medium">Refresh Prices</span>
+                        <span class="block text-xs text-gray-400">Update BTC & GMT prices</span>
+                    </div>
+                </button>
+            </nav>
         </div>
-    </div>
-		
-	<script>
-			
-		document.addEventListener('DOMContentLoaded', loadPriceMatrix);
+    </aside>
 
-		// Füge einen Event Listener hinzu, der das Feld "Daily-Reward" überwacht
-			document.getElementById('Daily-Reward').addEventListener('input', function () {
-				const dailyReward = parseFloat(document.getElementById('Daily-Reward').value); // Wert des Daily-Reward-Feldes
-				const myTH = parseFloat(document.getElementById('My_TH').value); // Wert des My_TH-Feldes
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden" 
+         onclick="toggleSidebar()"></div>
 
-				// Überprüfe, ob beide Werte gültig sind, um eine Division durch 0 zu vermeiden
-				if (!isNaN(dailyReward) && !isNaN(myTH) && myTH > 0) {
-					const satoshiPerTH = dailyReward / myTH; // Berechnung
-					document.getElementById('sat-TH').value = satoshiPerTH.toFixed(2); // Ergebnis einfügen
-				} else {
-					document.getElementById('sat-TH').value = ''; // Leeren, falls ungültig
-				}
-			}); 
-			            
-					// Füge einen Event Listener hinzu, der das Feld "Daily-Reward" überwacht
-					document.getElementById('sat-TH').addEventListener('input', function () {
-				const satpTH = parseFloat(document.getElementById('sat-TH').value); // Wert des Daily-Reward-Feldes
-				const myTH = parseFloat(document.getElementById('My_TH').value); // Wert des My_TH-Feldes
+    <!-- Main Content Area -->
+    <main class="min-h-screen">
+        <div class="p-4">
+            <!-- Calculator Section -->
+            <section id="calc-section" class="content-section max-w-6xl mx-auto">
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="material-icons text-3xl text-purple-400">calculate</span>
+                        <div>
+                            <h2 class="text-2xl font-bold">Mining Calculator</h2>
+                            <p class="text-gray-400">Configure your miner settings and calculate your earnings</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Controls -->
+                        <div class="space-y-6">
+                            <!-- TH Controls -->
+                            <div>
+                                <label class="block text-sm font-medium mb-3">TH Power Controls</label>
+                                <div class="flex gap-2 mb-3 flex-wrap">
+                                    <button onclick="updateMyTHMW(-100,'th-slider','My_TH'); calculateDailyReward();" 
+                                            class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">-100 TH</button>
+                                    <button onclick="updateMyTHMW(-10,'th-slider','My_TH'); calculateDailyReward();" 
+                                            class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">-10 TH</button>
+                                    <button onclick="updateMyTHMW(-1,'th-slider','My_TH'); calculateDailyReward();" 
+                                            class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">-1 TH</button>
+                                    <button onclick="updateMyTHMW(1,'th-slider','My_TH'); calculateDailyReward();" 
+                                            class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">+1 TH</button>
+                                    <button onclick="updateMyTHMW(10,'th-slider','My_TH'); calculateDailyReward();" 
+                                            class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">+10 TH</button>
+                                    <button onclick="updateMyTHMW(100,'th-slider','My_TH'); calculateDailyReward();" 
+                                            class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">+100 TH</button>
+                                </div>
+                                
+                                <label for="My_TH" class="block text-sm font-medium mb-2">
+                                    My TH Power
+                                    <span class="text-gray-400 text-xs ml-1" title="Die Anzahl der Terahashes, die dein Miner produziert.">(?)</span>
+                                </label>
+                                <input type="number" id="My_TH" value="500" placeholder="500" 
+                                       oninput="syncFieldAndSlider(event, 'th-slider', 'My_TH'); calculateDailyReward(); calculateCost();"
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <input type="range" id="th-slider" min="1" max="5000" step="1" value="500" tabindex="-1" 
+                                       oninput="syncFieldAndSlider(event, 'th-slider', 'My_TH'); calculateDailyReward(); calculateCost();"
+                                       class="w-full accent-purple-500">
+                            </div>
+                            
+                            <!-- Energy Efficiency -->
+                            <div>
+                                <label for="Energy-efficiency" class="block text-sm font-medium mb-2">Energy Efficiency (W/TH)</label>
+                                <input type="number" id="Energy-efficiency" value="23.88" placeholder="23.88" 
+                                       oninput="syncFieldAndSlider(event, 'Energy-efficiency', 'efficiency-slider')"
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <input type="range" id="efficiency-slider" min="15" max="35" step="0.01" value="23.88" tabindex="-1" 
+                                       oninput="syncFieldAndSlider(event, 'Energy-efficiency', 'efficiency-slider'); calculateCost();"
+                                       class="w-full accent-purple-500">
+                            </div>
+                            
+                            <!-- Discount -->
+                            <div>
+                                <label for="gomining-discount" class="block text-sm font-medium mb-2">GoMining Maintenance Discount (%)</label>
+                                <input type="number" id="gomining-discount" value="10.41" min="0" max="20" step="1" placeholder="10.41" 
+                                       oninput="syncFieldAndSlider(event, 'gomining-discount', 'gomining-discount-slider')"
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <input type="range" id="gomining-discount-slider" min="0" max="20" step="0.1" value="10.41" tabindex="-1" 
+                                       oninput="syncFieldAndSlider(event, 'gomining-discount', 'gomining-discount-slider'); calculateCost();"
+                                       class="w-full accent-purple-500">
+                            </div>
+                            
+                            <!-- Daily Reward -->
+                            <div>
+                                <label for="Daily-Reward" class="block text-sm font-medium mb-2">
+                                    My Daily Reward (Auto-calculated)
+                                    <span class="text-gray-400 text-xs ml-1" title="Automatically calculated as My TH × SAT per TH">(?)</span>
+                                </label>
+                                <input type="number" id="Daily-Reward" value="22000" placeholder="22000" readonly
+                                       class="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 focus:outline-none cursor-not-allowed text-gray-300">
+                            </div>
+                            
+                            <!-- Calculate Button -->
+                            <div class="pt-4">
+                                <button onclick="calculateCost()" 
+                                        class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+                                    Calculate Profits
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Results Table -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                                <span class="material-icons text-green-400">analytics</span>
+                                Profit Analysis
+                            </h3>
 
-				// Überprüfe, ob beide Werte gültig sind, um eine Division durch 0 zu vermeiden
-				if (!isNaN(satpTH) && !isNaN(myTH) && myTH > 0) {
-					const dailyReward = satpTH * myTH; // Berechnung
-					document.getElementById('Daily-Reward').value = dailyReward.toFixed(2); // Ergebnis einfügen
-				} else {
-					document.getElementById('Daily-Reward').value = '0'; // Leeren, falls ungültig
-				}
-			});	
-							// Füge einen Event Listener hinzu, der das Feld "Daily-Reward" überwacht
-							document.getElementById('My_TH').addEventListener('input', function () {
-				const satpTH = parseFloat(document.getElementById('sat-TH').value); // Wert des Daily-Reward-Feldes
-				const myTH = parseFloat(document.getElementById('My_TH').value); // Wert des My_TH-Feldes
+                            <div class="bg-gray-700 rounded-lg overflow-hidden">
+                                <table id="results-table" class="w-full text-sm">
+                                    <thead class="bg-gray-600">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left font-medium text-gray-200">Description</th>
+                                            <th class="px-4 py-3 text-right font-medium text-gray-200">Value ($)</th>
+                                            <th class="px-4 py-3 text-right font-medium text-gray-200">Value (BTC)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-600">
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-300">Daily Revenue</td>
+                                            <td id="daily-rewards" class="px-4 py-3 text-right text-green-400 font-mono">-</td>
+                                            <td id="daily-rewards-btc" class="px-4 py-3 text-right text-green-400 font-mono">-</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-300">Daily Electricity Cost</td>
+                                            <td id="electricity-cost" class="px-4 py-3 text-right text-red-400 font-mono">-</td>
+                                            <td id="electricity-cost-btc" class="px-4 py-3 text-right text-red-400 font-mono">-</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-300">Daily Service Cost</td>
+                                            <td id="service-cost" class="px-4 py-3 text-right text-red-400 font-mono">-</td>
+                                            <td id="service-cost-btc" class="px-4 py-3 text-right text-red-400 font-mono">-</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-300">Daily Total Maintenance Cost</td>
+                                            <td id="daily-maintenance-cost" class="px-4 py-3 text-right text-orange-400 font-mono">-</td>
+                                            <td id="daily-maintenance-cost-btc" class="px-4 py-3 text-right text-orange-400 font-mono">-</td>
+                                        </tr>
+                                        <tr class="bg-gray-600">
+                                            <td class="px-4 py-3 text-white font-semibold">Daily Net Profit</td>
+                                            <td id="daily-net-profit" class="px-4 py-3 text-right text-green-300 font-bold font-mono">-</td>
+                                            <td id="daily-net-profit-btc" class="px-4 py-3 text-right text-green-300 font-bold font-mono">-</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-300">Weekly Revenue</td>
+                                            <td id="weekly-rewards" class="px-4 py-3 text-right text-green-400 font-mono">-</td>
+                                            <td id="weekly-rewards-btc" class="px-4 py-3 text-right text-green-400 font-mono">-</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-300">Weekly Total Maintenance Cost</td>
+                                            <td id="weekly-maintenance-cost" class="px-4 py-3 text-right text-orange-400 font-mono">-</td>
+                                            <td id="weekly-maintenance-cost-btc" class="px-4 py-3 text-right text-orange-400 font-mono">-</td>
+                                        </tr>
+                                        <tr class="bg-gray-600">
+                                            <td class="px-4 py-3 text-white font-semibold">Weekly Net Profit</td>
+                                            <td id="weekly-net-profit" class="px-4 py-3 text-right text-green-300 font-bold font-mono">-</td>
+                                            <td id="weekly-net-profit-btc" class="px-4 py-3 text-right text-green-300 font-bold font-mono">-</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-300">Monthly Revenue</td>
+                                            <td id="monthly-rewards" class="px-4 py-3 text-right text-green-400 font-mono">-</td>
+                                            <td id="monthly-rewards-btc" class="px-4 py-3 text-right text-green-400 font-mono">-</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-300">Monthly Total Maintenance Cost</td>
+                                            <td id="monthly-maintenance-cost" class="px-4 py-3 text-right text-orange-400 font-mono">-</td>
+                                            <td id="monthly-maintenance-cost-btc" class="px-4 py-3 text-right text-orange-400 font-mono">-</td>
+                                        </tr>
+                                        <tr class="bg-gray-600">
+                                            <td class="px-4 py-3 text-white font-semibold">Monthly Net Profit</td>
+                                            <td id="monthly-net-profit" class="px-4 py-3 text-right text-green-300 font-bold font-mono">-</td>
+                                            <td id="monthly-net-profit-btc" class="px-4 py-3 text-right text-green-300 font-bold font-mono">-</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 text-gray-300">Maintenance Cost (%)</td>
+                                            <td id="maintenance" class="px-4 py-3 text-right text-yellow-400 font-mono">-</td>
+                                            <td class="px-4 py-3 text-right text-gray-500">-</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Formulas Footer -->
+                    <div class="mt-8 bg-gray-700 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-purple-400 flex items-center gap-2">
+                            <span class="material-icons">functions</span>
+                            Formulas Used
+                        </h3>
+                        <div class="space-y-2 text-sm text-gray-300">
+                            <div><strong class="text-white">Revenue:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-green-400">(SAT per TH × BTC Price) ÷ 1e8 × TH</code></div>
+                            <div><strong class="text-white">Electricity Cost:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-red-400">(Efficiency × TH × Cost per kWh × 24) ÷ 1000</code></div>
+                            <div><strong class="text-white">Service Cost:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-orange-400">0.0089 $ ÷ BTC Price × TH</code></div>
+                            <div><strong class="text-white">Net Revenue:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-green-400">Revenue - (Electricity Cost + Service Cost)</code></div>
+                            <div><strong class="text-white">Net Revenue %:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-yellow-400">(Net Revenue ÷ Revenue) × 100</code></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ROI Calculator Section -->
+            <section id="roi-section" class="content-section max-w-6xl mx-auto hidden">
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="material-icons text-3xl text-green-400">trending_up</span>
+                        <div>
+                            <h2 class="text-2xl font-bold">ROI Calculator</h2>
+                            <p class="text-gray-400">Calculate return on investment for mining hardware</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- ROI Controls -->
+                        <div class="space-y-6">
+                            <!-- TH Controls for ROI -->
+                            <div>
+                                <label class="block text-sm font-medium mb-3">TH Power Controls</label>
+                                <div class="flex gap-2 mb-3 flex-wrap">
+                                    <button onclick="updateMyTHMW(-100,'th-slider_ROI','My_TH_ROI'); calculateROI();" 
+                                            class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">-100 TH</button>
+                                    <button onclick="updateMyTHMW(-10,'th-slider_ROI','My_TH_ROI'); calculateROI();" 
+                                            class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">-10 TH</button>
+                                    <button onclick="updateMyTHMW(-1,'th-slider_ROI','My_TH_ROI'); calculateROI();" 
+                                            class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">-1 TH</button>
+                                    <button onclick="updateMyTHMW(1,'th-slider_ROI','My_TH_ROI'); calculateROI();" 
+                                            class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">+1 TH</button>
+                                    <button onclick="updateMyTHMW(10,'th-slider_ROI','My_TH_ROI'); calculateROI();" 
+                                            class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">+10 TH</button>
+                                    <button onclick="updateMyTHMW(100,'th-slider_ROI','My_TH_ROI'); calculateROI();" 
+                                            class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">+100 TH</button>
+                                </div>
+                                
+                                <label for="My_TH_ROI" class="block text-sm font-medium mb-2">Secondarymarket Miner TH Power</label>
+                                <input type="number" id="My_TH_ROI" value="1" placeholder="1" 
+                                       oninput="syncFieldAndSlider(event, 'th-slider_ROI', 'My_TH_ROI'); calculateROI();"
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <input type="range" id="th-slider_ROI" min="1" max="5000" step="1" value="1" tabindex="-1" 
+                                       oninput="syncFieldAndSlider(event, 'th-slider_ROI', 'My_TH_ROI'); calculateROI();"
+                                       class="w-full accent-green-500">
+                            </div>
+                            
+                            <!-- Energy Efficiency Buttons -->
+                            <div>
+                                <label class="block text-sm font-medium mb-3">Quick Miner Selection</label>
+                                <div class="flex gap-2 mb-3 flex-wrap">
+                                    <button onclick="setMinerValues(15); calculateROI();" 
+                                            class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">15 W/TH</button>
+                                    <button onclick="setMinerValues(20); calculateROI();" 
+                                            class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">20 W/TH</button>
+                                    <button onclick="setMinerValues(28); calculateROI();" 
+                                            class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">28 W/TH</button>
+                                    <button onclick="setMinerValues(35); calculateROI();" 
+                                            class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">35 W/TH</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Energy Efficiency -->
+                            <div>
+                                <label for="Energy-efficiency_ROI" class="block text-sm font-medium mb-2">Energy Efficiency (W/TH)</label>
+                                <input type="number" id="Energy-efficiency_ROI" value="20" placeholder="20" 
+                                       oninput="syncFieldAndSlider(event, 'efficiency-slider_ROI', 'Energy-efficiency_ROI'); calculateROI();"
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <input type="range" id="efficiency-slider_ROI" min="15" max="35" step="0.01" value="20" tabindex="-1" 
+                                       oninput="syncFieldAndSlider(event, 'efficiency-slider_ROI', 'Energy-efficiency_ROI'); calculateROI();"
+                                       class="w-full accent-green-500">
+                            </div>
+                            
+                            <!-- Discount -->
+                            <div>
+                                <label for="gomining-discount_ROI" class="block text-sm font-medium mb-2">GoMining Maintenance Discount (%)</label>
+                                <input type="number" id="gomining-discount_ROI" value="0" min="0" max="20" step="1" 
+                                       oninput="syncFieldAndSlider(event, 'gomining-discount-slider_ROI', 'gomining-discount_ROI'); calculateROI();"
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <input type="range" id="gomining-discount-slider_ROI" min="0" max="20" step="0.1" value="0" tabindex="-1" 
+                                       oninput="syncFieldAndSlider(event, 'gomining-discount-slider_ROI', 'gomining-discount_ROI'); calculateROI();"
+                                       class="w-full accent-green-500">
+                            </div>
+                            
+                            <!-- Price per TH -->
+                            <div>
+                                <label for="price-per-th_ROI" class="block text-sm font-medium mb-2">Price per TH ($)</label>
+                                <input type="number" id="price-per-th_ROI" value="22.93" placeholder="22.93"
+                                       oninput="calculateROI();"
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+                            
+                            <!-- Calculate Button -->
+                            <div class="pt-4">
+                                <button onclick="calculateROI();" 
+                                        class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+                                    Calculate ROI
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- ROI Results -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                                <span class="material-icons text-green-400">analytics</span>
+                                ROI Analysis
+                            </h3>
 
-				// Überprüfe, ob beide Werte gültig sind, um eine Division durch 0 zu vermeiden
-				if (!isNaN(satpTH) && !isNaN(myTH) && myTH > 0) {
-					const dailyReward = satpTH * myTH; // Berechnung
-					document.getElementById('Daily-Reward').value = dailyReward.toFixed(2); // Ergebnis einfügen
-				} else {
-					document.getElementById('Daily-Reward').value = '0'; // Leeren, falls ungültig
-				}
-			});
-	    					// Füge einen Event Listener hinzu, der das Feld "Daily-Reward" überwacht
-			document.getElementById('th-slider').addEventListener('input', function () {
-				const satpTH = parseFloat(document.getElementById('sat-TH').value); // Wert des Daily-Reward-Feldes
-				const myTH = parseFloat(document.getElementById('My_TH').value); // Wert des My_TH-Feldes
+                            <div class="bg-gray-700 rounded-lg p-6">
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center py-3 border-b border-gray-600">
+                                        <span class="text-gray-300">Total Investment:</span>
+                                        <span id="total-investment_ROI" class="text-right text-orange-400 font-mono font-bold">$0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-3 border-b border-gray-600">
+                                        <span class="text-gray-300">Daily Profit:</span>
+                                        <span id="daily-profit_ROI" class="text-right text-green-400 font-mono font-bold">$0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-3 border-b border-gray-600">
+                                        <span class="text-gray-300">Monthly Profit:</span>
+                                        <span id="monthly-profit_ROI" class="text-right text-green-400 font-mono font-bold">$0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-3 border-b border-gray-600">
+                                        <span class="text-gray-300">Yearly Profit:</span>
+                                        <span id="yearly-profit_ROI" class="text-right text-green-400 font-mono font-bold">$0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-3 border-b border-gray-600">
+                                        <span class="text-gray-300">Days of ROI:</span>
+                                        <span id="days-of-roi_ROI" class="text-right text-yellow-400 font-mono font-bold">0 Days</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-3 border-b border-gray-600">
+                                        <span class="text-gray-300">ROI % (per year):</span>
+                                        <span id="roi-percentage_ROI" class="text-right text-yellow-400 font-mono font-bold">0%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-3">
+                                        <span class="text-gray-300">Yearly Net BTC:</span>
+                                        <span id="yearly-net-btc_ROI" class="text-right text-orange-400 font-mono font-bold">0.00000000 BTC</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-				// Überprüfe, ob beide Werte gültig sind, um eine Division durch 0 zu vermeiden
-				if (!isNaN(satpTH) && !isNaN(myTH) && myTH > 0) {
-					const dailyReward = satpTH * myTH; // Berechnung
-					document.getElementById('Daily-Reward').value = dailyReward.toFixed(2); // Ergebnis einfügen
-				} else {
-					document.getElementById('Daily-Reward').value = '0'; // Leeren, falls ungültig
-				}
-			});
-			document.addEventListener('DOMContentLoaded', () => {
-			// Füge einen Event Listener für alle Eingabefelder hinzu
-			const inputs = document.querySelectorAll('input');
+            <!-- Miner Wars Section -->
+            <section id="wars-section" class="content-section max-w-6xl mx-auto hidden">
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="material-icons text-3xl text-red-400">military_tech</span>
+                        <div>
+                            <h2 class="text-2xl font-bold">Miner Wars</h2>
+                            <p class="text-gray-400">Compare solo rewards vs miner wars rewards</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Miner Wars Controls -->
+                        <div class="space-y-6">
+                            <!-- Reward Fund -->
+                            <div>
+                                <label for="Reward-fund_MW" class="block text-sm font-medium mb-2">Estimated Reward Fund Cycle</label>
+                                <input type="number" id="Reward-fund_MW" value="6.32095969" step="0.00000001"
+                                       oninput="calculateWeeklyMWReward();"
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            
+                            <!-- TH Controls for MW -->
+                            <div>
+                                <label class="block text-sm font-medium mb-3">TH Power Controls</label>
+                                <div class="flex gap-2 mb-3 flex-wrap">
+                                    <button onclick="updateMyTHMW(-100,'th-slider_MW','My_TH_MW'); calculateWeeklyRewardSolo(); calculateWeeklyMWReward();" 
+                                            class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">-100 TH</button>
+                                    <button onclick="updateMyTHMW(-10,'th-slider_MW','My_TH_MW'); calculateWeeklyRewardSolo(); calculateWeeklyMWReward();" 
+                                            class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">-10 TH</button>
+                                    <button onclick="updateMyTHMW(-1,'th-slider_MW','My_TH_MW'); calculateWeeklyRewardSolo(); calculateWeeklyMWReward();" 
+                                            class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">-1 TH</button>
+                                    <button onclick="updateMyTHMW(1,'th-slider_MW','My_TH_MW'); calculateWeeklyRewardSolo(); calculateWeeklyMWReward();" 
+                                            class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">+1 TH</button>
+                                    <button onclick="updateMyTHMW(10,'th-slider_MW','My_TH_MW'); calculateWeeklyRewardSolo(); calculateWeeklyMWReward();" 
+                                            class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">+10 TH</button>
+                                    <button onclick="updateMyTHMW(100,'th-slider_MW','My_TH_MW'); calculateWeeklyRewardSolo(); calculateWeeklyMWReward();" 
+                                            class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm transition-colors duration-200">+100 TH</button>
+                                </div>
+                                
+                                <label for="My_TH_MW" class="block text-sm font-medium mb-2">
+                                    My TH Power
+                                    <span class="text-gray-400 text-xs ml-1" title="Die Anzahl der Terahashes, die dein Miner produziert.">(?)</span>
+                                </label>
+                                <input type="number" id="My_TH_MW" value="207" placeholder="207" 
+                                       oninput="syncFieldAndSlider(event, 'th-slider_MW', 'My_TH_MW'); calculateWeeklyRewardSolo(); calculateWeeklyMWReward();"
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="range" id="th-slider_MW" min="1" max="5000" step="1" value="207" tabindex="-1" 
+                                       oninput="syncFieldAndSlider(event, 'th-slider_MW', 'My_TH_MW'); calculateWeeklyRewardSolo(); calculateWeeklyMWReward();"
+                                       class="w-full accent-red-500">
+                            </div>
+                            
+                            <!-- My TH Share -->
+                            <div>
+                                <label for="My-share-MW" class="block text-sm font-medium mb-2">My TH Share (%)</label>
+                                <input type="number" id="My-share-MW" value="10" min="0" max="100" step="0.01" placeholder="10"
+                                       oninput="calculateWeeklyMWReward();"
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            
+                            <!-- Clan TH -->
+                            <div>
+                                <label for="My-Clan_MW" class="block text-sm font-medium mb-2">TH of My Clan</label>
+                                <input type="number" id="My-Clan_MW" value="318114" placeholder="318114" 
+                                       oninput="syncFieldAndSlider(event, 'My-Clan-slider_MW', 'My-Clan_MW'); calculateWeeklyMWReward();"
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="range" id="My-Clan-slider_MW" min="1" max="500000" step="1000" value="318114" tabindex="-1" 
+                                       oninput="syncFieldAndSlider(event, 'My-Clan-slider_MW', 'My-Clan_MW'); calculateWeeklyMWReward();"
+                                       class="w-full accent-red-500">
+                            </div>
+                            
+                            <!-- Blocks Share -->
+                            <div>
+                                <label for="Blocksshare_MW" class="block text-sm font-medium mb-2">Blocks Share (%)</label>
+                                <input type="number" id="Blocksshare_MW" value="22.78" min="0" max="100" step="0.01" 
+                                       oninput="syncFieldAndSlider(event, 'Blocksshare-slider_MW', 'Blocksshare_MW'); calculateWeeklyMWReward(); highlightLargerInput();"
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="range" id="Blocksshare-slider_MW" min="0" max="100" step="0.01" value="22.78" tabindex="-1" 
+                                       oninput="syncFieldAndSlider(event, 'Blocksshare-slider_MW', 'Blocksshare_MW'); calculateWeeklyMWReward(); highlightLargerInput();"
+                                       class="w-full accent-red-500">
+                            </div>
+                        </div>
+                        
+                        <!-- Miner Wars Results -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                                <span class="material-icons text-red-400">analytics</span>
+                                Reward Comparison
+                            </h3>
 
-			inputs.forEach((input, index) => {
-				input.addEventListener('keydown', (event) => {
-					if (event.key === 'Enter') {
-						event.preventDefault(); // Verhindere das Standardverhalten (z. B. Form-Submission)
-						const nextInput = inputs[index + 1]; // Nächstes Feld suchen
+                            <div class="space-y-4">
+                                <!-- Solo vs MW Comparison -->
+                                <div class="bg-gray-700 rounded-lg p-6">
+                                    <div class="space-y-4">
+                                        <div class="flex justify-between items-center py-3 border-b border-gray-600">
+                                            <span class="text-gray-300">Weekly Solo Reward:</span>
+                                            <span id="Weekly-Solo-Reward_MW" class="text-right text-blue-400 font-mono font-bold">90097 SAT</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-3">
+                                            <span class="text-gray-300">Weekly Miner Wars Reward:</span>
+                                            <span id="Weekly-mw-Reward_MW" class="text-right text-red-400 font-mono font-bold">12400 SAT</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Manual Input Fields -->
+                                <div class="bg-gray-700 rounded-lg p-6">
+                                    <h4 class="text-lg font-semibold mb-4 text-gray-200">Manual Override</h4>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label for="Weekly-Solo-Reward_MW_Input" class="block text-sm font-medium mb-2">Manual Weekly Solo Reward</label>
+                                            <input type="number" id="Weekly-Solo-Reward_MW_Input" value="90097" placeholder="90097"
+                                                   oninput="highlightLargerInput();"
+                                                   class="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        </div>
+                                        <div>
+                                            <label for="Weekly-mw-Reward_MW_Input" class="block text-sm font-medium mb-2">Manual Weekly MW Reward</label>
+                                            <input type="number" id="Weekly-mw-Reward_MW_Input" value="12400" placeholder="12400"
+                                                   oninput="highlightLargerInput();"
+                                                   class="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Formulas Footer -->
+                    <div class="mt-8 bg-gray-700 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-red-400 flex items-center gap-2">
+                            <span class="material-icons">functions</span>
+                            Formulas Used
+                        </h3>
+                        <div class="space-y-2 text-sm text-gray-300">
+                            <div><strong class="text-white">Weekly Solo Reward:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-blue-400">(SAT/TH × My TH × 7 days)</code></div>
+                            <div><strong class="text-white">Weekly Miner Wars Reward:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-red-400">((Reward Fund in Satoshi × Block Share %) ÷ Clan TH) × My TH</code></div>
+                            <div><strong class="text-white">Block Share:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-yellow-400">My TH ÷ Clan TH</code></div>
+                            <div><strong class="text-white">Reward Fund Conversion:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-green-400">Reward Fund (Satoshi) × 0.00000001 = Reward Fund in BTC</code></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-						if (nextInput) {
-							nextInput.focus(); // Fokus auf das nächste Feld setzen
-						} else {
-							input.blur(); // Letztes Feld: Tastatur schließen
-						}
-					}
-				});
-			});
-		});
-	</script>
+            <!-- Investment Optimizer Section -->
+            <section id="invest-section" class="content-section max-w-6xl mx-auto hidden">
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="material-icons text-3xl text-yellow-400">savings</span>
+                        <div>
+                            <h2 class="text-2xl font-bold">Investment Optimizer</h2>
+                            <p class="text-gray-400">Optimize TH purchases based on your available budget</p>
+                            <p class="text-xs text-gray-500 mt-1">Calculated by buying a new 1TH miner and upgrading it. Price updated 22.04.2025</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Investment Controls -->
+                        <div class="space-y-6">
+                            <!-- Energy Efficiency Selection -->
+                            <div>
+                                <label for="Energy-efficiency-I" class="block text-sm font-medium mb-2">Secondary NFT Miner Energy Efficiency Level</label>
+                                <select id="efficiency-I" 
+                                        onchange="calculateInvest(parseFloat(document.getElementById('investment-amount-I').value), parseFloat(document.getElementById('efficiency-I').value));"
+                                        class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                                    <option value="15">15 W/TH</option>
+                                    <option value="20" selected>20 W/TH</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Investment Amount -->
+                            <div>
+                                <label for="gomining-discount-I" class="block text-sm font-medium mb-2">Investment Amount ($)</label>
+                                <input type="number" id="investment-amount-I" value="50000" min="0" max="999999" step="100" placeholder="50000"
+                                       oninput="calculateInvest(parseFloat(this.value), parseFloat(document.getElementById('efficiency-I').value));"
+                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                            </div>
+                            
+                            <!-- Calculate Button -->
+                            <div class="pt-4">
+                                <button onclick="calculateInvest(parseFloat(document.getElementById('investment-amount-I').value), parseFloat(document.getElementById('efficiency-I').value));" 
+                                        class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+                                    Calculate Investment
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Investment Results -->
+                        <div>
+                            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                                <span class="material-icons text-yellow-400">analytics</span>
+                                Investment Analysis
+                            </h3>
+
+                            <div class="space-y-6">
+                                <!-- Investment Overview -->
+                                <div class="bg-gray-700 rounded-lg p-6">
+                                    <h4 class="text-lg font-semibold mb-4 text-gray-200">Investment Overview</h4>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center py-2 border-b border-gray-600">
+                                            <span class="text-gray-300" title="Final TH level achieved">Final TH Level:</span>
+                                            <span id="My-Th-I" class="text-right text-yellow-400 font-mono font-bold">1</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-2 border-b border-gray-600">
+                                            <span class="text-gray-300" title="Amount used for full TH purchase">Total Investment Used:</span>
+                                            <span id="Total-Invest" class="text-right text-orange-400 font-mono font-bold">$0</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-2 border-b border-gray-600">
+                                            <span class="text-gray-300" title="Not enough for a full TH">Unused Budget:</span>
+                                            <span id="Unused-Budget" class="text-right text-gray-400 font-mono">$0</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-2 border-b border-gray-600">
+                                            <span class="text-gray-300" title="Average price per TH">Ø Price per TH:</span>
+                                            <span id="average-price-th" class="text-right text-blue-400 font-mono font-bold">$0</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-2 border-b border-gray-600">
+                                            <span class="text-gray-300" title="Return of investment">ROI %:</span>
+                                            <span id="roi-percentage-I" class="text-right text-green-400 font-mono font-bold">0%</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-2">
+                                            <span class="text-gray-300" title="Return of investment in days">ROI in Days:</span>
+                                            <span id="roi-days-I" class="text-right text-green-400 font-mono font-bold">0 days</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Daily Breakdown -->
+                                <div class="bg-gray-700 rounded-lg p-6">
+                                    <h4 class="text-lg font-semibold mb-4 text-gray-200">Daily Breakdown</h4>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center py-2 border-b border-gray-600">
+                                            <span class="text-gray-300" title="Power costs for your TH/s a day">Electricity Cost (C1):</span>
+                                            <span id="daily-electricity-usd-I" class="text-right text-red-400 font-mono">$0</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-2 border-b border-gray-600">
+                                            <span class="text-gray-300" title="Service costs for your TH/s a day">Service Cost (C2):</span>
+                                            <span id="daily-service-usd-I" class="text-right text-red-400 font-mono">$0</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-2 border-b border-gray-600">
+                                            <span class="text-gray-300" title="Amount of Satoshi accrued to the token holder at a rate of your TH/s a day">Daily Revenue (PR):</span>
+                                            <span id="daily-revenue-usd-I" class="text-right text-green-400 font-mono">$0</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-2">
+                                            <span class="text-gray-300 font-semibold" title="PR - C1 - C2 = Profit">Daily Net Profit:</span>
+                                            <span id="daily-net-profit-I" class="text-right text-green-300 font-mono font-bold">$0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Formulas Footer -->
+                    <div class="mt-8 bg-gray-700 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-yellow-400 flex items-center gap-2">
+                            <span class="material-icons">functions</span>
+                            Formulas Used - Investment
+                        </h3>
+                        <div class="space-y-2 text-sm text-gray-300">
+                            <div><strong class="text-white">Revenue:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-green-400">(SAT per TH × BTC Price) ÷ 1e8 × TH</code></div>
+                            <div><strong class="text-white">Electricity Cost:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-red-400">(Efficiency (W/TH) × TH × Cost per kWh × 24) ÷ 1000</code></div>
+                            <div><strong class="text-white">Service Cost:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-orange-400">0.0089 $ ÷ BTC Price × TH</code></div>
+                            <div><strong class="text-white">Net Revenue:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-green-400">Revenue - (Electricity Cost + Service Cost)</code></div>
+                            <div><strong class="text-white">Net Revenue %:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-yellow-400">(Net Revenue ÷ Revenue) × 100</code></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // ===== SIDEBAR NAVIGATION FUNCTIONS =====
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            sidebar.classList.toggle('sidebar');
+            overlay.classList.toggle('hidden');
+        }
+
+        function showSection(sectionId, event) {
+            // Prevent any default behavior
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            // Store current scroll position BEFORE any DOM changes
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+            
+            // Use requestAnimationFrame to ensure smooth execution
+            requestAnimationFrame(() => {
+                // Hide all sections
+                const sections = document.querySelectorAll('.content-section');
+                sections.forEach(section => {
+                    section.classList.add('hidden');
+                });
+                
+                // Show selected section  
+                const targetSection = document.getElementById(sectionId + '-section');
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                }
+                
+                // Update active states in sidebar
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => {
+                    item.classList.remove('bg-purple-600');
+                    item.classList.add('hover:bg-gray-700');
+                });
+                
+                // Set active state for clicked item
+                const activeItem = document.querySelector(`[onclick="showSection('${sectionId}', event)"]`);
+                if (activeItem) {
+                    activeItem.classList.add('bg-purple-600');
+                    activeItem.classList.remove('hover:bg-gray-700');
+                    // Remove focus IMMEDIATELY
+                    activeItem.blur();
+                }
+                
+                // Auto-close mobile sidebar after selection
+                if (window.innerWidth < 1024) {
+                    toggleSidebar();
+                }
+                
+                // Force restore scroll position immediately after DOM changes
+                window.scrollTo(scrollLeft, scrollTop);
+                
+                // Double-check scroll position in next frame
+                requestAnimationFrame(() => {
+                    window.scrollTo(scrollLeft, scrollTop);
+                });
+            });
+            
+            // Also immediately restore scroll position
+            window.scrollTo(window.pageXOffset || document.documentElement.scrollLeft, 
+                           window.pageYOffset || document.documentElement.scrollTop);
+        }
+
+        // ===== PRICE REFRESH FUNCTION =====
+        function refreshPrices() {
+            console.log('🔄 Refreshing prices using existing functions...');
+            
+            // Show loading state
+            const refreshBtn = event.target.closest('button');
+            const icon = refreshBtn.querySelector('.material-icons');
+            const originalIcon = icon.textContent;
+            
+            // Start loading animation
+            icon.textContent = 'hourglass_empty';
+            icon.style.animation = 'spin 1s linear infinite';
+            
+            // Add CSS for spin animation if not exists
+            if (!document.querySelector('#spin-animation')) {
+                const style = document.createElement('style');
+                style.id = 'spin-animation';
+                style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+                document.head.appendChild(style);
+            }
+            
+            // Use existing fetch functions
+            try {
+                // Call the original fetch functions directly
+                if (typeof fetchBTCPrice === 'function') {
+                    fetchBTCPrice();
+                    console.log('✅ Called fetchBTCPrice()');
+                }
+                
+                if (typeof fetchGMTPrice === 'function') {
+                    fetchGMTPrice();
+                    console.log('✅ Called fetchGMTPrice()');
+                }
+                
+                // Show success feedback after a short delay
+                setTimeout(() => {
+                    icon.textContent = 'check_circle';
+                    icon.style.animation = '';
+                    icon.style.color = '#10b981';
+                    console.log('✅ Prices refreshed successfully!');
+                    
+                    setTimeout(() => {
+                        icon.textContent = originalIcon;
+                        icon.style.color = '';
+                    }, 2000);
+                }, 1500);
+                
+            } catch (error) {
+                console.error('❌ Error refreshing prices:', error);
+                
+                // Show error feedback
+                icon.textContent = 'error';
+                icon.style.animation = '';
+                icon.style.color = '#ef4444';
+                
+                setTimeout(() => {
+                    icon.textContent = originalIcon;
+                    icon.style.color = '';
+                }, 2000);
+            }
+        }
+
+        // ===== GLOBAL ANTI-SCROLL PROTECTION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // ===== PREVENT ALL INPUT FOCUS SCROLLING =====
+            document.querySelectorAll('input, select').forEach(input => {
+                // Block focus events that cause scrolling for ALL inputs
+                input.addEventListener('focus', function(e) {
+                    // Store current scroll position
+                    const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    const currentScrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+                    
+                    // For range sliders, completely block focus (they don't need text input)
+                    if (this.type === 'range') {
+                        this.blur();
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return;
+                    }
+                    
+                    // For ALL other inputs (including number inputs), allow focus but prevent scroll
+                    setTimeout(() => {
+                        if (window.pageYOffset !== currentScrollTop || window.pageXOffset !== currentScrollLeft) {
+                            window.scrollTo(currentScrollLeft, currentScrollTop);
+                        }
+                    }, 1);
+                }, true);
+                
+                // Block mousedown from causing scroll for ALL inputs
+                input.addEventListener('mousedown', function(e) {
+                    const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    const currentScrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+                    
+                    // For range sliders, prevent focus completely
+                    if (this.type === 'range') {
+                        setTimeout(() => this.blur(), 1);
+                    }
+                    
+                    // For all inputs, prevent scroll but allow interaction
+                    setTimeout(() => {
+                        if (window.pageYOffset !== currentScrollTop || window.pageXOffset !== currentScrollLeft) {
+                            window.scrollTo(currentScrollLeft, currentScrollTop);
+                        }
+                    }, 1);
+                });
+                
+                // Special handling ONLY for range sliders (disable focus completely)
+                if (input.type === 'range') {
+                    // Override the focus method completely
+                    const originalFocus = input.focus;
+                    input.focus = function() {
+                        // Do nothing - completely disable focus
+                    };
+                    
+                    // Make them unfocusable
+                    input.setAttribute('tabindex', '-1');
+                    input.style.outline = 'none';
+                }
+            });
+            
+            // Store current scroll position
+            let currentScrollTop = 0;
+            let currentScrollLeft = 0;
+            
+            // Update stored position on manual scroll
+            window.addEventListener('scroll', function() {
+                currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                currentScrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+            });
+            
+            // Prevent automatic scrolling on focus events
+            document.addEventListener('focus', function(event) {
+                // Store position before focus
+                const beforeScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const beforeScrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+                
+                // Restore position after any potential scroll
+                requestAnimationFrame(() => {
+                    if (window.pageYOffset !== beforeScrollTop || window.pageXOffset !== beforeScrollLeft) {
+                        window.scrollTo(beforeScrollLeft, beforeScrollTop);
+                    }
+                });
+            }, true); // Use capture phase
+            
+            // Also handle click events that might cause scrolling
+            document.addEventListener('click', function(event) {
+                const beforeScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const beforeScrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+                
+                setTimeout(() => {
+                    if (window.pageYOffset !== beforeScrollTop || window.pageXOffset !== beforeScrollLeft) {
+                        window.scrollTo(beforeScrollLeft, beforeScrollTop);
+                    }
+                }, 1);
+            }, true);
+        });
+
+        // ===== DAILY REWARD CALCULATION =====
+        function calculateDailyReward() {
+            const myTH = parseFloat(document.getElementById('My_TH').value) || 0;
+            const satPerTH = parseFloat(document.getElementById('sat-TH').value) || 0;
+            
+            const dailyReward = myTH * satPerTH;
+            
+            // Update the Daily Reward field
+            document.getElementById('Daily-Reward').value = Math.round(dailyReward);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set calculator as default active section
+            showSection('calc');
+            
+            // Calculate initial daily reward
+            calculateDailyReward();
+            
+            // Mobile keyboard focus handling
+            document.querySelectorAll('input[type="number"], input[type="range"], select').forEach(function(input) {
+                input.addEventListener('focus', function() {
+                    this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                });
+
+                input.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter' || event.key === 'Tab') {
+                        const currentInputIndex = Array.from(document.querySelectorAll('input[type="number"], input[type="range"], select')).indexOf(this);
+                        const nextInput = document.querySelectorAll('input[type="number"], input[type="range"], select')[currentInputIndex + 1];
+
+                        if (nextInput) {
+                            nextInput.focus();
+                            nextInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        } else {
+                            input.blur(); // Close keyboard on last field
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
-
