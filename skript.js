@@ -490,6 +490,16 @@ function getPriceMatrix(efficiency) {
 
                 function calculateTHAndCostForEfficiency(investment, efficiency) {
                         const matrix = getPriceMatrix(efficiency); // Wählt die Preismatrix für die Effizienzklasse
+                        
+                        if (!matrix) {
+                            console.error('❌ Could not load price matrix for efficiency:', efficiency);
+                            return {
+                                th: 0,
+                                cost: 0,
+                                remainingInvestment: investment
+                            };
+                        }
+                        
                         const minerBaseCost = matrix[0].minerCost; // Grundpreis für den ersten TH
 
                         // Prüfen, ob das Investment kleiner als der Minerpreis ist
