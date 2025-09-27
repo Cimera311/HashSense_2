@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HashSense Design Showcase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        /* Custom animations for smooth transitions */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .accordion-content.open {
+            max-height: 2000px;
+            transition: max-height 0.3s ease-in;
+        }
+
+        /* Sidebar animations */
+        .sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+
+    <!-- Toggle Button for Both Options -->
+    <div class="fixed top-4 right-4 z-50 flex gap-2">
+        <button onclick="showOption(1)" 
+                class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors duration-200">
+            Option 1: Accordion
+        </button>
+        <button onclick="showOption(3)" 
+                class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors duration-200">
+            Option 3: Sidebar
+        </button>
+    </div>
+
+    <!-- ===== OPTION 1: ACCORDION DESIGN ===== -->
+    <div id="option1" class="min-h-screen">
+        <!-- Header with Price Cards -->
+        <header class="bg-gray-800 p-4">
+            <div class="max-w-4xl mx-auto">
+                <h1 class="text-3xl font-bold text-center mb-6">HashSense Calculator</h1>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- BTC Price Card -->
+                    <div class="bg-gray-700 rounded-xl p-4">
+                        <h2 class="text-sm font-semibold mb-3 text-gray-300">CURRENT BTC PRICE</h2>
+                        <div class="flex items-center gap-3">
+                            <img src="bitcoin-910307_1280.webp" alt="BTC" class="w-10 h-10">
+                            <select class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white">
+                                <option value="100000">$100,000</option>
+                                <option value="120000">$120,000</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- GMT Price Card -->
+                    <div class="bg-gray-700 rounded-xl p-4">
+                        <h2 class="text-sm font-semibold mb-3 text-gray-300">CURRENT GMT PRICE</h2>
+                        <div class="flex items-center gap-3">
+                            <img src="GoMining_Logo.webp" alt="GMT" class="w-10 h-10">
+                            <input type="number" placeholder="0.4269" step="0.0001"
+                                   class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white">
+                        </div>
+                    </div>
+                    
+                    <!-- SAT per TH Card -->
+                    <div class="bg-gray-700 rounded-xl p-4">
+                        <h2 class="text-sm font-semibold mb-3 text-gray-300">SAT PER TH</h2>
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">⚡</span>
+                            <input type="number" value="44" min="0" step="1"
+                                   class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content - Accordion Sections -->
+        <main class="max-w-4xl mx-auto p-4">
+            <!-- Calculator Section -->
+            <div class="mb-4">
+                <button onclick="toggleAccordion('calc-content')" 
+                        class="w-full bg-gray-800 hover:bg-gray-700 rounded-lg p-4 flex items-center justify-between transition-colors duration-200">
+                    <div class="flex items-center gap-4">
+                        <span class="material-icons text-2xl text-purple-400">calculate</span>
+                        <div class="text-left">
+                            <h3 class="text-xl font-semibold">Mining Calculator</h3>
+                            <p class="text-gray-400 text-sm">Calculate daily, weekly, and monthly profits</p>
+                        </div>
+                    </div>
+                    <span class="material-icons text-gray-400 accordion-arrow" id="calc-arrow">expand_more</span>
+                </button>
+                
+                <div id="calc-content" class="accordion-content bg-gray-800 rounded-b-lg">
+                    <div class="p-6">
+                        <!-- TH Controls -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-3">My TH Power</label>
+                            <div class="flex gap-2 mb-3 flex-wrap">
+                                <button class="bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded text-sm">-100</button>
+                                <button class="bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded text-sm">-10</button>
+                                <button class="bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded text-sm">-1</button>
+                                <button class="bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded text-sm">+1</button>
+                                <button class="bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded text-sm">+10</button>
+                                <button class="bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded text-sm">+100</button>
+                            </div>
+                            <input type="number" value="500" 
+                                   class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 mb-2">
+                            <input type="range" min="1" max="5000" value="500" 
+                                   class="w-full accent-purple-500">
+                        </div>
+                        
+                        <!-- Efficiency -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Energy Efficiency (W/TH)</label>
+                            <input type="number" value="23.88" 
+                                   class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 mb-2">
+                            <input type="range" min="15" max="35" value="23.88" step="0.01" 
+                                   class="w-full accent-purple-500">
+                        </div>
+
+                        <!-- Results Table -->
+                        <div class="bg-gray-700 rounded-lg overflow-hidden">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-600">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left">Description</th>
+                                        <th class="px-4 py-3 text-right">USD</th>
+                                        <th class="px-4 py-3 text-right">BTC</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="px-4 py-3 border-t border-gray-600">Daily Revenue</td>
+                                        <td class="px-4 py-3 border-t border-gray-600 text-right">$156.78</td>
+                                        <td class="px-4 py-3 border-t border-gray-600 text-right">0.00156780</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 border-t border-gray-600">Daily Net Profit</td>
+                                        <td class="px-4 py-3 border-t border-gray-600 text-right text-green-400">$89.45</td>
+                                        <td class="px-4 py-3 border-t border-gray-600 text-right text-green-400">0.00089450</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROI Section -->
+            <div class="mb-4">
+                <button onclick="toggleAccordion('roi-content')" 
+                        class="w-full bg-gray-800 hover:bg-gray-700 rounded-lg p-4 flex items-center justify-between transition-colors duration-200">
+                    <div class="flex items-center gap-4">
+                        <span class="material-icons text-2xl text-green-400">trending_up</span>
+                        <div class="text-left">
+                            <h3 class="text-xl font-semibold">ROI Calculator</h3>
+                            <p class="text-gray-400 text-sm">Calculate return on investment for mining hardware</p>
+                        </div>
+                    </div>
+                    <span class="material-icons text-gray-400 accordion-arrow" id="roi-arrow">expand_more</span>
+                </button>
+                
+                <div id="roi-content" class="accordion-content bg-gray-800 rounded-b-lg">
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Investment Amount ($)</label>
+                                <input type="number" value="50000" 
+                                       class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Price per TH ($)</label>
+                                <input type="number" value="22.93" 
+                                       class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2">
+                            </div>
+                        </div>
+                        
+                        <!-- ROI Results -->
+                        <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-gray-700 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-green-400">18.5%</div>
+                                <div class="text-sm text-gray-400">Yearly ROI</div>
+                            </div>
+                            <div class="bg-gray-700 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-blue-400">197</div>
+                                <div class="text-sm text-gray-400">Days to ROI</div>
+                            </div>
+                            <div class="bg-gray-700 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-purple-400">$137</div>
+                                <div class="text-sm text-gray-400">Daily Profit</div>
+                            </div>
+                            <div class="bg-gray-700 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-yellow-400">2,180</div>
+                                <div class="text-sm text-gray-400">Final TH</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Miner Wars Section -->
+            <div class="mb-4">
+                <button onclick="toggleAccordion('wars-content')" 
+                        class="w-full bg-gray-800 hover:bg-gray-700 rounded-lg p-4 flex items-center justify-between transition-colors duration-200">
+                    <div class="flex items-center gap-4">
+                        <span class="material-icons text-2xl text-red-400">military_tech</span>
+                        <div class="text-left">
+                            <h3 class="text-xl font-semibold">Miner Wars</h3>
+                            <p class="text-gray-400 text-sm">Clan rewards and mining competition analysis</p>
+                        </div>
+                    </div>
+                    <span class="material-icons text-gray-400 accordion-arrow" id="wars-arrow">expand_more</span>
+                </button>
+                
+                <div id="wars-content" class="accordion-content bg-gray-800 rounded-b-lg">
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">My TH Share (%)</label>
+                                <input type="number" value="10" 
+                                       class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Clan Total TH</label>
+                                <input type="number" value="318114" 
+                                       class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2">
+                            </div>
+                        </div>
+                        
+                        <!-- Wars Results -->
+                        <div class="mt-6 bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-lg font-semibold mb-3 text-red-400">Competition Results</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="text-center">
+                                    <div class="text-xl font-bold">22.78%</div>
+                                    <div class="text-sm text-gray-400">Block Share</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-xl font-bold">$1,247</div>
+                                    <div class="text-sm text-gray-400">Weekly Reward</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-xl font-bold">#3</div>
+                                    <div class="text-sm text-gray-400">Clan Rank</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investment Optimizer Section -->
+            <div class="mb-4">
+                <button onclick="toggleAccordion('invest-content')" 
+                        class="w-full bg-gray-800 hover:bg-gray-700 rounded-lg p-4 flex items-center justify-between transition-colors duration-200">
+                    <div class="flex items-center gap-4">
+                        <span class="material-icons text-2xl text-yellow-400">savings</span>
+                        <div class="text-left">
+                            <h3 class="text-xl font-semibold">Investment Optimizer</h3>
+                            <p class="text-gray-400 text-sm">Optimize TH purchases based on available budget</p>
+                        </div>
+                    </div>
+                    <span class="material-icons text-gray-400 accordion-arrow" id="invest-arrow">expand_more</span>
+                </button>
+                
+                <div id="invest-content" class="accordion-content bg-gray-800 rounded-b-lg">
+                    <div class="p-6">
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Available Budget ($)</label>
+                            <input type="number" value="75000" 
+                                   class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2">
+                        </div>
+                        
+                        <!-- Investment Results -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="bg-gray-700 rounded-lg p-4 text-center">
+                                <div class="text-xl font-bold text-yellow-400">3,271</div>
+                                <div class="text-sm text-gray-400">Final TH Level</div>
+                            </div>
+                            <div class="bg-gray-700 rounded-lg p-4 text-center">
+                                <div class="text-xl font-bold text-green-400">$74,850</div>
+                                <div class="text-sm text-gray-400">Used Budget</div>
+                            </div>
+                            <div class="bg-gray-700 rounded-lg p-4 text-center">
+                                <div class="text-xl font-bold text-orange-400">$150</div>
+                                <div class="text-sm text-gray-400">Unused Budget</div>
+                            </div>
+                            <div class="bg-gray-700 rounded-lg p-4 text-center">
+                                <div class="text-xl font-bold text-purple-400">$22.87</div>
+                                <div class="text-sm text-gray-400">Avg Price/TH</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== OPTION 3: SIDEBAR DESIGN ===== -->
+    <div id="option3" class="min-h-screen hidden">
+        <!-- Sidebar -->
+        <aside class="sidebar fixed left-0 top-0 w-64 h-full bg-gray-800 z-40 shadow-xl" id="sidebar">
+            <div class="p-4">
+                <h2 class="text-xl font-bold mb-6">HashSense</h2>
+                <nav class="space-y-2">
+                    <button onclick="showSection('calc-section')" 
+                            class="nav-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+                        <span class="material-icons text-purple-400">calculate</span>
+                        <span>Mining Calculator</span>
+                    </button>
+                    <button onclick="showSection('roi-section')" 
+                            class="nav-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+                        <span class="material-icons text-green-400">trending_up</span>
+                        <span>ROI Calculator</span>
+                    </button>
+                    <button onclick="showSection('wars-section')" 
+                            class="nav-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+                        <span class="material-icons text-red-400">military_tech</span>
+                        <span>Miner Wars</span>
+                    </button>
+                    <button onclick="showSection('invest-section')" 
+                            class="nav-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200">
+                        <span class="material-icons text-yellow-400">savings</span>
+                        <span>Investment Optimizer</span>
+                    </button>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Mobile Sidebar Toggle -->
+        <button onclick="toggleSidebar()" 
+                class="fixed top-4 left-4 z-50 bg-gray-800 p-2 rounded-lg lg:hidden">
+            <span class="material-icons text-white">menu</span>
+        </button>
+
+        <!-- Main Content Area -->
+        <main class="lg:ml-64 min-h-screen">
+            <!-- Header with Price Cards -->
+            <header class="bg-gray-800 p-4">
+                <div class="max-w-6xl mx-auto">
+                    <h1 class="text-3xl font-bold mb-6">HashSense Dashboard</h1>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Same price cards as Option 1 -->
+                        <div class="bg-gray-700 rounded-xl p-4">
+                            <h2 class="text-sm font-semibold mb-3 text-gray-300">CURRENT BTC PRICE</h2>
+                            <div class="flex items-center gap-3">
+                                <img src="bitcoin-910307_1280.webp" alt="BTC" class="w-10 h-10">
+                                <select class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white">
+                                    <option value="100000">$100,000</option>
+                                    <option value="120000">$120,000</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="bg-gray-700 rounded-xl p-4">
+                            <h2 class="text-sm font-semibold mb-3 text-gray-300">CURRENT GMT PRICE</h2>
+                            <div class="flex items-center gap-3">
+                                <img src="GoMining_Logo.webp" alt="GMT" class="w-10 h-10">
+                                <input type="number" placeholder="0.4269" step="0.0001"
+                                       class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white">
+                            </div>
+                        </div>
+                        <div class="bg-gray-700 rounded-xl p-4">
+                            <h2 class="text-sm font-semibold mb-3 text-gray-300">SAT PER TH</h2>
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">⚡</span>
+                                <input type="number" value="44" min="0" step="1"
+                                       class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Sections -->
+            <div class="p-4">
+                <!-- Calculator Section -->
+                <section id="calc-section" class="content-section max-w-6xl mx-auto">
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="material-icons text-3xl text-purple-400">calculate</span>
+                            <div>
+                                <h2 class="text-2xl font-bold">Mining Calculator</h2>
+                                <p class="text-gray-400">Calculate your daily, weekly, and monthly mining profits</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Controls -->
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium mb-3">TH Power Controls</label>
+                                    <div class="flex gap-2 mb-3 flex-wrap">
+                                        <button class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-sm">-100</button>
+                                        <button class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-sm">-10</button>
+                                        <button class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-sm">-1</button>
+                                        <button class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-sm">+1</button>
+                                        <button class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-sm">+10</button>
+                                        <button class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-sm">+100</button>
+                                    </div>
+                                    <input type="number" value="500" 
+                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-3">
+                                    <input type="range" min="1" max="5000" value="500" 
+                                           class="w-full accent-purple-500">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium mb-3">Energy Efficiency (W/TH)</label>
+                                    <input type="number" value="23.88" 
+                                           class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-3">
+                                    <input type="range" min="15" max="35" value="23.88" step="0.01" 
+                                           class="w-full accent-purple-500">
+                                </div>
+                            </div>
+                            
+                            <!-- Results -->
+                            <div>
+                                <h3 class="text-lg font-semibold mb-4">Profit Analysis</h3>
+                                <div class="bg-gray-700 rounded-lg p-4 space-y-4">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Daily Revenue:</span>
+                                        <span class="font-bold text-green-400">$156.78</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-400">Daily Costs:</span>
+                                        <span class="font-bold text-red-400">$67.33</span>
+                                    </div>
+                                    <hr class="border-gray-600">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-300 font-semibold">Daily Profit:</span>
+                                        <span class="font-bold text-green-400 text-lg">$89.45</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-300">Monthly Profit:</span>
+                                        <span class="font-bold text-green-400">$2,683.50</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ROI Section -->
+                <section id="roi-section" class="content-section max-w-6xl mx-auto hidden">
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="material-icons text-3xl text-green-400">trending_up</span>
+                            <div>
+                                <h2 class="text-2xl font-bold">ROI Calculator</h2>
+                                <p class="text-gray-400">Analyze return on investment for mining hardware</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div class="lg:col-span-2 space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">Investment Amount ($)</label>
+                                        <input type="number" value="50000" 
+                                               class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-2">Price per TH ($)</label>
+                                        <input type="number" value="22.93" 
+                                               class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-lg font-semibold mb-4">ROI Metrics</h3>
+                                <div class="space-y-3">
+                                    <div class="bg-gray-700 rounded-lg p-4 text-center">
+                                        <div class="text-2xl font-bold text-green-400">18.5%</div>
+                                        <div class="text-sm text-gray-400">Yearly ROI</div>
+                                    </div>
+                                    <div class="bg-gray-700 rounded-lg p-4 text-center">
+                                        <div class="text-2xl font-bold text-blue-400">197</div>
+                                        <div class="text-sm text-gray-400">Days to ROI</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Other sections would follow the same pattern -->
+                <section id="wars-section" class="content-section max-w-6xl mx-auto hidden">
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="material-icons text-3xl text-red-400">military_tech</span>
+                            <div>
+                                <h2 class="text-2xl font-bold">Miner Wars</h2>
+                                <p class="text-gray-400">Clan competition and reward analysis</p>
+                            </div>
+                        </div>
+                        <div class="text-center text-gray-400 py-8">
+                            <span class="material-icons text-6xl mb-4">military_tech</span>
+                            <p>Miner Wars content would go here...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="invest-section" class="content-section max-w-6xl mx-auto hidden">
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="material-icons text-3xl text-yellow-400">savings</span>
+                            <div>
+                                <h2 class="text-2xl font-bold">Investment Optimizer</h2>
+                                <p class="text-gray-400">Optimize TH purchases based on budget</p>
+                            </div>
+                        </div>
+                        <div class="text-center text-gray-400 py-8">
+                            <span class="material-icons text-6xl mb-4">savings</span>
+                            <p>Investment Optimizer content would go here...</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Show different options
+        function showOption(option) {
+            document.getElementById('option1').style.display = option === 1 ? 'block' : 'none';
+            document.getElementById('option3').style.display = option === 3 ? 'block' : 'none';
+            
+            if (option === 3) {
+                document.getElementById('sidebar').classList.add('open');
+            }
+        }
+
+        // Option 1: Accordion functions
+        function toggleAccordion(contentId) {
+            const content = document.getElementById(contentId);
+            const arrow = document.getElementById(contentId.replace('-content', '-arrow'));
+            
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                arrow.textContent = 'expand_more';
+            } else {
+                // Close all other accordions
+                document.querySelectorAll('.accordion-content').forEach(el => {
+                    el.classList.remove('open');
+                });
+                document.querySelectorAll('.accordion-arrow').forEach(el => {
+                    el.textContent = 'expand_more';
+                });
+                
+                // Open selected accordion
+                content.classList.add('open');
+                arrow.textContent = 'expand_less';
+            }
+        }
+
+        // Option 3: Sidebar functions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.add('hidden');
+            });
+            
+            // Remove active state from nav items
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('bg-gray-700');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Add active state to clicked nav item
+            event.target.closest('.nav-item').classList.add('bg-gray-700');
+            
+            // Close sidebar on mobile
+            if (window.innerWidth < 1024) {
+                toggleSidebar();
+            }
+        }
+
+        // Initialize with Option 1
+        showOption(1);
+    </script>
+</body>
+</html>
