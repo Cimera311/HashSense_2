@@ -251,6 +251,25 @@ function ladenMinerInTabelle() {
             let upgradeCostWATT = getUpgradeCostWATT(efficiency, efficiency - 1, myTH);
             let roiWATT = ROIofWATTUpgrade(upgradeCostWATT, myTH, efficiency, efficiency - 1);
 
+            // Währungsabhängige Anzeige wie in farmold.html
+            let worthDisplay = `$${parseFloat(worth).toFixed(2)}`;
+            let profitDisplay = `$${profitUSD.toFixed(2)}`;
+            let electricityDisplay = `$${(dailyelectricity.usd || 0).toFixed(2)}`;
+            let serviceDisplay = `$${(dailyservice.usd || 0).toFixed(2)}`;
+            let revenueDisplay = `$${(revenue.usd || 0).toFixed(2)}`;
+            if (waehrung === 'btc') {
+                worthDisplay = `${(worth / btcPrice).toFixed(8)} BTC`;
+                profitDisplay = `${profitBTC.toFixed(8)} BTC`;
+                electricityDisplay = `${(dailyelectricity.btc || 0).toFixed(8)} BTC`;
+                serviceDisplay = `${(dailyservice.btc || 0).toFixed(8)} BTC`;
+                revenueDisplay = `${(revenue.btc || 0).toFixed(8)} BTC`;
+            } else if (waehrung === 'gmt') {
+                worthDisplay = `${(worth / gmtPrice).toFixed(2)} GMT`;
+                profitDisplay = `${profitGMT.toFixed(2)} GMT`;
+                electricityDisplay = `${(dailyelectricity.gmt || 0).toFixed(2)} GMT`;
+                serviceDisplay = `${(dailyservice.gmt || 0).toFixed(2)} GMT`;
+                revenueDisplay = `${(revenue.gmt || 0).toFixed(2)} GMT`;
+            }
             let row = document.createElement('tr');
             row.innerHTML = `
                 <td class="px-4 py-3 border-t border-gray-700 text-white">
@@ -273,13 +292,13 @@ function ladenMinerInTabelle() {
                            class="bg-transparent border-0 text-white w-full focus:outline-none focus:bg-gray-600 rounded px-1"
                            data-field="efficiency" onchange="updateMinerData(this)">
                 </td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">$${parseFloat(worth).toFixed(2)}</td>
+                <td class="px-4 py-3 border-t border-gray-700 text-white">${worthDisplay}</td>
                 <td class="px-4 py-3 border-t border-gray-700 text-white">${roiTH.toFixed(1)}%</td>
                 <td class="px-4 py-3 border-t border-gray-700 text-white">${(typeof roiWATT === 'object' ? roiWATT.roi_percent : roiWATT.toFixed(1))}%</td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">$${profitUSD.toFixed(2)}</td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">$${(dailyelectricity.usd || 0).toFixed(2)}</td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">$${(dailyservice.usd || 0).toFixed(2)}</td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">$${(revenue.usd || 0).toFixed(2)}</td>
+                <td class="px-4 py-3 border-t border-gray-700 text-white">${profitDisplay}</td>
+                <td class="px-4 py-3 border-t border-gray-700 text-white">${electricityDisplay}</td>
+                <td class="px-4 py-3 border-t border-gray-700 text-white">${serviceDisplay}</td>
+                <td class="px-4 py-3 border-t border-gray-700 text-white">${revenueDisplay}</td>
             `;
             tbody.appendChild(row);
         });
