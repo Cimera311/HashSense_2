@@ -586,7 +586,6 @@
 
         function wechselWaehrung(neueWaehrung) {
             document.getElementById('currencyMode').innerText = neueWaehrung;
-            
             // Update button styles
             document.querySelectorAll('[id$="-btn"]').forEach(btn => {
                 if (btn.id.includes('btc') || btn.id.includes('usd') || btn.id.includes('gmt')) {
@@ -594,11 +593,11 @@
                     btn.classList.add('text-gray-300', 'hover:text-white');
                 }
             });
-            
             document.getElementById(`${neueWaehrung}-btn`).classList.remove('text-gray-300', 'hover:text-white');
             document.getElementById(`${neueWaehrung}-btn`).classList.add('bg-purple-600', 'text-white');
-            
-            aktualisiereFarmWerte();
+            // Daten speichern und neu laden wie im alten Code
+            if (typeof speichernDaten === 'function') speichernDaten();
+            if (typeof ladenDaten === 'function') ladenDaten();
         }
 
         function updateViewClasses() {
