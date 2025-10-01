@@ -65,7 +65,7 @@
 
   <script type="module">
     import('./priceMatrix.js').then(({ priceMatrixdatei }) => {
-      import('./skript-prices.js').then(({ efficiencyMatrix }) => {
+    import('./src/scripts/skript-prices.js').then(({ efficiencyMatrix }) => {
         const baseEff = 15;
         const basePrices = priceMatrixdatei[baseEff];
         const table = {};
