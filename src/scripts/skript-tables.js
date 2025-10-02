@@ -221,24 +221,33 @@ function ladenMinerInTabelle() {
     // Bestimme Währungssymbole für Header
     let currencySymbol = waehrung === 'btc' ? 'BTC' : waehrung === 'usd' ? '$' : 'GMT';
     
-    // Filter columns to only show active ones and create header cells
-    allColumns
-        .filter(col => activeColumns.includes(col.key))
-        .forEach(col => {
-            let th = document.createElement('th');
-            th.className = 'px-4 py-3 text-gray-300 font-medium resize-x overflow-hidden min-w-[100px]';
-            
-            // Dynamische Header-Texte mit Währung
-            let headerText = col.label;
-            if (col.key === 'Worth') {
-                headerText = waehrung === 'usd' ? 'Worth $' : `Worth (${currencySymbol})`;
-            } else if (['Profit', 'Electricity', 'Service', 'Revenue'].includes(col.key)) {
-                headerText = `${col.label} (${currencySymbol})`;
-            }
-            
-            th.textContent = headerText;
-            headerRow.appendChild(th);
-        });
+    // Create ALL header cells, but hide inactive ones with CSS
+    allColumns.forEach(col => {
+        let th = document.createElement('th');
+        let isActive = activeColumns.includes(col.key);
+        
+        // Grundlegende CSS-Klassen
+        th.className = 'px-4 py-3 text-gray-300 font-medium resize-x overflow-hidden min-w-[100px]';
+        
+        // Data attribute für Column identification
+        th.setAttribute('data-column', col.key);
+        
+        // CSS-Klasse für Sichtbarkeit
+        if (!isActive) {
+            th.classList.add('hidden-column');
+        }
+        
+        // Dynamische Header-Texte mit Währung
+        let headerText = col.label;
+        if (col.key === 'Worth') {
+            headerText = waehrung === 'usd' ? 'Worth $' : `Worth (${currencySymbol})`;
+        } else if (['Profit', 'Electricity', 'Service', 'Revenue'].includes(col.key)) {
+            headerText = `${col.label} (${currencySymbol})`;
+        }
+        
+        th.textContent = headerText;
+        headerRow.appendChild(th);
+    });
     
     thead.appendChild(headerRow);
     tableElement.appendChild(thead);
@@ -250,7 +259,7 @@ function ladenMinerInTabelle() {
     if (minerData.length === 0) {
         let emptyRow = document.createElement('tr');
         emptyRow.innerHTML = `
-            <td class="px-4 py-8 text-gray-400 text-center" colspan="${activeColumns.length}">
+            <td class="px-4 py-8 text-gray-400 text-center" colspan="${allColumns.length}">
                 <div class="py-4">
                     <div class="mb-2">🚀</div>
                     <div>No miners added yet</div>
@@ -260,55 +269,56 @@ function ladenMinerInTabelle() {
         `;
         tbody.appendChild(emptyRow);
     } else {
-        minerData.forEach(miner => {
-            // Get current prices
-            let btcPrice = parseFloat(document.getElementById('bitcoin-price-dropdown').value) || window.btcPrice || 100000;
-            let gmtPrice = parseFloat(document.getElementById('gmt-token-price').value) || window.gmtPrice || 0.4269;
-            let satoshiPerTH = parseFloat(document.getElementById('sat-TH').value) || 44;
+        minerData.forEach((miner, index) => {
+            try {
+                // Get current prices
+                let btcPrice = parseFloat(document.getElementById('bitcoin-price-dropdown').value) || window.btcPrice || 100000;
+                let gmtPrice = parseFloat(document.getElementById('gmt-token-price').value) || window.gmtPrice || 0.4269;
+                let satoshiPerTH = parseFloat(document.getElementById('sat-TH').value) || 44;
+                
+                // Extract miner data
+                let myTH = parseFloat(miner.power) || parseFloat(miner.TH) || 0;
+                let efficiency = parseFloat(miner.efficiency) || parseFloat(miner.W_TH) || 20;
+                
+                // Calculate values for this miner with error handling
+                let pricePerTH = typeof getPricePerTH === 'function' ? getPricePerTH(efficiency, myTH) : 1000;
+                let worth = typeof calculateWorth === 'function' ? calculateWorth(pricePerTH, myTH) : 0;
+                let revenue = typeof calculateDailyRevenue === 'function' ? calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice) : {usd: 0, btc: 0, gmt: 0};
+                let dailyelectricity = typeof calculateDailyElectricity === 'function' ? calculateDailyElectricity(myTH, efficiency, btcPrice, gmtPrice) : {usd: 0, btc: 0, gmt: 0};
+                let dailyservice = typeof calculateDailyService === 'function' ? calculateDailyService(myTH, btcPrice, gmtPrice) : {usd: 0, btc: 0, gmt: 0};
             
-            // Extract miner data
-            let myTH = parseFloat(miner.power) || parseFloat(miner.TH) || 0;
-            let efficiency = parseFloat(miner.efficiency) || parseFloat(miner.W_TH) || 20;
+                // Calculate profit
+                let profitUSD = (revenue.usd || 0) - (dailyelectricity.usd || 0) - (dailyservice.usd || 0);
+                let profitBTC = (revenue.btc || 0) - (dailyelectricity.btc || 0) - (dailyservice.btc || 0);
+                let profitGMT = (revenue.gmt || 0) - (dailyelectricity.gmt || 0) - (dailyservice.gmt || 0);
             
-            // Calculate values for this miner
-            let pricePerTH = getPricePerTH(efficiency, myTH);
-            let worth = calculateWorth(pricePerTH, myTH);
-            let revenue = calculateDailyRevenue(satoshiPerTH, myTH, btcPrice, gmtPrice);
-            let dailyelectricity = calculateDailyElectricity(myTH, efficiency, btcPrice, gmtPrice);
-            let dailyservice = calculateDailyService(myTH, btcPrice, gmtPrice);
-            
-            // Calculate profit
-            let profitUSD = (revenue.usd || 0) - (dailyelectricity.usd || 0) - (dailyservice.usd || 0);
-            let profitBTC = (revenue.btc || 0) - (dailyelectricity.btc || 0) - (dailyservice.btc || 0);
-            let profitGMT = (revenue.gmt || 0) - (dailyelectricity.gmt || 0) - (dailyservice.gmt || 0);
-            
-            // Calculate ROI values
-            let revenueupgrade = calculateDailyRevenue(satoshiPerTH, 1, btcPrice, gmtPrice);
-            let roiTH = calculateROI_THUpgrade(myTH, 1, pricePerTH, revenueupgrade, efficiency);
-            let upgradeCostWATT = getUpgradeCostWATT(efficiency, efficiency - 1, myTH);
-            let roiWATT = ROIofWATTUpgrade(upgradeCostWATT, myTH, efficiency, efficiency - 1);
+                // Calculate ROI values
+                let revenueupgrade = typeof calculateDailyRevenue === 'function' ? calculateDailyRevenue(satoshiPerTH, 1, btcPrice, gmtPrice) : {usd: 0, btc: 0, gmt: 0};
+                let roiTH = typeof calculateROI_THUpgrade === 'function' ? calculateROI_THUpgrade(myTH, 1, pricePerTH, revenueupgrade, efficiency) : 0;
+                let upgradeCostWATT = typeof getUpgradeCostWATT === 'function' ? getUpgradeCostWATT(efficiency, efficiency - 1, myTH) : 0;
+                let roiWATT = typeof ROIofWATTUpgrade === 'function' ? ROIofWATTUpgrade(upgradeCostWATT, myTH, efficiency, efficiency - 1) : 0;
 
-            // Währungsabhängige Anzeige wie in farmold.html
-            let worthDisplay = parseFloat(worth).toFixed(2);
-            let profitDisplay = profitUSD.toFixed(2);
-            let electricityDisplay = (dailyelectricity.usd || 0).toFixed(2);
-            let serviceDisplay = (dailyservice.usd || 0).toFixed(2);
-            let revenueDisplay = (revenue.usd || 0).toFixed(2);
-            if (waehrung === 'btc') {
-                worthDisplay = (worth / btcPrice).toFixed(8);
-                profitDisplay = profitBTC.toFixed(8);
-                electricityDisplay = (dailyelectricity.btc || 0).toFixed(8);
-                serviceDisplay = (dailyservice.btc || 0).toFixed(8);
-                revenueDisplay = (revenue.btc || 0).toFixed(8);
-            } else if (waehrung === 'gmt') {
-                worthDisplay = (worth / gmtPrice).toFixed(2);
-                profitDisplay = profitGMT.toFixed(2);
-                electricityDisplay = (dailyelectricity.gmt || 0).toFixed(2);
-                serviceDisplay = (dailyservice.gmt || 0).toFixed(2);
-                revenueDisplay = (revenue.gmt || 0).toFixed(2);
-            }
-            // Create column content mapping
-            const columnContent = {
+                // Währungsabhängige Anzeige wie in farmold.html
+                let worthDisplay = parseFloat(worth).toFixed(2);
+                let profitDisplay = profitUSD.toFixed(2);
+                let electricityDisplay = (dailyelectricity.usd || 0).toFixed(2);
+                let serviceDisplay = (dailyservice.usd || 0).toFixed(2);
+                let revenueDisplay = (revenue.usd || 0).toFixed(2);
+                if (waehrung === 'btc') {
+                    worthDisplay = (worth / btcPrice).toFixed(8);
+                    profitDisplay = profitBTC.toFixed(8);
+                    electricityDisplay = (dailyelectricity.btc || 0).toFixed(8);
+                    serviceDisplay = (dailyservice.btc || 0).toFixed(8);
+                    revenueDisplay = (revenue.btc || 0).toFixed(8);
+                } else if (waehrung === 'gmt') {
+                    worthDisplay = (worth / gmtPrice).toFixed(2);
+                    profitDisplay = profitGMT.toFixed(2);
+                    electricityDisplay = (dailyelectricity.gmt || 0).toFixed(2);
+                    serviceDisplay = (dailyservice.gmt || 0).toFixed(2);
+                    revenueDisplay = (revenue.gmt || 0).toFixed(2);
+                }
+                // Create column content mapping
+                const columnContent = {
                 'ID': `<td class="px-4 py-3 border-t border-gray-700 text-white">
                     <input type="text" value="${miner.miner_id || miner.id || ''}" 
                            class="bg-transparent border-0 text-white w-full focus:outline-none focus:bg-gray-600 rounded px-1"
@@ -336,14 +346,88 @@ function ladenMinerInTabelle() {
                 'Electricity': `<td class="px-4 py-3 border-t border-gray-700 text-white">${electricityDisplay}</td>`,
                 'Service': `<td class="px-4 py-3 border-t border-gray-700 text-white">${serviceDisplay}</td>`,
                 'Revenue': `<td class="px-4 py-3 border-t border-gray-700 text-white">${revenueDisplay}</td>`
-            };
+                };
 
-            // Generate row HTML with only active columns
-            let row = document.createElement('tr');
-            row.innerHTML = activeColumns.map(colKey => columnContent[colKey] || '').join('');
-            tbody.appendChild(row);
-        });
-    }
+                // Generate row HTML with ALL columns, but mark inactive ones as hidden
+                let row = document.createElement('tr');
+            
+                // Create cells for all columns
+                allColumns.forEach(col => {
+                    let isActive = activeColumns.includes(col.key);
+                    let cellHTML = columnContent[col.key];
+                    
+                    // Create cell directly instead of parsing HTML
+                    let cell = document.createElement('td');
+                    cell.className = 'px-4 py-3 border-t border-gray-700 text-white';
+                    cell.setAttribute('data-column', col.key);
+                    
+                    // Add content based on column type
+                    if (col.key === 'ID') {
+                        let input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = miner.miner_id || miner.id || '';
+                        input.className = 'bg-transparent border-0 text-white w-full focus:outline-none focus:bg-gray-600 rounded px-1';
+                        input.setAttribute('data-field', 'miner_id');
+                        input.onchange = function() { updateMinerData(this); };
+                        cell.appendChild(input);
+                    } else if (col.key === 'Miner Name') {
+                        let input = document.createElement('input');
+                        input.type = 'text';
+                        input.value = miner.Miner_Name || miner.name || 'Miner';
+                        input.className = 'bg-transparent border-0 text-white w-full focus:outline-none focus:bg-gray-600 rounded px-1';
+                        input.setAttribute('data-field', 'name');
+                        input.onchange = function() { updateMinerData(this); };
+                        cell.appendChild(input);
+                    } else if (col.key === 'TH') {
+                        let input = document.createElement('input');
+                        input.type = 'number';
+                        input.value = miner.power || miner.TH || 0;
+                        input.className = 'bg-transparent border-0 text-white w-full focus:outline-none focus:bg-gray-600 rounded px-1';
+                        input.setAttribute('data-field', 'power');
+                        input.onchange = function() { updateMinerData(this); };
+                        cell.appendChild(input);
+                    } else if (col.key === 'W/TH') {
+                        let input = document.createElement('input');
+                        input.type = 'number';
+                        input.value = miner.efficiency || miner.W_TH || 0;
+                        input.className = 'bg-transparent border-0 text-white w-full focus:outline-none focus:bg-gray-600 rounded px-1';
+                        input.setAttribute('data-field', 'efficiency');
+                        input.onchange = function() { updateMinerData(this); };
+                        cell.appendChild(input);
+                    } else if (col.key === 'Worth') {
+                        cell.textContent = worthDisplay;
+                    } else if (col.key === 'ROI TH') {
+                        cell.textContent = roiTH + '%';
+                    } else if (col.key === 'ROI Eff') {
+                        cell.textContent = (typeof roiWATT === 'object' ? roiWATT.roi_percent : roiWATT.toFixed(1)) + '%';
+                    } else if (col.key === 'Profit') {
+                        cell.textContent = profitDisplay;
+                    } else if (col.key === 'Electricity') {
+                        cell.textContent = electricityDisplay;
+                    } else if (col.key === 'Service') {
+                        cell.textContent = serviceDisplay;
+                    } else if (col.key === 'Revenue') {
+                        cell.textContent = revenueDisplay;
+                    } else {
+                        cell.textContent = 'N/A';
+                    }
+                    
+                    // Add hidden class if column is inactive
+                    if (!isActive) {
+                        cell.classList.add('hidden-column');
+                    }
+                    
+                    row.appendChild(cell);
+                });
+            
+                console.log(`Final row for miner ${index} has ${row.children.length} cells:`, row);
+                tbody.appendChild(row);
+                console.log(`tbody now has ${tbody.children.length} rows`);
+            } catch (error) {
+                console.error('Error processing miner', index, ':', error);
+            }
+        }); //test
+    }//test222
 
     tableElement.appendChild(tbody);
     tableContainer.appendChild(tableElement);

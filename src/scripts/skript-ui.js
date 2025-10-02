@@ -161,10 +161,29 @@
             // Close modal
             closeViewConfigModal();
 
-            // Reload tables to apply changes
-            ladenDaten();
+            // Apply visibility changes without reloading data
+            applyColumnVisibility(selectedColumns);
             
             showToast('Tabellenansicht aktualisiert!', 'success');
+        }
+        
+        function applyColumnVisibility(selectedColumns) {
+            // Get all table elements (both header and data cells)
+            const allCells = document.querySelectorAll('[data-column]');
+            
+            allCells.forEach(cell => {
+                const columnKey = cell.getAttribute('data-column');
+                
+                if (selectedColumns.includes(columnKey)) {
+                    // Show column
+                    cell.classList.remove('hidden-column');
+                } else {
+                    // Hide column
+                    cell.classList.add('hidden-column');
+                }
+            });
+            
+            console.log('Applied visibility to columns:', selectedColumns);
         }
 
         function updateBTCPrice() {
