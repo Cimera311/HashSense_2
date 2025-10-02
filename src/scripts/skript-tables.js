@@ -64,6 +64,10 @@ function ladeFarmTable(minerData) {
     tableElement.id = 'farm-table';
     tableElement.className = 'w-full text-sm text-left';
 
+    // Bestimme Währungssymbole für Header
+    let currencySymbol = waehrung === 'btc' ? 'BTC' : waehrung === 'usd' ? '$' : 'GMT';
+    let worthHeader = waehrung === 'usd' ? 'Farm worth $' : `Farm worth (${currencySymbol})`;
+
     // Tabellenkopf hinzufügen
     let thead = document.createElement('thead');
     thead.innerHTML = `
@@ -71,11 +75,11 @@ function ladeFarmTable(minerData) {
             <th class="px-4 py-3 text-gray-300 font-medium">Power (TH)</th>
             <th class="px-4 py-3 text-gray-300 font-medium">Efficiency (W/TH)</th>
             <th class="px-4 py-3 text-gray-300 font-medium">My Total Discount (%)</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">Farm worth $</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">Profit</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">Electricity -</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">Service -</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">Revenue</th>
+            <th class="px-4 py-3 text-gray-300 font-medium">${worthHeader}</th>
+            <th class="px-4 py-3 text-gray-300 font-medium">Profit (${currencySymbol})</th>
+            <th class="px-4 py-3 text-gray-300 font-medium">Electricity - (${currencySymbol})</th>
+            <th class="px-4 py-3 text-gray-300 font-medium">Service - (${currencySymbol})</th>
+            <th class="px-4 py-3 text-gray-300 font-medium">Revenue (${currencySymbol})</th>
         </tr>
     `;
     tableElement.appendChild(thead);
@@ -124,20 +128,20 @@ function ladeFarmTable(minerData) {
     let profitDisplay = '$0';
 
     if (waehrung === 'btc') {
-        revenueDisplay = `${revenue.btc.toFixed(8)} BTC`;
-        electricityDisplay = `${dailyelectricity.btc.toFixed(8)} BTC`;
-        serviceDisplay = `${dailyservice.btc.toFixed(8)} BTC`;
-        profitDisplay = `${profitbtc.toFixed(8)} BTC`;
+        revenueDisplay = revenue.btc.toFixed(8);
+        electricityDisplay = dailyelectricity.btc.toFixed(8);
+        serviceDisplay = dailyservice.btc.toFixed(8);
+        profitDisplay = profitbtc.toFixed(8);
     } else if (waehrung === 'usd') {
-        revenueDisplay = `$${revenue.usd.toFixed(2)}`;
-        electricityDisplay = `$${dailyelectricity.usd.toFixed(2)}`;
-        serviceDisplay = `$${dailyservice.usd.toFixed(2)}`;
-        profitDisplay = `$${(revenue.usd - dailyelectricity.usd - dailyservice.usd).toFixed(2)}`;
+        revenueDisplay = revenue.usd.toFixed(2);
+        electricityDisplay = dailyelectricity.usd.toFixed(2);
+        serviceDisplay = dailyservice.usd.toFixed(2);
+        profitDisplay = (revenue.usd - dailyelectricity.usd - dailyservice.usd).toFixed(2);
     } else if (waehrung === 'gmt') {
-        revenueDisplay = `${revenue.gmt.toFixed(2)} GMT`;
-        electricityDisplay = `${dailyelectricity.gmt.toFixed(2)} GMT`;
-        serviceDisplay = `${dailyservice.gmt.toFixed(2)} GMT`;
-        profitDisplay = `${(revenue.gmt - dailyelectricity.gmt - dailyservice.gmt).toFixed(2)} GMT`;
+        revenueDisplay = revenue.gmt.toFixed(2);
+        electricityDisplay = dailyelectricity.gmt.toFixed(2);
+        serviceDisplay = dailyservice.gmt.toFixed(2);
+        profitDisplay = (revenue.gmt - dailyelectricity.gmt - dailyservice.gmt).toFixed(2);
     }
 
     let row = document.createElement('tr');
@@ -145,7 +149,7 @@ function ladeFarmTable(minerData) {
         <td class="px-4 py-3 border-t border-gray-700 text-white">${totalPower}</td>
         <td class="px-4 py-3 border-t border-gray-700 text-white">${avgEfficiency}</td>
         <td class="px-4 py-3 border-t border-gray-700 text-white">${user_data.total_discount}</td>
-        <td class="px-4 py-3 border-t border-gray-700 text-white">$${worth}</td>
+        <td class="px-4 py-3 border-t border-gray-700 text-white">${worth}</td>
         <td class="px-4 py-3 border-t border-gray-700 text-white">${profitDisplay}</td>
         <td class="px-4 py-3 border-t border-gray-700 text-white">${electricityDisplay}</td>
         <td class="px-4 py-3 border-t border-gray-700 text-white">${serviceDisplay}</td>
@@ -205,10 +209,17 @@ function ladenMinerInTabelle() {
     tableElement.id = 'miner-table';
     tableElement.className = 'w-full text-sm text-left table-fixed';
 
+    // Bestimme Währung ZUERST
+    let currencyElement = document.getElementById('currencyMode');
+    let waehrung = currencyElement ? currencyElement.innerText : 'usd';
+
     // Dynamic table header - only show active columns
     let thead = document.createElement('thead');
     let headerRow = document.createElement('tr');
     headerRow.className = 'bg-gray-700';
+    
+    // Bestimme Währungssymbole für Header
+    let currencySymbol = waehrung === 'btc' ? 'BTC' : waehrung === 'usd' ? '$' : 'GMT';
     
     // Filter columns to only show active ones and create header cells
     allColumns
@@ -216,7 +227,16 @@ function ladenMinerInTabelle() {
         .forEach(col => {
             let th = document.createElement('th');
             th.className = 'px-4 py-3 text-gray-300 font-medium resize-x overflow-hidden min-w-[100px]';
-            th.textContent = col.label;
+            
+            // Dynamische Header-Texte mit Währung
+            let headerText = col.label;
+            if (col.key === 'Worth') {
+                headerText = waehrung === 'usd' ? 'Worth $' : `Worth (${currencySymbol})`;
+            } else if (['Profit', 'Electricity', 'Service', 'Revenue'].includes(col.key)) {
+                headerText = `${col.label} (${currencySymbol})`;
+            }
+            
+            th.textContent = headerText;
             headerRow.appendChild(th);
         });
     
@@ -226,9 +246,6 @@ function ladenMinerInTabelle() {
     // Tabellenkörper
     let tbody = document.createElement('tbody');
     tbody.id = 'miner-tbody';
-    
-    let currencyElement = document.getElementById('currencyMode');
-    let waehrung = currencyElement ? currencyElement.innerText : 'usd';
     
     if (minerData.length === 0) {
         let emptyRow = document.createElement('tr');
@@ -272,23 +289,23 @@ function ladenMinerInTabelle() {
             let roiWATT = ROIofWATTUpgrade(upgradeCostWATT, myTH, efficiency, efficiency - 1);
 
             // Währungsabhängige Anzeige wie in farmold.html
-            let worthDisplay = `$${parseFloat(worth).toFixed(2)}`;
-            let profitDisplay = `$${profitUSD.toFixed(2)}`;
-            let electricityDisplay = `$${(dailyelectricity.usd || 0).toFixed(2)}`;
-            let serviceDisplay = `$${(dailyservice.usd || 0).toFixed(2)}`;
-            let revenueDisplay = `$${(revenue.usd || 0).toFixed(2)}`;
+            let worthDisplay = parseFloat(worth).toFixed(2);
+            let profitDisplay = profitUSD.toFixed(2);
+            let electricityDisplay = (dailyelectricity.usd || 0).toFixed(2);
+            let serviceDisplay = (dailyservice.usd || 0).toFixed(2);
+            let revenueDisplay = (revenue.usd || 0).toFixed(2);
             if (waehrung === 'btc') {
-                worthDisplay = `${(worth / btcPrice).toFixed(8)} BTC`;
-                profitDisplay = `${profitBTC.toFixed(8)} BTC`;
-                electricityDisplay = `${(dailyelectricity.btc || 0).toFixed(8)} BTC`;
-                serviceDisplay = `${(dailyservice.btc || 0).toFixed(8)} BTC`;
-                revenueDisplay = `${(revenue.btc || 0).toFixed(8)} BTC`;
+                worthDisplay = (worth / btcPrice).toFixed(8);
+                profitDisplay = profitBTC.toFixed(8);
+                electricityDisplay = (dailyelectricity.btc || 0).toFixed(8);
+                serviceDisplay = (dailyservice.btc || 0).toFixed(8);
+                revenueDisplay = (revenue.btc || 0).toFixed(8);
             } else if (waehrung === 'gmt') {
-                worthDisplay = `${(worth / gmtPrice).toFixed(2)} GMT`;
-                profitDisplay = `${profitGMT.toFixed(2)} GMT`;
-                electricityDisplay = `${(dailyelectricity.gmt || 0).toFixed(2)} GMT`;
-                serviceDisplay = `${(dailyservice.gmt || 0).toFixed(2)} GMT`;
-                revenueDisplay = `${(revenue.gmt || 0).toFixed(2)} GMT`;
+                worthDisplay = (worth / gmtPrice).toFixed(2);
+                profitDisplay = profitGMT.toFixed(2);
+                electricityDisplay = (dailyelectricity.gmt || 0).toFixed(2);
+                serviceDisplay = (dailyservice.gmt || 0).toFixed(2);
+                revenueDisplay = (revenue.gmt || 0).toFixed(2);
             }
             // Create column content mapping
             const columnContent = {

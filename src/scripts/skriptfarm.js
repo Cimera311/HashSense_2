@@ -1,86 +1,115 @@
 
 function hinzufuegenCard(cardId, power, efficiency, name = "Miner") {
-let content = document.querySelector('.content');
+let content = document.getElementById('content');
 
 let card = document.createElement('div');
-card.className = 'card';
+card.className = 'card group';
 card.id = cardId;
+
+// Card Header mit Titel und Buttons
+let cardHeader = document.createElement('div');
+cardHeader.className = 'flex justify-between items-center mb-4 pt-2';
 
 let label = document.createElement('span');
 label.className = 'card-label';
 label.innerText = `#${cardId}`;
 card.appendChild(label);
 
-let deleteBtn = document.createElement('button');
-deleteBtn.className = 'delete-btn';
-deleteBtn.innerHTML = '&times;';
-deleteBtn.onclick = function () {
-entfernenCard(cardId);
-loescheEinzelnenMinerSupabase(cardId);
-};
-card.appendChild(deleteBtn);
+// Button Container
+let buttonContainer = document.createElement('div');
+buttonContainer.className = 'flex gap-1 right-1';
 
 let copyBtn = document.createElement('button');
 copyBtn.className = 'copy-btn';
 copyBtn.innerHTML = '&#x2398;';
+copyBtn.title = 'Copy Miner';
 copyBtn.onclick = function () {
 kopiereWerte(cardId);
 };
-card.appendChild(copyBtn);
+buttonContainer.appendChild(copyBtn);
 
-// **Name Input mit Label**
+let deleteBtn = document.createElement('button');
+deleteBtn.className = 'delete-btn';
+deleteBtn.innerHTML = '&times;';
+deleteBtn.title = 'Delete Miner';
+deleteBtn.onclick = function () {
+entfernenCard(cardId);
+loescheEinzelnenMinerSupabase(cardId);
+};
+buttonContainer.appendChild(deleteBtn);
+
+card.appendChild(buttonContainer);
+
+// Compact Name Input
 let nameContainer = document.createElement('div');
-nameContainer.className = 'input-container';
+nameContainer.className = 'mb-3 mt-6';
 
 let nameLabel = document.createElement('label');
 nameLabel.setAttribute('for', `${cardId}-name`);
-nameLabel.innerText = 'Name';
+nameLabel.className = 'text-xs font-medium text-gray-300 mb-1.5';
+nameLabel.innerText = '';
 
 let nameInput = document.createElement('input');
 nameInput.type = 'text';
 nameInput.id = `${cardId}-name`;
 nameInput.value = name;
+nameInput.className = 'w-full bg-gray-600 border border-gray-500 rounded-md px-3 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-transparent transition-all duration-200';
+nameInput.placeholder = 'Miner name';
 nameInput.oninput = function () { aktualisiereWert(cardId, 'name'); };
 
 nameContainer.appendChild(nameLabel);
 nameContainer.appendChild(nameInput);
 card.appendChild(nameContainer);
 
-// **Power Input mit Label**
+// Compact Power and Efficiency Grid
+let specsGrid = document.createElement('div');
+specsGrid.className = 'grid grid-cols-2 gap-2';
+
+// Power Input
 let powerContainer = document.createElement('div');
-powerContainer.className = 'input-container';
+powerContainer.className = 'space-y-1';
 
 let powerLabel = document.createElement('label');
 powerLabel.setAttribute('for', `${cardId}-power`);
-powerLabel.innerText = 'Power';
+powerLabel.className = 'text-xs font-medium text-gray-300';
+powerLabel.innerText = 'TH';
 
 let powerInput = document.createElement('input');
-powerInput.type = 'text';
+powerInput.type = 'number';
 powerInput.id = `${cardId}-power`;
 powerInput.value = `${power}`;
+powerInput.className = 'w-full bg-gray-600 border border-gray-500 rounded-md px-2 py-1.5 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-transparent transition-all duration-200';
+powerInput.placeholder = '0';
+powerInput.step = '0.1';
 powerInput.oninput = function () { aktualisiereWert(cardId, 'power'); aktualisiereFarmWerte(); };
 
 powerContainer.appendChild(powerLabel);
 powerContainer.appendChild(powerInput);
-card.appendChild(powerContainer);
 
-// **Efficiency Input mit Label**
+// Efficiency Input  
 let efficiencyContainer = document.createElement('div');
-efficiencyContainer.className = 'input-container';
+efficiencyContainer.className = 'space-y-1';
 
 let efficiencyLabel = document.createElement('label');
 efficiencyLabel.setAttribute('for', `${cardId}-efficiency`);
-efficiencyLabel.innerText = 'Efficiency';
+efficiencyLabel.className = 'text-xs font-medium text-gray-300';
+efficiencyLabel.innerText = 'W/TH';
 
 let efficiencyInput = document.createElement('input');
-efficiencyInput.type = 'text';
+efficiencyInput.type = 'number';
 efficiencyInput.id = `${cardId}-efficiency`;
 efficiencyInput.value = `${efficiency}`;
+efficiencyInput.className = 'w-full bg-gray-600 border border-gray-500 rounded-md px-2 py-1.5 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-transparent transition-all duration-200';
+efficiencyInput.placeholder = '0';
+efficiencyInput.step = '0.1';
 efficiencyInput.oninput = function () { aktualisiereWert(cardId, 'efficiency'); aktualisiereFarmWerte(); };
 
 efficiencyContainer.appendChild(efficiencyLabel);
 efficiencyContainer.appendChild(efficiencyInput);
-card.appendChild(efficiencyContainer);
+
+specsGrid.appendChild(powerContainer);
+specsGrid.appendChild(efficiencyContainer);
+card.appendChild(specsGrid);
 
 content.appendChild(card);
 aktualisiereFarmWerte();
@@ -228,6 +257,12 @@ tableContainer.id = 'miner-table-container'; // ID für gezieltes Löschen
 let tableElement = document.createElement('table');
 tableElement.id = 'miner-table';
 
+// Bestimme Währungssymbole für Header
+let currencyElement = document.getElementById('currencyMode');
+let waehrung = currencyElement ? currencyElement.innerText : 'usd';
+let currencySymbol = waehrung === 'btc' ? 'BTC' : waehrung === 'usd' ? '$' : 'GMT';
+let worthHeader = waehrung === 'usd' ? 'Miner worth $' : `Miner worth (${currencySymbol})`;
+
 // Erstelle den Tabellenkopf (thead)
 let thead = document.createElement('thead');
 thead.innerHTML = `
@@ -236,13 +271,13 @@ thead.innerHTML = `
 <th class="mineral-header">Miner Name</th>               
 <th>TH</th>
 <th>W/TH</th>
-<th>Miner worth $</th>
+<th>${worthHeader}</th>
 <th>ROI +1 TH(%)</th>
 <th>ROI -1 W/TH(%)</th>
-<th>Profit</th>
-<th>= Electricity -</th>
-<th>Service -</th>
-<th>Revenue</th>
+<th>Profit (${currencySymbol})</th>
+<th>Electricity - (${currencySymbol})</th>
+<th>Service - (${currencySymbol})</th>
+<th>Revenue (${currencySymbol})</th>
 </tr>
 `;
 tableElement.appendChild(thead);
@@ -334,22 +369,22 @@ let worth = calculateWorth(getPricePerTH(avgEfficiency, totalPower), totalPower)
 let profitbtc = revenue.btc - dailyelectricity.btc - dailyservice.btc;
 let revenueDisplay = '';
 if (waehrung === 'btc') {
-revenueDisplay = `${revenue.btc.toFixed(8)} BTC`;
-electricityDisplay = `${dailyelectricity.btc.toFixed(8)} BTC`;
-serviceDisplay = `${dailyservice.btc.toFixed(8)} BTC`;
-profitDisplay = `${profitbtc.toFixed(8)} BTC`;
+revenueDisplay = revenue.btc.toFixed(8);
+electricityDisplay = dailyelectricity.btc.toFixed(8);
+serviceDisplay = dailyservice.btc.toFixed(8);
+profitDisplay = profitbtc.toFixed(8);
 } else if (waehrung === 'usd') {
-revenueDisplay = `$${revenue.usd.toFixed(2)}`;
-electricityDisplay = `$${dailyelectricity.usd.toFixed(2)}`;
-serviceDisplay = `$${dailyservice.usd.toFixed(2)} `;
+revenueDisplay = revenue.usd.toFixed(2);
+electricityDisplay = dailyelectricity.usd.toFixed(2);
+serviceDisplay = dailyservice.usd.toFixed(2);
 let profit = btc2usd(btcPrice, profitbtc);
-profitDisplay = `$${profit} `;
+profitDisplay = profit;
 } else if (waehrung === 'gmt') {
-revenueDisplay = `${revenue.gmt ? revenue.gmt.toFixed(2) : "N/A"} GMT`;
-electricityDisplay = `${dailyelectricity.gmt.toFixed(2)} GMT`;
-serviceDisplay = `${dailyservice.gmt.toFixed(2)} GMT`;
+revenueDisplay = revenue.gmt ? revenue.gmt.toFixed(2) : "N/A";
+electricityDisplay = dailyelectricity.gmt.toFixed(2);
+serviceDisplay = dailyservice.gmt.toFixed(2);
 let profit = btc2gmt(btcPrice, gmtPrice, profitbtc);
-profitDisplay = `${profit} GMT`;
+profitDisplay = profit;
 }
 let row = document.createElement('tr');
 row.innerHTML = `
@@ -555,7 +590,7 @@ aktualisiereFarmWerte();
 
 }
 function aktualisiereFarmWerte() {
-let content = document.querySelector('.content');
+let content = document.getElementById('content');
 let cards = content.querySelectorAll('.card');
 
 let totalPower = 0;
@@ -592,10 +627,18 @@ hinzufuegenCard(get_highest_card(document.querySelector('.content')), powerValue
 
 }
 function updateViewClasses() {
-    const content = document.querySelector('.content');
-    if (content) {
-        content.classList.remove('grid-view', 'list-view');
-        content.classList.add(`${ansicht}-view`);
+    // Update both content containers
+    const minerContent = document.getElementById('content');
+    const farmContent = document.getElementById('farm-content');
+    
+    if (minerContent) {
+        minerContent.classList.remove('grid-view', 'list-view');
+        minerContent.classList.add(`${ansicht}-view`);
+    }
+    
+    if (farmContent) {
+        farmContent.classList.remove('grid-view', 'list-view');
+        farmContent.classList.add(`${ansicht}-view`);
     }
 }
 function toggleActionButtons() {

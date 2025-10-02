@@ -10,6 +10,7 @@
     <script src="src/scripts/skript-prices.js"></script>
     <script src="src/scripts/skript-tables.js"></script>
     <script src="src/scripts/skriptfarm.js"></script>
+    <script src="src/scripts/skript-ui.js"></script>
     <script src="src/scripts/skriptreferral.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
@@ -242,13 +243,15 @@
 
     <!-- Main Content Area -->
     <main class="max-w-7xl mx-auto px-4 py-6">
-        <!-- Farm Content -->
-        <div class="content" id="farm-content">
-            <!-- Farm overview will be dynamically added here -->
+        <!-- Farm Content Wrapper (außerhalb des Grids) -->
+        <div class="farm-wrapper mb-6">
+            <div class="content" id="farm-content">
+                <!-- Farm overview will be dynamically added here -->
+            </div>
         </div>
         
-        <!-- Miner Details Content -->
-        <div class="content" id="content">
+        <!-- Miner Details Content (im Grid) -->
+        <div class="content grid-view" id="content">
             <!-- Miner details table will be dynamically added here -->
         </div>
     </main>
@@ -470,37 +473,52 @@
 
     <!-- Tailwind Custom Classes for existing functionality -->
     <style>
-        /* Custom styles for miner cards and tables */
+        /* Custom styles for modern miner cards and tables */
         .card {
-            background-color: rgb(55 65 81);
+            background: linear-gradient(135deg, rgb(55 65 81) 0%, rgb(75 85 99) 100%);
             border-radius: 0.75rem;
             padding: 1rem;
             position: relative;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             border: 1px solid rgb(75 85 99);
+            transition: all 0.3s ease-in-out;
+            backdrop-filter: blur(10px);
+            max-width: 280px;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-color: rgb(147 51 234);
         }
         .farm-card {
-            background-color: rgb(126 34 206);
-            border-radius: 0.75rem;
-            padding: 1rem;
+            background: linear-gradient(135deg, rgb(126 34 206) 0%, rgb(147 51 234) 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
             position: relative;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(126, 34, 206, 0.3);
             border: 1px solid rgb(147 51 234);
+            transition: all 0.3s ease-in-out;
+        }
+        .farm-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px -12px rgba(126, 34, 206, 0.4);
         }
         .card-label {
             position: absolute;
-            top: 0.5rem;
-            left: 0.5rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            background-color: rgb(17 24 39);
+            top: 0.2rem;
+            left: 0.2rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, rgb(147 51 234) 0%, rgb(168 85 247) 100%);
             color: white;
             padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+            letter-spacing: 0.025em;
         }
         .delete-btn, .copy-btn {
             position: absolute;
-            top: 0.5rem;
+            top: 0.1rem;
             right: 0.5rem;
             width: 1.5rem;
             height: 1.5rem;
@@ -508,43 +526,55 @@
             align-items: center;
             justify-content: center;
             color: white;
-            background-color: rgb(220 38 38);
-            border-radius: 9999px;
+            background: linear-gradient(135deg, rgb(239 68 68) 0%, rgb(220 38 38) 100%);
+            border-radius: 0.375rem;
             font-size: 0.875rem;
             cursor: pointer;
             border: 0;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
         }
         .delete-btn:hover, .copy-btn:hover {
-            background-color: rgb(185 28 28);
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
         }
         .copy-btn {
-            right: 2.5rem;
-            background-color: rgb(37 99 235);
+            right: 2.25rem;
+            background: linear-gradient(135deg, rgb(59 130 246) 0%, rgb(37 99 235) 100%);
         }
         .copy-btn:hover {
-            background-color: rgb(29 78 216);
+            background: linear-gradient(135deg, rgb(37 99 235) 0%, rgb(29 78 216) 100%);
         }
         .input-container, .input-container-farm {
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
         }
         .input-container label, .input-container-farm label {
-            display: block;
+            display: flex;
+            align-items: center;
             font-size: 0.875rem;
-            font-weight: 500;
+            font-weight: 600;
             color: rgb(209 213 219);
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
         }
         .input-container input, .input-container-farm input {
             width: 100%;
             background-color: rgb(75 85 99);
             border: 1px solid rgb(107 114 128);
-            border-radius: 0.5rem;
-            padding: 0.5rem 0.75rem;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
             color: white;
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem;
         }
         .input-container input:focus, .input-container-farm input:focus {
             outline: none;
-            box-shadow: 0 0 0 2px rgb(147 51 234);
+            box-shadow: 0 0 0 2px rgb(147 51 234), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-color: rgb(147 51 234);
+            background-color: rgb(55 65 81);
+        }
+        .input-container input:hover, .input-container-farm input:hover {
+            border-color: rgb(156 163 175);
+            background-color: rgb(55 65 81);
         }
         .table-container {
             overflow-x: auto;
@@ -580,27 +610,19 @@
             background-color: rgb(75 85 99);
             border-radius: 0.25rem;
         }
-        .grid-view .content {
+        /* Auto-responsive grid - Cards verteilen sich automatisch */
+        .grid-view.content {
             display: grid;
             gap: 1rem;
-            grid-template-columns: repeat(1, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         }
-        @media (min-width: 768px) {
-            .grid-view .content {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
+        
+        /* Farm Wrapper bleibt außerhalb des Grids */
+        .farm-wrapper {
+            width: 100%;
         }
-        @media (min-width: 1024px) {
-            .grid-view .content {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-        }
-        @media (min-width: 1280px) {
-            .grid-view .content {
-                grid-template-columns: repeat(4, minmax(0, 1fr));
-            }
-        }
-        .list-view .content {
+        
+        .list-view.content {
             display: block;
         }
         .toast {
@@ -659,202 +681,6 @@
 
 
 
-
-
-        // Modal functions
-        function openImportModal() {
-            document.getElementById('importModal').classList.remove('hidden');
-            document.getElementById('importModal').classList.add('flex');
-            showTab('import-tab');
-        }
-
-        function closeImportModal(tabId) {
-            document.getElementById('importModal').classList.add('hidden');
-            document.getElementById('importModal').classList.remove('flex');
-        }
-
-        function openHowToImportModal(modalId) {
-            document.getElementById(modalId).classList.remove('hidden');
-            document.getElementById(modalId).classList.add('flex');
-        }
-
-        function closeHowToImportModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-            document.getElementById(modalId).classList.remove('flex');
-        }
-
-        function openConfirmDeleteModal() {
-            document.getElementById('confirmDeleteModal').classList.remove('hidden');
-            document.getElementById('confirmDeleteModal').classList.add('flex');
-        }
-
-        function closeConfirmDeleteModal() {
-            document.getElementById('confirmDeleteModal').classList.add('hidden');
-            document.getElementById('confirmDeleteModal').classList.remove('flex');
-        }
-
-        function openPreviewModal() {
-            document.getElementById('previewModal').classList.remove('hidden');
-            document.getElementById('previewModal').classList.add('flex');
-        }
-
-        function closePreviewModal() {
-            document.getElementById('previewModal').classList.add('hidden');
-            document.getElementById('previewModal').classList.remove('flex');
-        }
-
-        function showTab(tabId) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-page').forEach(tab => {
-                tab.style.display = 'none';
-            });
-            // Show selected tab
-            document.getElementById(tabId).style.display = 'block';
-        }
-
-        // Copy to clipboard function
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast('Address copied to clipboard!', 'success');
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-                showToast('Failed to copy address', 'error');
-            });
-        }
-
-        // Toast notification function
-        function showToast(message, type = 'success') {
-            let toast = document.getElementById('toast');
-            if (!toast) {
-                toast = document.createElement('div');
-                toast.id = 'toast';
-                toast.className = `toast ${type}`;
-                document.body.appendChild(toast);
-            } else {
-                toast.className = `toast ${type}`;
-            }
-
-            toast.textContent = message;
-            toast.style.display = 'block';
-
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 3000);
-        }
-
-
-
-        // Note: Main functions like hinzufuegenCard, ladenMinerSupabase, etc. 
-        // are implemented in src/scripts/skriptfarm.js and will be used automatically
-
-        function clearTransactionInput() {
-            document.getElementById('transactionInput').value = '';
-        }
-
-        // View Config Modal functions
-        function openViewConfigModal() {
-            // Define available columns
-            const availableColumns = [
-                { key: 'ID', label: 'ID' },
-                { key: 'Miner Name', label: 'Miner Name' },
-                { key: 'TH', label: 'TH' },
-                { key: 'W/TH', label: 'W/TH' },
-                { key: 'Worth', label: 'Worth' },
-                { key: 'ROI TH', label: 'ROI TH' },
-                { key: 'ROI Eff', label: 'ROI Eff' },
-                { key: 'Profit', label: 'Profit' },
-                { key: 'Electricity', label: 'Electricity' },
-                { key: 'Service', label: 'Service' },
-                { key: 'Revenue', label: 'Revenue' }
-            ];
-
-            // Get current active columns from localStorage or default to all
-            let activeColumns = JSON.parse(localStorage.getItem('minerTableColumns'));
-            if (!activeColumns) {
-                activeColumns = availableColumns.map(col => col.key); // Default: all columns
-            }
-
-            // Build checkbox HTML
-            const optionsHTML = availableColumns.map(col => `
-                <label class="flex items-center gap-2 mb-2 p-2 hover:bg-gray-700 rounded cursor-pointer">
-                    <input type="checkbox" class="view-column-checkbox" value="${col.key}" 
-                           ${activeColumns.includes(col.key) ? 'checked' : ''}>
-                    <span class="text-gray-200">${col.label}</span>
-                </label>
-            `).join('');
-
-            document.getElementById('viewConfigOptions').innerHTML = optionsHTML;
-            document.getElementById('viewConfigModal').classList.remove('hidden');
-            document.getElementById('viewConfigModal').classList.add('flex');
-        }
-
-        function closeViewConfigModal() {
-            document.getElementById('viewConfigModal').classList.add('hidden');
-            document.getElementById('viewConfigModal').classList.remove('flex');
-        }
-
-        function setViewPreset(preset) {
-            const presets = {
-                minimal: ['ID', 'Miner Name', 'TH', 'Profit', 'Revenue'],
-                standard: ['ID', 'Miner Name', 'TH', 'W/TH', 'Worth', 'Profit', 'Revenue'],
-                all: ['ID', 'Miner Name', 'TH', 'W/TH', 'Worth', 'ROI TH', 'ROI Eff', 'Profit', 'Electricity', 'Service', 'Revenue']
-            };
-
-            const selectedColumns = presets[preset] || presets.all;
-            
-            // Update checkboxes
-            document.querySelectorAll('.view-column-checkbox').forEach(checkbox => {
-                checkbox.checked = selectedColumns.includes(checkbox.value);
-            });
-        }
-
-        function applyViewConfig() {
-            // Get selected columns
-            const selectedColumns = [];
-            document.querySelectorAll('.view-column-checkbox:checked').forEach(checkbox => {
-                selectedColumns.push(checkbox.value);
-            });
-
-            // Save to localStorage
-            localStorage.setItem('minerTableColumns', JSON.stringify(selectedColumns));
-
-            // Close modal
-            closeViewConfigModal();
-
-            // Reload tables to apply changes
-            ladenDaten();
-            
-            showToast('Tabellenansicht aktualisiert!', 'success');
-        }
-/*
-        function ladenDaten_weg() {
-            console.log('Loading data');
-            loadAllTables(); // Aufrufe der neuen externen Funktion
-        }
-
-        function aktualisiereFarmWerte() {
-            console.log('Update farm values');
-            loadAllTables(); // Aufrufe der neuen externen Funktion
-        }*/
-
-        function updateBTCPrice() {
-            aktualisiereFarmWerte();
-        } 
-
-
-
-    
-        
-        // ===== SIDEBAR NAVIGATION FUNCTIONS =====
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('mobile-overlay');
-            
-            sidebar.classList.toggle('sidebar');
-            overlay.classList.toggle('hidden');
-        }
-
-        // Simple sidebar functionality - just toggle open/close for now
     </script>
 </body>
 </html>
