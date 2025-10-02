@@ -159,7 +159,7 @@
             console.log('DOM loaded - initializing prices and data...');
             fetchBTCPrice();
             fetchGMTPrice();
-            ladenDaten();
+           // ladenDaten();
         });
 
 			function syncFieldAndSlider(event, fieldId, sliderId) {
