@@ -152,6 +152,8 @@
                             onclick="window.location.href='HelpingSkripts.html'">Skripts</button>
                     <button class="bg-cyan-600 hover:bg-cyan-700 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-200" 
                             onclick="window.location.href='checkminer.html'">Check Miner</button>
+                    <button class="bg-pink-600 hover:bg-pink-700 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-200" 
+                            onclick="openViewConfigModal()">View Config</button>
                 </div>
 
                 <!-- Right side - View and Currency Toggles -->
@@ -343,6 +345,38 @@
                         onclick="confirmDeleteMiners()">Yes, delete</button>
                 <button class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-semibold" 
                         onclick="closeConfirmDeleteModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Config Modal -->
+    <div id="viewConfigModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-xl p-6 w-full max-w-lg mx-4">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl" 
+                    onclick="closeViewConfigModal()">&times;</button>
+            <h2 class="text-xl font-bold mb-4 text-pink-400">Change table view</h2>
+            
+            <!-- Column checkboxes will be added here dynamically -->
+            <div id="viewConfigOptions" class="mb-4 max-h-60 overflow-y-auto">
+                <!-- Checkboxes werden hier dynamisch eingefügt -->
+            </div>
+            
+            <!-- Preset buttons -->
+            <div class="flex gap-2 mb-4">
+                <button class="bg-gray-600 hover:bg-gray-700 px-3 py-1 rounded-lg text-sm font-semibold transition-colors duration-200" 
+                        onclick="setViewPreset('minimal')">Minimal</button>
+                <button class="bg-gray-600 hover:bg-gray-700 px-3 py-1 rounded-lg text-sm font-semibold transition-colors duration-200" 
+                        onclick="setViewPreset('standard')">Standard</button>
+                <button class="bg-gray-600 hover:bg-gray-700 px-3 py-1 rounded-lg text-sm font-semibold transition-colors duration-200" 
+                        onclick="setViewPreset('all')">Alle</button>
+            </div>
+            
+            <!-- Apply/Close button -->
+            <div class="flex gap-2">
+                <button class="bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200" 
+                        onclick="applyViewConfig()">Anwenden</button>
+                <button class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200" 
+                        onclick="closeViewConfigModal()">Schließen</button>
             </div>
         </div>
     </div>
@@ -752,6 +786,82 @@
             console.log('Finalize import, replace:', replace);
             closePreviewModal();
             // Implementation from your existing code
+        }
+
+        // View Config Modal functions
+        function openViewConfigModal() {
+            // Define available columns
+            const availableColumns = [
+                { key: 'ID', label: 'ID' },
+                { key: 'Miner Name', label: 'Miner Name' },
+                { key: 'TH', label: 'TH' },
+                { key: 'W/TH', label: 'W/TH' },
+                { key: 'Worth', label: 'Worth' },
+                { key: 'ROI TH', label: 'ROI TH' },
+                { key: 'ROI Eff', label: 'ROI Eff' },
+                { key: 'Profit', label: 'Profit' },
+                { key: 'Electricity', label: 'Electricity' },
+                { key: 'Service', label: 'Service' },
+                { key: 'Revenue', label: 'Revenue' }
+            ];
+
+            // Get current active columns from localStorage or default to all
+            let activeColumns = JSON.parse(localStorage.getItem('minerTableColumns'));
+            if (!activeColumns) {
+                activeColumns = availableColumns.map(col => col.key); // Default: all columns
+            }
+
+            // Build checkbox HTML
+            const optionsHTML = availableColumns.map(col => `
+                <label class="flex items-center gap-2 mb-2 p-2 hover:bg-gray-700 rounded cursor-pointer">
+                    <input type="checkbox" class="view-column-checkbox" value="${col.key}" 
+                           ${activeColumns.includes(col.key) ? 'checked' : ''}>
+                    <span class="text-gray-200">${col.label}</span>
+                </label>
+            `).join('');
+
+            document.getElementById('viewConfigOptions').innerHTML = optionsHTML;
+            document.getElementById('viewConfigModal').classList.remove('hidden');
+            document.getElementById('viewConfigModal').classList.add('flex');
+        }
+
+        function closeViewConfigModal() {
+            document.getElementById('viewConfigModal').classList.add('hidden');
+            document.getElementById('viewConfigModal').classList.remove('flex');
+        }
+
+        function setViewPreset(preset) {
+            const presets = {
+                minimal: ['ID', 'Miner Name', 'TH', 'Profit', 'Revenue'],
+                standard: ['ID', 'Miner Name', 'TH', 'W/TH', 'Worth', 'Profit', 'Revenue'],
+                all: ['ID', 'Miner Name', 'TH', 'W/TH', 'Worth', 'ROI TH', 'ROI Eff', 'Profit', 'Electricity', 'Service', 'Revenue']
+            };
+
+            const selectedColumns = presets[preset] || presets.all;
+            
+            // Update checkboxes
+            document.querySelectorAll('.view-column-checkbox').forEach(checkbox => {
+                checkbox.checked = selectedColumns.includes(checkbox.value);
+            });
+        }
+
+        function applyViewConfig() {
+            // Get selected columns
+            const selectedColumns = [];
+            document.querySelectorAll('.view-column-checkbox:checked').forEach(checkbox => {
+                selectedColumns.push(checkbox.value);
+            });
+
+            // Save to localStorage
+            localStorage.setItem('minerTableColumns', JSON.stringify(selectedColumns));
+
+            // Close modal
+            closeViewConfigModal();
+
+            // Reload tables to apply changes
+            ladenDaten();
+            
+            showToast('Tabellenansicht aktualisiert!', 'success');
         }
 
         function ladenDaten() {

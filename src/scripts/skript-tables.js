@@ -167,11 +167,32 @@ function ladenMinerInTabelle() {
     
     let content = document.getElementById('content');
     if (!content) {
-        console.error("Fehler: #content nicht gefunden.");
+        console.error("Error: #content not found.");
         return;
     }
 
-    // Leere den kompletten content Container
+    // Define all available columns with keys and labels
+    const allColumns = [
+        { key: 'ID', label: 'ID' },
+        { key: 'Miner Name', label: 'Miner Name' },
+        { key: 'TH', label: 'TH' },
+        { key: 'W/TH', label: 'W/TH' },
+        { key: 'Worth', label: 'Worth' },
+        { key: 'ROI TH', label: 'ROI TH' },
+        { key: 'ROI Eff', label: 'ROI Eff' },
+        { key: 'Profit', label: 'Profit' },
+        { key: 'Electricity', label: 'Electricity' },
+        { key: 'Service', label: 'Service' },
+        { key: 'Revenue', label: 'Revenue' }
+    ];
+
+    // Get active columns from localStorage or default to all columns
+    let activeColumns = JSON.parse(localStorage.getItem('minerTableColumns'));
+    if (!activeColumns || activeColumns.length === 0) {
+        activeColumns = allColumns.map(col => col.key); // Default: show all columns
+    }
+
+    // Clear content container
     content.innerHTML = '';
 
     // Erstelle den scrollbaren Container
@@ -184,23 +205,22 @@ function ladenMinerInTabelle() {
     tableElement.id = 'miner-table';
     tableElement.className = 'w-full text-sm text-left';
 
-    // Tabellenkopf
+    // Dynamic table header - only show active columns
     let thead = document.createElement('thead');
-    thead.innerHTML = `
-        <tr class="bg-gray-700">
-            <th class="px-4 py-3 text-gray-300 font-medium">ID</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">Miner Name</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">TH</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">W/TH</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">Worth</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">ROI TH</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">ROI Eff</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">Profit</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">Electricity</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">Service</th>
-            <th class="px-4 py-3 text-gray-300 font-medium">Revenue</th>
-        </tr>
-    `;
+    let headerRow = document.createElement('tr');
+    headerRow.className = 'bg-gray-700';
+    
+    // Filter columns to only show active ones and create header cells
+    allColumns
+        .filter(col => activeColumns.includes(col.key))
+        .forEach(col => {
+            let th = document.createElement('th');
+            th.className = 'px-4 py-3 text-gray-300 font-medium';
+            th.textContent = col.label;
+            headerRow.appendChild(th);
+        });
+    
+    thead.appendChild(headerRow);
     tableElement.appendChild(thead);
 
     // Tabellenkörper
@@ -213,7 +233,7 @@ function ladenMinerInTabelle() {
     if (minerData.length === 0) {
         let emptyRow = document.createElement('tr');
         emptyRow.innerHTML = `
-            <td class="px-4 py-8 text-gray-400 text-center" colspan="11">
+            <td class="px-4 py-8 text-gray-400 text-center" colspan="${activeColumns.length}">
                 <div class="py-4">
                     <div class="mb-2">🚀</div>
                     <div>No miners added yet</div>
@@ -270,36 +290,40 @@ function ladenMinerInTabelle() {
                 serviceDisplay = `${(dailyservice.gmt || 0).toFixed(2)} GMT`;
                 revenueDisplay = `${(revenue.gmt || 0).toFixed(2)} GMT`;
             }
-            let row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="px-4 py-3 border-t border-gray-700 text-white">
+            // Create column content mapping
+            const columnContent = {
+                'ID': `<td class="px-4 py-3 border-t border-gray-700 text-white">
                     <input type="text" value="${miner.miner_id || miner.id || ''}" 
                            class="bg-transparent border-0 text-white w-full focus:outline-none focus:bg-gray-600 rounded px-1"
                            data-field="miner_id" onchange="updateMinerData(this)">
-                </td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">
+                </td>`,
+                'Miner Name': `<td class="px-4 py-3 border-t border-gray-700 text-white">
                     <input type="text" value="${miner.Miner_Name || miner.name || 'Miner'}" 
                            class="bg-transparent border-0 text-white w-full focus:outline-none focus:bg-gray-600 rounded px-1"
                            data-field="name" onchange="updateMinerData(this)">
-                </td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">
+                </td>`,
+                'TH': `<td class="px-4 py-3 border-t border-gray-700 text-white">
                     <input type="number" value="${miner.power || miner.TH || 0}" 
                            class="bg-transparent border-0 text-white w-full focus:outline-none focus:bg-gray-600 rounded px-1"
                            data-field="power" onchange="updateMinerData(this)">
-                </td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">
+                </td>`,
+                'W/TH': `<td class="px-4 py-3 border-t border-gray-700 text-white">
                     <input type="number" value="${miner.efficiency || miner.W_TH || 0}" 
                            class="bg-transparent border-0 text-white w-full focus:outline-none focus:bg-gray-600 rounded px-1"
                            data-field="efficiency" onchange="updateMinerData(this)">
-                </td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">${worthDisplay}</td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">${roiTH.toFixed(1)}%</td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">${(typeof roiWATT === 'object' ? roiWATT.roi_percent : roiWATT.toFixed(1))}%</td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">${profitDisplay}</td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">${electricityDisplay}</td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">${serviceDisplay}</td>
-                <td class="px-4 py-3 border-t border-gray-700 text-white">${revenueDisplay}</td>
-            `;
+                </td>`,
+                'Worth': `<td class="px-4 py-3 border-t border-gray-700 text-white">${worthDisplay}</td>`,
+                'ROI TH': `<td class="px-4 py-3 border-t border-gray-700 text-white">${roiTH.toFixed(1)}%</td>`,
+                'ROI Eff': `<td class="px-4 py-3 border-t border-gray-700 text-white">${(typeof roiWATT === 'object' ? roiWATT.roi_percent : roiWATT.toFixed(1))}%</td>`,
+                'Profit': `<td class="px-4 py-3 border-t border-gray-700 text-white">${profitDisplay}</td>`,
+                'Electricity': `<td class="px-4 py-3 border-t border-gray-700 text-white">${electricityDisplay}</td>`,
+                'Service': `<td class="px-4 py-3 border-t border-gray-700 text-white">${serviceDisplay}</td>`,
+                'Revenue': `<td class="px-4 py-3 border-t border-gray-700 text-white">${revenueDisplay}</td>`
+            };
+
+            // Generate row HTML with only active columns
+            let row = document.createElement('tr');
+            row.innerHTML = activeColumns.map(colKey => columnContent[colKey] || '').join('');
             tbody.appendChild(row);
         });
     }
