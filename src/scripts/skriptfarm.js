@@ -112,7 +112,7 @@ return String(highestId + 1).padStart(5, '0'); // Rückgabe als fünfstellige Za
 }
 function speichernDaten() {
 let viewElement = document.getElementById('viewMode');
-let ansicht = viewElement.innerText; // Holt den aktuellen Modus aus der UI
+ansicht = viewElement.innerText; // Holt den aktuellen Modus aus der UI
 let minerData = [];
 let user_data = {}; // Neues Objekt für User-Daten
 
@@ -172,7 +172,7 @@ localStorage.setItem('user_data', JSON.stringify(user_data));
 
 function ladenDaten() {
 let viewElement = document.getElementById('viewMode');
-let ansicht = viewElement.innerText; // Holt den aktuellen Modus aus der UI
+ansicht = viewElement.innerText; // Holt den aktuellen Modus aus der UI
 
 let savedData = localStorage.getItem('minerData');
 if (!savedData) return; // Falls keine Daten existieren, nichts tun
@@ -431,7 +431,7 @@ farmContent.appendChild(farmCard);
 }
 
 
-function ladenMinerInTabelle() {
+/* function ladenMinerInTabelle() {
 let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
 let tbody = document.getElementById('miner-tbody');
 
@@ -515,7 +515,7 @@ row.innerHTML = `
 `;
 tbody.appendChild(row);
 });
-}
+} */
 
 
 
@@ -591,25 +591,60 @@ hinzufuegenCard(get_highest_card(document.querySelector('.content')), powerValue
 
 
 }
-function wechselAnsicht(mode) {
+function updateViewClasses() {
+    const content = document.querySelector('.content');
+    if (content) {
+        content.classList.remove('grid-view', 'list-view');
+        content.classList.add(`${ansicht}-view`);
+    }
+}
+function toggleActionButtons() {
+    let viewMode = document.getElementById('viewMode').innerText;
+    let addBtn = document.getElementById('addMinerBtn');
+    let deleteBtn = document.getElementById('deleteAllBtn');
+
+    if (viewMode === 'list') {
+        if (addBtn) addBtn.style.display = 'none';
+        if (deleteBtn) deleteBtn.style.display = 'none';
+    } else {
+        if (addBtn) addBtn.style.display = 'inline-flex';
+        if (deleteBtn) deleteBtn.style.display = 'inline-flex';
+    }
+}
+
+// View and currency switching functions
+function wechselAnsicht(neueAnsicht) {
+speichernDaten(); // Speichert die aktuellen Miner-Daten
+ansicht = neueAnsicht;
+document.getElementById('viewMode').innerText = neueAnsicht;
+
 document.getElementById("grid-btn").classList.remove("active");
 document.getElementById("list-btn").classList.remove("active");
+// Update button styles
+document.querySelectorAll('[id$="-btn"]').forEach(btn => {
+    if (btn.id.includes('grid') || btn.id.includes('list')) {
+        btn.classList.remove('bg-purple-600', 'text-white');
+        btn.classList.add('text-gray-300', 'hover:text-white');
+    }
+});
+document.getElementById(`${ansicht}-btn`).classList.add('active');
+document.getElementById(`${ansicht}-btn`).classList.remove('text-gray-300', 'hover:text-white');
+document.getElementById(`${ansicht}-btn`).classList.add('bg-purple-600', 'text-white');
 
-if (mode === "grid") {
-document.getElementById("grid-btn").classList.add("active");
-} else {
-document.getElementById("list-btn").classList.add("active");
-}
-speichernDaten(); // Speichert die aktuellen Miner-Daten
-let viewElement = document.getElementById('viewMode');
-viewElement.innerText = mode; // Speichert den aktuellen Modus in HTML
-
-// Entferne vorherige aktive Markierung
-document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
-
-// Setze den aktiven Button basierend auf der gewählten Ansicht
-document.getElementById(`${mode}-btn`).classList.add('active');
-ladenDaten(); // Lädt die Daten für die neue Ansicht
+ladenDaten(); // Lädt die Daten für die neue Ansicht   
+    // Update button styles
+    document.querySelectorAll('[id$="-btn"]').forEach(btn => {
+        if (btn.id.includes('grid') || btn.id.includes('list')) {
+            btn.classList.remove('bg-purple-600', 'text-white');
+            btn.classList.add('text-gray-300', 'hover:text-white');
+        }
+    });
+    
+    document.getElementById(`${neueAnsicht}-btn`).classList.remove('text-gray-300', 'hover:text-white');
+    document.getElementById(`${neueAnsicht}-btn`).classList.add('bg-purple-600', 'text-white');
+    
+    updateViewClasses();
+    toggleActionButtons();
 }
 
 
@@ -736,6 +771,7 @@ return priceEntries[i].pricePerTH;
 
 return null; // Falls keine passende Preisstufe gefunden wurde
 }
+/*
 function wechselWaehrung(mode) {
 // Alle Buttons manuell über ID deselektieren
 document.getElementById("btc-btn").classList.remove("active");
@@ -767,6 +803,21 @@ console.error(`Fehler: Der Button ${mode}-btn existiert nicht.`);
 // Aktualisiere die Miner-Tabelle mit der neuen Währung
 speichernDaten();
 ladenDaten();
+} */
+function wechselWaehrung(neueWaehrung) {
+    document.getElementById('currencyMode').innerText = neueWaehrung;
+    // Update button styles
+    document.querySelectorAll('[id$="-btn"]').forEach(btn => {
+        if (btn.id.includes('btc') || btn.id.includes('usd') || btn.id.includes('gmt')) {
+            btn.classList.remove('bg-purple-600', 'text-white');
+            btn.classList.add('text-gray-300', 'hover:text-white');
+        }
+    });
+    document.getElementById(`${neueWaehrung}-btn`).classList.remove('text-gray-300', 'hover:text-white');
+    document.getElementById(`${neueWaehrung}-btn`).classList.add('bg-purple-600', 'text-white');
+    // Daten speichern und neu laden wie im alten Code
+    if (typeof speichernDaten === 'function') speichernDaten();
+    if (typeof ladenDaten === 'function') ladenDaten();
 }
 
 function btc2usd(btcPrice, valueBtc) {

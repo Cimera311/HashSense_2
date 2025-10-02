@@ -647,8 +647,8 @@
     <script>
      
         // Global variables
-        let ansicht = 'grid';
-
+        // ansicht variable is declared in skriptfarm.js
+        //let ansicht = 'grid';
         // Initialize page
         window.onload = function() {
             ladenDaten();
@@ -656,49 +656,10 @@
             updateViewClasses();
         };
 
-        // View and currency switching functions
-        function wechselAnsicht(neueAnsicht) {
-            ansicht = neueAnsicht;
-            document.getElementById('viewMode').innerText = neueAnsicht;
-            
-            // Update button styles
-            document.querySelectorAll('[id$="-btn"]').forEach(btn => {
-                if (btn.id.includes('grid') || btn.id.includes('list')) {
-                    btn.classList.remove('bg-purple-600', 'text-white');
-                    btn.classList.add('text-gray-300', 'hover:text-white');
-                }
-            });
-            
-            document.getElementById(`${neueAnsicht}-btn`).classList.remove('text-gray-300', 'hover:text-white');
-            document.getElementById(`${neueAnsicht}-btn`).classList.add('bg-purple-600', 'text-white');
-            
-            updateViewClasses();
-            toggleActionButtons();
-        }
 
-        function wechselWaehrung(neueWaehrung) {
-            document.getElementById('currencyMode').innerText = neueWaehrung;
-            // Update button styles
-            document.querySelectorAll('[id$="-btn"]').forEach(btn => {
-                if (btn.id.includes('btc') || btn.id.includes('usd') || btn.id.includes('gmt')) {
-                    btn.classList.remove('bg-purple-600', 'text-white');
-                    btn.classList.add('text-gray-300', 'hover:text-white');
-                }
-            });
-            document.getElementById(`${neueWaehrung}-btn`).classList.remove('text-gray-300', 'hover:text-white');
-            document.getElementById(`${neueWaehrung}-btn`).classList.add('bg-purple-600', 'text-white');
-            // Daten speichern und neu laden wie im alten Code
-            if (typeof speichernDaten === 'function') speichernDaten();
-            if (typeof ladenDaten === 'function') ladenDaten();
-        }
 
-        function updateViewClasses() {
-            const content = document.querySelector('.content');
-            if (content) {
-                content.classList.remove('grid-view', 'list-view');
-                content.classList.add(`${ansicht}-view`);
-            }
-        }
+
+
 
         // Modal functions
         function openImportModal() {
@@ -781,19 +742,7 @@
             }, 3000);
         }
 
-        function toggleActionButtons() {
-            let viewMode = document.getElementById('viewMode').innerText;
-            let addBtn = document.getElementById('addMinerBtn');
-            let deleteBtn = document.getElementById('deleteAllBtn');
 
-            if (viewMode === 'list') {
-                if (addBtn) addBtn.style.display = 'none';
-                if (deleteBtn) deleteBtn.style.display = 'none';
-            } else {
-                if (addBtn) addBtn.style.display = 'inline-flex';
-                if (deleteBtn) deleteBtn.style.display = 'inline-flex';
-            }
-        }
 
         // Note: Main functions like hinzufuegenCard, ladenMinerSupabase, etc. 
         // are implemented in src/scripts/skriptfarm.js and will be used automatically
@@ -877,8 +826,8 @@
             
             showToast('Tabellenansicht aktualisiert!', 'success');
         }
-
-        function ladenDaten() {
+/*
+        function ladenDaten_weg() {
             console.log('Loading data');
             loadAllTables(); // Aufrufe der neuen externen Funktion
         }
@@ -886,95 +835,15 @@
         function aktualisiereFarmWerte() {
             console.log('Update farm values');
             loadAllTables(); // Aufrufe der neuen externen Funktion
-        }
+        }*/
 
         function updateBTCPrice() {
             aktualisiereFarmWerte();
-        }
+        } 
 
-        function fetchBTCPrice() {
-            console.log('Fetching BTC price...');
-            fetch('https://api.coinpaprika.com/v1/tickers/btc-bitcoin')
-                .then(response => response.json())
-                .then(data => {
-                    const btcPrice = parseFloat(data.quotes.USD.price).toFixed(0);
-                    const dropdown = document.getElementById('bitcoin-price-dropdown');
-                    const priceInput = document.getElementById('bitcoin-price');
-                    
-                    if (dropdown) {
-                        const selectedOption = dropdown.querySelector('#currentp');
-                        if (selectedOption) {
-                            selectedOption.value = btcPrice;
-                            selectedOption.text = formatDollar(btcPrice);
-                            selectedOption.selected = true;
-                        }
-                    }
-                    
-                    if (priceInput) {
-                        priceInput.value = btcPrice;
-                    }
-                    
-                    // Update global btcPrice variable
-                    window.btcPrice = btcPrice;
-                    
-                    console.log('BTC Price updated:', btcPrice);
-                    
-                    // Update calculations after price fetch
-                    aktualisiereFarmWerte();
-                })
-                .catch(error => {
-                    console.error('Error fetching BTC Price:', error);
-                    alert('Failed to fetch BTC Price. Please try again later.');
-                });
-        }
 
-        function fetchGMTPrice() {
-            console.log('Fetching GMT price...');
-            fetch('https://api.coinpaprika.com/v1/tickers/gmt-gomining-token')
-                .then(response => response.json())
-                .then(data => {
-                    const gmtPrice = parseFloat(data.quotes.USD.price).toFixed(4);
-                    const priceInput = document.getElementById('gmt-token-price');
-                    
-                    if (priceInput) {
-                        priceInput.value = gmtPrice;
-                    }
-                    
-                    // Update global gmtPrice variable
-                    window.gmtPrice = gmtPrice;
-                    
-                    console.log('GMT Price updated:', gmtPrice);
-                    
-                    // Update calculations after price fetch
-                    aktualisiereFarmWerte();
-                })
-                .catch(error => {
-                    console.error('Error fetching GMT Price:', error);
-                    alert('Failed to fetch GMT Price. Please try again later.');
-                });
-        }
 
-        function formatDollar(value) {
-            // Versuche, den Wert in eine Zahl zu konvertieren, falls er kein numerischer Typ ist
-            const numericValue = parseFloat(value);
-
-            // Überprüfe, ob die Konvertierung erfolgreich war
-            if (isNaN(numericValue)) {
-                console.error("Invalid value passed to formatDollar:", value);
-                return "$0.00"; // Rückgabewert bei Fehler
-            }
-
-            // Formatiere den Wert als Dollar ($123,456.78)
-            return `$${numericValue.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
-        }
-
-        // Initialize prices on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded - initializing prices and data...');
-            fetchBTCPrice();
-            fetchGMTPrice();
-            ladenDaten();
-        });
+    
         
         // ===== SIDEBAR NAVIGATION FUNCTIONS =====
         function toggleSidebar() {

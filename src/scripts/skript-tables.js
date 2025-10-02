@@ -313,7 +313,7 @@ function ladenMinerInTabelle() {
                            data-field="efficiency" onchange="updateMinerData(this)">
                 </td>`,
                 'Worth': `<td class="px-4 py-3 border-t border-gray-700 text-white">${worthDisplay}</td>`,
-                'ROI TH': `<td class="px-4 py-3 border-t border-gray-700 text-white">${roiTH.toFixed(1)}%</td>`,
+                'ROI TH': `<td class="px-4 py-3 border-t border-gray-700 text-white">${roiTH}%</td>`,
                 'ROI Eff': `<td class="px-4 py-3 border-t border-gray-700 text-white">${(typeof roiWATT === 'object' ? roiWATT.roi_percent : roiWATT.toFixed(1))}%</td>`,
                 'Profit': `<td class="px-4 py-3 border-t border-gray-700 text-white">${profitDisplay}</td>`,
                 'Electricity': `<td class="px-4 py-3 border-t border-gray-700 text-white">${electricityDisplay}</td>`,

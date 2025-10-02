@@ -44,8 +44,10 @@
 
 
 
+
+
        /* Preise jetzt in skript-prices.js*/
-      
+      /*
 		async function fetchBTCPrice() {
 			try {
                 const dropdown = document.getElementById('bitcoin-price-dropdown');
@@ -76,10 +78,89 @@
 					console.error('Error fetching Gomining Token Price:', error);
 					alert('Failed to fetch Gomining Token Price. Please try again later.');
 				}
-			}
+			} */
+        function fetchBTCPrice() {
+            console.log('Fetching BTC price...');
+            fetch('https://api.coinpaprika.com/v1/tickers/btc-bitcoin')
+                .then(response => response.json())
+                .then(data => {
+                    const btcPrice = parseFloat(data.quotes.USD.price).toFixed(0);
+                    const dropdown = document.getElementById('bitcoin-price-dropdown');
+                    const priceInput = document.getElementById('bitcoin-price');
+                    
+                    if (dropdown) {
+                        const selectedOption = dropdown.querySelector('#currentp');
+                        if (selectedOption) {
+                            selectedOption.value = btcPrice;
+                            selectedOption.text = formatDollar(btcPrice);
+                            selectedOption.selected = true;
+                        }
+                    }
+                    
+                    if (priceInput) {
+                        priceInput.value = btcPrice;
+                    }
+                    
+                    // Update global btcPrice variable
+                    window.btcPrice = btcPrice;
+                    
+                    console.log('BTC Price updated:', btcPrice);
+                    
+                    // Update calculations after price fetch
+                    aktualisiereFarmWerte();
+                })
+                .catch(error => {
+                    console.error('Error fetching BTC Price:', error);
+                    alert('Failed to fetch BTC Price. Please try again later.');
+                });
+        }
+    function fetchGMTPrice() {
+            console.log('Fetching GMT price...');
+            fetch('https://api.coinpaprika.com/v1/tickers/gmt-gomining-token')
+                .then(response => response.json())
+                .then(data => {
+                    const gmtPrice = parseFloat(data.quotes.USD.price).toFixed(4);
+                    const priceInput = document.getElementById('gmt-token-price');
+                    
+                    if (priceInput) {
+                        priceInput.value = gmtPrice;
+                    }
+                    
+                    // Update global gmtPrice variable
+                    window.gmtPrice = gmtPrice;
+                    
+                    console.log('GMT Price updated:', gmtPrice);
+                    
+                    // Update calculations after price fetch
+                    aktualisiereFarmWerte();
+                })
+                .catch(error => {
+                    console.error('Error fetching GMT Price:', error);
+                    alert('Failed to fetch GMT Price. Please try again later.');
+                });
+        }
 
+        function formatDollar(value) {
+            // Versuche, den Wert in eine Zahl zu konvertieren, falls er kein numerischer Typ ist
+            const numericValue = parseFloat(value);
 
+            // Überprüfe, ob die Konvertierung erfolgreich war
+            if (isNaN(numericValue)) {
+                console.error("Invalid value passed to formatDollar:", value);
+                return "$0.00"; // Rückgabewert bei Fehler
+            }
 
+            // Formatiere den Wert als Dollar ($123,456.78)
+            return `$${numericValue.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+        }
+
+        // Initialize prices on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded - initializing prices and data...');
+            fetchBTCPrice();
+            fetchGMTPrice();
+            ladenDaten();
+        });
 
 			function syncFieldAndSlider(event, fieldId, sliderId) {
 				const field = document.getElementById(fieldId);
