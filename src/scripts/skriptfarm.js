@@ -661,15 +661,15 @@ speichernDaten(); // Speichert die aktuellen Miner-Daten
 ansicht = neueAnsicht;
 document.getElementById('viewMode').innerText = neueAnsicht;
 
+    // Lösche explizit alle Table-Container vor dem Ansichtswechsel
+    let minerTableContainer = document.getElementById('miner-table-container');
+    if (minerTableContainer) {
+        console.log('🗑️ Removing miner table container');
+        minerTableContainer.remove();
+    }
 document.getElementById("grid-btn").classList.remove("active");
 document.getElementById("list-btn").classList.remove("active");
-// Update button styles
-document.querySelectorAll('[id$="-btn"]').forEach(btn => {
-    if (btn.id.includes('grid') || btn.id.includes('list')) {
-        btn.classList.remove('bg-purple-600', 'text-white');
-        btn.classList.add('text-gray-300', 'hover:text-white');
-    }
-});
+
 document.getElementById(`${ansicht}-btn`).classList.add('active');
 document.getElementById(`${ansicht}-btn`).classList.remove('text-gray-300', 'hover:text-white');
 document.getElementById(`${ansicht}-btn`).classList.add('bg-purple-600', 'text-white');
@@ -941,7 +941,7 @@ async function speichernMinerSupabase() {
     } else {
         console.log("✅ Miner erfolgreich gespeichert:", data);
         console.log("✅ User-Daten erfolgreich gespeichert:", data2);
-        alert("All miners and user data saved!");
+      //  alert("All miners and user data saved!");
     }
 }
 

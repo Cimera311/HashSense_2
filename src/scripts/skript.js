@@ -111,7 +111,7 @@
                 })
                 .catch(error => {
                     console.error('Error fetching BTC Price:', error);
-                    alert('Failed to fetch BTC Price. Please try again later.');
+                 //   alert('Failed to fetch BTC Price. Please try again later.');
                 });
         }
     function fetchGMTPrice() {
@@ -136,7 +136,7 @@
                 })
                 .catch(error => {
                     console.error('Error fetching GMT Price:', error);
-                    alert('Failed to fetch GMT Price. Please try again later.');
+                  //  alert('Failed to fetch GMT Price. Please try again later.');
                 });
         }
 
@@ -188,7 +188,7 @@
                 const daily_cost = 0.0089;
 
                 if (isNaN(efficiency) || isNaN(th) || isNaN(BTC) || isNaN(dailyReward)) {
-                    alert("Please fill out all fields!");
+                  //  alert("Please fill out all fields!");
                     return;
                 }
                 
@@ -481,7 +481,7 @@ function getPriceMatrix(efficiency) {
                 
                 function calculateInvest(investment, efficiency) {
                     if (isNaN(investment) || investment <= 0) {
-                        alert("Please enter a valid investment amount.");
+                     //   alert("Please enter a valid investment amount.");
                         return;
                     }
 
@@ -788,7 +788,7 @@ function getPriceMatrix(efficiency) {
 
                     // Überprüfe, ob die Eingabewerte gültig sind
                     if (isNaN(satPerTH) || isNaN(myTH)) {
-                        alert('Bitte geben Sie gültige Werte für Satoshi pro TH und My TH ein.');
+                      //  alert('Bitte geben Sie gültige Werte für Satoshi pro TH und My TH ein.');
                         return;
                     }
 
@@ -807,7 +807,7 @@ function getPriceMatrix(efficiency) {
 
                     // Überprüfe die Eingaben
                     if (isNaN(rewardFund) || isNaN(blockShare) || isNaN(clanTH) || isNaN(myTH) || clanTH === 0) {
-                        alert('Bitte geben Sie gültige Werte ein und stellen Sie sicher, dass Clan TH nicht 0 ist.');
+                       // alert('Bitte geben Sie gültige Werte ein und stellen Sie sicher, dass Clan TH nicht 0 ist.');
                         return;
                     }
 
