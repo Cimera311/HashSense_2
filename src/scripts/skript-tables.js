@@ -338,9 +338,56 @@ function ladenMinerInTabelle() {
  * @param {HTMLElement} inputElement - Das geänderte Input-Element
  */
 function updateMinerData(inputElement) {
-    // TODO: Implement data update logic
     console.log('Updating miner data:', inputElement.dataset.field, inputElement.value);
-    // This should update the localStorage and refresh calculations
+    
+    // Get current miner data from localStorage
+    let minerData = JSON.parse(localStorage.getItem('minerData')) || [];
+    
+    // Find the row index by traversing up to the table row
+    let row = inputElement.closest('tr');
+    let tbody = row.parentElement;
+    let rowIndex = Array.from(tbody.children).indexOf(row);
+    
+    // Update the specific field in the miner data
+    if (minerData[rowIndex]) {
+        let field = inputElement.dataset.field;
+        let value = inputElement.value;
+        
+        // Convert numeric fields to numbers
+        if (field === 'power' || field === 'efficiency') {
+            value = parseFloat(value) || 0;
+        }
+        
+        // Map field names to data structure
+        switch(field) {
+            case 'miner_id':
+                minerData[rowIndex].miner_id = value;
+                minerData[rowIndex].id = value; // Also update id field
+                break;
+            case 'name':
+                minerData[rowIndex].Miner_Name = value;
+                minerData[rowIndex].name = value;
+                break;
+            case 'power':
+                minerData[rowIndex].power = value;
+                minerData[rowIndex].TH = value;
+                break;
+            case 'efficiency':
+                minerData[rowIndex].efficiency = value;
+                minerData[rowIndex].W_TH = value;
+                break;
+        }
+        
+        // Save updated data to localStorage
+        localStorage.setItem('minerData', JSON.stringify(minerData));
+        
+        // Refresh both tables to show updated calculations
+        setTimeout(() => {
+            loadAllTables();
+        }, 100); // Small delay to ensure the input value is properly set
+        
+        console.log('Updated miner data:', minerData[rowIndex]);
+    }
 }
 
 /**
