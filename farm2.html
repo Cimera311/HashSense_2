@@ -37,6 +37,18 @@
     <!-- Google Material Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
+    <style>
+        /* Sidebar animations */
+        .sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+    </style>
+
     <script>
         // Global variables for prices
         window.btcPrice = 100000; // Default BTC price
@@ -48,6 +60,44 @@
     </script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
+    <!-- Sidebar -->
+    <aside class="sidebar fixed left-0 top-0 w-64 h-full bg-gray-800 z-40 shadow-xl" id="sidebar">
+        <div class="p-4">
+            <h2 class="text-xl font-bold mb-6 text-purple-400">HashFarm</h2>
+            <nav class="space-y-2">
+                <!-- Home Button -->
+                <a href="index.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-blue-400">home</span>
+                    <span class="text-white">Main Dashboard</span>
+                </a>
+                
+                <!-- HashSense Button -->
+                <a href="HashSense.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-purple-400">calculate</span>
+                    <span class="text-white">HashSense Calculator</span>
+                </a>
+                
+                <!-- Divider -->
+                <div class="border-t border-gray-600 my-4"></div>
+                
+                <!-- Price Refresh Button -->
+                <button onclick="fetchBTCPrice(); fetchGMTPrice()" 
+                        class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-blue-400">refresh</span>
+                    <div class="flex-1">
+                        <span class="block text-white font-medium">Refresh Prices</span>
+                        <span class="block text-xs text-gray-400">Update BTC & GMT prices</span>
+                    </div>
+                </button>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden" 
+         onclick="toggleSidebar()"></div>
 
     <!-- Header with Price Cards -->
     <header class="bg-gray-800 p-4">
@@ -109,8 +159,13 @@
 
             <!-- Action Buttons Row -->
             <div class="flex flex-wrap items-center justify-between gap-4">
-                <!-- Left side - Refresh and Mode Toggle -->
+                <!-- Left side - Sidebar Toggle, Refresh and Mode Toggle -->
                 <div class="flex gap-2">
+                    <button onclick="toggleSidebar()" 
+                            class="bg-purple-600 hover:bg-purple-700 p-2 rounded-lg transition-colors duration-200" 
+                            title="Open Menu">
+                        <span class="material-icons text-white">menu</span>
+                    </button>
                     <button class="bg-blue-600 hover:bg-blue-700 p-2 rounded-lg transition-colors duration-200" 
                             onclick="fetchBTCPrice(); fetchGMTPrice();" title="Refresh Prices">
                         <span class="material-icons text-white">refresh</span>
@@ -188,10 +243,12 @@
     <main class="max-w-7xl mx-auto px-4 py-6">
         <!-- Farm Content -->
         <div class="content" id="farm-content">
-            <!-- Miner cards will be dynamically added here -->
+            <!-- Farm overview will be dynamically added here -->
         </div>
+        
+        <!-- Miner Details Content -->
         <div class="content" id="content">
-            <!-- Additional content -->
+            <!-- Miner details table will be dynamically added here -->
         </div>
     </main>
 
@@ -961,6 +1018,17 @@
             fetchGMTPrice();
             ladenDaten();
         });
+        
+        // ===== SIDEBAR NAVIGATION FUNCTIONS =====
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            sidebar.classList.toggle('sidebar');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Simple sidebar functionality - just toggle open/close for now
     </script>
 </body>
 </html>
