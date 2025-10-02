@@ -203,7 +203,7 @@ function ladenMinerInTabelle() {
     // Neue Tabelle erstellen
     let tableElement = document.createElement('table');
     tableElement.id = 'miner-table';
-    tableElement.className = 'w-full text-sm text-left';
+    tableElement.className = 'w-full text-sm text-left table-fixed';
 
     // Dynamic table header - only show active columns
     let thead = document.createElement('thead');
@@ -215,7 +215,7 @@ function ladenMinerInTabelle() {
         .filter(col => activeColumns.includes(col.key))
         .forEach(col => {
             let th = document.createElement('th');
-            th.className = 'px-4 py-3 text-gray-300 font-medium';
+            th.className = 'px-4 py-3 text-gray-300 font-medium resize-x overflow-hidden min-w-[100px]';
             th.textContent = col.label;
             headerRow.appendChild(th);
         });
