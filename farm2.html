@@ -9,6 +9,7 @@
     <script src="src/scripts/skript.js"></script>
     <script src="src/scripts/skript-prices.js"></script>
     <script src="src/scripts/skript-tables.js"></script>
+    <script src="src/scripts/skriptfarm.js"></script>
     <script src="src/scripts/skriptreferral.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
@@ -794,55 +795,11 @@
             }
         }
 
-        // Placeholder functions - you'll need to implement these based on your existing skript.js
-        function hinzufuegenCard(cardId, power, efficiency, name) {
-            console.log('Add miner card:', cardId, power, efficiency, name);
-            // Implementation from your existing code
-        }
-
-        function get_highest_card(content) {
-            return Math.floor(Math.random() * 1000); // Placeholder
-        }
-
-        function speichernMinerSupabase() {
-            console.log('Save miners to cloud');
-            // Implementation from your existing code
-        }
-
-        function ladenMinerSupabase() {
-            console.log('Load miners from cloud');
-            // Implementation from your existing code
-        }
-
-        function confirmDeleteMiners() {
-            console.log('Delete all miners confirmed');
-            closeConfirmDeleteModal();
-            // Implementation from your existing code
-        }
-
-        function importMinerData() {
-            console.log('Import miner data');
-            // Implementation from your existing code
-        }
-
-        function convertTransactionsToXLSX() {
-            console.log('Convert transactions to XLSX');
-            // Implementation from your existing code
-        }
+        // Note: Main functions like hinzufuegenCard, ladenMinerSupabase, etc. 
+        // are implemented in src/scripts/skriptfarm.js and will be used automatically
 
         function clearTransactionInput() {
             document.getElementById('transactionInput').value = '';
-        }
-
-        function convertReferralToCSV() {
-            console.log('Convert referral to CSV');
-            // Implementation from your existing code
-        }
-
-        function finalizeImport(replace) {
-            console.log('Finalize import, replace:', replace);
-            closePreviewModal();
-            // Implementation from your existing code
         }
 
         // View Config Modal functions
