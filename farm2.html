@@ -85,13 +85,41 @@
                 <div class="border-t border-gray-600 my-4"></div>
                 
                 <!-- Price Refresh Button -->
-                <button onclick="fetchBTCPrice(); fetchGMTPrice()" 
+                <button onclick="fetchBTCPrice(); fetchGMTPrice(); aktualisiereFarmWerte();" 
                         class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
                     <span class="material-icons text-blue-400">refresh</span>
                     <div class="flex-1">
                         <span class="block text-white font-medium">Refresh Prices</span>
                         <span class="block text-xs text-gray-400">Update BTC & GMT prices</span>
                     </div>
+                </button>
+                
+                <!-- Divider -->
+                <div class="border-t border-gray-600 my-4"></div>
+                
+                <!-- Navigation Tools -->
+                <button onclick="openImportModal()" 
+                        class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-orange-400">upload</span>
+                    <span class="text-white">Imports</span>
+                </button>
+                
+                <button onclick="window.location.href='linkview.html'" 
+                        class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-indigo-400">link</span>
+                    <span class="text-white">LinkView</span>
+                </button>
+                
+                <button onclick="window.location.href='HelpingSkripts.html'" 
+                        class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-teal-400">code</span>
+                    <span class="text-white">Scripts</span>
+                </button>
+                
+                <button onclick="window.location.href='checkminer.html'" 
+                        class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-cyan-400">check_circle</span>
+                    <span class="text-white">Check Miner</span>
                 </button>
             </nav>
         </div>
@@ -169,7 +197,7 @@
                         <span class="material-icons text-white">menu</span>
                     </button>
                     <button class="bg-blue-600 hover:bg-blue-700 p-2 rounded-lg transition-colors duration-200" 
-                            onclick="fetchBTCPrice(); fetchGMTPrice();" title="Refresh Prices">
+                            onclick="fetchBTCPrice(); fetchGMTPrice();aktualisiereFarmWerte();" title="Refresh Prices">
                         <span class="material-icons text-white">refresh</span>
                     </button>
                     <button class="bg-gray-600 hover:bg-gray-700 p-2 rounded-lg transition-colors duration-200" 
@@ -201,14 +229,6 @@
                         <span class="material-icons text-white">delete</span>
                     </button>
                     
-                    <button class="bg-orange-600 hover:bg-orange-700 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-200" 
-                            onclick="openImportModal()">Imports</button>
-                    <button class="bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-200" 
-                            onclick="window.location.href='linkview.html'">LinkView</button>
-                    <button class="bg-teal-600 hover:bg-teal-700 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-200" 
-                            onclick="window.location.href='HelpingSkripts.html'">Skripts</button>
-                    <button class="bg-cyan-600 hover:bg-cyan-700 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-200" 
-                            onclick="window.location.href='checkminer.html'">Check Miner</button>
                     <button class="bg-pink-600 hover:bg-pink-700 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-200" 
                             onclick="openViewConfigModal()">View Config</button>
                 </div>

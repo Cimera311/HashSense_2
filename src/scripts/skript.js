@@ -107,7 +107,7 @@
                     console.log('BTC Price updated:', btcPrice);
                     
                     // Update calculations after price fetch
-                    aktualisiereFarmWerte();
+                   // aktualisiereFarmWerte();
                 })
                 .catch(error => {
                     console.error('Error fetching BTC Price:', error);
@@ -132,7 +132,7 @@
                     console.log('GMT Price updated:', gmtPrice);
                     
                     // Update calculations after price fetch
-                    aktualisiereFarmWerte();
+                   // aktualisiereFarmWerte();
                 })
                 .catch(error => {
                     console.error('Error fetching GMT Price:', error);
@@ -796,7 +796,7 @@ function getPriceMatrix(efficiency) {
                     const weeklyReward = satPerTH * myTH * 7;
 
                     // Schreibe den berechneten Wert in das Feld
-                    document.getElementById('Weelky-Solo-Reward_MW').value = weeklyReward.toFixed(0);
+                    //document.getElementById('Weelky-Solo-Reward_MW').value = weeklyReward.toFixed(0);
                 }
                 function calculateWeeklyMWReward() {
                     // Hole die Eingabewerte

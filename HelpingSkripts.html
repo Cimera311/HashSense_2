@@ -1,174 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script type="module" src="config.js"></script>
-        <script src="./priceMatrix.js"></script>
-  <script src="src/scripts/skript.js"></script>
-  <script src="src/scripts/skriptreferral.js"></script>
-        <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                console.log("Checking priceMatrixlocal:", window.priceMatrixlocal);
-            });
-        </script>
-        <link rel="stylesheet" href="styles.css">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HashFarm - Scripts & Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="config.js"></script>
+    <script src="./priceMatrix.js"></script>
+    <script src="src/scripts/skript.js"></script>
+    <script src="src/scripts/skriptreferral.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     
-        <title>HashSense Farm</title>
-        <style>
-            .lang-btn.active {
-                background-color: #6c5ce7;
-                color: white;
-            }
-            .lang-btn {
-                margin: 0 5px;
-                padding: 5px 10px;
-                cursor: pointer;
-                border: none;
-                background: #dfe6e9;
-                border-radius: 5px;
-            }
-            .accordion {
-                margin-top: 20px;
-            }
-            .accordion button {
-                background-color: #6c5ce7;
-                color: white;
-                padding: 10px;
-                width: 100%;
-                border: none;
-                text-align: left;
-                font-size: 16px;
-                cursor: pointer;
-                border-radius: 5px;
-            }
-            .accordion-content {
-                display: none;
-                padding: 10px;
-                background-color: #f0f0f0;
-                margin-top: 5px;
-                border-radius: 5px;
-            }
-            pre code {
-                white-space: pre-wrap;
-                word-wrap: break-word;
-            }
-
+    <!-- Google Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("Checking priceMatrixlocal:", window.priceMatrixlocal);
+        });
+    </script>
+    <style>
+        /* Sidebar animations */
+        .sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .lang-btn.active {
+            background: linear-gradient(135deg, rgb(147 51 234) 0%, rgb(168 85 247) 100%);
+            color: white;
+        }
+        
+        .lang-btn {
+            margin: 0 0.25rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border: none;
+            background: rgb(75 85 99);
+            border-radius: 0.5rem;
+            color: rgb(209 213 219);
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .lang-btn:hover {
+            background: rgb(55 65 81);
+        }
+        
+        .accordion {
+            margin-top: 1.5rem;
+        }
+        
+        .accordion button {
+            background: linear-gradient(135deg, rgb(147 51 234) 0%, rgb(168 85 247) 100%);
+            color: white;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            border: none;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+            font-weight: 600;
+        }
+        
+        .accordion button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px -5px rgba(147, 51, 234, 0.4);
+        }
+        
+        .accordion-content {
+            display: none;
+            padding: 1rem;
+            background: rgb(31 41 55);
+            margin-top: 0.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgb(55 65 81);
+        }
+        
+        pre code {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: rgb(17 24 39);
+            color: rgb(209 213 219);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
     </style>
 </head>
-<body>
-    <div class="main-container">
-        <div class="main-container">
-            <header class="header">
-                <div class="card-field">
-                    <div class="card-title">CURRENT BITCOINPRICE</div>
-                    <div class="card-content aligned">
-                        <div class="icon-wrap">
-                         <img src="bitcoin-910307_1280.webp" alt="BTC" class="card-icon">
-                        </div>
-                        <div class="value-wrap">
-                            <select id="bitcoin-price-dropdown" onchange="updateBTCPrice();">
-                                <option value="10000">10,000 $</option>
-                                <option value="20000">20,000 $</option>
-                                <option value="30000">30,000 $</option>    
-                                <option value="40000">40,000 $</option>
-                                <option value="50000">50,000 $</option>
-                                <option value="60000">60,000 $</option>   
-                                <option value="70000">70,000 $</option>
-                                <option value="80000">80,000 $</option>
-                                <option value="90000">90,000 $</option>
-                                <option id="currentp" value="0">current price</option>
-                                <option value="100000">100,000 $</option>
-                                <option value="110000">110,000 $</option>
-                                <option value="120000">120,000 $</option>
-                                <option value="130000">130,000 $</option>
-                                <option value="140000">140,000 $</option>
-                                <option value="150000">150,000 $</option>
-                                <option value="160000">160,000 $</option>
-                                <option value="200000">200,000 $</option>
-                                <option value="250000">250,000 $</option>
-                                <option value="300000">300,000 $</option>
-                                <option value="400000">400,000 $</option>   
-                            </select>
-                        </div>
-                </div>
-              </div>
-              <div class="card-field">
-                <div class="card-title">CURRENT GMT PRICE</div>
-                <div class="card-content aligned">
-                    <div class="icon-wrap">
-                        <img src="GoMining_Logo.webp" alt="GMT" class="card-icon">
-                    </div>
-                    <div class="value-wrap">
-                        <input type="number" id="gmt-token-price" placeholder="0.4269" step="0.0001">
-                    </div>
-                </div>
-                  </div>
-                  <div class="card-field">
-                    <div class="card-title">SAT PER TH</div>
-                    <div class="card-content">
-                        <img src="sats-ordinals-sats-logo.png" alt="⚡" class="card-icon">
-                      <input type="number" id="sat-TH" value="51" min="0" step="1">
-                    </div>
-                  </div>
-                  <button class="icon-btn" onclick="fetchBTCPrice(); fetchGMTPrice();"><span class="material-icons">refresh</span></button>
-
-            </header>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Sidebar -->
+    <aside class="sidebar fixed left-0 top-0 w-64 h-full bg-gray-800 z-40 shadow-xl" id="sidebar">
+        <div class="p-4">
+            <h2 class="text-xl font-bold mb-6 text-purple-400">HashFarm</h2>
+            <nav class="space-y-2">
+                <!-- Home Button -->
+                <a href="index.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-blue-400">home</span>
+                    <span class="text-white">Main Dashboard</span>
+                </a>
+                
+                <!-- Farm Button -->
+                <a href="farm2.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-green-400">agriculture</span>
+                    <span class="text-white">Mining Farm</span>
+                </a>
+                
+                <!-- HashSense Button -->
+                <a href="HashSense.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-purple-400">calculate</span>
+                    <span class="text-white">HashSense Calculator</span>
+                </a>
+            </nav>
         </div>
-    <div class="main-container">
+    </aside>
 
-        <header class="header header-actions">
-            <div class="action-center">
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden" 
+         onclick="toggleSidebar()"></div>
 
-                <div class="action-icons">
+    <!-- Header -->
+    <header class="bg-gray-800 p-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between">
+                <!-- Left side - Navigation -->
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" 
+                            class="bg-purple-600 hover:bg-purple-700 p-2 rounded-lg transition-colors duration-200" 
+                            title="Open Menu">
+                        <span class="material-icons text-white">menu</span>
+                    </button>
+                    <button onclick="window.location.href='farm2.html'" 
+                            class="bg-gray-600 hover:bg-gray-700 p-2 rounded-lg transition-colors duration-200" 
+                            title="Back to Farm">
+                        <span class="material-icons text-white">arrow_back</span>
+                    </button>
+                    <h1 class="text-xl font-bold text-white">Scripts & Tools</h1>
+                </div>
+                
+                <!-- Right side - Language Toggle -->
+                <div class="flex gap-2">
                     <button id="deBtn" class="lang-btn active">DE</button>
                     <button id="enBtn" class="lang-btn">EN</button>
-
                 </div>
             </div>
-        </header>
-        <div class="content" id="content">
-            <div id="deSection">
-                <h1>HashFarm Skripts</h1>
-                <p>Exportiere deine GoMining Transaktionen einfach per Skript.</p>
-                <h2>Was macht dieses Skript?</h2>
-                <p>Mit diesem Skript kannst du alle Transaktionen aus deinem GoMining Konto automatisch exportieren. Es durchsucht alle Seiten, sammelt die Daten und erstellt daraus eine CSV-Datei.</p>
+        </div>
+    </header>
 
-                <h2>Anleitung</h2>
-                <ol>
-                    <li>Gehe in die <strong>Transaktionsübersicht</strong> auf GoMining.</li>
-                    <li>Öffne die <strong>Console</strong> mit <kbd>F12</kbd> und wähle den Reiter <strong>Console</strong>.</li>
-                    <li>Füge das gesamte Skript in die Console ein und drücke <strong>Enter</strong>.</li>
-                    <li>Ggf. musst du zuvor das einfügen erlauben. "allow pasting" oder so</li>
-                </ol>
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-6">
+        <div id="deSection" class="bg-gray-800 rounded-xl p-6 shadow-lg">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-purple-400 mb-4">HashFarm Scripts</h1>
+                <p class="text-gray-300 text-lg">Exportiere deine GoMining Transaktionen einfach per Script.</p>
+            </div>
 
-                <h2>Ablauf</h2>
-                <ul>
-                    <li>Das Skript startet automatisch und sammelt alle Transaktionen.</li>
-                    <li>Es klickt sich automatisch durch alle Seiten.</li>
-                    <li>Am Ende wird eine CSV-Datei heruntergeladen.</li>
-                </ul>
+            <div class="space-y-8">
+                <div class="bg-gray-700 rounded-lg p-6">
+                    <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                        <span class="material-icons text-blue-400">info</span>
+                        Was macht dieses Script?
+                    </h2>
+                    <p class="text-gray-300">Mit diesem Script kannst du alle Transaktionen aus deinem GoMining Konto automatisch exportieren. Es durchsucht alle Seiten, sammelt die Daten und erstellt daraus eine CSV-Datei.</p>
+                </div>
 
-                <h2>CSV Aufbau</h2>
-                <p>Die CSV hat folgende Felder (jeweils mit <strong>;</strong> getrennt):</p>
-                <ul>
-                    <li>Datum (Tag/Monat/Jahr)</li>
-                    <li>Uhrzeit</li>
-                    <li>Typ</li>
-                    <li>Wert</li>
-                    <li>Währung (GMT oder BTC)</li>
-                    <li>Status</li>
-                </ul>
+                <div class="bg-gray-700 rounded-lg p-6">
+                    <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                        <span class="material-icons text-green-400">list</span>
+                        Anleitung
+                    </h2>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-300">
+                        <li>Gehe in die <strong class="text-purple-400">Transaktionsübersicht</strong> auf GoMining.</li>
+                        <li>Öffne die <strong class="text-purple-400">Console</strong> mit <kbd class="bg-gray-600 px-2 py-1 rounded text-white">F12</kbd> und wähle den Reiter <strong class="text-purple-400">Console</strong>.</li>
+                        <li>Füge das gesamte Script in die Console ein und drücke <kbd class="bg-gray-600 px-2 py-1 rounded text-white">Enter</kbd>.</li>
+                        <li>Ggf. musst du zuvor das Einfügen erlauben: <em class="text-yellow-400">"allow pasting"</em></li>
+                    </ol>
+                </div>
 
-                <h2>Export abbrechen</h2>
-                <p>Falls du den Export stoppen willst, kannst du jederzeit in der Console folgendes eintippen:</p>
-                <pre><code>cancelGoMiningExport();</code></pre>
-                <p>Das Skript beendet sich dann nach Abschluss der aktuellen Seite.</p>
+                <div class="bg-gray-700 rounded-lg p-6">
+                    <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                        <span class="material-icons text-orange-400">play_arrow</span>
+                        Ablauf
+                    </h2>
+                    <ul class="list-disc list-inside space-y-2 text-gray-300">
+                        <li>Das Script startet automatisch und sammelt alle Transaktionen.</li>
+                        <li>Es klickt sich automatisch durch alle Seiten.</li>
+                        <li>Am Ende wird eine CSV-Datei heruntergeladen.</li>
+                    </ul>
+                </div>
 
-                <h2>Hinweis</h2>
-                <p>Bitte Geduld haben: Jede Seite braucht etwa 2 Sekunden zum Laden. Bei vielen Transaktionen kann der Export ein paar Minuten dauern.</p>
+                <div class="bg-gray-700 rounded-lg p-6">
+                    <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                        <span class="material-icons text-cyan-400">table_chart</span>
+                        CSV Aufbau
+                    </h2>
+                    <p class="text-gray-300 mb-3">Die CSV hat folgende Felder (jeweils mit <strong class="text-purple-400">;</strong> getrennt):</p>
+                    <ul class="list-disc list-inside space-y-1 text-gray-300">
+                        <li>Datum (Tag/Monat/Jahr)</li>
+                        <li>Uhrzeit</li>
+                        <li>Typ</li>
+                        <li>Wert</li>
+                        <li>Währung (GMT oder BTC)</li>
+                        <li>Status</li>
+                    </ul>
+                </div>
+
+                <div class="bg-red-900/30 border border-red-600 rounded-lg p-6">
+                    <h2 class="text-xl font-semibold text-red-400 mb-4 flex items-center gap-2">
+                        <span class="material-icons">stop</span>
+                        Export abbrechen
+                    </h2>
+                    <p class="text-gray-300 mb-3">Falls du den Export stoppen willst, kannst du jederzeit in der Console folgendes eintippen:</p>
+                    <div class="bg-gray-800 rounded p-3">
+                        <code class="text-red-400">cancelGoMiningExport();</code>
+                    </div>
+                    <p class="text-gray-300 mt-3">Das Script beendet sich dann nach Abschluss der aktuellen Seite.</p>
+                </div>
+
+                <div class="bg-yellow-900/30 border border-yellow-600 rounded-lg p-6">
+                    <h2 class="text-xl font-semibold text-yellow-400 mb-3 flex items-center gap-2">
+                        <span class="material-icons">warning</span>
+                        Hinweis
+                    </h2>
+                    <p class="text-gray-300">Bitte Geduld haben: Jede Seite braucht etwa 2 Sekunden zum Laden. Bei vielen Transaktionen kann der Export ein paar Minuten dauern.</p>
+                </div>
                 <div class="accordion">
                     <button onclick="toggleAccordion('deScript')">📜 zeige Skript </button>
                     <div id="deScript" class="accordion-content">
@@ -348,48 +413,84 @@
                 </pre>
                 </div>  
             </div>  
-                <button class="main-btn" onclick="window.location.href='farm2.html'">Zurück zur Farm</button>
             </div>
+        </div>
          
   
-            <div id="enSection" style="display:none">
-                <h1>HashFarm Skripts</h1>
-                <p>Export your GoMining transactions easily using a script.</p>
-                <h2>What does this script do?</h2>
-                <p>This script allows you to automatically export all your transactions from your GoMining account. It browses all pages, collects the data, and generates a CSV file.</p>
+            <div id="enSection" class="bg-gray-800 rounded-xl p-6 shadow-lg" style="display:none">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-purple-400 mb-4">HashFarm Scripts</h1>
+                    <p class="text-gray-300 text-lg">Export your GoMining transactions easily using a script.</p>
+                </div>
 
-                <h2>Instructions</h2>
-                <ol>
-                    <li>Open the <strong>Transactions overview</strong> on GoMining.</li>
-                    <li>Open the <strong>Console</strong> using <kbd>F12</kbd> and select the <strong>Console</strong> tab.</li>
-                    <li>Paste the entire script into the console and press <strong>Enter</strong>.</li>
-                </ol>
+                <div class="space-y-8">
+                    <div class="bg-gray-700 rounded-lg p-6">
+                        <h2 class="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                            <span class="material-icons text-blue-400">info</span>
+                            What does this script do?
+                        </h2>
+                        <p class="text-gray-300">This script allows you to automatically export all your transactions from your GoMining account. It browses all pages, collects the data, and generates a CSV file.</p>
+                    </div>
 
-                <h2>Process</h2>
-                <ul>
-                    <li>The script starts automatically and collects all transactions.</li>
-                    <li>It clicks through all pages automatically.</li>
-                    <li>At the end, a CSV file is downloaded.</li>
-                </ul>
+                    <div class="bg-gray-700 rounded-lg p-6">
+                        <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                            <span class="material-icons text-green-400">list</span>
+                            Instructions
+                        </h2>
+                        <ol class="list-decimal list-inside space-y-2 text-gray-300">
+                            <li>Open the <strong class="text-purple-400">Transactions overview</strong> on GoMining.</li>
+                            <li>Open the <strong class="text-purple-400">Console</strong> using <kbd class="bg-gray-600 px-2 py-1 rounded text-white">F12</kbd> and select the <strong class="text-purple-400">Console</strong> tab.</li>
+                            <li>Paste the entire script into the console and press <kbd class="bg-gray-600 px-2 py-1 rounded text-white">Enter</kbd>.</li>
+                        </ol>
+                    </div>
 
-                <h2>CSV structure</h2>
-                <p>The CSV contains the following fields (each separated by <strong>;</strong>):</p>
-                <ul>
-                    <li>Date (day/month/year)</li>
-                    <li>Time</li>
-                    <li>Type</li>
-                    <li>Value</li>
-                    <li>Currency (GMT or BTC)</li>
-                    <li>Status</li>
-                </ul>
+                    <div class="bg-gray-700 rounded-lg p-6">
+                        <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                            <span class="material-icons text-orange-400">play_arrow</span>
+                            Process
+                        </h2>
+                        <ul class="list-disc list-inside space-y-2 text-gray-300">
+                            <li>The script starts automatically and collects all transactions.</li>
+                            <li>It clicks through all pages automatically.</li>
+                            <li>At the end, a CSV file is downloaded.</li>
+                        </ul>
+                    </div>
 
-                <h2>Cancel export</h2>
-                <p>If you want to stop the export, you can type the following into the console at any time:</p>
-                <pre><code>cancelGoMiningExport();</code></pre>
-                <p>The script will stop after finishing the current page.</p>
+                    <div class="bg-gray-700 rounded-lg p-6">
+                        <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                            <span class="material-icons text-cyan-400">table_chart</span>
+                            CSV structure
+                        </h2>
+                        <p class="text-gray-300 mb-3">The CSV contains the following fields (each separated by <strong class="text-purple-400">;</strong>):</p>
+                        <ul class="list-disc list-inside space-y-1 text-gray-300">
+                            <li>Date (day/month/year)</li>
+                            <li>Time</li>
+                            <li>Type</li>
+                            <li>Value</li>
+                            <li>Currency (GMT or BTC)</li>
+                            <li>Status</li>
+                        </ul>
+                    </div>
 
-                <h2>Note</h2>
-                <p>Please be patient: Each page takes about 2 seconds to load. With many transactions, the export can take several minutes.</p>
+                    <div class="bg-red-900/30 border border-red-600 rounded-lg p-6">
+                        <h2 class="text-xl font-semibold text-red-400 mb-4 flex items-center gap-2">
+                            <span class="material-icons">stop</span>
+                            Cancel export
+                        </h2>
+                        <p class="text-gray-300 mb-3">If you want to stop the export, you can type the following into the console at any time:</p>
+                        <div class="bg-gray-800 rounded p-3">
+                            <code class="text-red-400">cancelGoMiningExport();</code>
+                        </div>
+                        <p class="text-gray-300 mt-3">The script will stop after finishing the current page.</p>
+                    </div>
+
+                    <div class="bg-yellow-900/30 border border-yellow-600 rounded-lg p-6">
+                        <h2 class="text-xl font-semibold text-yellow-400 mb-3 flex items-center gap-2">
+                            <span class="material-icons">warning</span>
+                            Note
+                        </h2>
+                        <p class="text-gray-300">Please be patient: Each page takes about 2 seconds to load. With many transactions, the export can take several minutes.</p>
+                    </div>
                 <div class="accordion">
                     <button onclick="toggleAccordion('enScript')">📜 show Skript </button>
                     <div id="enScript" class="accordion-content">
@@ -566,15 +667,24 @@
       })();</code>
                 </pre>
             </div>
-                <button class="main-btn" onclick="window.location.href='farm2.html'">Back to your Farm</button>
-              </div>
+                </div>
             </div>
-        </div>
-    </div>
-        <footer class="footer">
-            <p>&copy; 2024 HashFarm | Helping you mine smarter.</p>
-        </footer>
-    </div>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-gray-800 p-6 mt-8 text-center text-gray-400">
+        <p>&copy; 2024 HashFarm | Helping you mine smarter.</p>
+    </footer>
+
+    <script>
+        // Sidebar toggle function
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+    </script>
 
     <script>
         const deBtn = document.getElementById('deBtn');
