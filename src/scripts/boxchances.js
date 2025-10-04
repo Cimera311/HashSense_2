@@ -14,8 +14,8 @@ const goBoxesData = {
         { item: "1 TH Miner", chance: 2.50, range: "Range 425-674", rarity: "uncommon", icon: "⚡" },
         { item: "10 GOMINING", chance: 2.50, range: "Range 675-924", rarity: "uncommon", icon: "💎" },
         { item: "3 Bonus miner days", chance: 2.50, range: "Range 925-1174", rarity: "uncommon", icon: "📅" },
-        { item: "-10% on power upgrade", chance: 6.00, range: "Range 1175-1774", rarity: "epic", icon: "⚡" },
-        { item: "-7% on power upgrade", chance: 15.00, range: "Range 1775-3274", rarity: "epic", icon: "⚡" },
+        { item: "-10% on power upgrade", chance: 6.00, range: "Range 1175-1774", rarity: "", icon: "⚡" },
+        { item: "-7% on power upgrade", chance: 15.00, range: "Range 1775-3274", rarity: "", icon: "⚡" },
         { item: "5 GOMINING", chance: 15.50, range: "Range 3275-4824", rarity: "common", icon: "💎" },
         { item: "1 Bonus miner day", chance: 15.75, range: "Range 4825-6399", rarity: "common", icon: "📅" },
         { item: "-5% on power upgrade", chance: 36.00, range: "Range 6400-9999", rarity: "common", icon: "⚡" }
@@ -35,10 +35,10 @@ const goBoxesData = {
         { item: "1 TH Miner", chance: 5.00, range: "Range 850-1349", rarity: "common", icon: "⚡" },
         { item: "10 GOMINING", chance: 5.00, range: "Range 1350-1849", rarity: "common", icon: "💎" },
         { item: "5 Bonus miner days", chance: 5.00, range: "Range 1850-2349", rarity: "common", icon: "📅" },
-        { item: "-10% on power upgrade", chance: 6.00, range: "Range 2350-2949", rarity: "epic", icon: "⚡" },
+        { item: "-10% on power upgrade", chance: 6.00, range: "Range 2350-2949", rarity: "", icon: "⚡" },
         { item: "5 GOMINING", chance: 7.50, range: "Range 2950-3699", rarity: "common", icon: "💎" },
         { item: "3 Bonus miner days", chance: 12.00, range: "Range 3700-4899", rarity: "common", icon: "📅" },
-        { item: "-7% on power upgrade", chance: 15.00, range: "Range 4900-6399", rarity: "epic", icon: "⚡" },
+        { item: "-7% on power upgrade", chance: 15.00, range: "Range 4900-6399", rarity: "", icon: "⚡" },
         { item: "-5% on power upgrade", chance: 36.00, range: "Range 6400-9999", rarity: "common", icon: "⚡" }
     ],
     gold: [
@@ -56,11 +56,11 @@ const goBoxesData = {
         { item: "50 GOMINING", chance: 2.50, range: "Range 775-1024", rarity: "uncommon", icon: "💎" },
         { item: "20 Bonus miner days", chance: 2.75, range: "Range 1025-1299", rarity: "common", icon: "📅" },
         { item: "15 Bonus miner days", chance: 5.00, range: "Range 1300-1799", rarity: "common", icon: "📅" },
-        { item: "-10% on power upgrade", chance: 6.00, range: "Range 1800-2399", rarity: "epic", icon: "⚡" },
+        { item: "-10% on power upgrade", chance: 6.00, range: "Range 1800-2399", rarity: "", icon: "⚡" },
         { item: "2 TH Miner", chance: 7.50, range: "Range 2400-3149", rarity: "common", icon: "⚡" },
         { item: "20 GOMINING", chance: 7.50, range: "Range 3150-3899", rarity: "common", icon: "💎" },
         { item: "10 Bonus miner days", chance: 10.00, range: "Range 3900-4899", rarity: "common", icon: "📅" },
-        { item: "-7% on power upgrade", chance: 15.00, range: "Range 4900-6399", rarity: "epic", icon: "⚡" },
+        { item: "-7% on power upgrade", chance: 15.00, range: "Range 4900-6399", rarity: "", icon: "⚡" },
         { item: "-5% on power upgrade", chance: 36.00, range: "Range 6400-9999", rarity: "common", icon: "⚡" }
     ],
     platinum: [
@@ -78,10 +78,10 @@ const goBoxesData = {
         { item: "30 Bonus miner days", chance: 2.50, range: "Range 1050-1299", rarity: "uncommon", icon: "📅" },
         { item: "8 TH Miner", chance: 5.00, range: "Range 1300-1799", rarity: "common", icon: "⚡" },
         { item: "25 Bonus miner days", chance: 5.00, range: "Range 1800-2299", rarity: "common", icon: "📅" },
-        { item: "-10% on power upgrade", chance: 6.00, range: "Range 2300-2899", rarity: "epic", icon: "⚡" },
+        { item: "-10% on power upgrade", chance: 6.00, range: "Range 2300-2899", rarity: "", icon: "⚡" },
         { item: "100 GOMINING", chance: 7.50, range: "Range 2900-3649", rarity: "common", icon: "💎" },
         { item: "20 Bonus miner days", chance: 12.50, range: "Range 3650-4899", rarity: "common", icon: "📅" },
-        { item: "-7% on power upgrade", chance: 15.00, range: "Range 4900-6399", rarity: "epic", icon: "⚡" },
+        { item: "-7% on power upgrade", chance: 15.00, range: "Range 4900-6399", rarity: "", icon: "⚡" },
         { item: "-5% on power upgrade", chance: 36.00, range: "Range 6400-9999", rarity: "common", icon: "⚡" }
     ],
     diamond: [
@@ -98,10 +98,10 @@ const goBoxesData = {
            { item: "16 TH Miner", chance: 5.00, range: "Range 1150-1649", rarity: "common", icon: "⚡" },
            { item: "200 GOMINING", chance: 5.00, range: "Range 1650-2149", rarity: "common", icon: "💎" },
            { item: "25 Bonus miner days", chance: 5.00, range: "Range 2150-2649", rarity: "common", icon: "📅" },
-           { item: "-10% on power upgrade", chance: 6.00, range: "Range 2650-3249", rarity: "epic", icon: "⚡" },
+           { item: "-10% on power upgrade", chance: 6.00, range: "Range 2650-3249", rarity: "", icon: "⚡" },
            { item: "8 TH Miner", chance: 7.50, range: "Range 3250-3999", rarity: "common", icon: "⚡" },
            { item: "100 GOMINING", chance: 7.50, range: "Range 4000-4749", rarity: "common", icon: "💎" },
-           { item: "-7% on power upgrade", chance: 22.50, range: "Range 4750-6999", rarity: "epic", icon: "⚡" },
+           { item: "-7% on power upgrade", chance: 22.50, range: "Range 4750-6999", rarity: "", icon: "⚡" },
            { item: "-5% on power upgrade", chance: 30.00, range: "Range 7000-9999", rarity: "common", icon: "⚡" }
     ],
     legend: [
@@ -118,9 +118,9 @@ const goBoxesData = {
         { item: "60 Bonus miner days", chance: 5.00, range: "Range 1800-2299", rarity: "common", icon: "📅" },
         { item: "16 TH Miner", chance: 7.50, range: "Range 2300-3049", rarity: "common", icon: "⚡" },
         { item: "200 GOMINING", chance: 7.50, range: "Range 3050-3799", rarity: "common", icon: "💎" },
-        { item: "-10% on power upgrade", chance: 9.00, range: "Range 3800-4699", rarity: "epic", icon: "⚡" },
+        { item: "-10% on power upgrade", chance: 9.00, range: "Range 3800-4699", rarity: "", icon: "⚡" },
         { item: "100 GOMINING", chance: 12.50, range: "Range 4700-5949", rarity: "common", icon: "💎" },
-        { item: "-7% on power upgrade", chance: 18.00, range: "Range 5950-7749", rarity: "epic", icon: "⚡" },
+        { item: "-7% on power upgrade", chance: 18.00, range: "Range 5950-7749", rarity: "", icon: "⚡" },
         { item: "-5% on power upgrade", chance: 22.50, range: "Range 7750-9999", rarity: "common", icon: "⚡" }
     ]
 };
