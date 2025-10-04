@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoBox Chances - HashSense</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="src/scripts/boxchances.js"></script>
+    <style>
+        .hidden-column {
+            display: none !important;
+        }
+        
+        .box-card {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(79, 70, 229, 0.1) 100%);
+        }
+        
+        .box-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -12px rgba(147, 51, 234, 0.4);
+        }
+        
+        .box-card img {
+            transition: transform 0.3s ease;
+        }
+
+        .box-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .box-bronze { border-color: #cd7f32; }
+        .box-bronze:hover { box-shadow: 0 20px 40px -12px rgba(205, 127, 50, 0.4); }
+
+        .box-silver { border-color: #c0c0c0; }
+        .box-silver:hover { box-shadow: 0 20px 40px -12px rgba(192, 192, 192, 0.4); }
+
+        .box-gold { border-color: #ffd700; }
+        .box-gold:hover { box-shadow: 0 20px 40px -12px rgba(255, 215, 0, 0.4); }
+
+        .box-platinum { border-color: #e5e4e2; }
+        .box-platinum:hover { box-shadow: 0 20px 40px -12px rgba(229, 228, 226, 0.4); }
+
+        .box-diamond { border-color: #b9f2ff; }
+        .box-diamond:hover { box-shadow: 0 20px 40px -12px rgba(185, 242, 255, 0.4); }
+
+        .box-legend { border-color: #ff6b35; }
+        .box-legend:hover { box-shadow: 0 20px 40px -12px rgba(255, 107, 53, 0.4); }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Sidebar -->
+    <aside class="sidebar fixed left-0 top-0 w-64 h-full bg-gray-800 z-40 shadow-xl transform -translate-x-full transition-transform duration-300" id="sidebar">
+        <div class="p-4">
+            <h2 class="text-xl font-bold mb-6 text-purple-400">HashFarm</h2>
+            <nav class="space-y-2">
+                <!-- Home Button -->
+                <a href="index.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-blue-400">home</span>
+                    <span class="text-white">Main Dashboard</span>
+                </a>
+                
+                <!-- Farm Button -->
+                <a href="farm2.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-green-400">agriculture</span>
+                    <span class="text-white">Mining Farm</span>
+                </a>
+                
+                <!-- Calculator Button -->
+                <a href="HashSense.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-purple-400">calculate</span>
+                    <span class="text-white">Calculator</span>
+                </a>
+                
+                <!-- Scripts Button -->
+                <a href="HelpingSkripts.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-teal-400">code</span>
+                    <span class="text-white">Scripts</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay fixed inset-0 bg-black bg-opacity-50 z-30 hidden" id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Header - Entschlackt -->
+    <header class="bg-gray-800 p-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between">
+                <!-- Left - Menu Burger -->
+                <div class="flex items-center gap-4">
+                    <button class="bg-gray-600 hover:bg-gray-700 p-2 rounded-lg transition-colors duration-200" 
+                            onclick="toggleSidebar()" title="Menu">
+                        <span class="material-icons text-white">menu</span>
+                    </button>
+                    
+                    <h1 class="text-2xl font-bold text-purple-400">
+                        <span class="material-icons text-3xl align-middle mr-2">casino</span>
+                        GOBoxes Chances
+                    </h1>
+                </div>
+
+                <!-- Right - Comparison Toggle (optional for later) -->
+                <div class="flex gap-2">
+                    <button class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors duration-200" 
+                            id="comparison-toggle" onclick="toggleComparisonMode()">
+                        <span class="material-icons text-sm align-middle mr-1">compare</span>
+                        Compare All
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6 ml-0 transition-all duration-300">
+        <!-- Box Selection Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            <!-- Bronze Box -->
+            <div class="box-card box-bronze bg-gray-800 rounded-lg p-4 border-2 cursor-pointer" onclick="showBoxDetails('bronze')">
+                <div class="text-center">
+                    <div class="w-16 h-16 mx-auto mb-3 rounded-lg overflow-hidden">
+                        <img src="src/data/go-box-bronze.png" alt="Bronze Box" class="w-full h-full object-contain">
+                    </div>
+                    <h3 class="text-sm font-bold text-orange-400 mb-1">Bronze</h3>
+                    <p class="text-gray-400 text-xs">Entry Level</p>
+                </div>
+            </div>
+
+            <!-- Silver Box -->
+            <div class="box-card box-silver bg-gray-800 rounded-lg p-4 border-2 cursor-pointer" onclick="showBoxDetails('silver')">
+                <div class="text-center">
+                    <div class="w-16 h-16 mx-auto mb-3 rounded-lg overflow-hidden">
+                        <img src="src/data/go-box-silver.png" alt="Silver Box" class="w-full h-full object-contain">
+                    </div>
+                    <h3 class="text-sm font-bold text-gray-300 mb-1">Silver</h3>
+                    <p class="text-gray-400 text-xs">Improved</p>
+                </div>
+            </div>
+
+            <!-- Gold Box -->
+            <div class="box-card box-gold bg-gray-800 rounded-lg p-4 border-2 cursor-pointer" onclick="showBoxDetails('gold')">
+                <div class="text-center">
+                    <div class="w-16 h-16 mx-auto mb-3 rounded-lg overflow-hidden">
+                        <img src="src/data/go-box-gold.png" alt="Gold Box" class="w-full h-full object-contain">
+                    </div>
+                    <h3 class="text-sm font-bold text-yellow-400 mb-1">Gold</h3>
+                    <p class="text-gray-400 text-xs">Premium Rewards</p>
+                </div>
+            </div>
+
+            <!-- Platinum Box -->
+            <div class="box-card box-platinum bg-gray-800 rounded-lg p-4 border-2 cursor-pointer" onclick="showBoxDetails('platinum')">
+                <div class="text-center">
+                    <div class="w-16 h-16 mx-auto mb-3 rounded-lg overflow-hidden">
+                        <img src="src/data/go-box-platinum.png" alt="Platinum Box" class="w-full h-full object-contain">
+                    </div>
+                    <h3 class="text-sm font-bold text-gray-200 mb-1">Platinum</h3>
+                    <p class="text-gray-400 text-xs">Elite Tier</p>
+                </div>
+            </div>
+
+            <!-- Diamond Box -->
+            <div class="box-card box-diamond bg-gray-800 rounded-lg p-4 border-2 cursor-pointer" onclick="showBoxDetails('diamond')">
+                <div class="text-center">
+                    <div class="w-16 h-16 mx-auto mb-3 rounded-lg overflow-hidden">
+                        <img src="src/data/go-box-diamond.png" alt="Diamond Box" class="w-full h-full object-contain">
+                    </div>
+                    <h3 class="text-sm font-bold text-cyan-400 mb-1">Diamond</h3>
+                    <p class="text-gray-400 text-xs">Ultra Rare</p>
+                </div>
+            </div>
+
+            <!-- Legend Box -->
+            <div class="box-card box-legend bg-gray-800 rounded-lg p-4 border-2 cursor-pointer" onclick="showBoxDetails('legend')">
+                <div class="text-center">
+                    <div class="w-16 h-16 mx-auto mb-3 rounded-lg overflow-hidden">
+                        <img src="src/data/go-box-legend.png" alt="Legend Box" class="w-full h-full object-contain">
+                    </div>
+                    <h3 class="text-sm font-bold text-orange-400 mb-1">Legend</h3>
+                    <p class="text-gray-400 text-xs">Legendary Drops</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail View Area -->
+        <div id="detail-area" class="hidden">
+            <div class="bg-gray-800 rounded-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="detail-title" class="text-2xl font-bold"></h2>
+                    <button onclick="hideDetails()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-colors">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+                
+                <!-- Chance Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs uppercase bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3">Item Type</th>
+                                <th class="px-6 py-3">Chance %</th>
+                                <th class="px-6 py-3">Range/Amount</th>
+                                <th class="px-6 py-3">Rarity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-table-body">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Mode (hidden by default) -->
+        <div id="comparison-area" class="hidden">
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h2 class="text-2xl font-bold mb-6">Compare All Boxes</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs uppercase bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3">Item Type</th>
+                                <th class="px-6 py-3">Bronze</th>
+                                <th class="px-6 py-3">Silver</th>
+                                <th class="px-6 py-3">Gold</th>
+                                <th class="px-6 py-3">Platinum</th>
+                                <th class="px-6 py-3">Diamond</th>
+                                <th class="px-6 py-3">Legend</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparison-table-body">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            const main = document.querySelector('main');
+            
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+            
+            if (window.innerWidth >= 1024) {
+                main.classList.toggle('ml-64');
+            }
+        }
+
+        // Box Details
+        function showBoxDetails(boxType) {
+            document.getElementById('detail-area').classList.remove('hidden');
+            document.getElementById('detail-title').textContent = boxType.charAt(0).toUpperCase() + boxType.slice(1) + ' Box Details';
+            
+            // Here you'll populate the table with actual data
+            populateBoxDetails(boxType);
+        }
+
+        function hideDetails() {
+            document.getElementById('detail-area').classList.add('hidden');
+        }
+
+        function toggleComparisonMode() {
+            const detailArea = document.getElementById('detail-area');
+            const comparisonArea = document.getElementById('comparison-area');
+            
+            if (comparisonArea.classList.contains('hidden')) {
+                detailArea.classList.add('hidden');
+                comparisonArea.classList.remove('hidden');
+            } else {
+                comparisonArea.classList.add('hidden');
+            }
+        }
+
+        function populateBoxDetails(boxType) {
+            const tableBody = document.getElementById('detail-table-body');
+            const boxData = getBoxData(boxType);
+            
+            if (boxData.length === 0) {
+                tableBody.innerHTML = `
+                    <tr class="bg-gray-700 border-b border-gray-600">
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-400">
+                            Data for ${boxType} box is being prepared...
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let tableHTML = '';
+            boxData.forEach(item => {
+                const rarityStyle = getRarityStyle(item.rarity);
+                tableHTML += `
+                    <tr class="bg-gray-700 border-b border-gray-600 hover:bg-gray-600 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">${item.icon}</span>
+                                <span>${item.item}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 font-semibold">${item.chance}%</td>
+                        <td class="px-6 py-4 text-gray-300">${item.range}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 rounded text-xs font-semibold ${rarityStyle.color} ${rarityStyle.bgColor}">
+                                ${item.rarity.charAt(0).toUpperCase() + item.rarity.slice(1)}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableBody.innerHTML = tableHTML;
+        }
+    </script>
+</body>
+</html>
