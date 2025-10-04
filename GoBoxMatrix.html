@@ -221,24 +221,67 @@
         <!-- Comparison Mode (hidden by default) -->
         <div id="comparison-area" class="hidden">
             <div class="bg-gray-800 rounded-lg p-6">
-                <h2 class="text-2xl font-bold mb-6">Compare All Boxes</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold">Compare All Boxes</h2>
+                        <p class="text-gray-400 text-sm mt-1">
+                            📊 Green highlighting shows best chances • 💎 Higher intensity = better odds
+                        </p>
+                    </div>
+                    <button onclick="toggleComparisonMode()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-colors">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+                
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left">
-                        <thead class="text-xs uppercase bg-gray-700">
+                        <thead class="text-xs uppercase bg-gray-700 sticky top-0">
                             <tr>
-                                <th class="px-6 py-3">Item Type</th>
-                                <th class="px-6 py-3">Bronze</th>
-                                <th class="px-6 py-3">Silver</th>
-                                <th class="px-6 py-3">Gold</th>
-                                <th class="px-6 py-3">Platinum</th>
-                                <th class="px-6 py-3">Diamond</th>
-                                <th class="px-6 py-3">Legend</th>
+                                <th class="px-4 py-3 sticky left-0 bg-gray-700 z-10">Item Type</th>
+                                <th class="px-4 py-3 text-center text-orange-400">
+                                    🥉 Bronze
+                                </th>
+                                <th class="px-4 py-3 text-center text-gray-300">
+                                    🥈 Silver  
+                                </th>
+                                <th class="px-4 py-3 text-center text-yellow-400">
+                                    🥇 Gold
+                                </th>
+                                <th class="px-4 py-3 text-center text-gray-200">
+                                    💎 Platinum
+                                </th>
+                                <th class="px-4 py-3 text-center text-cyan-400">
+                                    💠 Diamond
+                                </th>
+                                <th class="px-4 py-3 text-center text-red-400">
+                                    🌟 Legend
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="comparison-table-body">
                             <!-- Will be populated by JavaScript -->
                         </tbody>
                     </table>
+                </div>
+                
+                <!-- Legend -->
+                <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-green-600 rounded"></div>
+                        <span class="text-gray-400">Best Chance</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-green-800 rounded"></div>
+                        <span class="text-gray-400">Good Chance</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-gray-600 rounded"></div>
+                        <span class="text-gray-400">Fair Chance</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 bg-gray-800 rounded"></div>
+                        <span class="text-gray-400">Not Available</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -279,6 +322,7 @@
             if (comparisonArea.classList.contains('hidden')) {
                 detailArea.classList.add('hidden');
                 comparisonArea.classList.remove('hidden');
+                populateComparison();
             } else {
                 comparisonArea.classList.add('hidden');
             }
@@ -323,6 +367,110 @@
             
             tableBody.innerHTML = tableHTML;
         }
+
+        function populateComparison() {
+            const tableBody = document.getElementById('comparison-table-body');
+            
+            // Check if boxchances.js is loaded
+            if (typeof goBoxesData === 'undefined') {
+                tableBody.innerHTML = `
+                    <tr class="bg-gray-700 border-b border-gray-600">
+                        <td colspan="7" class="px-6 py-8 text-center text-gray-400">
+                            Loading comparison data...
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Get all unique items across all boxes
+            const allItems = new Set();
+            Object.values(goBoxesData).forEach(boxData => {
+                boxData.forEach(item => allItems.add(item.item));
+            });
+            
+            // Sort items alphabetically
+            const sortedItems = [...allItems].sort();
+            
+            let tableHTML = '';
+            sortedItems.forEach(itemName => {
+                tableHTML += `
+                    <tr class="bg-gray-700 border-b border-gray-600 hover:bg-gray-600 transition-colors">
+                        <td class="px-4 py-3 font-medium text-white sticky left-0 bg-gray-700">${itemName}</td>
+                `;
+                
+                // Collect chances for this item across all boxes
+                const boxTypes = ['bronze', 'silver', 'gold', 'platinum', 'diamond', 'legend'];
+                const chances = [];
+                
+                boxTypes.forEach(boxType => {
+                    const boxData = goBoxesData[boxType];
+                    const item = boxData.find(i => i.item === itemName);
+                    chances.push(item ? item.chance : 0);
+                });
+                
+                // Find max chance for highlighting
+                const maxChance = Math.max(...chances.filter(c => c > 0));
+                
+                // Add data for each box type
+                boxTypes.forEach((boxType, index) => {
+                    const boxData = goBoxesData[boxType];
+                    const item = boxData.find(i => i.item === itemName);
+                    
+                    if (item) {
+                        const isMaxChance = item.chance === maxChance && maxChance > 0;
+                        const rarityStyle = getRarityStyle(item.rarity);
+                        const highlightClass = isMaxChance ? 'ring-2 ring-green-400' : '';
+                        
+                        // Color intensity based on chance (higher = more green)
+                        const intensity = Math.min(100, (item.chance / maxChance) * 100);
+                        const bgColor = intensity > 80 ? 'bg-green-900' : 
+                                       intensity > 60 ? 'bg-green-800' :
+                                       intensity > 40 ? 'bg-gray-600' :
+                                       intensity > 20 ? 'bg-gray-700' : 'bg-gray-800';
+                        
+                        tableHTML += `
+                            <td class="px-4 py-3 text-center ${bgColor} ${highlightClass}">
+                                <div class="space-y-1">
+                                    <div class="font-semibold text-white">${item.chance}%</div>
+                                    <span class="px-1.5 py-0.5 rounded text-xs ${rarityStyle.color} ${rarityStyle.bgColor}">
+                                        ${item.rarity.charAt(0).toUpperCase()}
+                                    </span>
+                                </div>
+                            </td>
+                        `;
+                    } else {
+                        tableHTML += `<td class="px-4 py-3 text-center text-gray-500 bg-gray-800">-</td>`;
+                    }
+                });
+                
+                tableHTML += `</tr>`;
+            });
+            
+            tableBody.innerHTML = tableHTML;
+        }
+
+        // Helper function to get chance color intensity
+        function getChanceColor(chance, maxChance) {
+            if (chance === 0) return 'bg-gray-800';
+            
+            const percentage = (chance / maxChance) * 100;
+            
+            if (percentage >= 90) return 'bg-green-600';
+            if (percentage >= 70) return 'bg-green-700';
+            if (percentage >= 50) return 'bg-green-800';
+            if (percentage >= 30) return 'bg-yellow-800';
+            if (percentage >= 10) return 'bg-orange-800';
+            return 'bg-red-800';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-populate comparison if boxchances.js is available
+            if (typeof goBoxesData !== 'undefined') {
+                console.log('📦 GOBoxes data loaded successfully!');
+            }
+        });
     </script>
 </body>
 </html>
