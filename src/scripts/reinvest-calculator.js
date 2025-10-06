@@ -330,7 +330,7 @@ function calculateReinvestmentStrategy() {
             // Chart data
             chartData.labels.push(day < 30 ? `Day ${day + 1}` : dateStr);
             chartData.thData.push(todayMinerTH);
-            chartData.gmtData.push(currentGMTBalance);
+            chartData.gmtData.push(currentGMTBalance.toFixed(4));
             chartData.profitData.push(dailyProfitUSD);
         }
         
