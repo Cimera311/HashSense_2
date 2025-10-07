@@ -2,14 +2,14 @@
 		let GMTPrice = null; // Speichert den Gomining-Token-Preis
 		let currentCurrency = 'USD'; // Standardwährung
 		
-		    document.addEventListener('DOMContentLoaded', () => {
-				fetchBTCPrice();
-				fetchGMTPrice();
-				});
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchBTCPrice();
+            fetchGMTPrice();
+            });
 		function updateCurrency(currency) {
-				currentCurrency = currency; // Setze die aktuelle Währung
-				generateRevenueTable(document.getElementById('bitcoin-price-dropdown').value, document.getElementById('sat-TH').value, document.getElementById('gmt-token-price').value); // Aktualisiere die Tabelle
-			}
+                currentCurrency = currency; // Setze die aktuelle Währung
+                generateRevenueTable(document.getElementById('bitcoin-price-dropdown').value, document.getElementById('sat-TH').value, document.getElementById('gmt-token-price').value); // Aktualisiere die Tabelle
+            }
 
             const tabs = [
                 { name: "Solo-Mining", id: "Calc", description: "Configure your miner settings and calculate your daily, weekly, and monthly earnings for Solo Mining." },
@@ -47,38 +47,7 @@
 
 
        /* Preise jetzt in skript-prices.js*/
-      /*
-		async function fetchBTCPrice() {
-			try {
-                const dropdown = document.getElementById('bitcoin-price-dropdown');
-				const response = await fetch('https://api.coinpaprika.com/v1/tickers/btc-bitcoin');
-				const data = await response.json();
-				btcPrice = parseFloat(data.quotes.USD.price).toFixed(0); // Speichere den gefetcheten Bitcoin-Preis in der globalen Variable
-                const selectedOption = dropdown.querySelector('#currentp');
-                selectedOption.value = btcPrice;
-                selectedOption.text = formatDollar(btcPrice);   
-                selectedOption.selected = true;
-			} catch (error) {
-				console.error('Error fetching BTC Price:', error);
-				alert('Failed to fetch BTC Price. Please try again later.');
-			}
-		}
-        
-		async function fetchGMTPrice() {
-				try {
-					const response = await fetch('https://api.coinpaprika.com/v1/tickers/gmt-gomining-token');
-					const data = await response.json();
-					const gominingPrice = parseFloat(data.quotes.USD.price).toFixed(4); // Abrufen des Preises in USD
 
-
-					// Wert in Feld und Slider setzen
-					document.getElementById('gmt-token-price').value = gominingPrice;
-					console.log(`Gomining Price: $${gominingPrice}`);
-				} catch (error) {
-					console.error('Error fetching Gomining Token Price:', error);
-					alert('Failed to fetch Gomining Token Price. Please try again later.');
-				}
-			} */
         function fetchBTCPrice() {
             console.log('Fetching BTC price...');
             fetch('https://api.coinpaprika.com/v1/tickers/btc-bitcoin')
@@ -173,16 +142,29 @@
 				}
 			}
 
-
+            function formatValueByCurrency(usdValue, btcValue, gmtValue, currency) {
+                switch(currency) {
+                    case 'usd':
+                        return `$${usdValue.toFixed(2)}`;
+                    case 'btc':
+                        return `${btcValue.toFixed(8)} ₿`;
+                    case 'gmt':
+                        // GMT Wert berechnen wenn nicht vorhanden
+                        const gmtVal = gmtValue || (usdValue / (window.gmtPrice || 1));
+                        return `${gmtVal.toFixed(4)} GMT`;
+                    default:
+                        return `$${usdValue.toFixed(2)}`;
+                }
+            }
 
 
             function calculateCost() {
-                const BTC = parseFloat(document.getElementById('bitcoin-price-dropdown').value);       
-
+                const BTC = parseFloat(document.getElementById('bitcoin-price-dropdown').value);
+                const GMT = parseFloat(document.getElementById('gmt-token-price').value);
 				const th = parseFloat(document.getElementById('My_TH').value);
                 const efficiency = parseFloat(document.getElementById('Energy-efficiency').value);
                 const discount = parseFloat(document.getElementById('gomining-discount').value);
-
+                const currentCurrency = document.getElementById('currency-switch')?.value || 'usd';
                 const dailyReward = parseFloat(document.getElementById('Daily-Reward').value);
                 const costPerKWh = 0.05;
                 const daily_cost = 0.0089;
@@ -194,65 +176,86 @@
                 
                 // Daily calculations
 				const dailyElectricityCost = ((efficiency * th * 0.05 * 24) / 1000 ) * ((100 - discount) / 100); // Kosten für Strom
-                const dailyElectricityCostBTC = dailyElectricityCost / BTC 
+                const dailyElectricityCostBTC = dailyElectricityCost / BTC ;
+                const dailyElectricityCostGMT = dailyElectricityCost / GMT;
 
+                const dailyServiceCostBTC = (daily_cost * th) / BTC;
+                const dailyServiceCostGMT = (daily_cost * th) / GMT;
+                const dailyServiceCost = (daily_cost * th) * ((100 - discount) / 100);
 
-                const dailyServiceCostBTC = (daily_cost / BTC )* th ;
-                const dailyServiceCost = dailyServiceCostBTC * BTC * ((100 - discount) / 100);
                 const dailyTotalMaintenanceCost = dailyElectricityCost + dailyServiceCost;
-                const dailyRewardsInUSD = (dailyReward * 0.00000001) * BTC;
-                const dailyNetProfitInUSD = dailyRewardsInUSD - dailyTotalMaintenanceCost;
-                
-                const weeklyRewardsInUSD = dailyRewardsInUSD * 7;
-                const weeklyMaintenanceCostInUSD = dailyTotalMaintenanceCost * 7;
-                const weeklyNetProfitInUSD = weeklyRewardsInUSD - weeklyMaintenanceCostInUSD;
-                
-                const monthlyRewardsInUSD = dailyRewardsInUSD * 30;
-                const monthlyMaintenanceCostInUSD = dailyTotalMaintenanceCost * 30;
-                const monthlyNetProfitInUSD = monthlyRewardsInUSD - monthlyMaintenanceCostInUSD;
+                const dailyTotalMaintenanceCostBTC = dailyElectricityCostBTC + dailyServiceCostBTC;
+                const dailyTotalMaintenanceCostGMT = dailyElectricityCostGMT + dailyServiceCostGMT;
 
-                // BTC values
                 const dailyRewardsInBTC = dailyReward * 0.00000001;
-                const dailyElectricityCostInBTC = dailyElectricityCost / BTC;
-                const dailyServiceCostInBTC = dailyServiceCost / BTC;
-                const dailyMaintenanceCostInBTC = dailyTotalMaintenanceCost / BTC;
-                const dailyNetProfitInBTC = dailyNetProfitInUSD / BTC;
+                const dailyRewardsInUSD = (dailyReward * 0.00000001) * BTC;
+                const dailyRewardsInGMT = ((dailyReward * 0.00000001) * BTC ) / GMT;
+
                 const weeklyRewardsInBTC = dailyRewardsInBTC * 7;
-                const weeklyMaintenanceCostInBTC = weeklyMaintenanceCostInUSD / BTC;
-                const weeklyNetProfitInBTC = weeklyNetProfitInUSD / BTC;
+                const weeklyRewardsInUSD = dailyRewardsInUSD * 7;
+                const weeklyRewardsInGMT = dailyRewardsInGMT * 7;
+
                 const monthlyRewardsInBTC = dailyRewardsInBTC * 30;
-                const monthlyMaintenanceCostInBTC = monthlyMaintenanceCostInUSD / BTC;
-                const monthlyNetProfitInBTC = monthlyNetProfitInUSD / BTC;
-                const totalCosts = dailyElectricityCost + dailyServiceCost; // Gesamtkosten (Strom + Service)
-                const costPercentage = (totalCosts / dailyRewardsInUSD) * 100; // Prozentuale Kosten
+                const monthlyRewardsInUSD = dailyRewardsInUSD * 30;
+                const monthlyRewardsInGMT = dailyRewardsInGMT * 30;
+
+                const yearlyRewardsInBTC = dailyRewardsInBTC * 365;
+                const yearlyRewardsInUSD = dailyRewardsInUSD * 365;
+                const yearlyRewardsInGMT = dailyRewardsInGMT * 365;
+
+                const dailyNetProfitGMT = dailyRewardsInGMT - dailyTotalMaintenanceCostGMT;
+                const dailyNetProfitBTC = dailyRewardsInBTC - dailyTotalMaintenanceCostBTC;
+                const dailyNetProfitInUSD = dailyRewardsInUSD - dailyTotalMaintenanceCost;
+            
+                const weeklyNetProfitGMT = dailyNetProfitGMT * 7;
+                const weeklyNetProfitBTC = dailyNetProfitBTC * 7;
+                const weeklyNetProfitInUSD = dailyNetProfitInUSD * 7;
+
+                const monthlyNetProfitGMT = dailyNetProfitGMT * 30;
+                const monthlyNetProfitBTC = dailyNetProfitBTC * 30;
+                const monthlyNetProfitInUSD = dailyNetProfitInUSD * 30;
+
+                const yearlyNetProfitGMT = dailyNetProfitGMT * 365;
+                const yearlyNetProfitBTC = dailyNetProfitBTC * 365;
+                const yearlyNetProfitInUSD = dailyNetProfitInUSD * 365;
+
+                const weeklyTotalMaintenanceCost = dailyTotalMaintenanceCost * 7;
+                const weeklyTotalMaintenanceCostBTC = dailyTotalMaintenanceCostBTC * 7;
+                const weeklyTotalMaintenanceCostGMT = dailyTotalMaintenanceCostGMT * 7;
+
+                const monthlyTotalMaintenanceCost = dailyTotalMaintenanceCost * 30;
+                const monthlyTotalMaintenanceCostBTC = dailyTotalMaintenanceCostBTC * 30;
+                const monthlyTotalMaintenanceCostGMT = dailyTotalMaintenanceCostGMT * 30;
+
+                const yearlyTotalMaintenanceCost = dailyTotalMaintenanceCost * 365;
+                const yearlyTotalMaintenanceCostBTC = dailyTotalMaintenanceCostBTC * 365;
+                const yearlyTotalMaintenanceCostGMT = dailyTotalMaintenanceCostGMT * 365;
 
 
+                const costPercentage = (dailyTotalMaintenanceCostBTC / dailyRewardsInBTC) * 100;
 
+                // Update table with currency-aware formatting
+                document.getElementById('daily-rewards').innerText = formatValueByCurrency(dailyRewardsInUSD, dailyRewardsInBTC, dailyRewardsInGMT, currentCurrency);
+                document.getElementById('electricity-cost').innerText = formatValueByCurrency(dailyElectricityCost, dailyElectricityCostBTC, dailyElectricityCostGMT, currentCurrency);
+                document.getElementById('service-cost').innerText = formatValueByCurrency(dailyServiceCost, dailyServiceCostBTC, dailyServiceCostGMT, currentCurrency);
+                document.getElementById('daily-maintenance-cost').innerText = formatValueByCurrency(dailyTotalMaintenanceCost, dailyTotalMaintenanceCostBTC, dailyTotalMaintenanceCostGMT, currentCurrency);
+                document.getElementById('daily-net-profit').innerText = formatValueByCurrency(dailyNetProfitInUSD, dailyNetProfitBTC, dailyNetProfitGMT, currentCurrency);
 
+                document.getElementById('weekly-rewards').innerText = formatValueByCurrency(weeklyRewardsInUSD, weeklyRewardsInBTC, weeklyRewardsInGMT, currentCurrency);
+                document.getElementById('weekly-maintenance-cost').innerText = formatValueByCurrency(weeklyTotalMaintenanceCost, weeklyTotalMaintenanceCostBTC, weeklyTotalMaintenanceCostGMT, currentCurrency);
+                document.getElementById('weekly-net-profit').innerText = formatValueByCurrency(weeklyNetProfitInUSD, weeklyNetProfitBTC, weeklyNetProfitGMT, currentCurrency);
+
+                document.getElementById('monthly-rewards').innerText = formatValueByCurrency(monthlyRewardsInUSD, monthlyRewardsInBTC, monthlyRewardsInGMT, currentCurrency);
+                document.getElementById('monthly-maintenance-cost').innerText = formatValueByCurrency(monthlyTotalMaintenanceCost, monthlyTotalMaintenanceCostBTC, monthlyTotalMaintenanceCostGMT, currentCurrency);
+                document.getElementById('monthly-net-profit').innerText = formatValueByCurrency(monthlyNetProfitInUSD, monthlyNetProfitBTC, monthlyNetProfitGMT, currentCurrency);
+
+                document.getElementById('yearly-rewards').innerText = formatValueByCurrency(yearlyRewardsInUSD, yearlyRewardsInBTC, yearlyRewardsInGMT, currentCurrency);
+                document.getElementById('yearly-maintenance-cost').innerText = formatValueByCurrency(yearlyTotalMaintenanceCost, yearlyTotalMaintenanceCostBTC, yearlyTotalMaintenanceCostGMT, currentCurrency);
+                document.getElementById('yearly-net-profit').innerText = formatValueByCurrency(yearlyNetProfitInUSD, yearlyNetProfitBTC, yearlyNetProfitGMT, currentCurrency);
+
+                document.getElementById('maintenance').innerText = `${costPercentage.toFixed(2)}%`;
                 // Update table
-                document.getElementById('daily-rewards').innerText = `${dailyRewardsInUSD.toFixed(2)}`;
-                document.getElementById('daily-rewards-btc').innerText = `${dailyRewardsInBTC.toFixed(8)}`;
-                document.getElementById('electricity-cost').innerText = `${dailyElectricityCost.toFixed(2)}`;
-                document.getElementById('electricity-cost-btc').innerText = `${dailyElectricityCostInBTC.toFixed(8)}`;
-                document.getElementById('service-cost').innerText = `${dailyServiceCost.toFixed(2)}`;
-                document.getElementById('service-cost-btc').innerText = `${dailyServiceCostInBTC.toFixed(8)}`;
-                document.getElementById('daily-maintenance-cost').innerText = `${dailyTotalMaintenanceCost.toFixed(2)}`;
-                document.getElementById('daily-maintenance-cost-btc').innerText = `${dailyMaintenanceCostInBTC.toFixed(8)}`;
-                document.getElementById('daily-net-profit').innerText = `${dailyNetProfitInUSD.toFixed(2)}`;
-                document.getElementById('daily-net-profit-btc').innerText = `${dailyNetProfitInBTC.toFixed(8)}`;
-                document.getElementById('weekly-rewards').innerText = `${weeklyRewardsInUSD.toFixed(2)}`;
-                document.getElementById('weekly-rewards-btc').innerText = `${weeklyRewardsInBTC.toFixed(8)}`;
-                document.getElementById('weekly-maintenance-cost').innerText = `${weeklyMaintenanceCostInUSD.toFixed(2)}`;
-                document.getElementById('weekly-maintenance-cost-btc').innerText = `${weeklyMaintenanceCostInBTC.toFixed(8)}`;
-                document.getElementById('weekly-net-profit').innerText = `${weeklyNetProfitInUSD.toFixed(2)}`;
-                document.getElementById('weekly-net-profit-btc').innerText = `${weeklyNetProfitInBTC.toFixed(8)}`;
-                document.getElementById('monthly-rewards').innerText = `${monthlyRewardsInUSD.toFixed(2)}`;
-                document.getElementById('monthly-rewards-btc').innerText = `${monthlyRewardsInBTC.toFixed(8)}`;
-                document.getElementById('monthly-maintenance-cost').innerText = `${monthlyMaintenanceCostInUSD.toFixed(2)}`;
-                document.getElementById('monthly-maintenance-cost-btc').innerText = `${monthlyMaintenanceCostInBTC.toFixed(8)}`;
-                document.getElementById('monthly-net-profit').innerText = `${monthlyNetProfitInUSD.toFixed(2)}`;
-                document.getElementById('monthly-net-profit-btc').innerText = `${monthlyNetProfitInBTC.toFixed(8)}`;
-                document.getElementById('maintenance').innerText = `${costPercentage.toFixed(2)} %`; // Wert aktualisieren
+
             }
             function calculateMobileView() {
                 const dailyRevenue = parseFloat(document.getElementById('daily-revenue').textContent.replace('$', ''));
@@ -1021,4 +1024,27 @@ function getPriceMatrix(efficiency) {
 				  document.body.classList.toggle('dark');
 				});
 			  }
-			});      
+ 
+
+            // ERSETZE sie mit dieser vollständigen Version:
+            function switchCurrency() {
+                console.log('Currency switch triggered');
+                const currency = document.getElementById('currency-switch').value;
+                const header = document.getElementById('value-header');
+                
+                console.log('Selected currency:', currency);
+                
+                // Header aktualisieren
+                if (currency === 'usd') {
+                    header.textContent = 'Value ($)';
+                } else if (currency === 'btc') {
+                    header.textContent = 'Value (₿)';
+                } else if (currency === 'gmt') {
+                    header.textContent = 'Value (GMT)';
+                }
+                
+                // Neuberechnung triggern
+                calculateCost();
+                console.log('calculateCost() called after currency switch');
+            }
+			});     
