@@ -242,30 +242,29 @@
                     <label class="text-sm font-medium text-gray-300">Target Miner Efficiency (W/TH)</label>
                     <select id="miner-efficiency" 
                             class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        <option value="15">15 W/TH</option>
+                        <option value="15" selected>15 W/TH</option>
                         <option value="16">16 W/TH</option>
                         <option value="17">17 W/TH</option>
                         <option value="18">18 W/TH</option>
-                        <option value="19" selected>19 W/TH</option>
+                        <option value="19">19 W/TH</option>
                         <option value="20">20 W/TH</option>
-                        <option value="21">21 W/TH</option>
-                        <option value="22">22 W/TH</option>
-                        <option value="23">23 W/TH</option>
-                        <option value="24">24 W/TH</option>
-                        <option value="25">25 W/TH</option>
-                        <option value="30">30 W/TH</option>
-                        <option value="35">35 W/TH</option>
-                        <option value="40">40 W/TH</option>
-                        <option value="50">50 W/TH</option>
-                        <option value="60">60 W/TH</option>
                     </select>
                 </div>
 
                 <!-- Calculation Period -->
                 <div class="space-y-2">
-                    <label class="text-sm font-medium text-gray-300">Calculation Period (Days)</label>
-                    <input type="number" id="calculation-period" value="365" min="30" max="3650" step="1" 
-                           class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <label class="text-sm font-medium text-gray-300">Calculation Period</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="calculation-period" value="365" min="1" max="3650" step="1"
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+                        <select id="chart-period" onchange="updatePeriodLabel()" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+                            <option value="daily">Days</option>
+                            <option value="weekly">Weeks</option>
+                            <option value="monthly">Months</option>
+                            <option value="yearly">Years</option>
+                        </select>
+                    </div>
+                    <div class="text-xs text-gray-400">Chart display interval</div>
                 </div>
             </div>
         </section>
@@ -408,7 +407,11 @@
             initializePage();
             setupEventListeners();
         });
-
+        function updatePeriodLabel() {
+            // Optional: Update label text based on selection
+            const period = document.getElementById('chart-period').value;
+            console.log('Chart period changed to:', period);
+        }
         function initializePage() {
             // Load current BTC price
             loadCurrentBTCPrice();

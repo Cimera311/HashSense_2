@@ -202,7 +202,16 @@ function calculateReinvestmentStrategy() {
         gmtData: [],
         profitData: []
     };
-
+        // Get chart display settings
+        const chartPeriod = document.getElementById('chart-period').value;
+        let chartInterval = 1; // Default: daily
+        
+        switch(chartPeriod) {
+            case 'daily': chartInterval = 1; break;
+            case 'weekly': chartInterval = 7; break;
+            case 'monthly': chartInterval = 30; break;
+            case 'yearly': chartInterval = 365; break;
+        }
     for (let day = 0; day < inputs.calculationPeriod; day++) {
         // Calculate separate farm components with YESTERDAY values
         const farmComponents = calculateSeparateEfficiencies(
@@ -309,8 +318,8 @@ function calculateReinvestmentStrategy() {
             inputs.minerEfficiency
         );
 
-        // Store data for chart and table (daily for first 30 days, then sample)
-        const shouldStore = day < 30 || day % 30 === 0 || day === inputs.calculationPeriod - 1;
+        // Store data for chart based on selected interval
+        const shouldStore = day % chartInterval === 0 || day === inputs.calculationPeriod - 1;
         
         if (shouldStore) {
             const dateStr = new Date(currentDate.getTime() + day * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -326,11 +335,30 @@ function calculateReinvestmentStrategy() {
                 gmtBalance: currentGMTBalance,
                 strategy: strategyText
             });
+            
+            // Chart data - create appropriate labels
+            let label;
+            switch(chartPeriod) {
+                case 'daily':
+                    label = `Day ${day + 1}`;
+                    break;
+                case 'weekly':
+                    label = `Week ${Math.ceil((day + 1) / 7)}`;
+                    break;
+                case 'monthly':
+                    label = `Month ${Math.ceil((day + 1) / 30)}`;
+                    break;
+                case 'yearly':
+                    label = `Year ${Math.ceil((day + 1) / 365)}`;
+                    break;
+                default:
+                    label = `Day ${day + 1}`;
+            }
 
             // Chart data
-            chartData.labels.push(day < 30 ? `Day ${day + 1}` : dateStr);
+            chartData.labels.push(label);
             chartData.thData.push(todayMinerTH);
-            chartData.gmtData.push(currentGMTBalance.toFixed(4));
+            chartData.gmtData.push(Number(currentGMTBalance.toFixed(4)));
             chartData.profitData.push(dailyProfitUSD);
         }
         
