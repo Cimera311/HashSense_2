@@ -202,15 +202,24 @@ function calculateReinvestmentStrategy() {
         gmtData: [],
         profitData: []
     };
-        // Get chart display settings
+        // Get chart display settings - chart interval based on selected period unit
         const chartPeriod = document.getElementById('chart-period').value;
+        const periodCount = parseInt(document.getElementById('calculation-period').value) || 1;
         let chartInterval = 1; // Default: daily
         
         switch(chartPeriod) {
-            case 'daily': chartInterval = 1; break;
-            case 'weekly': chartInterval = 7; break;
-            case 'monthly': chartInterval = 30; break;
-            case 'yearly': chartInterval = 365; break;
+            case 'daily': 
+                chartInterval = Math.max(1, Math.floor(inputs.calculationPeriod / Math.min(100, periodCount))); 
+                break;
+            case 'weekly': 
+                chartInterval = 7; 
+                break;
+            case 'monthly': 
+                chartInterval = 30; 
+                break;
+            case 'yearly': 
+                chartInterval = 365; 
+                break;
         }
     for (let day = 0; day < inputs.calculationPeriod; day++) {
         // Calculate separate farm components with YESTERDAY values
@@ -392,7 +401,18 @@ function getInputValues() {
         const farmEfficiency = parseFloat(document.getElementById('farm-efficiency').value) || 19.50;
         const minerTH = parseFloat(document.getElementById('miner-th').value) || 0;
         const minerEfficiency = parseInt(document.getElementById('miner-efficiency').value) || 19;
-        const calculationPeriod = parseInt(document.getElementById('calculation-period').value) || 365;
+        // Convert calculation period to days based on selected unit
+        const periodCount = parseInt(document.getElementById('calculation-period').value) || 1;
+        const periodUnit = document.getElementById('chart-period').value || 'daily';
+        
+        let calculationPeriod;
+        switch(periodUnit) {
+            case 'daily': calculationPeriod = periodCount; break;
+            case 'weekly': calculationPeriod = periodCount * 7; break;
+            case 'monthly': calculationPeriod = periodCount * 30; break;
+            case 'yearly': calculationPeriod = periodCount * 365; break;
+            default: calculationPeriod = periodCount;
+        }
         
         // Get prices
         const btcPrice = parseFloat(document.getElementById('bitcoin-price-dropdown').value) || 67000;

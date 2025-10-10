@@ -255,7 +255,7 @@
                 <div class="space-y-2">
                     <label class="text-sm font-medium text-gray-300">Calculation Period</label>
                     <div class="flex gap-2">
-                        <input type="number" id="calculation-period" value="365" min="1" max="3650" step="1"
+                        <input type="number" id="calculation-period" value="1" min="1" step="1"
                             class="flex-1 bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
                         <select id="chart-period" onchange="updatePeriodLabel()" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
                             <option value="daily">Days</option>
@@ -264,7 +264,7 @@
                             <option value="yearly">Years</option>
                         </select>
                     </div>
-                    <div class="text-xs text-gray-400">Chart display interval</div>
+                    <div class="text-xs text-gray-400">Enter number of periods to calculate</div>
                 </div>
             </div>
         </section>
@@ -408,9 +408,10 @@
             setupEventListeners();
         });
         function updatePeriodLabel() {
-            // Optional: Update label text based on selection
             const period = document.getElementById('chart-period').value;
             console.log('Chart period changed to:', period);
+            // Keine Einschränkungen - der Benutzer soll frei wählen können
+            // 25 Jahre, 50 Jahre oder mehr sind völlig in Ordnung
         }
         function initializePage() {
             // Load current BTC price
