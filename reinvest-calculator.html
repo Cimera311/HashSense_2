@@ -91,6 +91,19 @@
             border: 2px solid #8b5cf6;
             background-color: #1e1b4b;
         }
+        /* iOS Style Toggle Switch */
+        #save-first-toggle:checked + label .dot {
+            transform: translateX(24px);
+            background-color: #8b5cf6;
+        }
+
+        #save-first-toggle:checked + label div:first-child {
+            background-color: #6d28d9;
+        }
+
+        .dot {
+            transition: all 0.3s ease-in-out;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
@@ -292,7 +305,7 @@
                         <span class="material-icons text-blue-400">build</span>
                         <h3 class="font-bold">Manual Reinvest</h3>
                     </div>
-                    <p class="text-sm text-gray-300 mb-3">Manual reinvestment of profits</p>
+                    <p class="text-sm text-gray-300 mb-3">Manual reinvestment of daily profits</p>
                     <div class="text-blue-400 font-bold">No Bonus</div>
                 </div>
 
@@ -315,15 +328,33 @@
                     <!-- Auto Reinvest Days -->
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-gray-300">Auto Reinvest Days (with 5% bonus)</label>
-                        <input type="range" id="auto-days" min="0" max="30" value="20" step="1"
+                        <input type="range" id="auto-days" min="0" max="30" value="15" step="1"
                                class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
                         <div class="flex justify-between text-sm text-gray-400">
                             <span>0</span>
-                            <span id="auto-days-value" class="font-bold text-purple-400">20 days</span>
+                            <span id="auto-days-value" class="font-bold text-purple-400">15 days</span>
                             <span>30</span>
                         </div>
                     </div>
-
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">Cycle Mode</label>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm text-gray-400">Auto First</span>
+                            <div class="relative">
+                                <input type="checkbox" id="save-first-toggle" class="sr-only" onchange="updateCycleMode()">
+                                <label for="save-first-toggle" class="flex items-center cursor-pointer">
+                                    <div class="relative">
+                                        <div class="w-12 h-6 bg-gray-600 rounded-full shadow-inner"></div>
+                                        <div class="dot absolute w-5 h-5 bg-white rounded-full shadow -left-0.5 -top-0.5 transition-transform duration-300 ease-in-out"></div>
+                                    </div>
+                                </label>
+                            </div>
+                            <span class="text-sm text-gray-400">Save First</span>
+                        </div>
+                        <div class="text-xs text-gray-400" id="cycle-description">
+                            Start with auto-reinvest days, then save for maintenance
+                        </div>
+                    </div>
                     <!-- Saving Days -->
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-gray-300">Saving Days (accumulate GMT for electricity)</label>
@@ -420,7 +451,7 @@
             // Update controlled settings display
             updateControlledSettings();
         }
-
+/*
         function setupEventListeners() {
             // Auto days slider
             document.getElementById('auto-days').addEventListener('input', updateControlledSettings);
@@ -443,7 +474,7 @@
                 timeout = setTimeout(later, wait);
             };
         }
-
+*/
         function updateControlledSettings() {
             const autoDays = parseInt(document.getElementById('auto-days').value);
             const savingDays = 30 - autoDays;

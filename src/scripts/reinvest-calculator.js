@@ -282,40 +282,43 @@ function calculateReinvestmentStrategy() {
                 strategyText = 'Hold (No Profit/Insufficient GMT)';
             }
             
-        } else if (currentStrategy === 'controlled') {
-            // CONTROLLED AUTO: Mix of auto and saving days
-            if (dayInCycle < autoDays) {
-                // AUTO DAYS: Same as automatic reinvest
-                currentGMTBalance -= dailyElectricity.gmt;
-                currentGMTBalance -= dailyService.gmt;
+            } else if (currentStrategy === 'controlled') {
+                // CONTROLLED AUTO: Mix of auto and saving days
+                // Check if we should save first or auto first
+                const shouldAutoInvest = saveFirst ? 
+                    (dayInCycle >= (30 - autoDays)) : // Save first: auto in last X days
+                    (dayInCycle < autoDays);          // Auto first: auto in first X days
                 
-                if (currentGMTBalance >= 0) {
-                    reinvestmentUSD = dailyRevenue.usd * 1.05; // ENTIRE revenue + 5% bonus
-                    const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
-                    todayMinerTH = yesterdayMinerTH + additionalTH;
-                    totalInvestment += reinvestmentUSD;
-                    strategyText = 'Auto +5%';
+                if (shouldAutoInvest) {
+                    // AUTO DAYS: Same as automatic reinvest
+                    currentGMTBalance -= dailyElectricity.gmt;
+                    currentGMTBalance -= dailyService.gmt;
+                    
+                    if (currentGMTBalance >= 0) {
+                        reinvestmentUSD = dailyRevenue.usd * 1.05;
+                        const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
+                        todayMinerTH = yesterdayMinerTH + additionalTH;
+                        totalInvestment += reinvestmentUSD;
+                        strategyText = 'Auto +5%';
+                    } else {
+                        currentGMTBalance += dailyElectricity.gmt;
+                        currentGMTBalance += dailyService.gmt;
+                        currentGMTBalance += dailyRevenue.gmt;
+                        strategyText = 'Hold (Insufficient GMT)';
+                    }
                 } else {
-                    // Not enough GMT for costs
-                    currentGMTBalance += dailyElectricity.gmt;
-                    currentGMTBalance += dailyService.gmt;
+                    // SAVING DAYS: Revenue to wallet, deduct costs, keep profit as savings
                     currentGMTBalance += dailyRevenue.gmt;
-                    strategyText = 'Hold (Insufficient GMT)';
+                    currentGMTBalance -= dailyElectricity.gmt;
+                    currentGMTBalance -= dailyService.gmt;
+                    strategyText = 'Saving';
                 }
-            } else {
-                // SAVING DAYS: Revenue to wallet, deduct costs, keep profit as savings
-                currentGMTBalance += dailyRevenue.gmt;
-                currentGMTBalance -= dailyElectricity.gmt;
-                currentGMTBalance -= dailyService.gmt;
-                strategyText = 'Saving';
-                // Profit stays in wallet as savings
+                
+                dayInCycle++;
+                if (dayInCycle >= 30) {
+                    dayInCycle = 0; // Reset cycle
+                }
             }
-            
-            dayInCycle++;
-            if (dayInCycle >= 30) {
-                dayInCycle = 0; // Reset cycle
-            }
-        }
         
         // Calculate TODAY farm values (for tomorrow's calculations)
         const todayFarmTH = inputs.farmTotalTH + (todayMinerTH - inputs.minerTH);
@@ -623,5 +626,23 @@ function calculateReinvestment() {
     } catch (error) {
         console.error('Calculation error:', error);
         alert('An error occurred during calculation. Please check your inputs and try again.');
+    }
+}
+// Global variable for cycle mode
+let saveFirst = false;
+
+function updateCycleMode() {
+    saveFirst = document.getElementById('save-first-toggle').checked;
+    const description = document.getElementById('cycle-description');
+    
+    if (saveFirst) {
+        description.textContent = "Start with saving days, then auto-reinvest with 5% bonus";
+    } else {
+        description.textContent = "Start with auto-reinvest days, then save for maintenance";
+    }
+    
+    // Recalculate if results are visible
+    if (!document.getElementById('results-section').classList.contains('hidden')) {
+        calculateReinvestment();
     }
 }
