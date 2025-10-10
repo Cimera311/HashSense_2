@@ -456,6 +456,8 @@ function updateResultsDisplay(calculationResults) {
 
     // Update summary cards
     document.getElementById('final-th').textContent = calculationResults.summary.finalTH.toFixed(2) + ' TH';
+    document.getElementById('final-farm-th').textContent = `${calculationResults.summary.finalFarmTH.toFixed(2)} TH`;
+    document.getElementById('final-farm-efficiency').textContent = `${calculationResults.summary.finalFarmEfficiency.toFixed(2)} W/TH`;
     document.getElementById('total-investment').textContent = '$' + calculationResults.summary.totalInvestment.toFixed(2);
     document.getElementById('final-gmt-balance').textContent = calculationResults.summary.finalGMTBalance.toFixed(2) + ' GMT';
 
