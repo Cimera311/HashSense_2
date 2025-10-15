@@ -183,6 +183,7 @@ function calculateReinvestmentStrategy() {
     const results = [];
     let currentDate = new Date();
     let currentGMTBalance = inputs.gmtWalletBalance;
+    let currentBTCBalance = 0; // NEU: BTC Wallet für v2
     let totalInvestment = 0;
     
     // Yesterday values (starting values)
@@ -195,32 +196,42 @@ function calculateReinvestmentStrategy() {
     const autoDays = currentStrategy === 'controlled' ? parseInt(document.getElementById('auto-days').value) : 30;
     const savingDays = 30 - autoDays;
     
+    // For controlled v2 strategy - NEU
+    let dayInCycleV2 = 0;
+    const reinvestDaysV2 = currentStrategy === 'controlledv2' ? parseInt(document.getElementById('controlled-reinvest-days-v2').value) : 0;
+    const btcRewardDaysV2 = currentStrategy === 'controlledv2' ? parseInt(document.getElementById('btc-reward-days-v2').value) : 0;
+    const savingDaysV2 = currentStrategy === 'controlledv2' ? parseInt(document.getElementById('controlled-saving-days-v2').value) : 0;
+    const totalCycleDaysV2 = reinvestDaysV2 + btcRewardDaysV2 + savingDaysV2;
+    
     // Data for chart
     const chartData = {
         labels: [],
         thData: [],
         gmtData: [],
+        btcData: [], // NEU: BTC Wallet Daten
         profitData: []
     };
-        // Get chart display settings - chart interval based on selected period unit
-        const chartPeriod = document.getElementById('chart-period').value;
-        const periodCount = parseInt(document.getElementById('calculation-period').value) || 1;
-        let chartInterval = 1; // Default: daily
-        
-        switch(chartPeriod) {
-            case 'daily': 
-                chartInterval = Math.max(1, Math.floor(inputs.calculationPeriod / Math.min(100, periodCount))); 
-                break;
-            case 'weekly': 
-                chartInterval = 7; 
-                break;
-            case 'monthly': 
-                chartInterval = 30; 
-                break;
-            case 'yearly': 
-                chartInterval = 365; 
-                break;
-        }
+    
+    // Get chart display settings
+    const chartPeriod = document.getElementById('chart-period').value;
+    const periodCount = parseInt(document.getElementById('calculation-period').value) || 1;
+    let chartInterval = 1;
+    
+    switch(chartPeriod) {
+        case 'daily': 
+            chartInterval = Math.max(1, Math.floor(inputs.calculationPeriod / Math.min(100, periodCount))); 
+            break;
+        case 'weekly': 
+            chartInterval = 7; 
+            break;
+        case 'monthly': 
+            chartInterval = 30; 
+            break;
+        case 'yearly': 
+            chartInterval = 365; 
+            break;
+    }
+    
     for (let day = 0; day < inputs.calculationPeriod; day++) {
         // Calculate separate farm components with YESTERDAY values
         const farmComponents = calculateSeparateEfficiencies(
@@ -241,15 +252,15 @@ function calculateReinvestmentStrategy() {
 
         let reinvestmentUSD = 0;
         let strategyText = 'Hold';
-        let todayMinerTH = yesterdayMinerTH; // Default: no growth
+        let todayMinerTH = yesterdayMinerTH;
 
-        // Execute GoMining strategy with correct wallet management
+        // ===== STRATEGY EXECUTION =====
+        
         if (currentStrategy === 'auto') {
             // AUTOMATIC REINVEST: Deduct costs from wallet, reinvest ENTIRE revenue + 5%
             currentGMTBalance -= dailyElectricity.gmt;
             currentGMTBalance -= dailyService.gmt;
             
-            // Check if we can afford the electricity and service costs
             if (currentGMTBalance >= 0) {
                 reinvestmentUSD = dailyRevenue.usd * 1.05; // ENTIRE revenue + 5% bonus
                 const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
@@ -282,45 +293,105 @@ function calculateReinvestmentStrategy() {
                 strategyText = 'Hold (No Profit/Insufficient GMT)';
             }
             
-            } else if (currentStrategy === 'controlled') {
-                // CONTROLLED AUTO: Mix of auto and saving days
-                // Check if we should save first or auto first
-                const shouldAutoInvest = saveFirst ? 
-                    (dayInCycle >= (30 - autoDays)) : // Save first: auto in last X days
-                    (dayInCycle < autoDays);          // Auto first: auto in first X days
+        } else if (currentStrategy === 'controlled') {
+            // CONTROLLED AUTO (v1)
+            const shouldAutoInvest = saveFirst ? 
+                (dayInCycle >= (30 - autoDays)) : 
+                (dayInCycle < autoDays);
+            
+            if (shouldAutoInvest) {
+                currentGMTBalance -= dailyElectricity.gmt;
+                currentGMTBalance -= dailyService.gmt;
                 
-                if (shouldAutoInvest) {
-                    // AUTO DAYS: Same as automatic reinvest
-                    currentGMTBalance -= dailyElectricity.gmt;
-                    currentGMTBalance -= dailyService.gmt;
-                    
-                    if (currentGMTBalance >= 0) {
-                        reinvestmentUSD = dailyRevenue.usd * 1.05;
-                        const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
-                        todayMinerTH = yesterdayMinerTH + additionalTH;
-                        totalInvestment += reinvestmentUSD;
-                        strategyText = 'Auto +5%';
-                    } else {
-                        currentGMTBalance += dailyElectricity.gmt;
-                        currentGMTBalance += dailyService.gmt;
-                        currentGMTBalance += dailyRevenue.gmt;
-                        strategyText = 'Hold (Insufficient GMT)';
-                    }
+                if (currentGMTBalance >= 0) {
+                    reinvestmentUSD = dailyRevenue.usd * 1.05;
+                    const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
+                    todayMinerTH = yesterdayMinerTH + additionalTH;
+                    totalInvestment += reinvestmentUSD;
+                    strategyText = 'Auto +5%';
                 } else {
-                    // SAVING DAYS: Revenue to wallet, deduct costs, keep profit as savings
+                    currentGMTBalance += dailyElectricity.gmt;
+                    currentGMTBalance += dailyService.gmt;
                     currentGMTBalance += dailyRevenue.gmt;
-                    currentGMTBalance -= dailyElectricity.gmt;
-                    currentGMTBalance -= dailyService.gmt;
-                    strategyText = 'Saving';
+                    strategyText = 'Hold (Insufficient GMT)';
+                }
+            } else {
+                currentGMTBalance += dailyRevenue.gmt;
+                currentGMTBalance -= dailyElectricity.gmt;
+                currentGMTBalance -= dailyService.gmt;
+                strategyText = 'Saving';
+            }
+            
+            dayInCycle++;
+            if (dayInCycle >= 30) {
+                dayInCycle = 0;
+            }
+            
+        } else if (currentStrategy === 'controlledv2') {
+            // ===== CONTROLLED AUTO V2 =====
+            const cyclePosition = dayInCycleV2 % totalCycleDaysV2;
+            
+            // Determine which phase we're in based on save-first toggle
+            let isReinvestPhase, isBTCPhase, isSavingPhase;
+            
+            if (saveFirstV2) {
+                // Save First: GMT Saving → BTC → TH Reinvest
+                isSavingPhase = cyclePosition < savingDaysV2;
+                isBTCPhase = cyclePosition >= savingDaysV2 && cyclePosition < savingDaysV2 + btcRewardDaysV2;
+                isReinvestPhase = cyclePosition >= savingDaysV2 + btcRewardDaysV2;
+            } else {
+                // TH First: TH Reinvest → BTC → GMT Saving
+                isReinvestPhase = cyclePosition < reinvestDaysV2;
+                isBTCPhase = cyclePosition >= reinvestDaysV2 && cyclePosition < reinvestDaysV2 + btcRewardDaysV2;
+                isSavingPhase = cyclePosition >= reinvestDaysV2 + btcRewardDaysV2;
+            }
+            
+            if (isReinvestPhase) {
+                // PHASE: Reinvest in TH mit +5%
+                currentGMTBalance -= dailyElectricity.gmt;
+                currentGMTBalance -= dailyService.gmt;
+                
+                if (currentGMTBalance >= 0) {
+                    reinvestmentUSD = dailyRevenue.usd * 1.05;
+                    const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
+                    todayMinerTH = yesterdayMinerTH + additionalTH;
+                    totalInvestment += reinvestmentUSD;
+                    strategyText = 'TH Reinvest +5%';
+                } else {
+                    currentGMTBalance += dailyElectricity.gmt;
+                    currentGMTBalance += dailyService.gmt;
+                    currentGMTBalance += dailyRevenue.gmt;
+                    strategyText = 'Hold (Insufficient GMT)';
                 }
                 
-                dayInCycle++;
-                if (dayInCycle >= 30) {
-                    dayInCycle = 0; // Reset cycle
+            } else if (isBTCPhase) {
+                // PHASE: Reward in BTC, Maintenance in GMT
+                currentBTCBalance += dailyRevenue.btc;
+                currentGMTBalance -= dailyElectricity.gmt;
+                currentGMTBalance -= dailyService.gmt;
+                
+                if (currentGMTBalance < 0) {
+                    currentBTCBalance -= dailyRevenue.btc;
+                    currentGMTBalance += dailyElectricity.gmt;
+                    currentGMTBalance += dailyService.gmt;
+                    currentGMTBalance += dailyRevenue.gmt;
+                    strategyText = 'Hold (Insufficient GMT)';
+                } else {
+                    strategyText = 'BTC Accumulation';
                 }
+                
+            } else if (isSavingPhase) {
+                // PHASE: Saving (Reinvest in GMT)
+                currentGMTBalance += dailyRevenue.gmt;
+                currentGMTBalance -= dailyElectricity.gmt;
+                currentGMTBalance -= dailyService.gmt;
+                strategyText = 'GMT Saving';
             }
+            
+            dayInCycleV2++;
+        }
         
-        // Calculate TODAY farm values (for tomorrow's calculations)
+        // Calculate TODAY farm values
         const todayFarmTH = inputs.farmTotalTH + (todayMinerTH - inputs.minerTH);
         const todayFarmEfficiency = calculateNewFarmEfficiency(
             inputs.farmTotalTH, 
@@ -345,36 +416,28 @@ function calculateReinvestmentStrategy() {
                 dailyProfitUSD: dailyProfitUSD,
                 reinvestmentUSD: reinvestmentUSD,
                 gmtBalance: currentGMTBalance,
+                btcBalance: currentBTCBalance, // NEU
                 strategy: strategyText
             });
             
-            // Chart data - create appropriate labels
+            // Chart labels
             let label;
             switch(chartPeriod) {
-                case 'daily':
-                    label = `Day ${day + 1}`;
-                    break;
-                case 'weekly':
-                    label = `Week ${Math.ceil((day + 1) / 7)}`;
-                    break;
-                case 'monthly':
-                    label = `Month ${Math.ceil((day + 1) / 30)}`;
-                    break;
-                case 'yearly':
-                    label = `Year ${Math.ceil((day + 1) / 365)}`;
-                    break;
-                default:
-                    label = `Day ${day + 1}`;
+                case 'daily': label = `Day ${day + 1}`; break;
+                case 'weekly': label = `Week ${Math.ceil((day + 1) / 7)}`; break;
+                case 'monthly': label = `Month ${Math.ceil((day + 1) / 30)}`; break;
+                case 'yearly': label = `Year ${Math.ceil((day + 1) / 365)}`; break;
+                default: label = `Day ${day + 1}`;
             }
 
-            // Chart data
             chartData.labels.push(label);
             chartData.thData.push(todayMinerTH);
             chartData.gmtData.push(Number(currentGMTBalance.toFixed(4)));
+            chartData.btcData.push(Number(currentBTCBalance.toFixed(8))); // NEU
             chartData.profitData.push(dailyProfitUSD);
         }
         
-        // TODAY becomes YESTERDAY for next iteration
+        // TODAY becomes YESTERDAY
         yesterdayFarmTH = todayFarmTH;
         yesterdayFarmEfficiency = todayFarmEfficiency;
         yesterdayMinerTH = todayMinerTH;
@@ -389,6 +452,7 @@ function calculateReinvestmentStrategy() {
             finalFarmEfficiency: yesterdayFarmEfficiency,
             totalInvestment: totalInvestment,
             finalGMTBalance: currentGMTBalance,
+            finalBTCBalance: currentBTCBalance, // NEU
             totalDays: inputs.calculationPeriod
         }
     };
@@ -448,27 +512,115 @@ function getInputValues() {
 /**
  * Update the results display
  */
-function updateResultsDisplay(calculationResults) {
-    if (!calculationResults) return;
-
+function updateResultsDisplay(calculationResult) {
     // Show results section
     document.getElementById('results-section').classList.remove('hidden');
-
+    
     // Update summary cards
-    document.getElementById('final-th').textContent = calculationResults.summary.finalTH.toFixed(2) + ' TH';
-    document.getElementById('final-farm-th').textContent = `${calculationResults.summary.finalFarmTH.toFixed(2)} TH`;
-    document.getElementById('final-farm-efficiency').textContent = `${calculationResults.summary.finalFarmEfficiency.toFixed(2)} W/TH`;
-    document.getElementById('total-investment').textContent = '$' + calculationResults.summary.totalInvestment.toFixed(2);
-    document.getElementById('final-gmt-balance').textContent = calculationResults.summary.finalGMTBalance.toFixed(2) + ' GMT';
-
+    document.getElementById('final-th').textContent = calculationResult.summary.finalTH.toFixed(2) + ' TH';
+    document.getElementById('final-farm-th').textContent = calculationResult.summary.finalFarmTH.toFixed(2) + ' TH';
+    document.getElementById('final-farm-efficiency').textContent = calculationResult.summary.finalFarmEfficiency.toFixed(2) + ' W/TH';
+    document.getElementById('total-investment').textContent = '$' + calculationResult.summary.totalInvestment.toFixed(2);
+    document.getElementById('final-gmt-balance').textContent = calculationResult.summary.finalGMTBalance.toFixed(4) + ' GMT';
+    
+    // NEU: BTC Balance Card (nur bei controlledv2 anzeigen)
+    const btcBalanceCard = document.getElementById('final-btc').parentElement;
+    if (currentStrategy === 'controlledv2') {
+        btcBalanceCard.style.display = 'block';
+        document.getElementById('final-btc').textContent = calculationResult.summary.finalBTCBalance.toFixed(8) + ' BTC';
+    } else {
+        btcBalanceCard.style.display = 'none';
+    }
+    
     // Update chart
-    updateChart(calculationResults.chartData);
-
+    updateChart(calculationResult.chartData);
+    
     // Update results table
-    updateResultsTable(calculationResults.results);
-
+    const tableBody = document.getElementById('results-table-body');
+    tableBody.innerHTML = '';
+    
+    calculationResult.results.forEach(result => {
+        const row = document.createElement('tr');
+        
+        // Period label
+        const periodCell = document.createElement('td');
+        const chartPeriod = document.getElementById('chart-period').value;
+        switch(chartPeriod) {
+            case 'daily':
+                periodCell.textContent = `Day ${result.day}`;
+                break;
+            case 'weekly':
+                periodCell.textContent = `Week ${Math.ceil(result.day / 7)}`;
+                break;
+            case 'monthly':
+                periodCell.textContent = `Month ${Math.ceil(result.day / 30)}`;
+                break;
+            case 'yearly':
+                periodCell.textContent = `Year ${Math.ceil(result.day / 365)}`;
+                break;
+        }
+        row.appendChild(periodCell);
+        
+        // Date
+        const dateCell = document.createElement('td');
+        dateCell.textContent = result.date;
+        row.appendChild(dateCell);
+        
+        // TH Amount
+        const thCell = document.createElement('td');
+        thCell.textContent = result.thAmount.toFixed(2) + ' TH';
+        row.appendChild(thCell);
+        
+        // Daily Profit
+        const profitCell = document.createElement('td');
+        profitCell.textContent = '$' + result.dailyProfitUSD.toFixed(2);
+        profitCell.className = result.dailyProfitUSD >= 0 ? 'text-green-400' : 'text-red-400';
+        row.appendChild(profitCell);
+        
+        // Reinvestment
+        const reinvestCell = document.createElement('td');
+        reinvestCell.textContent = result.reinvestmentUSD > 0 ? '$' + result.reinvestmentUSD.toFixed(2) : '-';
+        row.appendChild(reinvestCell);
+        
+        // GMT Balance
+        const gmtCell = document.createElement('td');
+        gmtCell.textContent = result.gmtBalance.toFixed(4) + ' GMT';
+        gmtCell.className = result.gmtBalance >= 0 ? 'text-purple-400' : 'text-red-400';
+        row.appendChild(gmtCell);
+        
+        // NEU: BTC Balance (nur bei controlledv2)
+        if (currentStrategy === 'controlledv2') {
+            const btcCell = document.createElement('td');
+            btcCell.textContent = result.btcBalance.toFixed(8) + ' BTC';
+            btcCell.className = 'text-orange-400';
+            row.appendChild(btcCell);
+        }
+        
+        // Strategy
+        const strategyCell = document.createElement('td');
+        strategyCell.textContent = result.strategy;
+        
+        // Color code strategy
+        if (result.strategy.includes('Auto')) {
+            strategyCell.className = 'text-green-400';
+        } else if (result.strategy.includes('Manual')) {
+            strategyCell.className = 'text-blue-400';
+        } else if (result.strategy.includes('Saving') || result.strategy.includes('GMT')) {
+            strategyCell.className = 'text-purple-400';
+        } else if (result.strategy.includes('BTC')) {
+            strategyCell.className = 'text-orange-400';
+        } else if (result.strategy.includes('TH')) {
+            strategyCell.className = 'text-green-400';
+        } else {
+            strategyCell.className = 'text-gray-400';
+        }
+        
+        row.appendChild(strategyCell);
+        tableBody.appendChild(row);
+    });
+    
     // Scroll to results
-    document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /**
@@ -477,30 +629,52 @@ function updateResultsDisplay(calculationResults) {
 function updateChart(chartData) {
     const ctx = document.getElementById('growthChart').getContext('2d');
     
+    // Destroy existing chart if it exists
     if (growthChart) {
         growthChart.destroy();
     }
-
+    
+    // Determine which datasets to show based on strategy
+    const datasets = [
+        {
+            label: 'TH Amount',
+            data: chartData.thData,
+            borderColor: 'rgb(34, 197, 94)',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            yAxisID: 'y',
+            tension: 0.4,
+            fill: true
+        },
+        {
+            label: 'GMT Balance',
+            data: chartData.gmtData,
+            borderColor: 'rgb(168, 85, 247)',
+            backgroundColor: 'rgba(168, 85, 247, 0.1)',
+            yAxisID: 'y1',
+            tension: 0.4,
+            fill: true
+        }
+    ];
+    
+    // Add BTC Balance line for controlledv2 strategy
+    if (currentStrategy === 'controlledv2') {
+        datasets.push({
+            label: 'BTC Balance',
+            data: chartData.btcData,
+            borderColor: 'rgb(249, 115, 22)', // Orange
+            backgroundColor: 'rgba(249, 115, 22, 0.1)',
+            yAxisID: 'y2',
+            tension: 0.4,
+            fill: true
+        });
+    }
+    
+    // Create new chart
     growthChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: chartData.labels,
-            datasets: [
-                {
-                    label: 'TH Amount',
-                    data: chartData.thData,
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    yAxisID: 'y'
-                },
-                {
-                    label: 'GMT Balance',
-                    data: chartData.gmtData,
-                    borderColor: '#8b5cf6',
-                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                    yAxisID: 'y1'
-                }
-            ]
+            datasets: datasets
         },
         options: {
             responsive: true,
@@ -511,18 +685,49 @@ function updateChart(chartData) {
             },
             plugins: {
                 legend: {
+                    display: true,
+                    position: 'top',
                     labels: {
-                        color: '#d1d5db'
+                        color: '#d1d5db',
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                    titleColor: '#f3f4f6',
+                    bodyColor: '#d1d5db',
+                    borderColor: '#374151',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.dataset.label === 'TH Amount') {
+                                label += context.parsed.y.toFixed(2) + ' TH';
+                            } else if (context.dataset.label === 'GMT Balance') {
+                                label += context.parsed.y.toFixed(4) + ' GMT';
+                            } else if (context.dataset.label === 'BTC Balance') {
+                                label += context.parsed.y.toFixed(8) + ' BTC';
+                            }
+                            return label;
+                        }
                     }
                 }
             },
             scales: {
                 x: {
-                    ticks: {
-                        color: '#9ca3af'
-                    },
                     grid: {
-                        color: '#374151'
+                        color: 'rgba(55, 65, 81, 0.5)'
+                    },
+                    ticks: {
+                        color: '#9ca3af',
+                        maxRotation: 45,
+                        minRotation: 0
                     }
                 },
                 y: {
@@ -532,13 +737,13 @@ function updateChart(chartData) {
                     title: {
                         display: true,
                         text: 'TH Amount',
-                        color: '#10b981'
-                    },
-                    ticks: {
-                        color: '#9ca3af'
+                        color: '#22c55e'
                     },
                     grid: {
-                        color: '#374151'
+                        color: 'rgba(55, 65, 81, 0.5)'
+                    },
+                    ticks: {
+                        color: '#22c55e'
                     }
                 },
                 y1: {
@@ -548,16 +753,37 @@ function updateChart(chartData) {
                     title: {
                         display: true,
                         text: 'GMT Balance',
-                        color: '#8b5cf6'
-                    },
-                    ticks: {
-                        color: '#9ca3af'
+                        color: '#a855f7'
                     },
                     grid: {
                         drawOnChartArea: false,
-                        color: '#374151'
+                    },
+                    ticks: {
+                        color: '#a855f7'
                     }
-                }
+                },
+                // NEU: Y-Achse für BTC (nur bei controlledv2)
+                ...(currentStrategy === 'controlledv2' && {
+                    y2: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'BTC Balance',
+                            color: '#f97316'
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                        ticks: {
+                            color: '#f97316',
+                            callback: function(value) {
+                                return value.toFixed(8);
+                            }
+                        }
+                    }
+                })
             }
         }
     });
@@ -646,5 +872,137 @@ function updateCycleMode() {
     // Recalculate if results are visible
     if (!document.getElementById('results-section').classList.contains('hidden')) {
         calculateReinvestment();
+    }
+}
+
+/**
+ * Calculate controlled reinvestment strategy (v2)
+ * New version with separate BTC wallet and improved logic
+ */
+function calculateControlledReinvestV2() {
+    const reinvestDays = parseInt(document.getElementById('controlled-reinvest-days-v2').value) || 0;
+    const btcRewardDays = parseInt(document.getElementById('btc-reward-days-v2').value) || 0;
+    const savingDays = parseInt(document.getElementById('controlled-saving-days-v2').value) || 0;
+    
+    const totalDays = reinvestDays + btcRewardDays + savingDays;
+    document.getElementById('controlled-total-days-v2').textContent = totalDays;
+    
+    // Simulation über 365 Tage
+    let currentTH = startingTH;
+    let gmtWallet = startingGMT;
+    let btcWallet = 0; // NEU: BTC Wallet
+    
+    const thData = [];
+    const gmtData = [];
+    const btcData = []; // NEU: BTC Chart-Daten
+    
+    for (let day = 1; day <= 365; day++) {
+        const cycleDay = ((day - 1) % totalDays) + 1;
+        
+        const dailyReward = currentTH * satPerTH;
+        const dailyMaintenanceSat = calculateDailyMaintenance(currentTH);
+        const dailyMaintenanceGMT = (dailyMaintenanceSat / 1e8) * btcPrice / gmtPrice;
+        
+        // Entscheide basierend auf Zyklus-Tag
+        if (cycleDay <= reinvestDays) {
+            // Phase 1: Reinvest in TH mit +5%
+            const netRewardSat = dailyReward - dailyMaintenanceSat;
+            const netRewardUSD = (netRewardSat / 1e8) * btcPrice;
+            const newTH = (netRewardUSD / pricePerTH) * 1.05; // +5% Bonus
+            currentTH += newTH;
+            gmtWallet -= dailyMaintenanceGMT;
+            
+        } else if (cycleDay <= reinvestDays + btcRewardDays) {
+            // Phase 2: Reward in BTC, Maintenance in GMT
+            btcWallet += dailyReward / 1e8; // Reward auf BTC Wallet
+            gmtWallet -= dailyMaintenanceGMT;
+            
+        } else {
+            // Phase 3: Saving (Reinvest in GMT)
+            const rewardGMT = (dailyReward / 1e8) * btcPrice / gmtPrice;
+            gmtWallet += rewardGMT - dailyMaintenanceGMT;
+        }
+        
+        thData.push({ x: day, y: currentTH });
+        gmtData.push({ x: day, y: gmtWallet });
+        btcData.push({ x: day, y: btcWallet }); // NEU
+    }
+    
+    // Chart aktualisieren mit BTC-Linie (orange)
+    updateChart(thData, gmtData, btcData);
+    
+    // Results anzeigen
+    displayResults({
+        finalTH: currentTH,
+        finalGMT: gmtWallet,
+        finalBTC: btcWallet // NEU
+    });
+}
+   /* function updateControlledV2Settings() {
+        const reinvestDays = parseInt(document.getElementById('controlled-reinvest-days-v2').value) || 0;
+        const btcRewardDays = parseInt(document.getElementById('btc-reward-days-v2').value) || 0;
+        const savingDays = parseInt(document.getElementById('controlled-saving-days-v2').value) || 0;
+        
+        const totalDays = reinvestDays + btcRewardDays + savingDays;
+        document.getElementById('controlled-total-days-v2').textContent = `${totalDays} days`;
+        
+        // Update phase summaries
+        document.getElementById('phase1-summary').textContent = `${reinvestDays}d TH reinvest`;
+        document.getElementById('phase2-summary').textContent = `${btcRewardDays}d BTC accumulation`;
+        document.getElementById('phase3-summary').textContent = `${savingDays}d GMT saving`;
+    } */
+// Global variable for cycle mode v2
+let saveFirstV2 = false;
+
+function updateCycleModeV2() {
+    saveFirstV2 = document.getElementById('save-first-toggle-v2').checked;
+    const description = document.getElementById('cycle-description-v2');
+    const cycleOrder = document.getElementById('cycle-order-v2');
+    
+    if (saveFirstV2) {
+        description.textContent = "Start with GMT saving, then BTC accumulation, then TH reinvest with 5% bonus";
+        cycleOrder.innerHTML = `
+            Phase 1: <span id="phase3-summary" class="text-green-400">${document.getElementById('controlled-saving-days-v2').value}d GMT saving</span> → 
+            Phase 2: <span id="phase2-summary" class="text-orange-400">${document.getElementById('btc-reward-days-v2').value}d BTC accumulation</span> → 
+            Phase 3: <span id="phase1-summary" class="text-blue-400">${document.getElementById('controlled-reinvest-days-v2').value}d TH reinvest</span>
+        `;
+    } else {
+        description.textContent = "Start with TH reinvest, then BTC accumulation, then GMT saving";
+        cycleOrder.innerHTML = `
+            Phase 1: <span id="phase1-summary" class="text-blue-400">${document.getElementById('controlled-reinvest-days-v2').value}d TH reinvest</span> → 
+            Phase 2: <span id="phase2-summary" class="text-orange-400">${document.getElementById('btc-reward-days-v2').value}d BTC accumulation</span> → 
+            Phase 3: <span id="phase3-summary" class="text-green-400">${document.getElementById('controlled-saving-days-v2').value}d GMT saving</span>
+        `;
+    }
+    
+    // Recalculate if results are visible
+    if (!document.getElementById('results-section').classList.contains('hidden')) {
+        calculateReinvestment();
+    }
+}
+
+function updateControlledV2Settings() {
+    const reinvestDays = parseInt(document.getElementById('controlled-reinvest-days-v2').value) || 0;
+    const btcRewardDays = parseInt(document.getElementById('btc-reward-days-v2').value) || 0;
+    const savingDays = parseInt(document.getElementById('controlled-saving-days-v2').value) || 0;
+    
+    const totalDays = reinvestDays + btcRewardDays + savingDays;
+    document.getElementById('controlled-total-days-v2').textContent = `${totalDays} days`;
+    
+    // Update cycle order display
+    updateCycleModeV2();
+}
+
+/**
+ * Update table header based on strategy
+ */
+function updateTableHeader() {
+    const table = document.querySelector('.results-table');
+    const btcHeader = table.querySelector('th:nth-child(7)'); // BTC Balance header
+    
+    if (currentStrategy === 'controlledv2') {
+        btcHeader.style.display = 'table-cell';
+    } else {
+        btcHeader.style.display = 'none';
     }
 }

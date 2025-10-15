@@ -104,6 +104,12 @@
         .dot {
             transition: all 0.3s ease-in-out;
         }
+            #save-first-toggle-v2:checked + label .dot {
+            transform: translateX(1.5rem);
+        }
+        #save-first-toggle-v2:checked + label > div {
+            background-color: rgb(249, 115, 22); /* Orange */
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
@@ -319,6 +325,17 @@
                     <p class="text-sm text-gray-300 mb-3">Mix of auto reinvest(with 5% TH bonus) and saving for maintenance</p>
                     <div class="text-purple-400 font-bold">Customizable</div>
                 </div>
+            
+                        <!-- Controlled Auto v2 Reinvestment -->
+                <div class="strategy-card bg-gray-700 rounded-lg p-4 border-2 border-transparent" 
+                    onclick="selectStrategy('controlledv2')">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="material-icons text-orange-400">schedule</span>
+                        <h3 class="font-bold">Controlled Auto + BTC</h3>
+                    </div>
+                    <p class="text-sm text-gray-300 mb-3">Advanced strategy with TH reinvest, BTC accumulation, and GMT saving phases</p>
+                    <div class="text-orange-400 font-bold">3-Phase Cycle</div>
+                </div>
             </div>
 
             <!-- Controlled Strategy Settings -->
@@ -361,6 +378,71 @@
                         <div class="text-sm text-gray-400 mt-2">
                             Saving Days: <span id="saving-days-value" class="font-bold text-blue-400">10 days</span>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controlled Reinvest v2 Settings -->
+            <div id="controlledv2-settings" class="mt-6 p-4 bg-gray-700 rounded-lg" style="display: none;">
+                <h4 class="font-bold mb-4 text-orange-400">Controlled Auto v2 Settings</h4>
+                
+                <div class="grid gap-4 md:grid-cols-3">
+                    <!-- Reinvest in TH Days -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">Reinvest in TH Days (with +5% bonus)</label>
+                        <input type="number" id="controlled-reinvest-days-v2" 
+                            class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500" 
+                            value="6" min="0" max="30" oninput="updateControlledV2Settings()">
+                        <div class="text-xs text-gray-400">Reward → TH with 5% bonus<br>Maintenance from GMT wallet</div>
+                    </div>
+
+                    <!-- Reward in BTC Days -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">Reward in BTC Days</label>
+                        <input type="number" id="btc-reward-days-v2" 
+                            class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-orange-500" 
+                            value="4" min="0" max="30" oninput="updateControlledV2Settings()">
+                        <div class="text-xs text-gray-400">Reward → BTC wallet<br>Maintenance from GMT wallet</div>
+                    </div>
+
+                    <!-- Saving Days -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">Saving Days (Reinvest in GMT)</label>
+                        <input type="number" id="controlled-saving-days-v2" 
+                            class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-green-500" 
+                            value="20" min="0" max="30" oninput="updateControlledV2Settings()">
+                        <div class="text-xs text-gray-400">Reward → GMT wallet<br>Maintenance from GMT wallet</div>
+                    </div>
+                </div>
+                <!-- NEU: Cycle Mode Toggle -->
+                <div class="mt-4 space-y-2">
+                    <label class="text-sm font-medium text-gray-300">Cycle Mode</label>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-gray-400">TH First</span>
+                        <div class="relative">
+                            <input type="checkbox" id="save-first-toggle-v2" class="sr-only" onchange="updateCycleModeV2()">
+                            <label for="save-first-toggle-v2" class="flex items-center cursor-pointer">
+                                <div class="relative">
+                                    <div class="w-12 h-6 bg-gray-600 rounded-full shadow-inner"></div>
+                                    <div class="dot absolute w-5 h-5 bg-white rounded-full shadow -left-0.5 -top-0.5 transition-transform duration-300 ease-in-out"></div>
+                                </div>
+                            </label>
+                        </div>
+                        <span class="text-sm text-gray-400">Save First</span>
+                    </div>
+                    <div class="text-xs text-gray-400" id="cycle-description-v2">
+                        Start with TH reinvest, then BTC accumulation, then GMT saving
+                    </div>
+                </div>
+                <!-- Total Days Display -->
+                <div class="mt-4 p-3 bg-gray-800 rounded-lg">
+                    <div class="text-sm text-gray-400">
+                        Total Cycle Duration: <span id="controlled-total-days-v2" class="font-bold text-orange-400">30 days</span>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">
+                        Phase 1: <span id="phase1-summary" class="text-blue-400">6d TH reinvest</span> → 
+                        Phase 2: <span id="phase2-summary" class="text-orange-400">4d BTC accumulation</span> → 
+                        Phase 3: <span id="phase3-summary" class="text-green-400">20d GMT saving</span>
                     </div>
                 </div>
             </div>
@@ -408,6 +490,11 @@
                     <h4 class="text-sm font-medium text-gray-300 mb-2">Final GMT Balance</h4>
                     <div id="final-gmt-balance" class="text-2xl font-bold text-purple-400">-</div>
                 </div>
+                    <!-- NEU -->
+                <div class="bg-gray-800 rounded-lg p-4">
+                    <div class="text-sm text-gray-400">Final BTC Balance</div>
+                    <div id="final-btc" class="text-2xl font-bold text-orange-500">-</div>
+                </div>
             </div>
 
             <!-- Detailed Results Table -->
@@ -422,6 +509,7 @@
                             <th>Daily Profit (USD)</th>
                             <th>Reinvestment (USD)</th>
                             <th>GMT Balance</th>
+                            <th>BTC Balance</th>
                             <th>Strategy</th>
                         </tr>
                     </thead>
@@ -444,7 +532,8 @@
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
             initializePage();
-            setupEventListeners();
+           // setupEventListeners();
+            updateControlledV2Settings();
         });
         function updatePeriodLabel() {
             const period = document.getElementById('chart-period').value;
@@ -490,7 +579,6 @@
             document.getElementById('auto-days-value').textContent = `${autoDays} days`;
             document.getElementById('saving-days-value').textContent = `${savingDays} days`;
         }
-
         function selectStrategy(strategy) {
             currentStrategy = strategy;
             
@@ -502,15 +590,38 @@
             
             // Show/hide controlled settings
             const controlledSettings = document.getElementById('controlled-settings');
+            const controlledV2Settings = document.getElementById('controlledv2-settings');
+            
             if (strategy === 'controlled') {
                 controlledSettings.style.display = 'block';
+                controlledV2Settings.style.display = 'none';
+            } else if (strategy === 'controlledv2') {
+                controlledSettings.style.display = 'none';
+                controlledV2Settings.style.display = 'block';
             } else {
                 controlledSettings.style.display = 'none';
+                controlledV2Settings.style.display = 'none';
             }
+            
+            // Update table header visibility for BTC column
+            updateTableHeader();
             
             // Recalculate if results are visible
             if (!document.getElementById('results-section').classList.contains('hidden')) {
                 calculateReinvestment();
+            }
+        }
+        
+        function updateTableHeader() {
+            const table = document.querySelector('.results-table');
+            const btcHeader = table.querySelector('th:nth-child(7)'); // BTC Balance header
+            
+            if (btcHeader) {
+                if (currentStrategy === 'controlledv2') {
+                    btcHeader.style.display = 'table-cell';
+                } else {
+                    btcHeader.style.display = 'none';
+                }
             }
         }
 
