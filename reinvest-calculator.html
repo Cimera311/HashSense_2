@@ -91,7 +91,58 @@
             border: 2px solid #8b5cf6;
             background-color: #1e1b4b;
         }
-        /* iOS Style Toggle Switch */
+        /* Improved Toggle Switch Styling */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #4b5563;
+            transition: 0.3s;
+            border-radius: 12px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #8b5cf6;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Orange variant for v2 */
+        .toggle-slider.orange input:checked + .toggle-slider {
+            background-color: #f97316;
+        }
+        /* iOS Style Toggle Switch 
         #save-first-toggle:checked + label .dot {
             transform: translateX(24px);
             background-color: #8b5cf6;
@@ -108,8 +159,9 @@
             transform: translateX(1.5rem);
         }
         #save-first-toggle-v2:checked + label > div {
-            background-color: rgb(249, 115, 22); /* Orange */
-        }
+            background-color: rgb(249, 115, 22); /* Orange 
+        } 
+        */
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
@@ -353,19 +405,15 @@
                             <span>30</span>
                         </div>
                     </div>
+                    <!-- Improved Cycle Mode Toggle -->
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-gray-300">Cycle Mode</label>
                         <div class="flex items-center gap-3">
                             <span class="text-sm text-gray-400">Auto First</span>
-                            <div class="relative">
-                                <input type="checkbox" id="save-first-toggle" class="sr-only" onchange="updateCycleMode()">
-                                <label for="save-first-toggle" class="flex items-center cursor-pointer">
-                                    <div class="relative">
-                                        <div class="w-12 h-6 bg-gray-600 rounded-full shadow-inner"></div>
-                                        <div class="dot absolute w-5 h-5 bg-white rounded-full shadow -left-0.5 -top-0.5 transition-transform duration-300 ease-in-out"></div>
-                                    </div>
-                                </label>
-                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="save-first-toggle" onchange="updateCycleMode()">
+                                <span class="toggle-slider"></span>
+                            </label>
                             <span class="text-sm text-gray-400">Save First</span>
                         </div>
                         <div class="text-xs text-gray-400" id="cycle-description">
@@ -414,20 +462,15 @@
                         <div class="text-xs text-gray-400">Reward → GMT wallet<br>Maintenance from GMT wallet</div>
                     </div>
                 </div>
-                <!-- NEU: Cycle Mode Toggle -->
+                <!-- Improved V2 Cycle Mode Toggle -->
                 <div class="mt-4 space-y-2">
                     <label class="text-sm font-medium text-gray-300">Cycle Mode</label>
                     <div class="flex items-center gap-3">
                         <span class="text-sm text-gray-400">TH First</span>
-                        <div class="relative">
-                            <input type="checkbox" id="save-first-toggle-v2" class="sr-only" onchange="updateCycleModeV2()">
-                            <label for="save-first-toggle-v2" class="flex items-center cursor-pointer">
-                                <div class="relative">
-                                    <div class="w-12 h-6 bg-gray-600 rounded-full shadow-inner"></div>
-                                    <div class="dot absolute w-5 h-5 bg-white rounded-full shadow -left-0.5 -top-0.5 transition-transform duration-300 ease-in-out"></div>
-                                </div>
-                            </label>
-                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="save-first-toggle-v2" onchange="updateCycleModeV2()">
+                            <span class="toggle-slider orange"></span>
+                        </label>
                         <span class="text-sm text-gray-400">Save First</span>
                     </div>
                     <div class="text-xs text-gray-400" id="cycle-description-v2">
@@ -439,7 +482,7 @@
                     <div class="text-sm text-gray-400">
                         Total Cycle Duration: <span id="controlled-total-days-v2" class="font-bold text-orange-400">30 days</span>
                     </div>
-                    <div class="text-xs text-gray-500 mt-1">
+                    <div class="text-xs text-gray-500 mt-1" id="cycle-order-v2">
                         Phase 1: <span id="phase1-summary" class="text-blue-400">6d TH reinvest</span> → 
                         Phase 2: <span id="phase2-summary" class="text-orange-400">4d BTC accumulation</span> → 
                         Phase 3: <span id="phase3-summary" class="text-green-400">20d GMT saving</span>
@@ -490,8 +533,14 @@
                     <h4 class="text-sm font-medium text-gray-300 mb-2">Final GMT Balance</h4>
                     <div id="final-gmt-balance" class="text-2xl font-bold text-purple-400">-</div>
                 </div>
+                    <!-- NEU: Hold Days Card -->
+                <div class="bg-gray-700 rounded-lg p-4">
+                    <h4 class="text-sm font-medium text-gray-300 mb-2">Hold Days</h4>
+                    <div id="hold-days" class="text-2xl font-bold text-red-400">-</div>
+                    <div class="text-xs text-gray-400 mt-1">Insufficient GMT</div>
+                </div>
                     <!-- NEU -->
-                <div class="bg-gray-800 rounded-lg p-4">
+                <div class="bg-gray-700 rounded-lg p-4">
                     <div class="text-sm text-gray-400">Final BTC Balance</div>
                     <div id="final-btc" class="text-2xl font-bold text-orange-500">-</div>
                 </div>

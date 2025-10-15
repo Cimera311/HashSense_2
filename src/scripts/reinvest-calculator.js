@@ -180,6 +180,8 @@ function calculateReinvestmentStrategy() {
     const inputs = getInputValues();
     if (!inputs) return null;
 
+    let holdDaysCount = 0; // NEU: Counter für Hold Days
+
     const results = [];
     let currentDate = new Date();
     let currentGMTBalance = inputs.gmtWalletBalance;
@@ -273,6 +275,7 @@ function calculateReinvestmentStrategy() {
                 currentGMTBalance += dailyService.gmt;
                 currentGMTBalance += dailyRevenue.gmt;
                 strategyText = 'Hold (Insufficient GMT)';
+                holdDaysCount++; // NEU: Increment Hold Days counter
             }
             
         } else if (currentStrategy === 'manual') {
@@ -291,6 +294,7 @@ function calculateReinvestmentStrategy() {
                 strategyText = 'Manual';
             } else {
                 strategyText = 'Hold (No Profit/Insufficient GMT)';
+                holdDaysCount++; // NEU: Increment Hold Days counter
             }
             
         } else if (currentStrategy === 'controlled') {
@@ -314,6 +318,7 @@ function calculateReinvestmentStrategy() {
                     currentGMTBalance += dailyService.gmt;
                     currentGMTBalance += dailyRevenue.gmt;
                     strategyText = 'Hold (Insufficient GMT)';
+                    holdDaysCount++; // NEU: Increment Hold Days counter
                 }
             } else {
                 currentGMTBalance += dailyRevenue.gmt;
@@ -362,6 +367,7 @@ function calculateReinvestmentStrategy() {
                     currentGMTBalance += dailyService.gmt;
                     currentGMTBalance += dailyRevenue.gmt;
                     strategyText = 'Hold (Insufficient GMT)';
+                    holdDaysCount++; // NEU: Increment Hold Days counter
                 }
                 
             } else if (isBTCPhase) {
@@ -376,6 +382,7 @@ function calculateReinvestmentStrategy() {
                     currentGMTBalance += dailyService.gmt;
                     currentGMTBalance += dailyRevenue.gmt;
                     strategyText = 'Hold (Insufficient GMT)';
+                    holdDaysCount++; // NEU: Increment Hold Days counter
                 } else {
                     strategyText = 'BTC Accumulation';
                 }
@@ -453,7 +460,8 @@ function calculateReinvestmentStrategy() {
             totalInvestment: totalInvestment,
             finalGMTBalance: currentGMTBalance,
             finalBTCBalance: currentBTCBalance, // NEU
-            totalDays: inputs.calculationPeriod
+            totalDays: inputs.calculationPeriod, 
+            holdDays: holdDaysCount // NEU: Total Hold Days
         }
     };
 }
@@ -522,7 +530,7 @@ function updateResultsDisplay(calculationResult) {
     document.getElementById('final-farm-efficiency').textContent = calculationResult.summary.finalFarmEfficiency.toFixed(2) + ' W/TH';
     document.getElementById('total-investment').textContent = '$' + calculationResult.summary.totalInvestment.toFixed(2);
     document.getElementById('final-gmt-balance').textContent = calculationResult.summary.finalGMTBalance.toFixed(4) + ' GMT';
-    
+    document.getElementById('hold-days').textContent = `${calculationResult.summary.holdDays}`; // NEU: Hold Days anzeigen
     // NEU: BTC Balance Card (nur bei controlledv2 anzeigen)
     const btcBalanceCard = document.getElementById('final-btc').parentElement;
     if (currentStrategy === 'controlledv2') {
@@ -959,19 +967,28 @@ function updateCycleModeV2() {
     const description = document.getElementById('cycle-description-v2');
     const cycleOrder = document.getElementById('cycle-order-v2');
     
+    // Sichere Element-Zugriffe mit Fallback-Werten
+    const savingDaysElement = document.getElementById('controlled-saving-days-v2');
+    const btcDaysElement = document.getElementById('btc-reward-days-v2');
+    const reinvestDaysElement = document.getElementById('controlled-reinvest-days-v2');
+    
+    const savingDays = savingDaysElement ? savingDaysElement.value : '10';
+    const btcDays = btcDaysElement ? btcDaysElement.value : '10';
+    const reinvestDays = reinvestDaysElement ? reinvestDaysElement.value : '10';
+    
     if (saveFirstV2) {
         description.textContent = "Start with GMT saving, then BTC accumulation, then TH reinvest with 5% bonus";
         cycleOrder.innerHTML = `
-            Phase 1: <span id="phase3-summary" class="text-green-400">${document.getElementById('controlled-saving-days-v2').value}d GMT saving</span> → 
-            Phase 2: <span id="phase2-summary" class="text-orange-400">${document.getElementById('btc-reward-days-v2').value}d BTC accumulation</span> → 
-            Phase 3: <span id="phase1-summary" class="text-blue-400">${document.getElementById('controlled-reinvest-days-v2').value}d TH reinvest</span>
+            Phase 1: <span class="text-green-400">${savingDays}d GMT saving</span> → 
+            Phase 2: <span class="text-orange-400">${btcDays}d BTC accumulation</span> → 
+            Phase 3: <span class="text-blue-400">${reinvestDays}d TH reinvest</span>
         `;
     } else {
         description.textContent = "Start with TH reinvest, then BTC accumulation, then GMT saving";
         cycleOrder.innerHTML = `
-            Phase 1: <span id="phase1-summary" class="text-blue-400">${document.getElementById('controlled-reinvest-days-v2').value}d TH reinvest</span> → 
-            Phase 2: <span id="phase2-summary" class="text-orange-400">${document.getElementById('btc-reward-days-v2').value}d BTC accumulation</span> → 
-            Phase 3: <span id="phase3-summary" class="text-green-400">${document.getElementById('controlled-saving-days-v2').value}d GMT saving</span>
+            Phase 1: <span class="text-blue-400">${reinvestDays}d TH reinvest</span> → 
+            Phase 2: <span class="text-orange-400">${btcDays}d BTC accumulation</span> → 
+            Phase 3: <span class="text-green-400">${savingDays}d GMT saving</span>
         `;
     }
     
