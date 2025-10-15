@@ -3,34 +3,6 @@
  * Calculates different reinvestment strategies with 5% bonus feature
  */
 
-// ===== GREEDY MINER FEATURE =====
-
-/**
- * Calculate how many Tuesdays are in the given number of days
- */
-
-/**
- * Get all Tuesday day numbers within the calculation period
- * @param {number} totalDays - Total days to calculate
- * @returns {Array} - Array of day numbers that are Tuesdays [5, 12, 19, 26, ...]
- */
-function getTuesdayDays(totalDays) {
-    const tuesdayDays = [];
-    const today = new Date();
-    
-    for (let day = 0; day < totalDays; day++) {
-        const calculationDate = new Date(today);
-        calculationDate.setDate(today.getDate() + day);
-        
-        // Check if it's Tuesday (getDay() returns 2 for Tuesday)
-        if (calculationDate.getDay() === 2) {
-            tuesdayDays.push(day);
-        }
-    }
-    
-    return tuesdayDays;
-}
-
 // ===== CALCULATION FUNCTIONS =====
 
 /**
@@ -205,13 +177,7 @@ function calculateTHFromUSD(usdAmount, efficiency, currentTH) {
  */
 function calculateReinvestmentStrategy() {
     // Get input values
-    const inputs = {
-        ...getInputValues(),
-        greedy: document.getElementById('greedy-miner-enabled').checked, // FEHLT
-        targetIsGreedy: document.getElementById('target-is-greedy-toggle').checked, // FEHLT
-        greedyGrowthRate: parseFloat(document.getElementById('greedy-growth-rate').value) || 0.12, // FEHLT
-        greedyMinerTH: parseFloat(document.getElementById('greedy-miner-th').value) || 10.00000000 // FEHLT
-    };
+    const inputs = getInputValues();
     if (!inputs) return null;
 
     let holdDaysCount = 0; // NEU: Counter für Hold Days
@@ -430,48 +396,6 @@ function calculateReinvestmentStrategy() {
             }
             
             dayInCycleV2++;
-            
-        } else if (currentStrategy === 'greedy') {
-            // ===== GREEDY MINER STRATEGY =====
-            const greedyMinerSeparate = document.getElementById('greedy-miner-separate').checked;
-            const greedyGrowthRate = parseFloat(document.getElementById('greedy-growth-rate').value) || 0.12;
-            const greedyTargetTH = parseFloat(document.getElementById('greedy-target-th').value) || yesterdayMinerTH;
-            
-            if (greedyMinerSeparate) {
-                // SEPARATE MINER: Greedy miner grows independently
-                if (isTuesday(day)) {
-                    const greedyGrowth = yesterdayMinerTH * (greedyGrowthRate / 100);
-                    todayMinerTH = yesterdayMinerTH + greedyGrowth;
-                    strategyText = `Greedy Tuesday +${greedyGrowthRate}%`;
-                } else {
-                    todayMinerTH = yesterdayMinerTH; // No growth on non-Tuesday
-                    strategyText = 'Greedy Hold';
-                }
-                
-                // Normal cost handling
-                currentGMTBalance += dailyRevenue.gmt;
-                currentGMTBalance -= dailyElectricity.gmt;
-                currentGMTBalance -= dailyService.gmt;
-                
-            } else {
-                // TARGET MINER: Greedy miner grows towards target
-                if (isTuesday(day) && yesterdayMinerTH < greedyTargetTH) {
-                    const potentialGrowth = yesterdayMinerTH * (greedyGrowthRate / 100);
-                    const maxGrowth = greedyTargetTH - yesterdayMinerTH;
-                    const actualGrowth = Math.min(potentialGrowth, maxGrowth);
-                    
-                    todayMinerTH = yesterdayMinerTH + actualGrowth;
-                    strategyText = `Greedy Target +${((actualGrowth / yesterdayMinerTH) * 100).toFixed(2)}%`;
-                } else {
-                    todayMinerTH = yesterdayMinerTH;
-                    strategyText = yesterdayMinerTH >= greedyTargetTH ? 'Greedy Target Reached' : 'Greedy Hold';
-                }
-                
-                // Normal cost handling
-                currentGMTBalance += dailyRevenue.gmt;
-                currentGMTBalance -= dailyElectricity.gmt;
-                currentGMTBalance -= dailyService.gmt;
-            }
         }
         
         // Calculate TODAY farm values
@@ -1099,92 +1023,3 @@ function updateTableHeader() {
         btcHeader.style.display = 'none';
     }
 }
-       // ===== GREEDY MINER FUNCTIONS =====
-        
-        function updateGreedyMode() {
-            const isSeparate = document.getElementById('greedy-miner-separate').checked;
-            const targetContainer = document.getElementById('target-th-container');
-            const description = document.getElementById('greedy-mode-description');
-            
-            if (isSeparate) {
-                targetContainer.style.display = 'none';
-                description.textContent = 'Separate Mode: Miner grows independently without limit';
-            } else {
-                targetContainer.style.display = 'block';
-                description.textContent = 'Target Mode: Miner grows towards a specific TH target';
-            }
-            
-            updateGreedyPreview();
-        }
-        
-        function updateGreedyPreview() {
-            const calculationPeriod = parseInt(document.getElementById('calculation-period').value) || 30;
-            const chartPeriod = document.getElementById('chart-period').value || 'daily';
-            
-            // Calculate total days based on period
-            let totalDays;
-            switch(chartPeriod) {
-                case 'daily': totalDays = calculationPeriod; break;
-                case 'weekly': totalDays = calculationPeriod * 7; break;
-                case 'monthly': totalDays = calculationPeriod * 30; break;
-                case 'yearly': totalDays = calculationPeriod * 365; break;
-                default: totalDays = calculationPeriod;
-            }
-            
-            // Count Tuesdays using the same logic as in the calculator
-            let tuesdayCount = 0;
-            const startDate = new Date();
-            
-            for (let day = 0; day < totalDays; day++) {
-                const currentDate = new Date(startDate.getTime() + day * 24 * 60 * 60 * 1000);
-                if (currentDate.getDay() === 2) { // Tuesday = 2
-                    tuesdayCount++;
-                }
-            }
-            
-            document.getElementById('tuesday-count').textContent = `${tuesdayCount}`;
-        }
-
-        function toggleGreedyOptions() {
-            const isEnabled = document.getElementById('greedy-miner-enabled').checked;
-            const greedyOptions = document.getElementById('greedy-options');
-            
-            if (isEnabled) {
-                greedyOptions.style.display = 'block';
-                updateGreedyConfig(); // Update config when options are shown
-            } else {
-                greedyOptions.style.display = 'none';
-            }
-        }
-
-        function updateGreedyConfig() {
-            const targetIsGreedy = document.getElementById('target-is-greedy-toggle').checked;
-            const separateGreedySection = document.getElementById('separate-greedy-section');
-            const greedyConfigDescription = document.getElementById('greedy-config-description');
-            const greedySummary = document.getElementById('greedy-summary');
-            
-            // Get current values
-            const targetMinerTH = parseFloat(document.getElementById('miner-th').value) || 1.0;
-            const greedyMinerTH = parseFloat(document.getElementById('greedy-miner-th').value) || 1.0;
-            const greedyGrowthRate = parseFloat(document.getElementById('greedy-growth-rate').value) || 0.12;
-            
-            if (targetIsGreedy) {
-                // Target miner IS the greedy miner
-                separateGreedySection.style.display = 'none';
-                greedyConfigDescription.textContent = 'The target miner will grow by the specified percentage every Tuesday';
-                greedySummary.innerHTML = `
-                    Configuration: <span class="text-green-400">Target Miner (${targetMinerTH.toFixed(1)} TH)</span> is the Greedy Miner 
-                    (grows ${greedyGrowthRate}% every Tuesday)
-                `;
-            } else {
-                // Separate greedy miner
-                separateGreedySection.style.display = 'block';
-                greedyConfigDescription.textContent = 'Target miner and greedy miner are separate miners';
-                const totalTH = targetMinerTH + greedyMinerTH;
-                greedySummary.innerHTML = `
-                    Configuration: <span class="text-blue-400">Target Miner (${targetMinerTH.toFixed(1)} TH)</span> + 
-                    <span class="text-green-400">Separate Greedy (${greedyMinerTH.toFixed(1)} TH)</span> = 
-                    <span class="text-white font-bold">${totalTH.toFixed(1)} TH total</span> with greedy growth
-                `;
-            }
-        }

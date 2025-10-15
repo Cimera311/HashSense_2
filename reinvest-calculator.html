@@ -142,6 +142,11 @@
         .toggle-slider.orange input:checked + .toggle-slider {
             background-color: #f97316;
         }
+
+        /* Green variant for Greedy */
+        input:checked + .toggle-slider.green {
+            background-color: #16a34a;
+        }
         /* iOS Style Toggle Switch 
         #save-first-toggle:checked + label .dot {
             transform: translateX(24px);
@@ -338,6 +343,73 @@
                     <div class="text-xs text-gray-400">Enter number of periods to calculate</div>
                 </div>
             </div>
+        <!-- NEU: Erweiterte Greedy Miner Checkbox Section -->
+        <div class="mt-6 p-4 bg-gray-700 rounded-lg" style="display: none;">
+            <div class="flex items-start gap-3">
+                <div class="flex items-center h-6">
+                    <input type="checkbox" id="greedy-miner-enabled" onchange="toggleGreedyOptions()"
+                        class="w-4 h-4 text-green-600 bg-gray-600 border-gray-500 rounded focus:ring-green-500 focus:ring-2">
+                </div>
+                <div class="flex-1">
+                    <label for="greedy-miner-enabled" class="text-sm font-medium text-gray-300 cursor-pointer">
+                        I am greedy and I have a greedy! 🤑
+                    </label>
+                    <div class="text-xs text-gray-400 mt-1">
+                        Enable automatic 0.12% TH growth every Tuesday
+                    </div>
+                </div>
+            </div>
+             
+            <!-- Greedy Options (hidden by default) -->
+            <div id="greedy-options" class="mt-4 space-y-4" style="display: none;">
+                <!-- Greedy Target Switch -->
+                <div class="p-3 bg-gray-800 rounded-lg">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">Greedy Miner Configuration</label>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm text-gray-400">Target Miner is NOT the Greedy</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="target-is-greedy-toggle" onchange="updateGreedyConfig()">
+                                <span class="toggle-slider" style="background-color: #059669;"></span>
+                            </label>
+                            <span class="text-sm text-gray-400">Target Miner IS the Greedy</span>
+                        </div>
+                        <div class="text-xs text-gray-400" id="greedy-config-description">
+                            Target miner and greedy miner are separate miners
+                        </div>
+                               <!-- NEU: Greedy Growth Rate Input -->
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-300">Predicted Greedy Growth (% per Tuesday)</label>
+                            <input type="number" id="greedy-growth-rate" value="0.12" min="0" max="5" step="0.01" 
+                                class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                                oninput="updateGreedyConfig()">
+                            <div class="text-xs text-gray-400">
+                                Weekly growth percentage based on recent GoMining performance
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Separate Greedy TH Input (shown when target is NOT greedy) -->
+                <div id="separate-greedy-section" class="p-3 bg-gray-800 rounded-lg">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">The Total TH of all my Greedys -- yes there are some really greedy miners out there</label>
+                        <input type="number" id="greedy-miner-th" value="10.00000000" min="1" step="0.00000001" 
+                            class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <div class="text-xs text-gray-400">
+                            TH amount of your separate greedy miner (grows by 0.12% every Tuesday)
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Greedy Summary -->
+                <div class="p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                    <div class="text-sm text-green-400 font-medium" id="greedy-summary">
+                        Configuration: Target Miner (1.0 TH) + Separate Greedy (1.0 TH) = 2.0 TH total with greedy growth
+                    </div>
+                </div>
+            </div>
+
         </section>
 
         <!-- Reinvestment Strategy Selection -->
@@ -389,6 +461,7 @@
                     <div class="text-orange-400 font-bold">3-Phase Cycle</div>
                 </div>
             </div>
+            
 
             <!-- Controlled Strategy Settings -->
             <div id="controlled-settings" class="mt-6 p-4 bg-gray-700 rounded-lg">
@@ -489,6 +562,8 @@
                     </div>
                 </div>
             </div>
+
+            
         </section>
 
         <!-- Calculate Button -->
@@ -597,30 +672,7 @@
             // Update controlled settings display
             updateControlledSettings();
         }
-/*
-        function setupEventListeners() {
-            // Auto days slider
-            document.getElementById('auto-days').addEventListener('input', updateControlledSettings);
-            
-            // All inputs for real-time calculation
-            const inputs = ['gmt-wallet-balance', 'farm-total-th', 'farm-efficiency', 'miner-th', 'miner-efficiency', 'calculation-period'];
-            inputs.forEach(id => {
-                document.getElementById(id).addEventListener('input', debounce(calculateReinvestment, 500));
-            });
-        }
 
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-*/
         function updateControlledSettings() {
             const autoDays = parseInt(document.getElementById('auto-days').value);
             const savingDays = 30 - autoDays;
@@ -640,16 +692,25 @@
             // Show/hide controlled settings
             const controlledSettings = document.getElementById('controlled-settings');
             const controlledV2Settings = document.getElementById('controlledv2-settings');
+            const greedySettings = document.getElementById('greedy-settings');
             
             if (strategy === 'controlled') {
                 controlledSettings.style.display = 'block';
                 controlledV2Settings.style.display = 'none';
+                greedySettings.style.display = 'none';
             } else if (strategy === 'controlledv2') {
                 controlledSettings.style.display = 'none';
                 controlledV2Settings.style.display = 'block';
+                greedySettings.style.display = 'none';
+            } else if (strategy === 'greedy') {
+                controlledSettings.style.display = 'none';
+                controlledV2Settings.style.display = 'none';
+                greedySettings.style.display = 'block';
+                updateGreedyPreview();
             } else {
                 controlledSettings.style.display = 'none';
                 controlledV2Settings.style.display = 'none';
+                greedySettings.style.display = 'none';
             }
             
             // Update table header visibility for BTC column
@@ -709,6 +770,7 @@
             }
         }
 
+ 
         // Main calculation is handled in reinvest-calculator.js
     </script>
 </body>
