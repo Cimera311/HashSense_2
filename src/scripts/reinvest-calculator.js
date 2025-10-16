@@ -207,14 +207,21 @@ function calculateReinvestmentStrategy() {
     // Get input values
     const inputs = {
         ...getInputValues(),
-        greedy: document.getElementById('greedy-miner-enabled').checked, // FEHLT
-        targetIsGreedy: document.getElementById('target-is-greedy-toggle').checked, // FEHLT
-        greedyGrowthRate: parseFloat(document.getElementById('greedy-growth-rate').value) || 0.12, // FEHLT
-        greedyMinerTH: parseFloat(document.getElementById('greedy-miner-th').value) || 10.00000000, // FEHLT
-        greedyMinerEfficiency: parseFloat(document.getElementById('greedy-miner-efficiency').value) || 20.0 // NEU
+        greedy: document.getElementById('greedy-miner-enabled').checked,
+        targetIsGreedy: document.getElementById('target-is-greedy-toggle').checked,
+        // ✅ NUR setzen wenn Greedy aktiviert ist!
+        greedyGrowthRate: document.getElementById('greedy-miner-enabled').checked ? 
+            (parseFloat(document.getElementById('greedy-growth-rate').value) || 0.12) : 0,
+        greedyMinerTH: document.getElementById('greedy-miner-enabled').checked ? 
+            (parseFloat(document.getElementById('greedy-miner-th').value) || 10.00000000) : 0,
+        greedyMinerEfficiency: document.getElementById('greedy-miner-enabled').checked ? 
+            (parseFloat(document.getElementById('greedy-miner-efficiency').value) || 20.0) : 0
     };
     if (!inputs) return null;
-
+    // ✅ DEBUG: Log initial inputs
+    console.log('=== CALCULATION START ===');
+    console.log('Inputs:', inputs);
+    console.log('Strategy:', currentStrategy);
     let holdDaysCount = 0; // NEU: Counter für Hold Days
 
     const results = [];
@@ -227,6 +234,17 @@ function calculateReinvestmentStrategy() {
     let yesterdayFarmTH = inputs.farmTotalTH;
     let yesterdayFarmEfficiency = inputs.farmEfficiency;
     let yesterdayMinerTH = inputs.minerTH;
+    // ✅ KORRIGIERT: Greedy TH abhängig vom Modus
+    let yesterdayGreedyTH;
+    if (inputs.greedy) {
+        if (inputs.targetIsGreedy) {
+            yesterdayGreedyTH = inputs.minerTH; // Target IS Greedy → Gleicher Wert
+        } else {
+            yesterdayGreedyTH = inputs.greedyMinerTH; // Separate Greedy → Eigener Wert
+        }
+    } else {
+        yesterdayGreedyTH = 0; // Kein Greedy aktiviert
+    }
     
     // For controlled strategy
     let dayInCycle = 0;
@@ -243,9 +261,11 @@ function calculateReinvestmentStrategy() {
     // Data for chart
     const chartData = {
         labels: [],
-        thData: [],
+        thData: [],           // Target Miner TH
+        greedyData: [],       // ✅ NEU: Separate Greedy TH
+        totalMiningData: [],  // ✅ NEU: Target + Greedy combined
         gmtData: [],
-        btcData: [], // NEU: BTC Wallet Daten
+        btcData: [],
         profitData: []
     };
     
@@ -290,7 +310,7 @@ function calculateReinvestmentStrategy() {
         let reinvestmentUSD = 0;
         let strategyText = 'Hold';
         let todayMinerTH = yesterdayMinerTH;
-
+        let todayGreedyTH = yesterdayGreedyTH; // ✅ Separate Today Variable
         // ===== STRATEGY EXECUTION =====
         
         if (currentStrategy === 'auto') {
@@ -435,7 +455,14 @@ function calculateReinvestmentStrategy() {
         } 
         
         // ===== GREEDY MINER LOGIC (independent of strategy) =====
-        if (inputs.greedy && isTuesday(day)) {
+            // ✅ IMMER: Wenn Target IS Greedy → Synchronisiere Greedy TH
+        if (inputs.greedy && inputs.targetIsGreedy) {
+            todayGreedyTH = todayMinerTH; // ✅ JEDEN TAG, nicht nur Dienstag!
+        }
+        const tuesdayDays = getTuesdayDays(inputs.calculationPeriod);
+        if (inputs.greedy && tuesdayDays.includes(day)) {
+
+
             if (inputs.targetIsGreedy) {
                 // Case: Target miner IS the greedy miner
                 const greedyResult = applyGreedyGrowthWhenTargetIsGreedy({
@@ -449,8 +476,9 @@ function calculateReinvestmentStrategy() {
                 });
                 
                 todayMinerTH = greedyResult.newTargetTH;
+                todayGreedyTH = todayMinerTH; // ✅ NEU: Für Chart - Target IS Greedy!
                 strategyText += ` + Greedy Tuesday +${inputs.greedyGrowthRate}%`;
-                
+
             } else {
                 // Case: Separate greedy miner (part of farm)
                 const greedyResult = applyGreedyGrowthToFarmDay({
@@ -458,47 +486,60 @@ function calculateReinvestmentStrategy() {
                     farmEfficiencyWPerTH: yesterdayFarmEfficiency,
                     targetTH: todayMinerTH,
                     targetEfficiencyWPerTH: inputs.minerEfficiency,
-                    greedyTH: inputs.greedyMinerTH,
-                    greedyEfficiencyWPerTH: undefined // will be calculated from farm
+                    greedyTH: todayGreedyTH, // ✅ Use todayGreedyTH, not inputs.greedyMinerTH
+                    greedyEfficiencyWPerTH: inputs.greedyMinerEfficiency // ✅ Use defined value
                 }, {
                     greedyGrowthRate: inputs.greedyGrowthRate,
                     maxGreedyTH: Infinity,
-                    useGreedyEfficiencyIfProvided: false
+                    useGreedyEfficiencyIfProvided: true
                 });
                 
                 // Update farm efficiency and greedy TH for next iteration
                 yesterdayFarmEfficiency = greedyResult.newFarmEfficiencyWPerTH;
-                inputs.greedyMinerTH = greedyResult.newGreedyTH; // Update for next day
+                todayGreedyTH = greedyResult.newGreedyTH; // ✅ Update todayGreedyTH
                 strategyText += ` + Greedy Tuesday +${inputs.greedyGrowthRate}%`;
             }
         }
 
         // Calculate TODAY farm values
-        const todayFarmTH = inputs.farmTotalTH + (todayMinerTH - inputs.minerTH);
+        const todayFarmTH = yesterdayFarmTH + (todayMinerTH - yesterdayMinerTH) +
+                            (inputs.greedy && !inputs.targetIsGreedy ? 
+                            (todayGreedyTH - yesterdayGreedyTH) : 0); // ✅ Include separate greedy growth
         const todayFarmEfficiency = calculateNewFarmEfficiency(
-            inputs.farmTotalTH, 
-            inputs.farmEfficiency, 
-            todayMinerTH, 
-            inputs.minerTH, 
-            inputs.minerEfficiency
+            yesterdayFarmTH,          // ✅ Yesterday Farm TH (not original!)
+            yesterdayFarmEfficiency,  // ✅ Yesterday Farm Efficiency (not original!)
+            todayMinerTH,            // ✅ Today Miner TH
+            yesterdayMinerTH,        // ✅ Yesterday Miner TH (not original!)
+            inputs.minerEfficiency   // ✅ Miner Efficiency (konstant)
         );
-
+        // ✅ DEBUG: Log farm calculations every 7 days or on Greedy days
+      /*  if (day % 7 === 0 || (inputs.greedy && tuesdayDays.includes(day))) {
+            console.log(`\n--- Day ${day + 1} Farm Calculation ---`);
+            console.log('  yesterdayFarmTH:', yesterdayFarmTH);
+            console.log('  todayMinerTH:', todayMinerTH);
+            console.log('  yesterdayMinerTH:', yesterdayMinerTH);
+            console.log('  todayGreedyTH:', todayGreedyTH);
+            console.log('  yesterdayGreedyTH:', yesterdayGreedyTH);
+            console.log('  → todayFarmTH:', todayFarmTH);
+            console.log('  Strategy:', strategyText);
+        } */
         // Store data for chart based on selected interval
         const shouldStore = day % chartInterval === 0 || day === inputs.calculationPeriod - 1;
         
         if (shouldStore) {
             const dateStr = new Date(currentDate.getTime() + day * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-            
+
             results.push({
                 day: day + 1,
                 date: dateStr,
                 thAmount: todayMinerTH,
                 farmTH: todayFarmTH,
                 farmEfficiency: todayFarmEfficiency,
+                greedyTH: inputs.greedy ? todayGreedyTH : 0, // ✅ NEU: Separate Greedy TH
                 dailyProfitUSD: dailyProfitUSD,
                 reinvestmentUSD: reinvestmentUSD,
                 gmtBalance: currentGMTBalance,
-                btcBalance: currentBTCBalance, // NEU
+                btcBalance: currentBTCBalance,
                 strategy: strategyText
             });
             
@@ -513,9 +554,11 @@ function calculateReinvestmentStrategy() {
             }
 
             chartData.labels.push(label);
-            chartData.thData.push(todayMinerTH);
+            chartData.thData.push(todayMinerTH); // Target Miner TH
+            chartData.greedyData.push(inputs.greedy  ? todayGreedyTH : 0); // ✅ Nur bei separatem Greedy
+            chartData.totalMiningData.push(todayFarmTH); // ✅ NEU: Total Mining TH
             chartData.gmtData.push(Number(currentGMTBalance.toFixed(4)));
-            chartData.btcData.push(Number(currentBTCBalance.toFixed(8))); // NEU
+            chartData.btcData.push(Number(currentBTCBalance.toFixed(8)));
             chartData.profitData.push(dailyProfitUSD);
         }
         
@@ -523,7 +566,23 @@ function calculateReinvestmentStrategy() {
         yesterdayFarmTH = todayFarmTH;
         yesterdayFarmEfficiency = todayFarmEfficiency;
         yesterdayMinerTH = todayMinerTH;
+        yesterdayGreedyTH = todayGreedyTH; // ✅ NEU: Greedy TH für nächsten Tag
+        // ✅ DEBUG: Log yesterday updates every 7 days
+        if (day % 7 === 0) {
+            console.log(`  Updated Yesterday Values for Day ${day + 2}:`);
+            console.log('    yesterdayFarmTH:', yesterdayFarmTH);
+            console.log('    yesterdayMinerTH:', yesterdayMinerTH);
+            console.log('    yesterdayGreedyTH:', yesterdayGreedyTH);
+        }
     }
+
+    // ✅ DEBUG: Log final results
+    console.log('\n=== FINAL RESULTS ===');
+    console.log('Final Target Miner TH:', yesterdayMinerTH);
+    console.log('Final Greedy TH:', yesterdayGreedyTH);
+    console.log('Final Farm TH:', yesterdayFarmTH);
+    console.log('Final Farm Efficiency:', yesterdayFarmEfficiency);
+    console.log('=== CALCULATION END ===\n');
 
     return {
         results: results,
@@ -532,6 +591,7 @@ function calculateReinvestmentStrategy() {
             finalTH: yesterdayMinerTH,
             finalFarmTH: yesterdayFarmTH,
             finalFarmEfficiency: yesterdayFarmEfficiency,
+            finalGreedyTH: yesterdayGreedyTH, // ✅ Bereits da!
             totalInvestment: totalInvestment,
             finalGMTBalance: currentGMTBalance,
             finalBTCBalance: currentBTCBalance, // NEU
@@ -599,6 +659,9 @@ function updateResultsDisplay(calculationResult) {
     // Show results section
     document.getElementById('results-section').classList.remove('hidden');
     
+    // ✅ Update table header based on strategy and greedy settings
+    updateTableHeader(calculationResult.inputs);
+
     // Update summary cards
     document.getElementById('final-th').textContent = calculationResult.summary.finalTH.toFixed(2) + ' TH';
     document.getElementById('final-farm-th').textContent = calculationResult.summary.finalFarmTH.toFixed(2) + ' TH';
@@ -606,6 +669,59 @@ function updateResultsDisplay(calculationResult) {
     document.getElementById('total-investment').textContent = '$' + calculationResult.summary.totalInvestment.toFixed(2);
     document.getElementById('final-gmt-balance').textContent = calculationResult.summary.finalGMTBalance.toFixed(4) + ' GMT';
     document.getElementById('hold-days').textContent = `${calculationResult.summary.holdDays}`; // NEU: Hold Days anzeigen
+    // ✅ NEU: Greedy Final TH Card
+    const greedyFinalCard = document.getElementById('greedy-final-card');
+    const greedyFinalTH = document.getElementById('greedy-final-th');
+    
+    if (document.getElementById('greedy-miner-enabled').checked) {
+        greedyFinalCard.style.display = 'block';
+        const isTargetIsGreedy = document.getElementById('target-is-greedy-toggle').checked;
+        
+        if (isTargetIsGreedy) {
+            greedyFinalTH.textContent = calculationResult.summary.finalTH.toFixed(2) + ' TH ';
+            greedyFinalTH.className = 'text-lg font-bold text-yellow-400 opacity-75'; // Dimmed
+        } else {
+            greedyFinalTH.textContent = calculationResult.summary.finalGreedyTH.toFixed(2) + ' TH';
+            greedyFinalTH.className = 'text-lg font-bold text-yellow-400'; // Full brightness
+        }
+    } else {
+        greedyFinalCard.style.display = 'none';
+    }
+    // ✅ NEU: Calculate and display greedy growth info
+    if (document.getElementById('greedy-miner-enabled').checked) {
+        greedyFinalCard.style.display = 'block';
+        const isTargetIsGreedy = document.getElementById('target-is-greedy-toggle').checked;
+        const greedyGrowthInfo = document.getElementById('greedy-growth-info');
+        
+        if (isTargetIsGreedy) {
+            // ✅ KORRIGIERT: Target IS Greedy auch mit Growth % berechnen!
+            const startingTargetTH = parseFloat(document.getElementById('miner-th').value) || 0;
+            const finalTargetTH = calculationResult.summary.finalTH;
+            const targetGrowth = startingTargetTH > 0 ? 
+                ((finalTargetTH - startingTargetTH) / startingTargetTH * 100).toFixed(1) : 0;
+            
+            greedyFinalTH.textContent = finalTargetTH.toFixed(2) + ' TH';
+            greedyFinalTH.className = 'text-lg font-bold text-yellow-400';
+            if (greedyGrowthInfo) {
+                greedyGrowthInfo.textContent = `Greedy: +${targetGrowth}%`;
+            }
+        } else {
+            // ✅ Separate Greedy: Existierende Logik beibehalten
+            const startingGreedyTH = parseFloat(document.getElementById('greedy-miner-th').value) || 0;
+            const finalGreedyTH = calculationResult.summary.finalGreedyTH;
+            const greedyGrowth = startingGreedyTH > 0 ? 
+                ((finalGreedyTH - startingGreedyTH) / startingGreedyTH * 100).toFixed(1) : 0;
+            
+            greedyFinalTH.textContent = finalGreedyTH.toFixed(2) + ' TH';
+            greedyFinalTH.className = 'text-lg font-bold text-yellow-400';
+            if (greedyGrowthInfo) {
+                greedyGrowthInfo.textContent = `Greedy: +${greedyGrowth}%`;
+            }
+        }
+    } else {
+        greedyFinalCard.style.display = 'none';
+    }
+
     // NEU: BTC Balance Card (nur bei controlledv2 anzeigen)
     const btcBalanceCard = document.getElementById('final-btc').parentElement;
     if (currentStrategy === 'controlledv2') {
@@ -625,7 +741,7 @@ function updateResultsDisplay(calculationResult) {
     calculationResult.results.forEach(result => {
         const row = document.createElement('tr');
         
-        // Period label
+        // 1. Period label ✅
         const periodCell = document.createElement('td');
         const chartPeriod = document.getElementById('chart-period').value;
         switch(chartPeriod) {
@@ -644,46 +760,71 @@ function updateResultsDisplay(calculationResult) {
         }
         row.appendChild(periodCell);
         
-        // Date
-        const dateCell = document.createElement('td');
-        dateCell.textContent = result.date;
-        row.appendChild(dateCell);
+    // 2. Date ✅
+    const dateCell = document.createElement('td');
+    dateCell.textContent = result.date;
+    row.appendChild(dateCell);
         
-        // TH Amount
-        const thCell = document.createElement('td');
-        thCell.textContent = result.thAmount.toFixed(2) + ' TH';
-        row.appendChild(thCell);
+    // 3. Target Miner TH ✅
+    const thCell = document.createElement('td');
+    thCell.textContent = result.thAmount.toFixed(2) + ' TH';
+    thCell.className = 'text-green-400';
+    row.appendChild(thCell);
         
-        // Daily Profit
-        const profitCell = document.createElement('td');
-        profitCell.textContent = '$' + result.dailyProfitUSD.toFixed(2);
-        profitCell.className = result.dailyProfitUSD >= 0 ? 'text-green-400' : 'text-red-400';
-        row.appendChild(profitCell);
-        
-        // Reinvestment
-        const reinvestCell = document.createElement('td');
-        reinvestCell.textContent = result.reinvestmentUSD > 0 ? '$' + result.reinvestmentUSD.toFixed(2) : '-';
-        row.appendChild(reinvestCell);
-        
-        // GMT Balance
-        const gmtCell = document.createElement('td');
-        gmtCell.textContent = result.gmtBalance.toFixed(4) + ' GMT';
-        gmtCell.className = result.gmtBalance >= 0 ? 'text-purple-400' : 'text-red-400';
-        row.appendChild(gmtCell);
-        
-        // NEU: BTC Balance (nur bei controlledv2)
-        if (currentStrategy === 'controlledv2') {
-            const btcCell = document.createElement('td');
-            btcCell.textContent = result.btcBalance.toFixed(8) + ' BTC';
-            btcCell.className = 'text-orange-400';
-            row.appendChild(btcCell);
+    // 4. Greedy TH Column (nur wenn greedy enabled) ✅
+    const inputs = {
+        greedy: document.getElementById('greedy-miner-enabled').checked,
+        targetIsGreedy: document.getElementById('target-is-greedy-toggle').checked
+    };
+    
+    if (inputs.greedy) {
+        const greedyCell = document.createElement('td');
+        if (inputs.targetIsGreedy) {
+            greedyCell.textContent = result.thAmount.toFixed(2) + ' TH';
+            greedyCell.className = 'text-yellow-400 opacity-60';
+        } else {
+            greedyCell.textContent = result.greedyTH.toFixed(2) + ' TH';
+            greedyCell.className = 'text-yellow-400';
         }
+        row.appendChild(greedyCell);
+    }
         
-        // Strategy
-        const strategyCell = document.createElement('td');
-        strategyCell.textContent = result.strategy;
+    // 5. Farm TH Column ✅
+    const farmCell = document.createElement('td');
+    farmCell.textContent = result.farmTH.toFixed(2) + ' TH';
+    farmCell.className = 'text-amber-600';
+    row.appendChild(farmCell);
+    
+    // 6. Daily Profit ✅
+    const profitCell = document.createElement('td');
+    profitCell.textContent = '$' + result.dailyProfitUSD.toFixed(2);
+    profitCell.className = result.dailyProfitUSD >= 0 ? 'text-green-400' : 'text-red-400';
+    row.appendChild(profitCell);
+    
+    // 7. Reinvestment ✅
+    const reinvestCell = document.createElement('td');
+    reinvestCell.textContent = result.reinvestmentUSD > 0 ? '$' + result.reinvestmentUSD.toFixed(2) : '-';
+    row.appendChild(reinvestCell);
+    
+    // 8. GMT Balance ✅
+    const gmtCell = document.createElement('td');
+    gmtCell.textContent = result.gmtBalance.toFixed(4) + ' GMT';
+    gmtCell.className = result.gmtBalance >= 0 ? 'text-purple-400' : 'text-red-400';
+    row.appendChild(gmtCell);
+    
+    // 9. BTC Balance (nur bei controlledv2) ✅
+    if (currentStrategy === 'controlledv2') {
+        const btcCell = document.createElement('td');
+        btcCell.textContent = result.btcBalance.toFixed(8) + ' BTC';
+        btcCell.className = 'text-orange-400';
+        row.appendChild(btcCell);
+    }
         
-        // Color code strategy
+    // 10. Strategy ✅
+    const strategyCell = document.createElement('td');
+    strategyCell.textContent = result.strategy;
+        
+        // Color code strategy (existing logic)
         if (result.strategy.includes('Auto')) {
             strategyCell.className = 'text-green-400';
         } else if (result.strategy.includes('Manual')) {
@@ -694,18 +835,92 @@ function updateResultsDisplay(calculationResult) {
             strategyCell.className = 'text-orange-400';
         } else if (result.strategy.includes('TH')) {
             strategyCell.className = 'text-green-400';
+        } else if (result.strategy.includes('Greedy')) {
+            strategyCell.className = 'text-yellow-400'; // ✅ NEU: Gold für Greedy Strategies
         } else {
             strategyCell.className = 'text-gray-400';
         }
         
-        row.appendChild(strategyCell);
-        tableBody.appendChild(row);
+    row.appendChild(strategyCell);
+    
+    tableBody.appendChild(row);
     });
     
     // Scroll to results
     document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+
+/**
+ * Update table header based on strategy and greedy settings
+ */
+/**
+ * Update table header based on strategy and greedy settings
+ */
+function updateTableHeader() {
+    const table = document.querySelector('.results-table');
+    if (!table) return;
+    
+    const thead = table.querySelector('thead tr');
+    if (!thead) return;
+    
+    // Get current settings
+    const isControlledV2 = currentStrategy === 'controlledv2';
+    const isGreedyEnabled = document.getElementById('greedy-miner-enabled').checked;
+    const isTargetIsGreedy = document.getElementById('target-is-greedy-toggle').checked;
+    
+    // Clear existing headers
+    thead.innerHTML = '';
+    
+    // ✅ KORREKTE Header-Reihenfolge entsprechend den Spalten
+    const headers = [];
+
+    // 1. Day
+    headers.push({ text: 'Day', class: 'text-gray-300' });
+    
+    // 2. Date
+    headers.push({ text: 'Date', class: 'text-gray-300' });
+
+    // 3. Target TH
+    headers.push({ text: 'Target TH', class: 'text-green-400' });
+    
+    // 4. Greedy TH (nur wenn greedy enabled)
+    if (isGreedyEnabled) {
+        if (isTargetIsGreedy) {
+            headers.push({ text: 'Greedy TH', class: 'text-yellow-400' });
+        } else {
+            headers.push({ text: 'Greedy TH', class: 'text-yellow-400' });
+        }
+    }
+    
+    // 5. Farm TH
+    headers.push({ text: 'Farm TH', class: 'text-amber-600' });
+    
+    // 6. Daily Profit
+    headers.push({ text: 'Daily Profit', class: 'text-gray-300' });
+    
+    // 7. Reinvestment
+    headers.push({ text: 'Reinvestment', class: 'text-gray-300' });
+    
+    // 8. GMT Balance
+    headers.push({ text: 'GMT Balance', class: 'text-purple-400' });
+    
+    // 9. BTC Balance (nur bei controlledv2)
+    if (isControlledV2) {
+        headers.push({ text: 'BTC Balance', class: 'text-orange-400' });
+    }
+    
+    // 10. Strategy
+    headers.push({ text: 'Strategy', class: 'text-gray-300' });
+    
+    // Create header elements
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header.text;
+        th.className = `px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${header.class}`;
+        thead.appendChild(th);
+    });
+}
 /**
  * Update the growth chart
  */
@@ -720,15 +935,6 @@ function updateChart(chartData) {
     // Determine which datasets to show based on strategy
     const datasets = [
         {
-            label: 'TH Amount',
-            data: chartData.thData,
-            borderColor: 'rgb(34, 197, 94)',
-            backgroundColor: 'rgba(34, 197, 94, 0.1)',
-            yAxisID: 'y',
-            tension: 0.4,
-            fill: true
-        },
-        {
             label: 'GMT Balance',
             data: chartData.gmtData,
             borderColor: 'rgb(168, 85, 247)',
@@ -736,6 +942,15 @@ function updateChart(chartData) {
             yAxisID: 'y1',
             tension: 0.4,
             fill: true
+        },
+        {
+            label: 'Target Miner TH',
+            data: chartData.thData,
+            borderColor: 'rgb(34, 197, 94)',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            yAxisID: 'y',
+            tension: 0.4,
+            fill: false
         }
     ];
     
@@ -751,7 +966,28 @@ function updateChart(chartData) {
             fill: true
         });
     }
-    
+        // Add Greedy Miner line if separate greedy is enabled
+    if (chartData.greedyData.some(value => value > 0)) {
+        datasets.push({
+            label: 'Greedy TH',
+            data: chartData.greedyData,
+            borderColor: 'rgb(255, 193, 7)', // Gold/Yellow for Greedy
+            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+            yAxisID: 'y',
+            tension: 0.4,
+            fill: false
+            });
+        
+        datasets.push({
+            label: 'Total Farm TH',
+            data: chartData.totalMiningData,
+            borderColor: 'rgb(139, 69, 19)', // Brown for combined
+            backgroundColor: 'rgba(139, 69, 19, 0.1)',
+            yAxisID: 'y',
+            tension: 0.4,
+            fill: true
+        });
+    }
     // Create new chart
     growthChart = new Chart(ctx, {
         type: 'line',
@@ -786,16 +1022,37 @@ function updateChart(chartData) {
                     displayColors: true,
                     callbacks: {
                         label: function(context) {
-                            let label = context.dataset.label || '';
+            let label = context.dataset.label || '';
                             if (label) {
                                 label += ': ';
                             }
-                            if (context.dataset.label === 'TH Amount') {
-                                label += context.parsed.y.toFixed(2) + ' TH';
-                            } else if (context.dataset.label === 'GMT Balance') {
-                                label += context.parsed.y.toFixed(4) + ' GMT';
-                            } else if (context.dataset.label === 'BTC Balance') {
-                                label += context.parsed.y.toFixed(8) + ' BTC';
+                            
+                            // Erweiterte Label-Behandlung für alle Chart-Linien
+                            switch (context.dataset.label) {
+                                case 'TH Amount':
+                                case 'Target Miner TH':
+                                    label += context.parsed.y.toFixed(2) + ' TH';
+                                    break;
+                                case 'Greedy Miner TH':
+                                    label += context.parsed.y.toFixed(2) + ' TH';
+                                    break;
+                                case 'Total Mining TH':
+                                    label += context.parsed.y.toFixed(2) + ' TH (Combined Farm)';
+                                    break;
+                                case 'GMT Balance':
+                                    label += context.parsed.y.toFixed(4) + ' GMT';
+                                    break;
+                                case 'BTC Balance':
+                                    label += context.parsed.y.toFixed(8) + ' BTC';
+                                    break;
+                                default:
+                                    // Fallback für unbekannte Labels
+                                    if (label.includes('TH')) {
+                                        label += context.parsed.y.toFixed(2) + ' TH';
+                                    } else {
+                                        label += context.parsed.y.toFixed(2);
+                                    }
+                                    break;
                             }
                             return label;
                         }
@@ -1087,7 +1344,7 @@ function updateControlledV2Settings() {
 
 /**
  * Update table header based on strategy
- */
+ */  /*
 function updateTableHeader() {
     const table = document.querySelector('.results-table');
     const btcHeader = table.querySelector('th:nth-child(7)'); // BTC Balance header
@@ -1097,7 +1354,7 @@ function updateTableHeader() {
     } else {
         btcHeader.style.display = 'none';
     }
-}
+} */
        // ===== GREEDY MINER FUNCTIONS =====
         
         function updateGreedyMode() {
