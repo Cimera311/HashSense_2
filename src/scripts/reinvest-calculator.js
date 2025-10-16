@@ -210,7 +210,8 @@ function calculateReinvestmentStrategy() {
         greedy: document.getElementById('greedy-miner-enabled').checked, // FEHLT
         targetIsGreedy: document.getElementById('target-is-greedy-toggle').checked, // FEHLT
         greedyGrowthRate: parseFloat(document.getElementById('greedy-growth-rate').value) || 0.12, // FEHLT
-        greedyMinerTH: parseFloat(document.getElementById('greedy-miner-th').value) || 10.00000000 // FEHLT
+        greedyMinerTH: parseFloat(document.getElementById('greedy-miner-th').value) || 10.00000000, // FEHLT
+        greedyMinerEfficiency: parseFloat(document.getElementById('greedy-miner-efficiency').value) || 20.0 // NEU
     };
     if (!inputs) return null;
 
@@ -431,49 +432,47 @@ function calculateReinvestmentStrategy() {
             
             dayInCycleV2++;
             
-        } else if (currentStrategy === 'greedy') {
-            // ===== GREEDY MINER STRATEGY =====
-            const greedyMinerSeparate = document.getElementById('greedy-miner-separate').checked;
-            const greedyGrowthRate = parseFloat(document.getElementById('greedy-growth-rate').value) || 0.12;
-            const greedyTargetTH = parseFloat(document.getElementById('greedy-target-th').value) || yesterdayMinerTH;
-            
-            if (greedyMinerSeparate) {
-                // SEPARATE MINER: Greedy miner grows independently
-                if (isTuesday(day)) {
-                    const greedyGrowth = yesterdayMinerTH * (greedyGrowthRate / 100);
-                    todayMinerTH = yesterdayMinerTH + greedyGrowth;
-                    strategyText = `Greedy Tuesday +${greedyGrowthRate}%`;
-                } else {
-                    todayMinerTH = yesterdayMinerTH; // No growth on non-Tuesday
-                    strategyText = 'Greedy Hold';
-                }
+        } 
+        
+        // ===== GREEDY MINER LOGIC (independent of strategy) =====
+        if (inputs.greedy && isTuesday(day)) {
+            if (inputs.targetIsGreedy) {
+                // Case: Target miner IS the greedy miner
+                const greedyResult = applyGreedyGrowthWhenTargetIsGreedy({
+                    farmTH: yesterdayFarmTH,
+                    farmEfficiencyWPerTH: yesterdayFarmEfficiency,
+                    targetTH: todayMinerTH,
+                    targetEfficiencyWPerTH: inputs.minerEfficiency
+                }, {
+                    greedyGrowthRate: inputs.greedyGrowthRate,
+                    maxTargetTH: Infinity // optional: could be from UI
+                });
                 
-                // Normal cost handling
-                currentGMTBalance += dailyRevenue.gmt;
-                currentGMTBalance -= dailyElectricity.gmt;
-                currentGMTBalance -= dailyService.gmt;
+                todayMinerTH = greedyResult.newTargetTH;
+                strategyText += ` + Greedy Tuesday +${inputs.greedyGrowthRate}%`;
                 
             } else {
-                // TARGET MINER: Greedy miner grows towards target
-                if (isTuesday(day) && yesterdayMinerTH < greedyTargetTH) {
-                    const potentialGrowth = yesterdayMinerTH * (greedyGrowthRate / 100);
-                    const maxGrowth = greedyTargetTH - yesterdayMinerTH;
-                    const actualGrowth = Math.min(potentialGrowth, maxGrowth);
-                    
-                    todayMinerTH = yesterdayMinerTH + actualGrowth;
-                    strategyText = `Greedy Target +${((actualGrowth / yesterdayMinerTH) * 100).toFixed(2)}%`;
-                } else {
-                    todayMinerTH = yesterdayMinerTH;
-                    strategyText = yesterdayMinerTH >= greedyTargetTH ? 'Greedy Target Reached' : 'Greedy Hold';
-                }
+                // Case: Separate greedy miner (part of farm)
+                const greedyResult = applyGreedyGrowthToFarmDay({
+                    farmTH: yesterdayFarmTH,
+                    farmEfficiencyWPerTH: yesterdayFarmEfficiency,
+                    targetTH: todayMinerTH,
+                    targetEfficiencyWPerTH: inputs.minerEfficiency,
+                    greedyTH: inputs.greedyMinerTH,
+                    greedyEfficiencyWPerTH: undefined // will be calculated from farm
+                }, {
+                    greedyGrowthRate: inputs.greedyGrowthRate,
+                    maxGreedyTH: Infinity,
+                    useGreedyEfficiencyIfProvided: false
+                });
                 
-                // Normal cost handling
-                currentGMTBalance += dailyRevenue.gmt;
-                currentGMTBalance -= dailyElectricity.gmt;
-                currentGMTBalance -= dailyService.gmt;
+                // Update farm efficiency and greedy TH for next iteration
+                yesterdayFarmEfficiency = greedyResult.newFarmEfficiencyWPerTH;
+                inputs.greedyMinerTH = greedyResult.newGreedyTH; // Update for next day
+                strategyText += ` + Greedy Tuesday +${inputs.greedyGrowthRate}%`;
             }
         }
-        
+
         // Calculate TODAY farm values
         const todayFarmTH = inputs.farmTotalTH + (todayMinerTH - inputs.minerTH);
         const todayFarmEfficiency = calculateNewFarmEfficiency(
@@ -1166,6 +1165,7 @@ function updateTableHeader() {
             // Get current values
             const targetMinerTH = parseFloat(document.getElementById('miner-th').value) || 1.0;
             const greedyMinerTH = parseFloat(document.getElementById('greedy-miner-th').value) || 1.0;
+            const greedyEfficiency = parseInt(document.getElementById('greedy-miner-efficiency').value) || 20.00;
             const greedyGrowthRate = parseFloat(document.getElementById('greedy-growth-rate').value) || 0.12;
             
             if (targetIsGreedy) {
@@ -1183,8 +1183,8 @@ function updateTableHeader() {
                 const totalTH = targetMinerTH + greedyMinerTH;
                 greedySummary.innerHTML = `
                     Configuration: <span class="text-blue-400">Target Miner (${targetMinerTH.toFixed(1)} TH)</span> + 
-                    <span class="text-green-400">Separate Greedy (${greedyMinerTH.toFixed(1)} TH)</span> = 
-                    <span class="text-white font-bold">${totalTH.toFixed(1)} TH total</span> with greedy growth
+                    <span class="text-green-400">Separate Greedy (${greedyMinerTH.toFixed(1)} TH @ ${greedyEfficiency} W/TH)</span> = 
+                    <span class="text-white font-bold">${totalTH.toFixed(1)} TH total</span> with greedy growth ${greedyGrowthRate}% every Tuesday
                 `;
             }
         }
