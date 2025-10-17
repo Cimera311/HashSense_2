@@ -1,4 +1,7 @@
-      globalThis.cancelExport = false;
+     
+     //DAS HIER IST DAS RICHTIGE Skript
+     
+     globalThis.cancelExport = false;
       globalThis.dateFormat = 'us'; // Default
 
       function normalizeDate(dateStr, format) {
