@@ -847,9 +847,9 @@
                 let i = 0;
                 while (i < lines.length) {
                     // Detect new block by date line
-                    if (/^\d{1,2}[\/\.]\d{1,2}[\/\.]\d{4}$/.test(lines[i])) {
-                        blockOrder++;
-                    }
+                   // if (/^\d{1,2}[\/\.]\d{1,2}[\/\.]\d{4}$/.test(lines[i])) {
+                     //   blockOrder++;
+                   // }
                     // Look for "Miner" line
                     if (lines[i] === 'Miner' && i + 1 < lines.length) {
                         try {
@@ -1024,7 +1024,7 @@
                             if (tComp !== 0) return tComp;
                         }
                         // Fallback: blockOrder
-                        return (a.blockOrder ?? 0) - (b.blockOrder ?? 0);
+                        return (b.blockOrder ?? 0) - (a.blockOrder ?? 0);
                     });
                 };
 
