@@ -51,10 +51,10 @@ function calculateDailyRevenue(satoshiPerTH, totalTH, btcPrice, gmtPrice) {
 /**
  * Calculate daily electricity costs
  */
-function calculateDailyElectricity(totalTH, efficiency, btcPrice, gmtPrice) {
+function calculateDailyElectricity(totalTH, efficiency, btcPrice, gmtPrice, discount) {
     const costPerKWh = 0.05; // USD per kWh
     const hoursPerDay = 24;
-    const discount = 0; // No discount by default
+    //const discount = 0; // No discount by default
 
     // Calculate costs in USD
     const dailyElectricityUSD = ((efficiency * totalTH * costPerKWh * hoursPerDay) / 1000) * (1 - discount);
@@ -71,9 +71,9 @@ function calculateDailyElectricity(totalTH, efficiency, btcPrice, gmtPrice) {
 /**
  * Calculate daily service costs
  */
-function calculateDailyService(totalTH, btcPrice, gmtPrice) {
+function calculateDailyService(totalTH, btcPrice, gmtPrice, discount) {
     const serviceCostPerTHUSD = 0.0089; // USD per TH per day
-    const discount = 0; // No discount by default
+    //const discount = 0; // No discount by default
 
     const dailyServiceUSD = serviceCostPerTHUSD * totalTH * (1 - discount);
     const dailyServiceBTC = btcPrice ? dailyServiceUSD / btcPrice : null;
@@ -142,10 +142,10 @@ function calculateSeparateEfficiencies(totalTH, avgEfficiency, minerTH, minerEff
 /**
  * Calculate daily electricity costs with separate farm and miner calculations
  */
-function calculateSeparateElectricity(farmComponents, btcPrice, gmtPrice) {
+function calculateSeparateElectricity(farmComponents, btcPrice, gmtPrice, discount) {
     const costPerKWh = 0.05; // USD per kWh
     const hoursPerDay = 24;
-    const discount = 0; // No discount by default
+    //const discount = 0; // No discount by default
     
     // Calculate electricity for rest of farm
     const farmElectricityUSD = farmComponents.restFarmTH > 0 ? 
@@ -300,9 +300,9 @@ function calculateReinvestmentStrategy() {
         
         // Calculate daily metrics with YESTERDAY farm values
         const dailyRevenue = calculateDailyRevenue(inputs.satPerTH, yesterdayFarmTH, inputs.btcPrice, inputs.gmtPrice);
-        const dailyElectricity = calculateSeparateElectricity(farmComponents, inputs.btcPrice, inputs.gmtPrice);
-        const dailyService = calculateDailyService(yesterdayFarmTH, inputs.btcPrice, inputs.gmtPrice);
-        
+        const dailyElectricity = calculateSeparateElectricity(farmComponents, inputs.btcPrice, inputs.gmtPrice, inputs.discount);
+        const dailyService = calculateDailyService(yesterdayFarmTH, inputs.btcPrice, inputs.gmtPrice, inputs.discount);
+
         // Calculate daily profit for display purposes
         const dailyProfitGMT = dailyRevenue.gmt - dailyElectricity.gmt - dailyService.gmt;
         const dailyProfitUSD = dailyRevenue.usd - dailyElectricity.usd - dailyService.usd;
@@ -614,7 +614,9 @@ function getInputValues() {
         // Convert calculation period to days based on selected unit
         const periodCount = parseInt(document.getElementById('calculation-period').value) || 1;
         const periodUnit = document.getElementById('chart-period').value || 'daily';
-        
+        const discountfield = parseFloat(document.getElementById('gomining-discount-reinvest').value) || 0;
+        const discount = (discountfield) / 100;
+
         let calculationPeriod;
         switch(periodUnit) {
             case 'daily': calculationPeriod = periodCount; break;
@@ -643,7 +645,8 @@ function getInputValues() {
             calculationPeriod,
             btcPrice,
             gmtPrice,
-            satPerTH
+            satPerTH,
+            discount
         };
     } catch (error) {
         console.error('Error getting input values:', error);
