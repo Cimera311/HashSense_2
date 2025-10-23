@@ -21,6 +21,37 @@
     <meta property="og:url" content="https://hashfarm.me/reinvest-calculator.html">
     <meta property="og:type" content="website">
 
+    <meta name="description" content="Advanced GoMining reinvestment calculator with 5% auto-reinvest bonus. Compare strategies: Auto, Manual, Controlled Auto, and BTC accumulation. Optimize your Bitcoin mining growth with detailed projections and charts.">
+    <meta name="keywords" content="GoMining calculator, Bitcoin mining reinvestment, GMT token, crypto mining strategy, BTC accumulation, mining profitability, reinvestment bonus, mining calculator">
+
+    <link rel="canonical" href="https://hashfarm.me/reinvest-calculator.html">
+    <script type="application/ld+json">
+        {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "GoMining Reinvestment Calculator",
+        "description": "Calculate and optimize GoMining reinvestment strategies with multiple approaches including automatic 5% bonus reinvestment, manual control, and BTC accumulation phases.",
+        "url": "https://hashfarm.me/reinvest-calculator.html",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Auto Reinvestment with 5% Bonus",
+            "Manual Reinvestment Strategy",
+            "Controlled Auto Strategy",
+            "BTC Accumulation Phase",
+            "Greedy Miner Support",
+            "Interactive Charts",
+            "Detailed Timeline Projections"
+        ]
+        }
+    </script>
+    <meta name="author" content="HashSense">
+    <meta name="robots" content="index, follow">
     <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
@@ -280,7 +311,50 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto p-4 space-y-6">
-
+<section class="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+    <button onclick="toggleSeoContent()" class="w-full p-4 flex items-center justify-between hover:bg-gray-750 transition-colors">
+        <h1 class="text-2xl font-bold text-purple-400">About This GoMining Calculator</h1>
+        <span id="seo-toggle-icon" class="material-icons text-purple-400">expand_more</span>
+    </button>
+    
+    <div id="seo-content" class="hidden p-6 pt-0 border-t border-gray-700">
+        <div class="prose prose-invert max-w-none text-gray-300">
+            <p class="mb-4">
+                This calculator helps you plan and compare different <strong>GoMining reward strategies</strong>. GoMining offers four ways to receive your mining rewards, each with different advantages:
+            </p>
+            
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div class="bg-gray-700 p-3 rounded-lg">
+                    <h3 class="text-lg font-semibold text-blue-400 mb-2">1. BTC Rewards Only</h3>
+                    <p class="text-sm">Receive rewards in BTC and pay maintenance in BTC. Simple and straightforward.</p>
+                </div>
+                
+                <div class="bg-gray-700 p-3 rounded-lg">
+                    <h3 class="text-lg font-semibold text-orange-400 mb-2">2. BTC Accumulation</h3>
+                    <p class="text-sm">Get full rewards as BTC, pay maintenance from GMT wallet. Requires GMT balance from saving phases.</p>
+                </div>
+                
+                <div class="bg-gray-700 p-3 rounded-lg">
+                    <h3 class="text-lg font-semibold text-purple-400 mb-2">3. GMT Reinvest</h3>
+                    <p class="text-sm">Receive rewards as GMT and use it to pay maintenance. Build up your GMT buffer.</p>
+                </div>
+                
+                <div class="bg-gray-700 p-3 rounded-lg">
+                    <h3 class="text-lg font-semibold text-green-400 mb-2">4. Auto TH Reinvest</h3>
+                    <p class="text-sm">Reinvest rewards into TH with <strong>5% bonus</strong>. Pay maintenance from GMT wallet for maximum growth.</p>
+                </div>
+            </div>
+            
+            <p class="text-sm mb-4">
+                Our calculator lets you simulate combinations of these strategies over time. Compare automatic reinvestment with the 5% bonus against manual approaches, or create custom cycles that alternate between TH growth, BTC accumulation, and GMT saving phases.
+            </p>
+            
+            <div class="bg-yellow-900/20 border border-yellow-600/30 rounded-lg p-3 text-sm">
+                <strong class="text-yellow-400">⚠️ Important:</strong> This is a planning tool only. Results depend on Bitcoin price, network difficulty, and GoMining parameters. Always do your own research (DYOR) and make informed decisions based on your individual situation.
+            </div>
+        </div>
+    </div>
+</section>
         <!-- Input Parameters Section -->
         <section class="bg-gray-800 rounded-xl p-6 shadow-lg">
             <h2 class="text-2xl font-bold mb-6 text-purple-400">Starting Parameters</h2>
@@ -787,7 +861,18 @@
                 document.getElementById('gmt-token-price').value = '0.4269';
             }
         }
-
+        function toggleSeoContent() {
+            const content = document.getElementById('seo-content');
+            const icon = document.getElementById('seo-toggle-icon');
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.textContent = 'expand_less';
+            } else {
+                content.classList.add('hidden');
+                icon.textContent = 'expand_more';
+            }
+        }
  
         // Main calculation is handled in reinvest-calculator.js
     </script>
