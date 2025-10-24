@@ -1,4 +1,4 @@
-// Auto-generiert am 2025-10-23T02:57:36.891Z
+// Auto-generiert am 2025-10-24T02:54:47.900Z
 const gmtPriceData = {
   "2024-01-02": {
     "date_iso": "2024-01-02",
@@ -4625,7 +4625,14 @@ const gmtPriceData = {
     "time_berlin": "01:23",
     "symbol": "GOMINING",
     "price_eur": "0,35586900",
-    "price_usd": "0,41324953"
+    "price_usd": "0,41324953\r"
+  },
+  "2025-10-24": {
+    "date_iso": "2025-10-24",
+    "time_berlin": "01:23",
+    "symbol": "GOMINING",
+    "price_eur": "0,35393560",
+    "price_usd": "0,41119300"
   }
 };
 
