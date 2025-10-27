@@ -1,187 +1,327 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HashFarm - Login</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Open Graph Meta -->
-  <meta property="og:title" content="HashFarm – Bitcoin Mining Tools">
-  <meta property="og:description" content="Track, calculate and optimize your Bitcoin mining ROI with HashFarm.">
-  <meta property="og:image" content="https://hashfarm.me/assets/preview.png">
-  <meta property="og:url" content="https://hashfarm.me/">
-  <meta property="og:type" content="website">
-
-  <!-- Favicons -->
-  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
-
-  <!-- Android/Chrome -->
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/android-chrome-192x192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="assets/android-chrome-512x512.png">
-
-  <!-- Apple iOS -->
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="assets/site.webmanifest">
-
-<script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/+esm';
-
-    const supabaseUrl = "https://umlgbacgghrvzwfvirro.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtbGdiYWNnZ2hydnp3ZnZpcnJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY1MTAzMjQsImV4cCI6MjA1MjA4NjMyNH0.Hv0X4Wy4PtbSJ4yEN-CFszdX4zEoW4CMEHrbRBbX1Ug";
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    console.log("Supabase-Client verfügbar:", supabase);
-
-    window.addEventListener('DOMContentLoaded', () => {
-        /* Registrierung*/
-        document.getElementById("signup-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-           
-            
-            const email = document.getElementById("signup-email").value;
-            const password = document.getElementById("signup-password").value;
-            const passwordRepeat = document.getElementById("signup-password-repeat").value;
-          
-            if (password.length < 6) {
-                alert("Password must be at least 6 characters long!");
-                return;
-            }
-            if (password !== passwordRepeat) {
-                alert("Passwords do not match!");
-                return;
-            }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support HashSense - Help Us Keep Building Tools for the GoMining Community</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+        }
         
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
-                /*options: { data: { username } },*/
-            });
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2px;
+            border-radius: 1rem;
+        }
         
-            if (error) {
-                console.error("Registration failed:", error.message);
-                alert("Registration failed: " + error.message);
-            } else {
-                console.log("Registration successful:", data);
-                alert("Registration successful! Please Check your Spam sorry ^^");
+        .gradient-border-content {
+            background: #1f2937;
+            border-radius: calc(1rem - 2px);
+            padding: 2rem;
+        }
+        
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.3);
+        }
+        
+        .copy-button {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-button:hover {
+            background: #667eea;
+        }
+        
+        .copy-button:active {
+            transform: scale(0.95);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
             }
-        });
-
-        // Login
-        document.getElementById("login-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const email = document.getElementById("login-email").value;
-            const password = document.getElementById("login-password").value;
-
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-            if (error) {
-                console.error("Login failed:", error.message);
-                alert("Login failed: " + error.message);
-            } else {
-                console.log("Login successful:", data);
-                //alert("Login successful!");
-                    // Speichere Session in sessionStorage
-                sessionStorage.setItem("supabaseSession", JSON.stringify(data.session));
-                window.location.href = "services.html"; // Weiterleitung nach dem Login
+            50% {
+                opacity: 0.7;
             }
-        });
-
-        /* Passwort zurücksetzen*/
-        document.getElementById("forgot-password-form").addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const email = document.getElementById("forgot-email").value;
-
-            const { data, error } = await supabase.auth.resetPasswordForEmail(email);
-
-            if (error) {
-                console.error("Password reset failed:", error.message);
-                alert("Password reset failed: " + error.message);
-            } else {
-                console.log("Password reset email sent:", data);
-                alert("Password reset email sent!");
-            }
-        });
-
-        // Tab switching functionality
-        const tabs = document.querySelectorAll('.tab-button');
-        const sections = document.querySelectorAll('.tab-section');
-
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Remove active class from all tabs
-                tabs.forEach(t => t.classList.remove('border-purple-500', 'text-white'));
-                tabs.forEach(t => t.classList.add('border-transparent', 'text-gray-400'));
-                
-                // Hide all sections
-                sections.forEach(section => section.classList.add('hidden'));
-                
-                // Add active class to the clicked tab
-                tab.classList.remove('border-transparent', 'text-gray-400');
-                tab.classList.add('border-purple-500', 'text-white');
-                
-                // Show corresponding section
-                const sectionId = tab.getAttribute('data-target');
-                document.getElementById(sectionId).classList.remove('hidden');
-            });
-        });
-    });
-</script>
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+<body class="text-gray-100">
+    
+    <!-- Header/Navigation -->
+    <nav class="bg-gray-900 border-b border-gray-700 sticky top-0 z-50 backdrop-blur-sm bg-opacity-90">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <a href="index.html" class="flex items-center gap-3">
+                    <img src="assets/favicon.ico" alt="HashSense" class="w-8 h-8">
+                    <span class="text-xl font-bold text-white">HashSense</span>
+                </a>
+                <div class="flex items-center gap-4">
+                    <a href="HashSense.html" class="text-gray-300 hover:text-purple-400 transition-colors">Calculators</a>
+                    <a href="reinvest-calculator.html" class="text-gray-300 hover:text-purple-400 transition-colors">Reinvest</a>
+                    <a href="farm2.html" class="text-gray-300 hover:text-purple-400 transition-colors">Hashfarm</a>
+                    <a href="gomining-promocode.html" class="text-gray-300 hover:text-purple-400 transition-colors">Promo Codes</a>
+                </div>
+            </div>
+        </div>
+    </nav>
 
+    <!-- Hero Section -->
+    <section class="max-w-4xl mx-auto px-4 py-16 text-center">
+        <div class="mb-8">
+            <span class="material-icons text-6xl text-purple-400 pulse-animation">favorite</span>
+        </div>
+        <h1 class="text-5xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            Support HashSense
+        </h1>
+        <p class="text-xl text-gray-300 mb-4 max-w-2xl mx-auto">
+            Help us keep building <span class="text-purple-400 font-semibold">free tools</span> for the GoMining community!
+        </p>
+        <p class="text-gray-400 max-w-2xl mx-auto">
+            All our calculators and tools are completely free to use. Your support helps us cover hosting costs, maintain the website, and keep developing new features.
+        </p>
+    </section>
 
-    <!-- Back to Home Button -->
-    <div class="mt-6">
-      <button onclick="window.location.href='index.html'" 
-              class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition-colors duration-200">
-        Back to Home
-      </button>
-    </div>
-  </main>
+    <!-- Support Methods -->
+    <section class="max-w-6xl mx-auto px-4 pb-16">
+        <div class="grid md:grid-cols-2 gap-6">
+            
+            <!-- Referral Link -->
+            <div class="gradient-border hover-lift">
+                <div class="gradient-border-content">
+                    <div class="flex items-center justify-center w-16 h-16 bg-purple-600 rounded-full mb-4 mx-auto">
+                        <span class="material-icons text-3xl">link</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-center mb-3">Use Our Referral Code</h3>
+                    <p class="text-gray-400 text-center mb-6">
+                        Sign up to GoMining and use our referral code <span class="text-purple-400 font-mono font-semibold">ICjK3</span> to get <span class="text-green-400 font-semibold">5% extra TH</span> on your first miner purchase! We get a small commission. Win-win! 🎉
+                    </p>
+                    <a href="https://gomining.com/?ref=ICjK3" target="_blank" rel="noopener"
+                       class="block w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition-all">
+                        Sign Up to GoMining →
+                    </a>
+                    <p class="text-xs text-gray-500 text-center mt-3">Use Code <span class="text-purple-400 font-mono">ICjK3</span> after signup • New users only</p>
+                </div>
+            </div>
 
-  <!-- Footer -->
-  <footer class="bg-gray-800 p-6 text-center text-gray-400">
-    <h3 class="text-purple-400 text-lg font-semibold mb-2">Support Us</h3>
-    <p>If you like our work, support us with GMT tokens on BNB Smart Chain:</p>
+            <!-- GMT Donation -->
+            <div class="gradient-border hover-lift">
+                <div class="gradient-border-content">
+                    <div class="flex items-center justify-center w-16 h-16 bg-green-600 rounded-full mb-4 mx-auto">
+                        <span class="material-icons text-3xl">account_balance_wallet</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-center mb-3">Donate GMT</h3>
+                    <p class="text-gray-400 text-center mb-6">
+                        Send GMT tokens directly to our BSC wallet. Every donation helps keep the website online! 💚
+                    </p>
+                    <div class="bg-gray-800 rounded-lg p-4 mb-4">
+                        <p class="text-xs text-gray-500 mb-2">BSC Wallet Address:</p>
+                        <div class="flex items-center gap-2">
+                            <input type="text" readonly value="0x3229E3118F803d8EaCB52D5f598395F5bf888bad" 
+                                   id="gmt-address"
+                                   class="bg-gray-900 text-gray-300 text-xs font-mono px-3 py-2 rounded flex-1 border border-gray-700">
+                            <button onclick="copyToClipboard('gmt-address')" 
+                                    class="copy-button bg-purple-600 text-white px-3 py-2 rounded flex items-center gap-1">
+                                <span class="material-icons text-sm">content_copy</span>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center">⚠️ BSC Network Only (BEP-20)</p>
+                </div>
+            </div>
 
-    <div class="mt-3 flex items-center justify-center gap-2">
-      <img src="GoMining_Logo.webp" class="w-6 h-6" alt="Wallet">
-      <span id="wallet-address" class="font-mono text-sm">0x3229E3118F803d8EaCB52D5f598395F5bf888bad</span>
-    </div>
-    <button onclick="copyToClipboard('0x3229E3118F803d8EaCB52D5f598395F5bf888bad')" 
-            class="mt-3 bg-purple-600 hover:bg-purple-700 text-white px-4 py-1 rounded">
-      Copy address
-    </button>
+            <!-- BTC Donation 
+            <div class="gradient-border hover-lift">
+                <div class="gradient-border-content">
+                    <div class="flex items-center justify-center w-16 h-16 bg-orange-600 rounded-full mb-4 mx-auto">
+                        <span class="material-icons text-3xl">currency_bitcoin</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-center mb-3">Donate BTC</h3>
+                    <p class="text-gray-400 text-center mb-6">
+                        Support us with Bitcoin. Every satoshi counts and helps keep the lights on! 🧡
+                    </p>
+                    <div class="bg-gray-800 rounded-lg p-4 mb-4">
+                        <p class="text-xs text-gray-500 mb-2">BTC Wallet Address:</p>
+                        <div class="flex items-center gap-2">
+                            <input type="text" readonly value="bc1qYourBTCWalletAddressHere" 
+                                   id="btc-address"
+                                   class="bg-gray-900 text-gray-300 text-xs font-mono px-3 py-2 rounded flex-1 border border-gray-700">
+                            <button onclick="copyToClipboard('btc-address')" 
+                                    class="copy-button bg-purple-600 text-white px-3 py-2 rounded flex items-center gap-1">
+                                <span class="material-icons text-sm">content_copy</span>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center">⚠️ Bitcoin Network Only</p>
+                </div>
+            </div>-->
 
-    <p class="mt-4">Or join us through our referral link:</p>
-    <div class="flex justify-center gap-4 mt-3">
-      <a href="https://gomining.com/?ref=ICjK3" target="_blank">
-        <img src="https://cimera311.github.io/Gomining_Calculator/Gomining.jpg"
-             class="w-36 rounded-lg shadow" alt="GoMining Referral">
-      </a>
-      <a href="https://app.gomining.com/miner-wars/mining/select-pool?inviteToClan=2232" target="_blank">
-        <img src="IMG_5594.jpeg" class="w-36 rounded-lg shadow" alt="Join Us!!!">
-      </a>
-    </div>
+        </div>
+    </section>
 
-    <p class="mt-6">&copy; 2024 HashSense. All rights reserved.</p>
-    <p>This website is for informational purposes only.</p>
-  </footer>
+    <!-- Join Our Clan -->
+    <section class="max-w-4xl mx-auto px-4 pb-16">
+        <div class="bg-gradient-to-r from-purple-900 to-pink-900 rounded-2xl p-8 text-center">
+            <span class="material-icons text-5xl text-purple-300 mb-4 inline-block">groups</span>
+            <h2 class="text-3xl font-bold mb-4">Join Wagmington Clan!</h2>
+            <p class="text-gray-200 mb-6 max-w-2xl mx-auto">
+                Join the <span class="text-purple-300 font-semibold">Wagmington Clan</span> on GoMining. 
+                Connect with other miners, share strategies, and grow together as a community!
+            </p>
+            <a href="https://app.gomining.com/miner-wars/mining/select-pool?inviteToClan=2232" target="_blank" rel="noopener"
+               class="inline-block bg-white text-purple-900 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition-all">
+                Join Wagmington →
+            </a>
+        </div>
+    </section>
 
-  <script>
-    // Copy to clipboard function
-    function copyToClipboard(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        alert('Address copied to clipboard!');
-      }).catch(err => {
-        console.error('Failed to copy: ', err);
-      });
-    }
-  </script>
+    <!-- What You Get -->
+    <section class="max-w-4xl mx-auto px-4 pb-16">
+        <h2 class="text-3xl font-bold text-center mb-12">What's Free to Use</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="material-icons text-green-400">check_circle</span>
+                    <h3 class="text-xl font-semibold">All Core Calculators</h3>
+                </div>
+                <p class="text-gray-400">Mining Calculator, ROI Calculator, Reinvestment Calculator - all free to use.</p>
+            </div>
+            
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="material-icons text-green-400">check_circle</span>
+                    <h3 class="text-xl font-semibold">Daily Price Updates</h3>
+                </div>
+                <p class="text-gray-400">Real-time BTC and GMT prices updated automatically from CoinPaprika.</p>
+            </div>
+            
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="material-icons text-green-400">check_circle</span>
+                    <h3 class="text-xl font-semibold">No Ads</h3>
+                </div>
+                <p class="text-gray-400">Clean interface, no annoying ads. Only anonymous Google Analytics for usage stats.</p>
+            </div>
+            
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="material-icons text-green-400">check_circle</span>
+                    <h3 class="text-xl font-semibold">Privacy First</h3>
+                </div>
+                <p class="text-gray-400">Your data stays secure and anonymous. We only track page views, nothing personal.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="max-w-4xl mx-auto px-4 pb-16">
+        <h2 class="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+        <div class="space-y-4">
+            
+            <details class="bg-gray-800 rounded-lg p-6 border border-gray-700 cursor-pointer">
+                <summary class="font-semibold text-lg cursor-pointer">Why do you need support?</summary>
+                <p class="text-gray-400 mt-3">
+                    Running a website, maintaining automated price updates via external tools, and developing new features takes time and money. 
+                    Your support helps cover hosting costs and keeps everything running smoothly and free for everyone.
+                </p>
+            </details>
+            
+            
+            <details class="bg-gray-800 rounded-lg p-6 border border-gray-700 cursor-pointer">
+                <summary class="font-semibold text-lg cursor-pointer">How is my donation used?</summary>
+                <p class="text-gray-400 mt-3">
+                    Donations help cover hosting costs, domain fees, and keep me motivated to continue developing new features and fixing bugs. 
+                    Think of it as buying me coffee to fuel late-night coding sessions! ☕
+                </p>
+            </details>
+            
+            <details class="bg-gray-800 rounded-lg p-6 border border-gray-700 cursor-pointer">
+                <summary class="font-semibold text-lg cursor-pointer">Can I contribute in other ways?</summary>
+                <p class="text-gray-400 mt-3">
+                    Absolutely! Share the tools with other GoMining miners, report bugs, suggest features, or join our clan. 
+                    Community feedback is invaluable!
+                </p>
+            </details>
+            
+        </div>
+    </section>
+
+    <!-- Thank You Section -->
+    <section class="max-w-4xl mx-auto px-4 pb-16 text-center">
+        <div class="bg-gray-800 rounded-2xl p-12 border border-gray-700">
+            <span class="material-icons text-6xl text-pink-400 mb-4 inline-block">volunteer_activism</span>
+            <h2 class="text-3xl font-bold mb-4">Thank You! 🙏</h2>
+            <p class="text-gray-300 text-lg max-w-2xl mx-auto mb-6">
+                Your support means a lot and helps keep these tools available for the entire GoMining community. 
+                Together, we're making Bitcoin mining with GoMining more accessible and transparent!
+            </p>
+            <p class="text-gray-400 italic">
+                Happy Mining! ⛏️✨
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="src/scripts/footer-component.js"></script>
+    
+    <script>
+        function copyToClipboard(elementId) {
+            const input = document.getElementById(elementId);
+            input.select();
+            input.setSelectionRange(0, 99999); // For mobile devices
+            
+            navigator.clipboard.writeText(input.value).then(() => {
+                // Visual feedback
+                const button = event.target.closest('button');
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<span class="material-icons text-sm">check</span>';
+                button.classList.add('bg-green-600');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.classList.remove('bg-green-600');
+                }, 2000);
+            });
+        }
+    </script>
+
+    <!-- Google Analytics (optional) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VQ2RT4JL4L"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-VQ2RT4JL4L');
+    </script>
+
 </body>
 </html>
