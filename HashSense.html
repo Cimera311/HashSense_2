@@ -11,6 +11,8 @@
     <script src="src/scripts/skript-tables.js"></script>
     <script src="src/scripts/skriptreferral.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <!-- Footer Script -->
+    <script src="src/scripts/footer-component.js"></script>
     
     <!-- Plausible Analytics -->
     <script defer data-domain="hashfarm.me" src="https://plausible.io/js/script.js"></script>
@@ -1117,14 +1119,15 @@
         </div>
     </main>
 
-            <!-- Footer mit Support-Link -->
+            <!-- Footer mit Support-Link 
             <footer class="bg-gray-800 text-gray-400 py-6 mt-12 text-center">
                 <div class="max-w-7xl mx-auto flex flex-col items-center gap-2">
                     <span>&copy; 2025 HashFarm</span>
                     <a href="support.html" class="text-purple-400 underline hover:text-purple-300">Support</a>
                 </div>
-            </footer>
-
+            </footer> -->
+<!-- Footer Container -->
+    <div id="footer-container"></div>
     <script>
         // ===== SIDEBAR NAVIGATION FUNCTIONS =====
         function toggleSidebar() {
@@ -1313,6 +1316,10 @@
                     // Make them unfocusable
                     input.setAttribute('tabindex', '-1');
                     input.style.outline = 'none';
+                }
+                const footerContainer = document.getElementById('footer-container');
+                if (footerContainer) {
+                    footerContainer.innerHTML = renderFooter();
                 }
             });
             

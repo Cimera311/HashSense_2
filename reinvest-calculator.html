@@ -10,6 +10,8 @@
     <script src="src/scripts/greedy-scripts.js"></script>
     <script src="src/scripts/reinvest-calculator.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <!-- Footer Script -->
+    <script src="src/scripts/footer-component.js"></script>
     
     <!-- Plausible Analytics -->
     <script defer data-domain="hashfarm.me" src="https://plausible.io/js/script.js"></script>
@@ -882,7 +884,7 @@
 
     <!-- Overlay for Sidebar -->
     <div class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden" id="sidebar-overlay" onclick="closeSidebar()"></div>
-
+<div id="footer-container"></div>
     <script>
         // Global variables for calculation
         let currentStrategy = 'controlled';
