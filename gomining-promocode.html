@@ -228,6 +228,7 @@
             <!-- CTA Button -->
             <a href="https://gomining.com/?ref=ICjK3" 
                target="_blank" rel="noopener"
+               onclick="trackReferralClick('Hero CTA')"
                class="inline-flex items-center gap-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 px-8 py-4 rounded-xl font-bold text-lg transition-all transform hover:scale-105">
                 <span class="material-icons">rocket_launch</span>
                 Start Mining with Discount
@@ -355,6 +356,9 @@
         </section>
     </main>
 
+    <!-- Cookie Consent -->
+    <script src="src/scripts/cookie-consent.js"></script>
+
     <!-- Footer -->
     <footer class="bg-gray-800 border-t border-gray-700 py-8">
         <div class="max-w-6xl mx-auto px-4">
@@ -408,7 +412,26 @@
                     copyText.parentElement.classList.remove('bg-green-600');
                     copyText.parentElement.classList.add('bg-purple-600');
                 }, 2000);
+                
+                // Track promo code copy
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'copy_promo_code', {
+                        'event_category': 'Promo Code',
+                        'event_label': 'Code ICjK3 Copied',
+                        'value': 1
+                    });
+                }
             });
+        }
+        
+        function trackReferralClick(location) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'click_referral_link', {
+                    'event_category': 'Referral',
+                    'event_label': 'GoMining Link - ' + location,
+                    'value': 1
+                });
+            }
         }
         
         function toggleFaq() {
