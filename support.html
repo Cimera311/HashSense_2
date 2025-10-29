@@ -120,9 +120,19 @@
                     </div>
                     <h3 class="text-2xl font-bold text-center mb-3">Use Our Referral Code</h3>
                     <p class="text-gray-400 text-center mb-6">
-                        Sign up to GoMining and use our referral code <span class="text-purple-400 font-mono font-semibold">ICjK3</span> to get <span class="text-green-400 font-semibold">5% extra TH</span> on your first miner purchase! We get a small commission. Win-win! 🎉
+                        Sign up to GoMining and use our referral code to get <span class="text-green-400 font-semibold">5% extra TH</span> on your first miner purchase! We get a small commission. Win-win! 🎉
                     </p>
+                    
+                    <!-- Copy Referral Code Button -->
+                    <button onclick="copyReferralCode(event)" 
+                            class="w-full bg-gray-800 border-2 border-purple-600 text-purple-400 font-semibold py-3 px-6 rounded-lg mb-3 hover:bg-gray-700 transition-all flex items-center justify-center gap-2">
+                        <span class="material-icons text-sm">content_copy</span>
+                        <span>Copy Referral Code: <span class="font-mono">ICjK3</span></span>
+                    </button>
+                    
+                    <!-- Sign Up Button -->
                     <a href="https://gomining.com/?ref=ICjK3" target="_blank" rel="noopener"
+                       onclick="trackReferralClick()"
                        class="block w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition-all">
                         Sign Up to GoMining →
                     </a>
@@ -294,6 +304,7 @@
     <script src="src/scripts/footer-component.js"></script>
     
     <script>
+        // Copy wallet address to clipboard
         function copyToClipboard(elementId) {
             const input = document.getElementById(elementId);
             input.select();
@@ -310,7 +321,53 @@
                     button.innerHTML = originalHTML;
                     button.classList.remove('bg-green-600');
                 }, 2000);
+                
+                // Track GMT wallet copy
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'copy_wallet', {
+                        'event_category': 'Donation',
+                        'event_label': elementId === 'gmt-address' ? 'GMT Wallet' : 'BTC Wallet',
+                        'value': 1
+                    });
+                }
             });
+        }
+        
+        // Copy referral code to clipboard
+        function copyReferralCode(event) {
+            const code = 'ICjK3';
+            navigator.clipboard.writeText(code).then(() => {
+                // Visual feedback
+                const button = event.target.closest('button');
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<span class="material-icons text-sm">check</span><span>Copied!</span>';
+                button.classList.add('bg-green-600', 'border-green-600', 'text-white');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.classList.remove('bg-green-600', 'border-green-600', 'text-white');
+                }, 2000);
+                
+                // Track referral code copy
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'copy_referral_code', {
+                        'event_category': 'Referral',
+                        'event_label': 'Referral Code Copied',
+                        'value': 1
+                    });
+                }
+            });
+        }
+        
+        // Track referral link click
+        function trackReferralClick() {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'click_referral_link', {
+                    'event_category': 'Referral',
+                    'event_label': 'Sign Up Button Clicked',
+                    'value': 1
+                });
+            }
         }
     </script>
 
