@@ -326,8 +326,6 @@ function calculateReinvestmentStrategy() {
                 strategyText = 'Auto +5%';
             } else {
                 // Not enough GMT for costs - revert and hold
-                currentGMTBalance += dailyElectricity.gmt;
-                currentGMTBalance += dailyService.gmt;
                 currentGMTBalance += dailyRevenue.gmt;
                 strategyText = 'Hold (Insufficient GMT)';
                 holdDaysCount++; // NEU: Increment Hold Days counter
@@ -369,8 +367,7 @@ function calculateReinvestmentStrategy() {
                     totalInvestment += reinvestmentUSD;
                     strategyText = 'Auto +5%';
                 } else {
-                    currentGMTBalance += dailyElectricity.gmt;
-                    currentGMTBalance += dailyService.gmt;
+
                     currentGMTBalance += dailyRevenue.gmt;
                     strategyText = 'Hold (Insufficient GMT)';
                     holdDaysCount++; // NEU: Increment Hold Days counter
@@ -418,8 +415,6 @@ function calculateReinvestmentStrategy() {
                     totalInvestment += reinvestmentUSD;
                     strategyText = 'TH Reinvest +5%';
                 } else {
-                    currentGMTBalance += dailyElectricity.gmt;
-                    currentGMTBalance += dailyService.gmt;
                     currentGMTBalance += dailyRevenue.gmt;
                     strategyText = 'Hold (Insufficient GMT)';
                     holdDaysCount++; // NEU: Increment Hold Days counter
@@ -427,18 +422,15 @@ function calculateReinvestmentStrategy() {
                 
             } else if (isBTCPhase) {
                 // PHASE: Reward in BTC, Maintenance in GMT
-                currentBTCBalance += dailyRevenue.btc;
                 currentGMTBalance -= dailyElectricity.gmt;
                 currentGMTBalance -= dailyService.gmt;
                 
-                if (currentGMTBalance < 0) {
-                    currentBTCBalance -= dailyRevenue.btc;
-                    currentGMTBalance += dailyElectricity.gmt;
-                    currentGMTBalance += dailyService.gmt;
+                if (currentGMTBalance < 0) {                                                     
                     currentGMTBalance += dailyRevenue.gmt;
                     strategyText = 'Hold (Insufficient GMT)';
                     holdDaysCount++; // NEU: Increment Hold Days counter
                 } else {
+                    currentBTCBalance += dailyRevenue.btc;
                     strategyText = 'BTC Accumulation';
                 }
                 
