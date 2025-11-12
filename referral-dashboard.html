@@ -580,6 +580,121 @@ Nov 1, 2025
                 </div>
             </div>
 
+            <!-- ========================================= -->
+            <!-- NEW: PERFORMANCE SECTION - User Acquisition Analysis -->
+            <!-- ========================================= -->
+            <div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid rgba(103, 61, 236, 0.3);">
+                <h2 style="color: #a78bfa; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+                    <span class="material-icons" style="font-size: 28px;">person_add</span>
+                    User Acquisition Performance
+                </h2>
+
+                <!-- Performance Stats Cards -->
+                <div class="stats-grid" style="margin-bottom: 30px;">
+                    <div class="stat-card">
+                        <div class="label">🔵 Registration Users</div>
+                        <div class="value" id="statRegistrationUsers">0</div>
+                        <div class="sub-value" id="statRegistrationPercent">0%</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="label">🟢 First Purchase Users</div>
+                        <div class="value" id="statFirstPurchaseUsers">0</div>
+                        <div class="sub-value" id="statFirstPurchasePercent">0%</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="label">📊 Total Unique Users</div>
+                        <div class="value" id="statTotalUniqueUsers">0</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="label">🎯 Conversion Rate</div>
+                        <div class="value" id="statConversionRate">0%</div>
+                        <div class="sub-value">Registered → Purchased</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="label">⏱️ Avg Time to Purchase</div>
+                        <div class="value" id="statAvgTimeToPurchase">0 days</div>
+                        <div class="sub-value">For Registration Users</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="label">📈 Avg Daily Growth</div>
+                        <div class="value" id="statAvgDailyGrowth">0</div>
+                        <div class="sub-value">New users per day</div>
+                    </div>
+                </div>
+
+                <!-- User Acquisition Timeline Chart -->
+                <div class="chart-card" style="margin-bottom: 30px;">
+                    <h3>👥 User Acquisition Timeline</h3>
+                    <p style="color: #888; font-size: 0.9em; margin-bottom: 15px;">
+                        Shows when new referrals first appeared: 🔵 Registration vs 🟢 Direct Purchase
+                    </p>
+                    
+                    <!-- Date Range Filter -->
+                    <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; background: rgba(30, 30, 46, 0.8); padding: 15px; border-radius: 8px;">
+                        <label style="color: #aaa; font-weight: 600;">📅 Filter Period:</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <label style="color: #888; font-size: 0.9em;">From:</label>
+                            <select id="acquisitionFromMonth" style="padding: 8px 12px; background: rgba(30, 30, 46, 0.9); border: 2px solid #673dec; border-radius: 6px; color: #fff; cursor: pointer;">
+                                <!-- Filled dynamically -->
+                            </select>
+                            <select id="acquisitionFromYear" style="padding: 8px 12px; background: rgba(30, 30, 46, 0.9); border: 2px solid #673dec; border-radius: 6px; color: #fff; cursor: pointer;">
+                                <!-- Filled dynamically -->
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <label style="color: #888; font-size: 0.9em;">To:</label>
+                            <select id="acquisitionToMonth" style="padding: 8px 12px; background: rgba(30, 30, 46, 0.9); border: 2px solid #673dec; border-radius: 6px; color: #fff; cursor: pointer;">
+                                <!-- Filled dynamically -->
+                            </select>
+                            <select id="acquisitionToYear" style="padding: 8px 12px; background: rgba(30, 30, 46, 0.9); border: 2px solid #673dec; border-radius: 6px; color: #fff; cursor: pointer;">
+                                <!-- Filled dynamically -->
+                            </select>
+                        </div>
+                        <button onclick="applyAcquisitionFilter()" class="btn btn-primary" style="padding: 8px 20px; margin: 0;">
+                            <span class="material-icons" style="font-size: 18px;">filter_alt</span>
+                            Apply Filter
+                        </button>
+                        <button onclick="resetAcquisitionFilter()" class="btn btn-secondary" style="padding: 8px 16px; margin: 0;">
+                            <span class="material-icons" style="font-size: 18px;">refresh</span>
+                            Reset
+                        </button>
+                    </div>
+                    
+                    <canvas id="acquisitionChart"></canvas>
+                </div>
+                
+                <!-- Monthly Summary Table -->
+                <div class="chart-card" style="margin-bottom: 30px;">
+                    <h3>📊 Monthly User Acquisition Summary</h3>
+                    <div style="overflow-x: auto; margin-top: 15px;">
+                        <table class="data-table" id="monthlyAcquisitionTable">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortMonthlyTable('month')">Month <span class="material-icons" style="font-size: 16px;">arrow_downward</span></th>
+                                    <th onclick="sortMonthlyTable('registration')">🔵 Registration</th>
+                                    <th onclick="sortMonthlyTable('firstPurchase')">🟢 First Purchase</th>
+                                    <th onclick="sortMonthlyTable('total')">Total Users</th>
+                                    <th onclick="sortMonthlyTable('conversion')">Conversion %</th>
+                                    <th onclick="sortMonthlyTable('avgDays')">Avg Days to Buy</th>
+                                    <th onclick="sortMonthlyTable('earnings')">Earnings (GMT)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="monthlyAcquisitionBody">
+                                <!-- Filled dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- ========================================= -->
+            <!-- END: PERFORMANCE SECTION -->
+            <!-- ========================================= -->
+
             <!-- Filter Bar -->
             <div class="filter-bar">
                 <input type="text" id="searchInput" placeholder="🔍 Search by User ID..." onkeyup="filterData()">

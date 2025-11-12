@@ -12,6 +12,13 @@ let sortDirection = 'desc';
 // Chart instances
 let earningsChart = null;
 let typeChart = null;
+let acquisitionChart = null; // NEW: Performance chart
+
+// Acquisition filter state
+let acquisitionFilterFrom = null;
+let acquisitionFilterTo = null;
+let monthlySortColumn = 'month';
+let monthlySortDirection = 'desc';
 
 // ===========================
 // INITIALIZATION
@@ -258,6 +265,7 @@ function updateDisplay() {
     filteredData = [...referralData];
     updateStatistics();
     updateCharts();
+    updatePerformanceAnalysis(); // NEW: Performance section
     updateTable();
 }
 
@@ -459,6 +467,519 @@ function formatCurrency(amount, currency) {
     } else if (currency === 'EUR') {
         return '€' + amount.toFixed(2);
     }
+}
+
+// ===========================
+// NEW: PERFORMANCE ANALYSIS
+// ===========================
+
+function updatePerformanceAnalysis() {
+    // 1. Find first appearance for each user
+    const userFirstAppearance = {};
+    
+    referralData.forEach(reward => {
+        if (!userFirstAppearance[reward.userId]) {
+            userFirstAppearance[reward.userId] = {
+                date: reward.date,
+                time: reward.time,
+                type: reward.type,
+                category: reward.type === 'Registration' ? 'Registration' : 'First Purchase',
+                dateTime: new Date(reward.date + ' ' + reward.time)
+            };
+        } else {
+            // Check if this is earlier
+            const currentDateTime = new Date(reward.date + ' ' + reward.time);
+            if (currentDateTime < userFirstAppearance[reward.userId].dateTime) {
+                userFirstAppearance[reward.userId] = {
+                    date: reward.date,
+                    time: reward.time,
+                    type: reward.type,
+                    category: reward.type === 'Registration' ? 'Registration' : 'First Purchase',
+                    dateTime: currentDateTime
+                };
+            }
+        }
+    });
+    
+    // 2. Count by category
+    const registrationUsers = Object.values(userFirstAppearance).filter(u => u.category === 'Registration').length;
+    const firstPurchaseUsers = Object.values(userFirstAppearance).filter(u => u.category === 'First Purchase').length;
+    const totalUsers = registrationUsers + firstPurchaseUsers;
+    
+    // Update stats cards
+    document.getElementById('statRegistrationUsers').textContent = registrationUsers;
+    document.getElementById('statRegistrationPercent').textContent = 
+        totalUsers > 0 ? ((registrationUsers / totalUsers * 100).toFixed(1) + '%') : '0%';
+    
+    document.getElementById('statFirstPurchaseUsers').textContent = firstPurchaseUsers;
+    document.getElementById('statFirstPurchasePercent').textContent = 
+        totalUsers > 0 ? ((firstPurchaseUsers / totalUsers * 100).toFixed(1) + '%') : '0%';
+    
+    document.getElementById('statTotalUniqueUsers').textContent = totalUsers;
+    
+    // 3. Calculate conversion rate (Registration users who later made a purchase)
+    const registrationUserIds = Object.keys(userFirstAppearance).filter(
+        id => userFirstAppearance[id].category === 'Registration'
+    );
+    
+    const purchasedAfterRegistration = registrationUserIds.filter(userId => {
+        // Check if user has any Purchase/Upgrade/Boosts after registration
+        return referralData.some(r => 
+            r.userId === userId && 
+            r.type !== 'Registration' && 
+            new Date(r.date + ' ' + r.time) > userFirstAppearance[userId].dateTime
+        );
+    }).length;
+    
+    const conversionRate = registrationUsers > 0 
+        ? ((purchasedAfterRegistration / registrationUsers) * 100).toFixed(1) 
+        : 0;
+    
+    document.getElementById('statConversionRate').textContent = conversionRate + '%';
+    
+    // 4. Calculate average time to first purchase (for Registration users)
+    let totalDays = 0;
+    let countWithPurchase = 0;
+    
+    registrationUserIds.forEach(userId => {
+        const registrationDate = userFirstAppearance[userId].dateTime;
+        const firstPurchase = referralData
+            .filter(r => r.userId === userId && r.type !== 'Registration')
+            .sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time))[0];
+        
+        if (firstPurchase) {
+            const purchaseDate = new Date(firstPurchase.date + ' ' + firstPurchase.time);
+            const daysDiff = (purchaseDate - registrationDate) / (1000 * 60 * 60 * 24);
+            totalDays += daysDiff;
+            countWithPurchase++;
+        }
+    });
+    
+    const avgDays = countWithPurchase > 0 ? (totalDays / countWithPurchase).toFixed(1) : 0;
+    document.getElementById('statAvgTimeToPurchase').textContent = avgDays + ' days';
+    
+    // 5. Calculate average daily growth
+    const dateMap = {};
+    Object.values(userFirstAppearance).forEach(user => {
+        dateMap[user.date] = (dateMap[user.date] || 0) + 1;
+    });
+    
+    const uniqueDates = Object.keys(dateMap).length;
+    const avgDailyGrowth = uniqueDates > 0 ? (totalUsers / uniqueDates).toFixed(1) : 0;
+    document.getElementById('statAvgDailyGrowth').textContent = avgDailyGrowth;
+    
+    // 6. Initialize date filter dropdowns
+    initializeAcquisitionDateFilters(userFirstAppearance);
+    
+    // 7. Create acquisition timeline chart
+    updateAcquisitionChart(userFirstAppearance);
+    
+    // 8. Create monthly summary table
+    updateMonthlyAcquisitionTable(userFirstAppearance);
+}
+
+function updateAcquisitionChart(userFirstAppearance) {
+    // Aggregate by date
+    const dailyAcquisition = {};
+    
+    Object.values(userFirstAppearance).forEach(user => {
+        if (!dailyAcquisition[user.date]) {
+            dailyAcquisition[user.date] = { registration: 0, firstPurchase: 0 };
+        }
+        
+        if (user.category === 'Registration') {
+            dailyAcquisition[user.date].registration++;
+        } else {
+            dailyAcquisition[user.date].firstPurchase++;
+        }
+    });
+    
+    // Sort dates
+    const sortedDates = Object.keys(dailyAcquisition).sort();
+    const registrationData = sortedDates.map(date => dailyAcquisition[date].registration);
+    const firstPurchaseData = sortedDates.map(date => dailyAcquisition[date].firstPurchase);
+    
+    // Destroy existing chart
+    if (acquisitionChart) {
+        acquisitionChart.destroy();
+    }
+    
+    // Create chart
+    const ctx = document.getElementById('acquisitionChart').getContext('2d');
+    acquisitionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sortedDates,
+            datasets: [
+                {
+                    label: '🔵 Registration Users',
+                    data: registrationData,
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: '#3b82f6',
+                    borderWidth: 1
+                },
+                {
+                    label: '🟢 First Purchase Users',
+                    data: firstPurchaseData,
+                    backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                    borderColor: '#10b981',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                x: {
+                    stacked: true,
+                    ticks: { color: '#aaa' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'New Users',
+                        color: '#aaa'
+                    },
+                    ticks: { 
+                        color: '#aaa',
+                        stepSize: 1
+                    },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: { color: '#fff' }
+                },
+                tooltip: {
+                    callbacks: {
+                        footer: function(tooltipItems) {
+                            let total = 0;
+                            tooltipItems.forEach(item => {
+                                total += item.parsed.y;
+                            });
+                            return 'Total: ' + total + ' users';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeAcquisitionDateFilters(userFirstAppearance) {
+    // Get all unique dates
+    const allDates = Object.values(userFirstAppearance).map(u => new Date(u.date));
+    if (allDates.length === 0) return;
+    
+    const minDate = new Date(Math.min(...allDates));
+    const maxDate = new Date(Math.max(...allDates));
+    
+    // Populate month dropdowns
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const fromMonth = document.getElementById('acquisitionFromMonth');
+    const toMonth = document.getElementById('acquisitionToMonth');
+    
+    fromMonth.innerHTML = '';
+    toMonth.innerHTML = '';
+    
+    months.forEach((month, idx) => {
+        fromMonth.innerHTML += `<option value="${idx}">${month}</option>`;
+        toMonth.innerHTML += `<option value="${idx}">${month}</option>`;
+    });
+    
+    // Populate year dropdowns
+    const fromYear = document.getElementById('acquisitionFromYear');
+    const toYear = document.getElementById('acquisitionToYear');
+    
+    fromYear.innerHTML = '';
+    toYear.innerHTML = '';
+    
+    const minYear = minDate.getFullYear();
+    const maxYear = maxDate.getFullYear();
+    
+    for (let year = minYear; year <= maxYear; year++) {
+        fromYear.innerHTML += `<option value="${year}">${year}</option>`;
+        toYear.innerHTML += `<option value="${year}">${year}</option>`;
+    }
+    
+    // Set default values
+    fromMonth.value = minDate.getMonth();
+    fromYear.value = minYear;
+    toMonth.value = maxDate.getMonth();
+    toYear.value = maxYear;
+    
+    // Initialize filter state
+    acquisitionFilterFrom = minDate;
+    acquisitionFilterTo = maxDate;
+}
+
+function applyAcquisitionFilter() {
+    const fromMonth = parseInt(document.getElementById('acquisitionFromMonth').value);
+    const fromYear = parseInt(document.getElementById('acquisitionFromYear').value);
+    const toMonth = parseInt(document.getElementById('acquisitionToMonth').value);
+    const toYear = parseInt(document.getElementById('acquisitionToYear').value);
+    
+    acquisitionFilterFrom = new Date(fromYear, fromMonth, 1);
+    acquisitionFilterTo = new Date(toYear, toMonth + 1, 0); // Last day of month
+    
+    // Re-analyze and update charts
+    updatePerformanceAnalysis();
+}
+
+function resetAcquisitionFilter() {
+    acquisitionFilterFrom = null;
+    acquisitionFilterTo = null;
+    updatePerformanceAnalysis();
+}
+
+function updateAcquisitionChart(userFirstAppearance) {
+    // Filter by date range if set
+    let filteredUsers = Object.values(userFirstAppearance);
+    
+    if (acquisitionFilterFrom && acquisitionFilterTo) {
+        filteredUsers = filteredUsers.filter(user => {
+            const userDate = new Date(user.date);
+            return userDate >= acquisitionFilterFrom && userDate <= acquisitionFilterTo;
+        });
+    }
+    
+    // Aggregate by date
+    const dailyAcquisition = {};
+    
+    filteredUsers.forEach(user => {
+        if (!dailyAcquisition[user.date]) {
+            dailyAcquisition[user.date] = { registration: 0, firstPurchase: 0 };
+        }
+        
+        if (user.category === 'Registration') {
+            dailyAcquisition[user.date].registration++;
+        } else {
+            dailyAcquisition[user.date].firstPurchase++;
+        }
+    });
+    
+    // Sort dates
+    const sortedDates = Object.keys(dailyAcquisition).sort();
+    const registrationData = sortedDates.map(date => dailyAcquisition[date].registration);
+    const firstPurchaseData = sortedDates.map(date => dailyAcquisition[date].firstPurchase);
+    
+    // Destroy existing chart
+    if (acquisitionChart) {
+        acquisitionChart.destroy();
+    }
+    
+    // Create chart
+    const ctx = document.getElementById('acquisitionChart').getContext('2d');
+    acquisitionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sortedDates,
+            datasets: [
+                {
+                    label: '🔵 Registration Users',
+                    data: registrationData,
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: '#3b82f6',
+                    borderWidth: 1
+                },
+                {
+                    label: '🟢 First Purchase Users',
+                    data: firstPurchaseData,
+                    backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                    borderColor: '#10b981',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                x: {
+                    stacked: true,
+                    ticks: { color: '#aaa' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'New Users',
+                        color: '#aaa'
+                    },
+                    ticks: { 
+                        color: '#aaa',
+                        stepSize: 1
+                    },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: { color: '#fff' }
+                },
+                tooltip: {
+                    callbacks: {
+                        footer: function(tooltipItems) {
+                            let total = 0;
+                            tooltipItems.forEach(item => {
+                                total += item.parsed.y;
+                            });
+                            return 'Total: ' + total + ' users';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateMonthlyAcquisitionTable(userFirstAppearance) {
+    // Filter by date range if set
+    let filteredUsers = Object.values(userFirstAppearance);
+    
+    if (acquisitionFilterFrom && acquisitionFilterTo) {
+        filteredUsers = filteredUsers.filter(user => {
+            const userDate = new Date(user.date);
+            return userDate >= acquisitionFilterFrom && userDate <= acquisitionFilterTo;
+        });
+    }
+    
+    // Group by month
+    const monthlyData = {};
+    
+    filteredUsers.forEach(user => {
+        const date = new Date(user.date);
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        
+        if (!monthlyData[monthKey]) {
+            monthlyData[monthKey] = {
+                registration: 0,
+                firstPurchase: 0,
+                registrationUserIds: [],
+                allUserIds: []
+            };
+        }
+        
+        monthlyData[monthKey].allUserIds.push(Object.keys(userFirstAppearance).find(
+            id => userFirstAppearance[id] === user
+        ));
+        
+        if (user.category === 'Registration') {
+            monthlyData[monthKey].registration++;
+            monthlyData[monthKey].registrationUserIds.push(Object.keys(userFirstAppearance).find(
+                id => userFirstAppearance[id] === user
+            ));
+        } else {
+            monthlyData[monthKey].firstPurchase++;
+        }
+    });
+    
+    // Calculate additional metrics for each month
+    const monthlyStats = [];
+    
+    Object.keys(monthlyData).forEach(monthKey => {
+        const data = monthlyData[monthKey];
+        const total = data.registration + data.firstPurchase;
+        
+        // Calculate conversion rate (registration users who purchased in that month or later)
+        const converted = data.registrationUserIds.filter(userId => {
+            return referralData.some(r => 
+                r.userId === userId && 
+                r.type !== 'Registration'
+            );
+        }).length;
+        
+        const conversionRate = data.registration > 0 ? ((converted / data.registration) * 100).toFixed(1) : 0;
+        
+        // Calculate average days to purchase for registration users
+        let totalDays = 0;
+        let countWithPurchase = 0;
+        
+        data.registrationUserIds.forEach(userId => {
+            const regDate = new Date(userFirstAppearance[userId].date + ' ' + userFirstAppearance[userId].time);
+            const firstPurchase = referralData
+                .filter(r => r.userId === userId && r.type !== 'Registration')
+                .sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time))[0];
+            
+            if (firstPurchase) {
+                const purchaseDate = new Date(firstPurchase.date + ' ' + firstPurchase.time);
+                const daysDiff = (purchaseDate - regDate) / (1000 * 60 * 60 * 24);
+                totalDays += daysDiff;
+                countWithPurchase++;
+            }
+        });
+        
+        const avgDays = countWithPurchase > 0 ? (totalDays / countWithPurchase).toFixed(1) : 0;
+        
+        // Calculate earnings for users acquired in this month
+        const earnings = referralData
+            .filter(r => data.allUserIds.includes(r.userId))
+            .reduce((sum, r) => sum + r.rewardGMT, 0);
+        
+        monthlyStats.push({
+            month: monthKey,
+            registration: data.registration,
+            firstPurchase: data.firstPurchase,
+            total: total,
+            conversionRate: parseFloat(conversionRate),
+            avgDays: parseFloat(avgDays),
+            earnings: earnings
+        });
+    });
+    
+    // Sort by month (descending by default)
+    monthlyStats.sort((a, b) => {
+        let aVal = a[monthlySortColumn];
+        let bVal = b[monthlySortColumn];
+        
+        if (monthlySortDirection === 'asc') {
+            return aVal > bVal ? 1 : -1;
+        } else {
+            return aVal < bVal ? 1 : -1;
+        }
+    });
+    
+    // Render table
+    const tbody = document.getElementById('monthlyAcquisitionBody');
+    tbody.innerHTML = '';
+    
+    monthlyStats.forEach(stat => {
+        const [year, month] = stat.month.split('-');
+        const monthName = new Date(year, parseInt(month) - 1).toLocaleString('en', { month: 'short', year: 'numeric' });
+        
+        const regPercent = stat.total > 0 ? ((stat.registration / stat.total) * 100).toFixed(1) : 0;
+        const fpPercent = stat.total > 0 ? ((stat.firstPurchase / stat.total) * 100).toFixed(1) : 0;
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><strong>${monthName}</strong></td>
+            <td>${stat.registration} <span style="color: #888; font-size: 0.85em;">(${regPercent}%)</span></td>
+            <td>${stat.firstPurchase} <span style="color: #888; font-size: 0.85em;">(${fpPercent}%)</span></td>
+            <td><strong>${stat.total}</strong></td>
+            <td>${stat.conversionRate}%</td>
+            <td>${stat.avgDays} days</td>
+            <td>${stat.earnings.toFixed(2)} GMT</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function sortMonthlyTable(column) {
+    if (monthlySortColumn === column) {
+        monthlySortDirection = monthlySortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        monthlySortColumn = column;
+        monthlySortDirection = 'desc';
+    }
+    
+    updatePerformanceAnalysis();
 }
 
 // ===========================
