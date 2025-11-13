@@ -395,6 +395,89 @@
             font-weight: 600;
         }
 
+        /* User Chips */
+        .user-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #673dec 0%, #5a32c4 100%);
+            border-radius: 20px;
+            color: #fff;
+            font-size: 0.9em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(103, 61, 236, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .user-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(103, 61, 236, 0.6);
+        }
+
+        .user-chip .color-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+
+        .user-chip .remove-btn {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.2s ease;
+        }
+
+        .user-chip .remove-btn:hover {
+            background: rgba(255, 77, 77, 0.8);
+        }
+
+        .user-chip .remove-btn .material-icons {
+            font-size: 14px;
+        }
+
+        /* Leaderboard Rank Badges */
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .rank-badge.gold {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.6);
+        }
+
+        .rank-badge.silver {
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(192, 192, 192, 0.6);
+        }
+
+        .rank-badge.bronze {
+            background: linear-gradient(135deg, #cd7f32 0%, #e09856 100%);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(205, 127, 50, 0.6);
+        }
+
+        .rank-badge.default {
+            background: rgba(103, 61, 236, 0.3);
+            color: #fff;
+            border: 2px solid #673dec;
+        }
+
         /* Loading Spinner */
         .spinner {
             display: none;
@@ -693,6 +776,88 @@ Nov 1, 2025
             </div>
             <!-- ========================================= -->
             <!-- END: PERFORMANCE SECTION -->
+            <!-- ========================================= -->
+
+            <!-- ========================================= -->
+            <!-- USER COMPARISON SECTION -->
+            <!-- ========================================= -->
+            <div id="userComparisonSection" style="display: none;">
+                <h2 style="margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+                    <span class="material-icons" style="color: #673dec; font-size: 32px;">leaderboard</span>
+                    User Comparison & Rankings
+                </h2>
+
+                <!-- Top 10 Leaderboard -->
+                <div class="chart-card" style="margin-bottom: 30px;">
+                    <h3>🏆 User Leaderboard by Total Earnings</h3>
+                    <p style="color: #888; font-size: 0.9em; margin-bottom: 15px;">
+                        Showing all users with at least one reward. Scroll to see more.
+                    </p>
+                    <div style="overflow-y: auto; max-height: 600px; margin-top: 15px; border: 1px solid rgba(103, 61, 236, 0.3); border-radius: 8px;">
+                        <table class="data-table" id="leaderboardTable" style="margin: 0;">
+                            <thead style="position: sticky; top: 0; z-index: 10; background: rgba(30, 30, 46, 0.95);">
+                                <tr>
+                                    <th style="text-align: center; width: 60px;">Rank</th>
+                                    <th>User ID</th>
+                                    <th onclick="sortLeaderboard('totalEarnings')" style="cursor: pointer;">Total Earnings (GMT) <span class="material-icons" style="font-size: 16px;">arrow_downward</span></th>
+                                    <th onclick="sortLeaderboard('rewardCount')" style="cursor: pointer;">Reward Count</th>
+                                    <th onclick="sortLeaderboard('avgReward')" style="cursor: pointer;">Avg Reward</th>
+                                    <th onclick="sortLeaderboard('lastActivity')" style="cursor: pointer;">Last Activity</th>
+                                    <th style="text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardBody">
+                                <!-- Filled dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- User Comparison Chart -->
+                <div class="chart-card" style="margin-bottom: 30px;">
+                    <h3>📈 User Earnings Comparison (Timeline)</h3>
+                    
+                    <!-- User Selection -->
+                    <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <label style="color: #888; font-size: 0.9em; margin-bottom: 8px; display: block;">Select users to compare:</label>
+                            <div style="display: flex; gap: 10px;">
+                                <select id="userCompareSelect" style="flex: 1; padding: 10px; background: rgba(30, 30, 46, 0.9); border: 2px solid #673dec; border-radius: 6px; color: #fff; cursor: pointer;">
+                                    <option value="">-- Select a user --</option>
+                                    <!-- Filled dynamically -->
+                                </select>
+                                <button onclick="addUserToComparison()" class="btn btn-primary" style="padding: 10px 20px; margin: 0;">
+                                    <span class="material-icons" style="font-size: 18px;">add</span>
+                                    Add User
+                                </button>
+                            </div>
+                        </div>
+                        <button onclick="clearComparisonUsers()" class="btn btn-secondary" style="padding: 10px 16px; margin: 0;">
+                            <span class="material-icons" style="font-size: 18px;">clear_all</span>
+                            Clear All
+                        </button>
+                    </div>
+
+                    <!-- Selected Users Display -->
+                    <div id="selectedUsersDisplay" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; min-height: 40px;">
+                        <!-- Filled dynamically with chips -->
+                    </div>
+
+                    <!-- Chart Type Toggle -->
+                    <div style="margin-bottom: 15px; display: flex; gap: 10px;">
+                        <button onclick="setComparisonChartType('cumulative')" id="btnCumulative" class="btn btn-info" style="padding: 8px 16px; margin: 0;">
+                            📊 Cumulative Earnings
+                        </button>
+                        <button onclick="setComparisonChartType('individual')" id="btnIndividual" class="btn btn-secondary" style="padding: 8px 16px; margin: 0;">
+                            📉 Individual Rewards
+                        </button>
+                    </div>
+
+                    <canvas id="userComparisonChart"></canvas>
+                </div>
+            </div>
+            <!-- ========================================= -->
+            <!-- END: USER COMPARISON SECTION -->
             <!-- ========================================= -->
 
             <!-- Filter Bar -->

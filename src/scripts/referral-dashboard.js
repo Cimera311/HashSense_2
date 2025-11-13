@@ -13,12 +13,25 @@ let sortDirection = 'desc';
 let earningsChart = null;
 let typeChart = null;
 let acquisitionChart = null; // NEW: Performance chart
+let userComparisonChart = null; // NEW: User comparison chart
 
 // Acquisition filter state
 let acquisitionFilterFrom = null;
 let acquisitionFilterTo = null;
 let monthlySortColumn = 'month';
 let monthlySortDirection = 'desc';
+
+// User comparison state
+let selectedComparisonUsers = [];
+let comparisonChartType = 'cumulative'; // 'cumulative' or 'individual'
+let leaderboardSortColumn = 'totalEarnings';
+let leaderboardSortDirection = 'desc';
+
+// Predefined colors for user comparison
+const userColors = [
+    '#673dec', '#00ff7f', '#ff6b6b', '#4ecdc4', '#ffd93d', 
+    '#6c5ce7', '#00b894', '#fd79a8', '#74b9ff', '#a29bfe'
+];
 
 // ===========================
 // INITIALIZATION
@@ -266,6 +279,7 @@ function updateDisplay() {
     updateStatistics();
     updateCharts();
     updatePerformanceAnalysis(); // NEW: Performance section
+    updateUserComparison(); // NEW: User comparison section
     updateTable();
 }
 
@@ -1112,6 +1126,378 @@ function showMessage(elementId, message, type) {
 
 function showSpinner(spinnerId, show) {
     document.getElementById(spinnerId).style.display = show ? 'inline-block' : 'none';
+}
+
+// ===========================
+// USER COMPARISON & LEADERBOARD
+// ===========================
+
+function updateUserComparison() {
+    if (referralData.length === 0) {
+        document.getElementById('userComparisonSection').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('userComparisonSection').style.display = 'block';
+    
+    // Update leaderboard
+    updateLeaderboard();
+    
+    // Populate user selection dropdown
+    populateUserCompareSelect();
+    
+    // Update comparison chart if users are selected
+    if (selectedComparisonUsers.length > 0) {
+        updateComparisonChart();
+    }
+}
+
+function updateLeaderboard() {
+    // Aggregate user data
+    const userStats = {};
+    
+    referralData.forEach(record => {
+        if (!userStats[record.userId]) {
+            userStats[record.userId] = {
+                userId: record.userId,
+                totalEarnings: 0,
+                rewardCount: 0,
+                lastActivity: record.date
+            };
+        }
+        
+        userStats[record.userId].totalEarnings += record.rewardGMT;
+        userStats[record.userId].rewardCount++;
+        
+        // Update last activity if this record is more recent
+        if (new Date(record.date) > new Date(userStats[record.userId].lastActivity)) {
+            userStats[record.userId].lastActivity = record.date;
+        }
+    });
+    
+    // Convert to array and calculate avg reward
+    let usersArray = Object.values(userStats).map(user => ({
+        ...user,
+        avgReward: user.totalEarnings / user.rewardCount
+    }));
+    
+    // Sort by selected column
+    usersArray.sort((a, b) => {
+        let aVal = a[leaderboardSortColumn];
+        let bVal = b[leaderboardSortColumn];
+        
+        if (leaderboardSortColumn === 'lastActivity') {
+            aVal = new Date(aVal);
+            bVal = new Date(bVal);
+        }
+        
+        if (leaderboardSortDirection === 'asc') {
+            return aVal > bVal ? 1 : -1;
+        } else {
+            return aVal < bVal ? 1 : -1;
+        }
+    });
+    
+    // Show ALL users (not just top 10)
+    
+    // Render table
+    const tbody = document.getElementById('leaderboardBody');
+    tbody.innerHTML = '';
+    
+    usersArray.forEach((user, index) => {
+        const rank = index + 1;
+        let rankBadge = '';
+        
+        if (rank === 1) {
+            rankBadge = '<span class="rank-badge gold">🥇</span>';
+        } else if (rank === 2) {
+            rankBadge = '<span class="rank-badge silver">🥈</span>';
+        } else if (rank === 3) {
+            rankBadge = '<span class="rank-badge bronze">🥉</span>';
+        } else {
+            rankBadge = `<span class="rank-badge default">${rank}</span>`;
+        }
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td style="text-align: center;">${rankBadge}</td>
+            <td><strong>${user.userId}</strong></td>
+            <td style="color: #00ff7f; font-weight: 600;">${user.totalEarnings.toFixed(2)} GMT</td>
+            <td>${user.rewardCount}</td>
+            <td>${user.avgReward.toFixed(2)} GMT</td>
+            <td>${formatDate(user.lastActivity)}</td>
+            <td style="text-align: center;">
+                <button onclick="addUserToComparisonById('${user.userId}')" class="btn btn-info" style="padding: 4px 12px; font-size: 0.85em; margin: 0;">
+                    <span class="material-icons" style="font-size: 16px;">add_chart</span>
+                    Compare
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function sortLeaderboard(column) {
+    if (leaderboardSortColumn === column) {
+        leaderboardSortDirection = leaderboardSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        leaderboardSortColumn = column;
+        leaderboardSortDirection = 'desc';
+    }
+    
+    updateLeaderboard();
+}
+
+function populateUserCompareSelect() {
+    const select = document.getElementById('userCompareSelect');
+    const uniqueUsers = [...new Set(referralData.map(r => r.userId))].sort();
+    
+    select.innerHTML = '<option value="">-- Select a user --</option>';
+    
+    uniqueUsers.forEach(userId => {
+        // Skip if already selected
+        if (!selectedComparisonUsers.includes(userId)) {
+            select.innerHTML += `<option value="${userId}">${userId}</option>`;
+        }
+    });
+}
+
+function addUserToComparison() {
+    const select = document.getElementById('userCompareSelect');
+    const userId = select.value;
+    
+    if (!userId) {
+        alert('Please select a user first.');
+        return;
+    }
+    
+    if (selectedComparisonUsers.includes(userId)) {
+        alert('This user is already selected.');
+        return;
+    }
+    
+    if (selectedComparisonUsers.length >= 10) {
+        alert('Maximum 10 users can be compared at once.');
+        return;
+    }
+    
+    selectedComparisonUsers.push(userId);
+    updateSelectedUsersDisplay();
+    updateComparisonChart();
+    populateUserCompareSelect(); // Refresh dropdown
+}
+
+function addUserToComparisonById(userId) {
+    if (selectedComparisonUsers.includes(userId)) {
+        alert('This user is already in the comparison.');
+        return;
+    }
+    
+    if (selectedComparisonUsers.length >= 10) {
+        alert('Maximum 10 users can be compared at once.');
+        return;
+    }
+    
+    selectedComparisonUsers.push(userId);
+    updateSelectedUsersDisplay();
+    updateComparisonChart();
+    populateUserCompareSelect();
+    
+    // Scroll to comparison chart
+    document.getElementById('userComparisonChart').scrollIntoView({ behavior: 'smooth' });
+}
+
+function removeUserFromComparison(userId) {
+    selectedComparisonUsers = selectedComparisonUsers.filter(id => id !== userId);
+    updateSelectedUsersDisplay();
+    updateComparisonChart();
+    populateUserCompareSelect();
+}
+
+function clearComparisonUsers() {
+    selectedComparisonUsers = [];
+    updateSelectedUsersDisplay();
+    updateComparisonChart();
+    populateUserCompareSelect();
+}
+
+function updateSelectedUsersDisplay() {
+    const container = document.getElementById('selectedUsersDisplay');
+    
+    if (selectedComparisonUsers.length === 0) {
+        container.innerHTML = '<p style="color: #888; font-style: italic;">No users selected yet. Add users to compare their earnings.</p>';
+        return;
+    }
+    
+    container.innerHTML = '';
+    
+    selectedComparisonUsers.forEach((userId, index) => {
+        const color = userColors[index % userColors.length];
+        
+        const chip = document.createElement('div');
+        chip.className = 'user-chip';
+        chip.innerHTML = `
+            <span class="color-indicator" style="background-color: ${color};"></span>
+            <span>${userId}</span>
+            <span class="remove-btn" onclick="removeUserFromComparison('${userId}')">
+                <span class="material-icons">close</span>
+            </span>
+        `;
+        
+        container.appendChild(chip);
+    });
+}
+
+function setComparisonChartType(type) {
+    comparisonChartType = type;
+    
+    // Update button states
+    document.getElementById('btnCumulative').className = type === 'cumulative' ? 'btn btn-info' : 'btn btn-secondary';
+    document.getElementById('btnIndividual').className = type === 'individual' ? 'btn btn-info' : 'btn btn-secondary';
+    
+    updateComparisonChart();
+}
+
+function updateComparisonChart() {
+    if (selectedComparisonUsers.length === 0) {
+        // Show empty state
+        if (userComparisonChart) {
+            userComparisonChart.destroy();
+            userComparisonChart = null;
+        }
+        return;
+    }
+    
+    // Get all unique dates from all selected users
+    const allDates = new Set();
+    selectedComparisonUsers.forEach(userId => {
+        referralData
+            .filter(r => r.userId === userId)
+            .forEach(r => allDates.add(r.date));
+    });
+    
+    const sortedDates = Array.from(allDates).sort();
+    
+    // Prepare datasets for each user
+    const datasets = [];
+    
+    selectedComparisonUsers.forEach((userId, index) => {
+        const color = userColors[index % userColors.length];
+        const userRecords = referralData
+            .filter(r => r.userId === userId)
+            .sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time));
+        
+        if (comparisonChartType === 'cumulative') {
+            // Cumulative earnings over time
+            let cumulative = 0;
+            const dataByDate = {};
+            
+            userRecords.forEach(record => {
+                cumulative += record.rewardGMT;
+                dataByDate[record.date] = cumulative;
+            });
+            
+            // Map to sorted dates
+            const data = sortedDates.map(date => dataByDate[date] || null);
+            
+            // Fill nulls with previous value (carry forward)
+            let lastValue = 0;
+            const filledData = data.map(val => {
+                if (val !== null) {
+                    lastValue = val;
+                    return val;
+                }
+                return lastValue;
+            });
+            
+            datasets.push({
+                label: userId,
+                data: filledData,
+                borderColor: color,
+                backgroundColor: color + '20',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.3,
+                spanGaps: true
+            });
+        } else {
+            // Individual rewards
+            const dataByDate = {};
+            
+            userRecords.forEach(record => {
+                if (!dataByDate[record.date]) {
+                    dataByDate[record.date] = 0;
+                }
+                dataByDate[record.date] += record.rewardGMT;
+            });
+            
+            const data = sortedDates.map(date => dataByDate[date] || 0);
+            
+            datasets.push({
+                label: userId,
+                data: data,
+                borderColor: color,
+                backgroundColor: color + '80',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.1
+            });
+        }
+    });
+    
+    // Destroy existing chart
+    if (userComparisonChart) {
+        userComparisonChart.destroy();
+    }
+    
+    // Create chart
+    const ctx = document.getElementById('userComparisonChart').getContext('2d');
+    userComparisonChart = new Chart(ctx, {
+        type: 'line',
+        data: { 
+            labels: sortedDates,
+            datasets: datasets 
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                x: {
+                    ticks: { 
+                        color: '#aaa',
+                        maxRotation: 45,
+                        minRotation: 45
+                    },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: comparisonChartType === 'cumulative' ? 'Cumulative Earnings (GMT)' : 'Daily Reward Amount (GMT)',
+                        color: '#aaa'
+                    },
+                    ticks: { color: '#aaa' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: { 
+                        color: '#fff',
+                        font: { size: 12 }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' GMT';
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
 
 function showAutoSaveIndicator() {

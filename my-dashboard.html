@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My GoMining Dashboard</title>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(103, 61, 236, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #673dec 0%, #00ff7f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #aaa;
+            font-size: 1.1em;
+        }
+
+        /* Import Section */
+        .import-section {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+        }
+
+        .import-section h2 {
+            color: #a78bfa;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .import-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .import-card {
+            background: rgba(103, 61, 236, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px dashed rgba(103, 61, 236, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .import-card:hover {
+            border-color: #673dec;
+            background: rgba(103, 61, 236, 0.2);
+        }
+
+        .import-card h3 {
+            color: #00ff7f;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            background: rgba(10, 10, 20, 0.8);
+            border: 2px solid #673dec;
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            resize: vertical;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #673dec 0%, #5a32c4 100%);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(103, 61, 236, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(103, 61, 236, 0.6);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00ff7f 0%, #00cc66 100%);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(0, 255, 127, 0.4);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 127, 0.6);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4d4d 0%, #cc0000 100%);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Display Section */
+        .display-section {
+            display: none;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(30, 30, 46, 0.9);
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(103, 61, 236, 0.4);
+        }
+
+        .stat-card .icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .label {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .stat-card .value {
+            color: #00ff7f;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .sub-value {
+            color: #888;
+            font-size: 0.85em;
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: rgba(30, 30, 46, 0.9);
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+        }
+
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-card h3 {
+            color: #a78bfa;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(103, 61, 236, 0.1);
+            border-radius: 8px;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            padding: 10px 15px;
+            background: rgba(10, 10, 20, 0.8);
+            border: 2px solid #673dec;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95em;
+        }
+
+        .filter-bar input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+        }
+
+        .data-table thead {
+            background: rgba(103, 61, 236, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(103, 61, 236, 0.2);
+        }
+
+        .data-table th {
+            color: #a78bfa;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .data-table th:hover {
+            background: rgba(103, 61, 236, 0.4);
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(103, 61, 236, 0.1);
+        }
+
+        .table-scroll {
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid rgba(103, 61, 236, 0.3);
+            border-radius: 8px;
+        }
+
+        /* Transaction Type Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-mining {
+            background: rgba(0, 255, 127, 0.2);
+            color: #00ff7f;
+            border: 1px solid #00ff7f;
+        }
+
+        .badge-deposit {
+            background: rgba(0, 123, 255, 0.2);
+            color: #007bff;
+            border: 1px solid #007bff;
+        }
+
+        .badge-withdrawal {
+            background: rgba(255, 77, 77, 0.2);
+            color: #ff4d4d;
+            border: 1px solid #ff4d4d;
+        }
+
+        .badge-upgrade {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid #ffc107;
+        }
+
+        .badge-referral {
+            background: rgba(103, 61, 236, 0.2);
+            color: #a78bfa;
+            border: 1px solid #a78bfa;
+        }
+
+        .badge-bounty {
+            background: rgba(255, 217, 61, 0.2);
+            color: #ffd93d;
+            border: 1px solid #ffd93d;
+        }
+
+        .badge-maintenance {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+        }
+
+        .badge-purchase {
+            background: rgba(78, 205, 196, 0.2);
+            color: #4ecdc4;
+            border: 1px solid #4ecdc4;
+        }
+
+        .badge-other {
+            background: rgba(136, 136, 136, 0.2);
+            color: #888;
+            border: 1px solid #888;
+        }
+
+        /* Positive/Negative Amounts */
+        .amount-positive {
+            color: #00ff7f;
+            font-weight: 600;
+        }
+
+        .amount-negative {
+            color: #ff4d4d;
+            font-weight: 600;
+        }
+
+        /* Result Messages */
+        .result-message {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 600;
+        }
+
+        .result-message.success {
+            background: rgba(0, 255, 127, 0.2);
+            border: 2px solid #00ff7f;
+            color: #00ff7f;
+        }
+
+        .result-message.error {
+            background: rgba(255, 77, 77, 0.2);
+            border: 2px solid #ff4d4d;
+            color: #ff4d4d;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>💎 My GoMining Dashboard</h1>
+            <p>Track your mining performance, transactions, and portfolio</p>
+        </header>
+
+        <!-- Import Section -->
+        <div class="import-section">
+            <h2>
+                <span class="material-icons">upload_file</span>
+                Import Your Transaction Data
+            </h2>
+            
+            <div class="import-options">
+                <!-- CSV Upload -->
+                <div class="import-card">
+                    <h3>
+                        <span class="material-icons">description</span>
+                        Upload CSV File
+                    </h3>
+                    <p style="color: #888; margin-bottom: 15px; font-size: 0.9em;">
+                        Upload your gomining_transactions.csv file exported from GoMining
+                    </p>
+                    <input type="file" id="csvFileInput" accept=".csv" style="display: none;" onchange="handleFileUpload(event)">
+                    <button class="btn btn-primary" onclick="document.getElementById('csvFileInput').click()">
+                        <span class="material-icons">upload</span>
+                        Choose CSV File
+                    </button>
+                    <div id="csvMessage" class="result-message"></div>
+                </div>
+
+                <!-- Paste Data -->
+                <div class="import-card">
+                    <h3>
+                        <span class="material-icons">content_paste</span>
+                        Paste CSV Data
+                    </h3>
+                    <p style="color: #888; margin-bottom: 15px; font-size: 0.9em;">
+                        Copy data from your CSV file and paste it here
+                    </p>
+                    <textarea id="pasteInput" placeholder="Paste CSV data here..."></textarea>
+                    <button class="btn btn-success" onclick="parseCSVPaste()">
+                        <span class="material-icons">check_circle</span>
+                        Import Data
+                    </button>
+                    <div id="pasteMessage" class="result-message"></div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn btn-danger" onclick="clearAllData()">
+                    <span class="material-icons">delete_forever</span>
+                    Clear All Data
+                </button>
+            </div>
+        </div>
+
+        <!-- Display Section -->
+        <div id="displaySection" class="display-section">
+            
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="icon">💰</div>
+                    <div class="label">Current Balance</div>
+                    <div class="value" id="statBalance">0 GMT</div>
+                    <div class="sub-value" id="statBalanceUSD">$0.00</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="icon">⛏️</div>
+                    <div class="label">Total Mining Revenue</div>
+                    <div class="value" id="statMining">0 GMT</div>
+                    <div class="sub-value" id="statMiningDays">0 days</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="icon">📥</div>
+                    <div class="label">Total Deposits</div>
+                    <div class="value" id="statDeposits">0 GMT</div>
+                    <div class="sub-value" id="statDepositCount">0 transactions</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="icon">📤</div>
+                    <div class="label">Total Withdrawals</div>
+                    <div class="value" id="statWithdrawals">0 GMT</div>
+                    <div class="sub-value" id="statWithdrawalCount">0 transactions</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="icon">📈</div>
+                    <div class="label">ROI</div>
+                    <div class="value" id="statROI">0%</div>
+                    <div class="sub-value" id="statROIDetails">Break-even: TBD</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="icon">📊</div>
+                    <div class="label">Average Daily Mining</div>
+                    <div class="value" id="statAvgDaily">0 GMT</div>
+                    <div class="sub-value" id="statBestDay">Best: 0 GMT</div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <!-- Balance Timeline -->
+                <div class="chart-card full-width">
+                    <h3>
+                        <span class="material-icons">timeline</span>
+                        Balance Over Time
+                    </h3>
+                    <canvas id="balanceChart"></canvas>
+                </div>
+
+                <!-- Transaction Types -->
+                <div class="chart-card">
+                    <h3>
+                        <span class="material-icons">pie_chart</span>
+                        Transaction Types
+                    </h3>
+                    <canvas id="typeChart"></canvas>
+                </div>
+
+                <!-- Monthly Income/Expenses -->
+                <div class="chart-card">
+                    <h3>
+                        <span class="material-icons">bar_chart</span>
+                        Monthly Income vs Expenses
+                    </h3>
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+
+                <!-- Mining Performance -->
+                <div class="chart-card full-width">
+                    <h3>
+                        <span class="material-icons">show_chart</span>
+                        Daily Mining Revenue
+                    </h3>
+                    <canvas id="miningChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Transaction History Table -->
+            <div class="table-container">
+                <h2 style="color: #a78bfa; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <span class="material-icons">list</span>
+                    Transaction History
+                </h2>
+
+                <!-- Filters -->
+                <div class="filter-bar">
+                    <input type="text" id="searchInput" placeholder="🔍 Search transactions..." onkeyup="filterTransactions()">
+                    
+                    <select id="typeFilter" onchange="filterTransactions()">
+                        <option value="all">All Types</option>
+                        <option value="mining">Mining</option>
+                        <option value="referral">Referral</option>
+                        <option value="bounty">Bounty</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="deposit">Deposit</option>
+                        <option value="withdrawal">Withdrawal</option>
+                        <option value="upgrade">Upgrade</option>
+                        <option value="purchase">Purchase</option>
+                    </select>
+
+                    <select id="sortBy" onchange="sortTransactions()">
+                        <option value="date-desc">Date (Newest)</option>
+                        <option value="date-asc">Date (Oldest)</option>
+                        <option value="amount-desc">Amount (High to Low)</option>
+                        <option value="amount-asc">Amount (Low to High)</option>
+                    </select>
+
+                    <button class="btn btn-primary" onclick="exportToCSV()">
+                        <span class="material-icons">download</span>
+                        Export CSV
+                    </button>
+                </div>
+
+                <!-- Table -->
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Amount (GMT)</th>
+                                <th>Balance</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionTableBody">
+                            <!-- Filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="src/scripts/my-dashboard.js"></script>
+</body>
+</html>
