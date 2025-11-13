@@ -502,23 +502,23 @@
 
                 <div class="stat-card">
                     <div class="icon">📥</div>
-                    <div class="label">Total Deposits</div>
-                    <div class="value" id="statDeposits">0 GMT</div>
-                    <div class="sub-value" id="statDepositCount">0 transactions</div>
+                    <div class="label">Total Income</div>
+                    <div class="value" id="statIncome">0 GMT</div>
+                    <div class="sub-value" id="statIncomeCount">0 transactions</div>
                 </div>
 
                 <div class="stat-card">
                     <div class="icon">📤</div>
-                    <div class="label">Total Withdrawals</div>
-                    <div class="value" id="statWithdrawals">0 GMT</div>
-                    <div class="sub-value" id="statWithdrawalCount">0 transactions</div>
+                    <div class="label">Total Expenses</div>
+                    <div class="value" id="statExpenses">0 GMT</div>
+                    <div class="sub-value" id="statExpenseCount">0 transactions</div>
                 </div>
 
                 <div class="stat-card">
-                    <div class="icon">📈</div>
-                    <div class="label">ROI</div>
-                    <div class="value" id="statROI">0%</div>
-                    <div class="sub-value" id="statROIDetails">Break-even: TBD</div>
+                    <div class="icon">�</div>
+                    <div class="label">Net Profit</div>
+                    <div class="value" id="statProfit">0 GMT</div>
+                    <div class="sub-value" id="statProfitPercent">+0%</div>
                 </div>
 
                 <div class="stat-card">
@@ -527,6 +527,17 @@
                     <div class="value" id="statAvgDaily">0 GMT</div>
                     <div class="sub-value" id="statBestDay">Best: 0 GMT</div>
                 </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="text-align: center; margin-bottom: 30px;">
+                <button class="btn btn-danger" onclick="clearAllData()" style="font-size: 1.1em; padding: 15px 30px;">
+                    <span class="material-icons">delete_forever</span>
+                    Clear All Data & Start Fresh
+                </button>
+                <p style="color: #888; margin-top: 10px; font-size: 0.9em;">
+                    This will remove all imported transactions from memory
+                </p>
             </div>
 
             <!-- Charts Section -->

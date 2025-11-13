@@ -202,12 +202,46 @@ function loadFromLocalStorage() {
 }
 
 function clearAllData() {
-    if (confirm('Are you sure you want to delete all transaction data? This cannot be undone!')) {
+    if (confirm('⚠️ Are you sure you want to delete ALL transaction data?\n\nThis will:\n- Clear all imported transactions\n- Reset all statistics\n- Clear all charts\n- Remove data from browser storage\n\nThis action CANNOT be undone!')) {
+        // Clear data
         transactions = [];
         filteredTransactions = [];
+        
+        // Destroy all charts
+        if (balanceChart) {
+            balanceChart.destroy();
+            balanceChart = null;
+        }
+        if (typeChart) {
+            typeChart.destroy();
+            typeChart = null;
+        }
+        if (monthlyChart) {
+            monthlyChart.destroy();
+            monthlyChart = null;
+        }
+        if (miningChart) {
+            miningChart.destroy();
+            miningChart = null;
+        }
+        
+        // Clear localStorage
         localStorage.removeItem('myTransactions');
+        
+        // Hide display section
         document.getElementById('displaySection').style.display = 'none';
-        alert('✅ All data cleared.');
+        
+        // Clear any input fields
+        document.getElementById('pasteInput').value = '';
+        
+        // Reset file input
+        const fileInput = document.getElementById('csvFileInput');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+        
+        // Show success message
+        alert('✅ All data has been cleared successfully!\n\nYou can now import a new CSV file.');
     }
 }
 
@@ -249,37 +283,35 @@ function updateStatistics() {
     document.getElementById('statMining').textContent = totalMining.toFixed(2) + ' GMT';
     document.getElementById('statMiningDays').textContent = miningDays + ' days';
     
-    // Deposits
-    const deposits = transactions.filter(t => 
-        t.type.toLowerCase().includes('deposit') || 
-        t.amount > 0 && !t.type.toLowerCase().includes('mining')
-    );
-    const totalDeposits = deposits.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    // Total Income (all positive amounts)
+    const incomeTransactions = transactions.filter(t => t.amount > 0);
+    const totalIncome = incomeTransactions.reduce((sum, t) => sum + t.amount, 0);
     
-    document.getElementById('statDeposits').textContent = totalDeposits.toFixed(2) + ' GMT';
-    document.getElementById('statDepositCount').textContent = deposits.length + ' transactions';
+    document.getElementById('statIncome').textContent = totalIncome.toFixed(2) + ' GMT';
+    document.getElementById('statIncomeCount').textContent = incomeTransactions.length + ' transactions';
     
-    // Withdrawals
-    const withdrawals = transactions.filter(t => 
-        t.type.toLowerCase().includes('withdrawal') || 
-        t.type.toLowerCase().includes('withdraw')
-    );
-    const totalWithdrawals = withdrawals.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    // Total Expenses (all negative amounts - maintenance, fees, etc.)
+    const expenseTransactions = transactions.filter(t => t.amount < 0);
+    const totalExpenses = Math.abs(expenseTransactions.reduce((sum, t) => sum + t.amount, 0));
     
-    document.getElementById('statWithdrawals').textContent = totalWithdrawals.toFixed(2) + ' GMT';
-    document.getElementById('statWithdrawalCount').textContent = withdrawals.length + ' transactions';
+    document.getElementById('statExpenses').textContent = totalExpenses.toFixed(2) + ' GMT';
+    document.getElementById('statExpenseCount').textContent = expenseTransactions.length + ' transactions';
     
-    // ROI calculation
-    const invested = totalDeposits;
-    const earned = totalMining;
-    const roi = invested > 0 ? ((earned / invested) * 100) : 0;
-    const daysToBreakEven = invested > 0 && totalMining > 0 && miningDays > 0 
-        ? Math.ceil((invested - earned) / (totalMining / miningDays))
-        : 0;
+    // Net Profit (Income - Expenses)
+    const netProfit = totalIncome - totalExpenses;
+    const profitPercent = totalIncome > 0 ? ((netProfit / totalIncome) * 100) : 0;
     
-    document.getElementById('statROI').textContent = roi.toFixed(1) + '%';
-    document.getElementById('statROIDetails').textContent = 
-        daysToBreakEven > 0 ? `Break-even: ${daysToBreakEven} days` : 'Break-even reached! 🎉';
+    document.getElementById('statProfit').textContent = netProfit.toFixed(2) + ' GMT';
+    document.getElementById('statProfitPercent').textContent = 
+        (netProfit >= 0 ? '+' : '') + profitPercent.toFixed(1) + '%';
+    
+    // Update stat card color based on profit
+    const profitCard = document.getElementById('statProfit');
+    if (netProfit >= 0) {
+        profitCard.style.color = '#00ff7f';
+    } else {
+        profitCard.style.color = '#ff4d4d';
+    }
     
     // Average daily mining
     const avgDaily = miningDays > 0 ? totalMining / miningDays : 0;
