@@ -1127,9 +1127,217 @@
             const converted = (gmtAmount * rate).toFixed(2);
             return `${gmtAmount.toFixed(2)} GMT (${currency}${converted})`;
         }
+// Export to CSV
+function exportToCSV() {
+    const miners = Object.values(minerData);
+    
+    if (miners.length === 0) {
+        alert('❌ No data to export! Please import some miners first.');
+        return;
+    }
 
+    const currency = settings.currency === 'USD' ? 'USD' : 'EUR';
+    const currencySymbol = settings.currency === 'USD' ? '$' : '€';
+    const fiat = settings.currency;
+
+    // CSV Header
+    let csv = 'Miner_ID;Miner_Name;Purchase_Date;Purchase_Time;Purchase_Price_GMT;Purchase_Price_' + currencySymbol + ';Purchase_TH;Purchase_WTH;';
+    csv += 'Current_TH;Current_WTH;Total_TH_Upgrades;Total_Efficiency_Upgrades;';
+    csv += 'Total_Upgrade_Cost_GMT;Total_Upgrade_Cost_' + currencySymbol + ';Total_Investment_GMT;Total_Investment_' + currencySymbol + ';';
+    csv += 'Sale_Date;Sale_Buyer_Price_GMT;Sale_Buyer_Price_' + currencySymbol + ';Sale_Your_Price_GMT;Sale_Your_Price_' + currencySymbol + ';Profit_Loss_' + currencySymbol + ';Status\n';
+
+    miners.forEach(miner => {
+        // Get date-specific prices
+        const purchaseRate = getPriceForDate(miner.purchase.date, 'GMT', fiat) || settings.exchangeRates[settings.currency];
+        
+        // Calculate upgrade costs with date-specific prices
+        let totalUpgradeCostGMT = 0;
+        let totalUpgradeCostFiat = 0;
+        
+        miner.upgrades.th.forEach(u => {
+            const upgradeRate = getPriceForDate(u.date, 'GMT', fiat) || settings.exchangeRates[settings.currency];
+            totalUpgradeCostGMT += u.price || 0;
+            totalUpgradeCostFiat += (u.price || 0) * upgradeRate;
+        });
+        
+        miner.upgrades.efficiency.forEach(u => {
+            const upgradeRate = getPriceForDate(u.date, 'GMT', fiat) || settings.exchangeRates[settings.currency];
+            totalUpgradeCostGMT += u.price || 0;
+            totalUpgradeCostFiat += (u.price || 0) * upgradeRate;
+        });
+        
+        const totalInvestmentGMT = (miner.purchase.price || 0) + totalUpgradeCostGMT;
+        const totalInvestmentFiat = (miner.purchase.price || 0) * purchaseRate + totalUpgradeCostFiat;
+
+        // Format values for CSV (replace . with , for decimal)
+        const formatNumber = (num) => {
+            if (!num && num !== 0) return '0';
+            return num.toFixed(2).replace('.', ',');
+        };
+
+        const formatDateForCSV = (dateStr) => {
+            if (!dateStr || dateStr === 'Unknown') return dateStr;
+            
+            let parts;
+            if (dateStr.includes('/')) {
+                parts = dateStr.split('/');
+            } else if (dateStr.includes('.')) {
+                parts = dateStr.split('.');
+            } else {
+                return dateStr;
+            }
+
+            if (settings.dateFormat === 'US') {
+                return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
+            } else {
+                if (dateStr.includes('/')) {
+                    return `${parts[1].padStart(2, '0')}.${parts[0].padStart(2, '0')}.${parts[2]}`;
+                } else {
+                    return `${parts[0].padStart(2, '0')}.${parts[1].padStart(2, '0')}.${parts[2]}`;
+                }
+            }
+        };
+
+        // Build row
+        let row = `"${miner.id}";`;
+        row += `"${miner.name}";`;
+        row += `"${formatDateForCSV(miner.purchase.date)}";`;
+        row += `"${miner.purchase.time}";`;
+        row += `"${formatNumber(miner.purchase.price)}";`;
+        row += `"${formatNumber(miner.purchase.price * purchaseRate)}${currencySymbol}";`;
+        row += `"${formatNumber(miner.purchase.th)}";`;
+        row += `"${formatNumber(miner.purchase.wth)}";`;
+        row += `"${formatNumber(miner.currentTH)}";`;
+        row += `"${formatNumber(miner.currentWTH)}";`;
+        row += `"${miner.upgrades.th.length}";`;
+        row += `"${miner.upgrades.efficiency.length}";`;
+        row += `"${formatNumber(totalUpgradeCostGMT)}";`;
+        row += `"${formatNumber(totalUpgradeCostFiat)}${currencySymbol}";`;
+        row += `"${formatNumber(totalInvestmentGMT)}";`;
+        row += `"${formatNumber(totalInvestmentFiat)}${currencySymbol}";`;
+        
+        if (miner.sale) {
+            const saleRate = getPriceForDate(miner.sale.date, 'GMT', fiat) || settings.exchangeRates[settings.currency];
+            const saleRevenueFiat = (miner.sale.yourPrice || 0) * saleRate;
+            const profitLossFiat = saleRevenueFiat - totalInvestmentFiat;
+            
+            row += `"${formatDateForCSV(miner.sale.date)}";`;
+            row += `"${formatNumber(miner.sale.buyerPrice)}";`;
+            row += `"${formatNumber(miner.sale.buyerPrice * saleRate)}${currencySymbol}";`;
+            row += `"${formatNumber(miner.sale.yourPrice)}";`;
+            row += `"${formatNumber(saleRevenueFiat)}${currencySymbol}";`;
+            row += `"${formatNumber(profitLossFiat)}${currencySymbol}";`;
+            row += `"SOLD"`;
+        } else {
+            row += `"";"";"";"";"";"";"ACTIVE"`;
+        }
+        
+        csv += row + '\n';
+    });
+
+    // Add upgrades detail section
+    csv += '\n\n';
+    csv += 'DETAILED_UPGRADE_HISTORY\n';
+    csv += 'Miner_ID;Miner_Name;Upgrade_Type;Date;From_Value;To_Value;Price_GMT;Price_' + currencySymbol + '\n';
+
+    miners.forEach(miner => {
+        // TH Upgrades
+        miner.upgrades.th.forEach(upgrade => {
+            const upgradeRate = getPriceForDate(upgrade.date, 'GMT', fiat) || settings.exchangeRates[settings.currency];
+            
+            const formatNumber = (num) => {
+                if (!num && num !== 0) return '0';
+                return num.toFixed(2).replace('.', ',');
+            };
+
+            const formatDateForCSV = (dateStr) => {
+                if (!dateStr || dateStr === 'Unknown') return dateStr;
+                
+                let parts;
+                if (dateStr.includes('/')) {
+                    parts = dateStr.split('/');
+                } else if (dateStr.includes('.')) {
+                    parts = dateStr.split('.');
+                } else {
+                    return dateStr;
+                }
+
+                if (settings.dateFormat === 'US') {
+                    return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
+                } else {
+                    if (dateStr.includes('/')) {
+                        return `${parts[1].padStart(2, '0')}.${parts[0].padStart(2, '0')}.${parts[2]}`;
+                    } else {
+                        return `${parts[0].padStart(2, '0')}.${parts[1].padStart(2, '0')}.${parts[2]}`;
+                    }
+                }
+            };
+
+            csv += `"${miner.id}";"${miner.name}";"TH_Upgrade";"${formatDateForCSV(upgrade.date)}";`;
+            csv += `"${formatNumber(upgrade.from)}";"${formatNumber(upgrade.to)}";`;
+            csv += `"${formatNumber(upgrade.price)}";"${formatNumber(upgrade.price * upgradeRate)}${currencySymbol}"\n`;
+        });
+
+        // Efficiency Upgrades
+        miner.upgrades.efficiency.forEach(upgrade => {
+            const upgradeRate = getPriceForDate(upgrade.date, 'GMT', fiat) || settings.exchangeRates[settings.currency];
+            
+            const formatNumber = (num) => {
+                if (!num && num !== 0) return '0';
+                return num.toFixed(2).replace('.', ',');
+            };
+
+            const formatDateForCSV = (dateStr) => {
+                if (!dateStr || dateStr === 'Unknown') return dateStr;
+                
+                let parts;
+                if (dateStr.includes('/')) {
+                    parts = dateStr.split('/');
+                } else if (dateStr.includes('.')) {
+                    parts = dateStr.split('.');
+                } else {
+                    return dateStr;
+                }
+
+                if (settings.dateFormat === 'US') {
+                    return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
+                } else {
+                    if (dateStr.includes('/')) {
+                        return `${parts[1].padStart(2, '0')}.${parts[0].padStart(2, '0')}.${parts[2]}`;
+                    } else {
+                        return `${parts[0].padStart(2, '0')}.${parts[1].padStart(2, '0')}.${parts[2]}`;
+                    }
+                }
+            };
+
+            csv += `"${miner.id}";"${miner.name}";"Efficiency_Upgrade";"${formatDateForCSV(upgrade.date)}";`;
+            csv += `"${formatNumber(upgrade.from)}";"${formatNumber(upgrade.to)}";`;
+            csv += `"${formatNumber(upgrade.price)}";"${formatNumber(upgrade.price * upgradeRate)}${currencySymbol}"\n`;
+        });
+    });
+
+    // Generate filename with date
+    const now = new Date();
+    const dateStr = settings.dateFormat === 'US' 
+        ? `${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}-${now.getFullYear()}`
+        : `${now.getDate().toString().padStart(2, '0')}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getFullYear()}`;
+    
+    const filename = `GoMining_Miner_History_${dateStr}_${currency}.csv`;
+
+    // Download CSV
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showResult('purchaseResult', 'success', `✅ CSV exported successfully as ${filename}`);
+}
         // Export to CSV
-        function exportToCSV() {
+        function exportToCSValt() {
             const miners = Object.values(minerData);
             
             if (miners.length === 0) {
@@ -1137,15 +1345,17 @@
                 return;
             }
 
-            // CSV Header
-            let csv = 'Miner_ID;Miner_Name;Purchase_Date;Purchase_Time;Purchase_Price_GMT;Purchase_Price_Fiat;Purchase_TH;Purchase_WTH;';
-            csv += 'Current_TH;Current_WTH;Total_TH_Upgrades;Total_Efficiency_Upgrades;';
-            csv += 'Total_Upgrade_Cost_GMT;Total_Upgrade_Cost_Fiat;Total_Investment_GMT;Total_Investment_Fiat;';
-            csv += 'Sale_Date;Sale_Buyer_Price_GMT;Sale_Buyer_Price_Fiat;Sale_Your_Price_GMT;Sale_Your_Price_Fiat;Status\n';
-
             const currency = settings.currency === 'USD' ? 'USD' : 'EUR';
             const currencySymbol = settings.currency === 'USD' ? '$' : '€';
             const rate = settings.exchangeRates[settings.currency];
+
+            // CSV Header
+            let csv = 'Miner_ID;Miner_Name;Purchase_Date;Purchase_Time;Purchase_Price_GMT;Purchase_Price ' + currencySymbol + ';Purchase_TH;Purchase_WTH;';
+            csv += 'Current_TH;Current_WTH;Total_TH_Upgrades;Total_Efficiency_Upgrades;';
+            csv += 'Total_Upgrade_Cost_GMT;Total_Upgrade_Cost_' + currencySymbol + ';Total_Investment_GMT;Total_Investment_' + currencySymbol + ';';
+            csv += 'Sale_Date;Sale_Buyer_Price_GMT;Sale_Buyer_Price_' + currencySymbol + ';Sale_Your_Price_GMT;Sale_Your_Price_' + currencySymbol + ';Status\n';
+
+
 
             miners.forEach(miner => {
                 // Calculate totals
@@ -1192,7 +1402,7 @@
                 row += `"${formatDateForCSV(miner.purchase.date)}";`;
                 row += `"${miner.purchase.time}";`;
                 row += `"${formatNumber(miner.purchase.price)}";`;
-                row += `"${formatNumber(miner.purchase.price * rate)}";`;
+                row += `"${formatNumber(miner.purchase.price * rate)}${currencySymbol}";`;
                 row += `"${formatNumber(miner.purchase.th)}";`;
                 row += `"${formatNumber(miner.purchase.wth)}";`;
                 row += `"${formatNumber(miner.currentTH)}";`;
@@ -1200,16 +1410,17 @@
                 row += `"${miner.upgrades.th.length}";`;
                 row += `"${miner.upgrades.efficiency.length}";`;
                 row += `"${formatNumber(totalUpgradeCost)}";`;
-                row += `"${formatNumber(totalUpgradeCost * rate)}";`;
+                row += `"${formatNumber(totalUpgradeCost * rate)}${currencySymbol}";`;
                 row += `"${formatNumber(totalInvestment)}";`;
-                row += `"${formatNumber(totalInvestment * rate)}";`;
+                row += `"${formatNumber(totalInvestment * rate)}${currencySymbol}";`;
                 
                 if (miner.sale) {
                     row += `"${formatDateForCSV(miner.sale.date)}";`;
                     row += `"${formatNumber(miner.sale.buyerPrice)}";`;
-                    row += `"${formatNumber(miner.sale.buyerPrice * rate)}";`;
+                    row += `"${formatNumber(miner.sale.buyerPrice * rate)}${currencySymbol}";`;
                     row += `"${formatNumber(miner.sale.yourPrice)}";`;
-                    row += `"${formatNumber(miner.sale.yourPrice * rate)}";`;
+                    row += `"${formatNumber(miner.sale.yourPrice * rate)}${currencySymbol}";`;
+                    row += `"${formatNumber((miner.sale.yourPrice - totalInvestment) * rate)}${currencySymbol}";`;
                     row += `"SOLD"`;
                 } else {
                     row += `"";"";"";"";"";"ACTIVE"`;
@@ -1221,7 +1432,7 @@
             // Add upgrades detail section
             csv += '\n\n';
             csv += 'DETAILED_UPGRADE_HISTORY\n';
-            csv += 'Miner_ID;Miner_Name;Upgrade_Type;Date;From_Value;To_Value;Price_GMT;Price_Fiat\n';
+            csv += 'Miner_ID;Miner_Name;Upgrade_Type;Date;From_Value;To_Value;Price_GMT;Price_Fiat' + currencySymbol + '\n';
 
             miners.forEach(miner => {
                 // TH Upgrades
@@ -1256,7 +1467,7 @@
 
                     csv += `"${miner.id}";"${miner.name}";"TH_Upgrade";"${formatDateForCSV(upgrade.date)}";`;
                     csv += `"${formatNumber(upgrade.from)}";"${formatNumber(upgrade.to)}";`;
-                    csv += `"${formatNumber(upgrade.price)}";"${formatNumber(upgrade.price * rate)}"\n`;
+                    csv += `"${formatNumber(upgrade.price)}";"${formatNumber(upgrade.price * rate)}${currencySymbol}"\n`;
                 });
 
                 // Efficiency Upgrades
@@ -1291,7 +1502,7 @@
 
                     csv += `"${miner.id}";"${miner.name}";"Efficiency_Upgrade";"${formatDateForCSV(upgrade.date)}";`;
                     csv += `"${formatNumber(upgrade.from)}";"${formatNumber(upgrade.to)}";`;
-                    csv += `"${formatNumber(upgrade.price)}";"${formatNumber(upgrade.price * rate)}"\n`;
+                    csv += `"${formatNumber(upgrade.price)}";"${formatNumber(upgrade.price * rate)}${currencySymbol}"\n`;
                 });
             });
 
@@ -1304,7 +1515,7 @@
             const filename = `GoMining_Miner_History_${dateStr}_${currency}.csv`;
 
             // Download CSV
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }); // ← HIER '\uFEFF' hinzufügen
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.setAttribute('href', url);
