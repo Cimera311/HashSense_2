@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GoMining Miner History Import - Tax Export Helper</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: rgba(103, 61, 236, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+        }
+
+        h1 {
+            color: #00ff7f;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0, 255, 127, 0.5);
+        }
+
+        .subtitle {
+            color: #aaa;
+            font-size: 1.1em;
+        }
+
+        /* Global Settings Bar */
+        .settings-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(103, 61, 236, 0.3);
+        }
+
+        .setting-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .setting-group label {
+            color: #aaa;
+            font-weight: 600;
+        }
+
+        .toggle-btn {
+            padding: 8px 16px;
+            background: rgba(103, 61, 236, 0.3);
+            border: 2px solid #673dec;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(103, 61, 236, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .toggle-btn.active {
+            background: #673dec;
+            box-shadow: 0 0 15px rgba(103, 61, 236, 0.6);
+        }
+
+        /* Import Section */
+        .import-section {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+        }
+
+        .import-section h2 {
+            color: #673dec;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .import-section h2 .material-icons {
+            font-size: 28px;
+        }
+
+        .import-help {
+            background: rgba(0, 255, 127, 0.1);
+            border-left: 4px solid #00ff7f;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            color: #ccc;
+            font-size: 0.95em;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            background: #1a1a2e;
+            border: 2px solid #444;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #673dec;
+            box-shadow: 0 0 10px rgba(103, 61, 236, 0.3);
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #673dec 0%, #5a32c4 100%);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(103, 61, 236, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(103, 61, 236, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-info {
+            background: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+            border: 2px solid rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-info:hover {
+            background: rgba(0, 123, 255, 0.2);
+        }
+
+        /* Result Message */
+        .result-message {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 600;
+            animation: slideIn 0.3s ease;
+        }
+
+        .result-message.success {
+            background: rgba(0, 255, 127, 0.2);
+            border: 2px solid #00ff7f;
+            color: #00ff7f;
+        }
+
+        .result-message.error {
+            background: rgba(255, 77, 77, 0.2);
+            border: 2px solid #ff4d4d;
+            color: #ff4d4d;
+        }
+
+        .result-message.info {
+            background: rgba(103, 61, 236, 0.2);
+            border: 2px solid #673dec;
+            color: #a78bfa;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Display Section */
+        .display-section {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 40px;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+        }
+
+        .display-section h2 {
+            color: #00ff7f;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(103, 61, 236, 0.2);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 2px solid #673dec;
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .stat-card .label {
+            color: #aaa;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .value {
+            color: #00ff7f;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .material-icons {
+            vertical-align: middle;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .settings-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .button-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>⛏️ GoMining Miner History Import</h1>
+                    <p class="subtitle">Tax Export Helper - Import your complete mining history</p>
+                </div>
+                <button onclick="showKeyboardShortcuts()" style="background: rgba(103, 61, 236, 0.3); border: 2px solid #673dec; padding: 10px 15px; border-radius: 8px; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; transition: all 0.3s ease;">
+                    <span class="material-icons">help_outline</span>
+                    Shortcuts
+                </button>
+            </div>
+        </header>
+
+        <!-- Global Settings -->
+        <div class="settings-bar">
+            <div class="setting-group">
+                <label>💱 Currency:</label>
+                <button class="toggle-btn active" id="currencyUSD">USD ($)</button>
+                <button class="toggle-btn" id="currencyEUR">EUR (€)</button>
+            </div>
+
+            <div class="setting-group">
+                <label>📅 Date Format:</label>
+                <button class="toggle-btn active" id="dateUS">US (MM/DD/YYYY)</button>
+                <button class="toggle-btn" id="dateEU">EU (DD.MM.YYYY)</button>
+            </div>
+
+            <div class="setting-group">
+                <label>👁️ View Mode:</label>
+                <button class="toggle-btn active" id="viewTable">Table</button>
+                <button class="toggle-btn" id="viewAccordion">Accordion</button>
+                <button class="toggle-btn" id="viewCards">Cards</button>
+            </div>
+
+            <div class="setting-group">
+                <button class="toggle-btn" onclick="backupData()" title="Download backup JSON">
+                    <span class="material-icons" style="font-size: 18px;">backup</span>
+                    Backup
+                </button>
+                <button class="toggle-btn" onclick="document.getElementById('restoreFile').click()" title="Restore from backup">
+                    <span class="material-icons" style="font-size: 18px;">restore</span>
+                    Restore
+                </button>
+                <button class="toggle-btn" onclick="clearAllData()" title="Delete all data" style="background: rgba(255, 77, 77, 0.2); border-color: #ff4d4d;">
+                    <span class="material-icons" style="font-size: 18px;">delete_forever</span>
+                    Clear All Data
+                </button>
+                <input type="file" id="restoreFile" accept=".json" style="display: none;" onchange="restoreData(event)">
+            </div>
+
+            <div id="autoSaveIndicator" style="display: flex; align-items: center; gap: 8px; color: #00ff7f; font-size: 0.9em; opacity: 0; transition: opacity 0.3s;">
+                <span class="material-icons" style="font-size: 16px;">check_circle</span>
+                Auto-saved
+            </div>
+        </div>
+
+        <!-- Import Sections -->
+        
+        <!-- STEP 1: Transfer Import (Current Farm State) -->
+        <div class="import-section">
+            <h2>
+                <span class="material-icons">download</span>
+                STEP 1: Import Current Farm
+            </h2>
+            <div class="import-help">
+                📋 Go to GoMining → My Miners Dashboard, select all your miners and copy them. Paste here to capture your current farm state (TH, W/TH, IDs, Collections, Chain).
+            </div>
+            <textarea id="transferInput" placeholder="Paste your current miners from My Miners Dashboard here...&#10;&#10;miner&#10;130.61 TH&#10;15 W/TH&#10;#12345&#10;The GoMining Whales •&#10;BSC"></textarea>
+            <div class="button-container">
+                <button class="btn btn-primary" onclick="parseTransferImport()">
+                    <span class="material-icons">download</span>
+                    <span>Import Current Farm</span>
+                </button>
+                <button class="btn btn-secondary" onclick="clearField('transferInput')">
+                    <span class="material-icons">clear</span>
+                    Clear Field
+                </button>
+            </div>
+            <div class="result-message" id="transferResult"></div>
+        </div>
+
+        <!-- STEP 2: Purchase History -->
+        <div class="import-section">
+            <h2>
+                <span class="material-icons">shopping_cart</span>
+                STEP 2: Purchase History
+            </h2>
+            <div class="import-help">
+                📝 Go to GoMining → Transactions → Purchase History, copy all entries and paste them here. You can paste multiple times - duplicates will be detected automatically via Miner ID.
+            </div>
+            <textarea id="purchaseInput" placeholder="Paste your Purchase History here...&#10;&#10;Date	Miner	Price	Status&#10;08:04:11&#10;10/15/2025&#10;Miner&#10;The Mine Box #253652&#10;1 TH&#10;20 W/TH&#10;54.60&#10;Success"></textarea>
+            <div class="button-container">
+                <button class="btn btn-primary" onclick="parsePurchaseHistory()">
+                    <span class="material-icons">sync</span>
+                    <span>Parse Purchase Data</span>
+                    <div class="spinner" id="purchaseSpinner"></div>
+                </button>
+                <button class="btn btn-secondary" onclick="clearField('purchaseInput')">
+                    <span class="material-icons">clear</span>
+                    Clear Field
+                </button>
+            </div>
+            <div class="result-message" id="purchaseResult"></div>
+        </div>
+
+        <!-- STEP 3: Upgrade History -->
+        <div class="import-section">
+            <h2>
+                <span class="material-icons">upgrade</span>
+                STEP 3: Upgrade History
+            </h2>
+            <div class="import-help">
+                📝 Go to GoMining → Transactions → Upgrade History, copy all entries and paste them here. Upgrades will be matched to miners via their ID.
+            </div>
+            <textarea id="upgradeInput" placeholder="Paste your Upgrade History here...&#10;&#10;Date	Miner	Price	Status&#10;10/17/2025&#10;Miner&#10;The Greedy Machines #3548&#10;124 TH&#10;128 TH&#10;250.20&#10;Success"></textarea>
+            <div class="button-container">
+                <button class="btn btn-primary" onclick="parseUpgradeHistory()">
+                    <span class="material-icons">sync</span>
+                    <span>Parse Upgrade Data</span>
+                    <div class="spinner" id="upgradeSpinner"></div>
+                </button>
+                <button class="btn btn-secondary" onclick="clearField('upgradeInput')">
+                    <span class="material-icons">clear</span>
+                    Clear Field
+                </button>
+            </div>
+            <div class="result-message" id="upgradeResult"></div>
+        </div>
+
+        <!-- STEP 4: Sell History -->
+        <div class="import-section">
+            <h2>
+                <span class="material-icons">sell</span>
+                STEP 4: Sell History
+            </h2>
+            <div class="import-help">
+                📝 Go to GoMining → Transactions → Sell History, copy all entries and paste them here. Sales will be matched to miners via their ID.
+            </div>
+            <textarea id="sellInput" placeholder="Paste your Sell History here...&#10;&#10;Listing date	Miner	Price for the buyer	You will get	Status&#10;10/6/2025&#10;Miner&#10;The Mine Box #112899&#10;4.80 TH&#10;20 W/TH&#10;96.69&#10;92.09&#10;Sold"></textarea>
+            <div class="button-container">
+                <button class="btn btn-primary" onclick="parseSellHistory()">
+                    <span class="material-icons">sync</span>
+                    <span>Parse Sell Data</span>
+                    <div class="spinner" id="sellSpinner"></div>
+                </button>
+                <button class="btn btn-secondary" onclick="clearField('sellInput')">
+                    <span class="material-icons">clear</span>
+                    Clear Field
+                </button>
+            </div>
+            <div class="result-message" id="sellResult"></div>
+        </div>
+
+        <!-- Display Section -->
+        <div class="display-section" id="displaySection" style="display: none;">
+            <h2>
+                <span class="material-icons">inventory</span>
+                Your Miner History
+            </h2>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="label">Total Miners</div>
+                    <div class="value" id="statTotal">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Active Miners</div>
+                    <div class="value" id="statActive">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Sold Miners</div>
+                    <div class="value" id="statSold">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Total Investment</div>
+                    <div class="value" id="statInvestment">0 GMT</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Total TH</div>
+                    <div class="value" id="statTotalTH">0 TH</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Sales Revenue</div>
+                    <div class="value" id="statRevenue">0 GMT</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Profit/Loss</div>
+                    <div class="value" id="statProfit">0 GMT</div>
+                </div>
+            </div>
+
+            <!-- Error Panel (Import Conflicts & Issues) -->
+            <div id="errorPanel" style=" background: rgba(255, 77, 77, 0.1); border: 2px solid #ff4d4d; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                <h3 style="color: #ff4d4d; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
+                    <span class="material-icons">error</span>
+                    Import Conflicts & Errors
+                    <button onclick="clearErrors()" style="margin-left: auto; background: rgba(255, 77, 77, 0.2); border: 1px solid #ff4d4d; padding: 6px 12px; border-radius: 6px; color: #ff4d4d; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                        <span class="material-icons" style="font-size: 16px;">clear_all</span>
+                        Clear All
+                    </button>
+                </h3>
+                <div id="errorList" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Errors will be added here dynamically -->
+                </div>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
+                <div style="flex: 1; min-width: 250px;">
+                    <input type="text" id="searchInput" placeholder="🔍 Search miners by name or ID..." 
+                        onkeyup="filterMiners()" 
+                        style="width: 100%; padding: 12px; background: rgba(30, 30, 46, 0.8); border: 2px solid #673dec; border-radius: 8px; color: #fff; font-size: 1em;">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <select id="statusFilter" onchange="filterMiners()" 
+                        style="padding: 12px; background: rgba(30, 30, 46, 0.8); border: 2px solid #673dec; border-radius: 8px; color: #fff; cursor: pointer;">
+                        <option value="all">All Miners</option>
+                        <option value="active">Active Only</option>
+                        <option value="sold">Sold Only</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Export Button -->
+            <div class="button-container">
+                <button class="btn btn-primary" onclick="exportToCSV()">
+                    <span class="material-icons">download</span>
+                    Export to CSV
+                </button>
+                <button class="btn btn-secondary" onclick="deleteFilteredMiners()" id="deleteFilteredBtn" style="display: none;">
+                    <span class="material-icons">delete_sweep</span>
+                    Delete Filtered
+                </button>
+                <button class="btn btn-secondary" onclick="clearAllData()">
+                    <span class="material-icons">delete_forever</span>
+                    Clear All Data
+                </button>
+            </div>
+
+            <!-- Data Display Container (will be filled dynamically) -->
+            <div id="minerDisplay" style="margin-top: 30px;"></div>
+        </div>
+
+        <a href="how-to-copy-paste-miners.html" target="_blank" class="btn btn-info">
+            <span class="material-icons" style="vertical-align: middle;">help_outline</span>
+            How to copy paste my miners?
+        </a>
+    </div>
+
+    <script src="src/scripts/price-data-btc.js"></script>
+    <script src="src/scripts/price-data-gmt.js"></script>
+    <script src="src/scripts/dailyprices.js"></script>
+    <script src="src/scripts/my-farm-import.js"></script>
+</body>
+</html>
