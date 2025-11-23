@@ -1,4 +1,42 @@
 const efficiencyMatrix = {
+            16: { to: 15, pricePerW: 0.93 },
+            17: { to: 16, pricePerW: 0.93 },
+            18: { to: 17, pricePerW: 0.93 },
+            19: { to: 18, pricePerW: 0.93 },
+            20: { to: 19, pricePerW: 0.93 },
+            21: { to: 20, pricePerW: 1.38 },
+            22: { to: 21, pricePerW: 1.38 },
+            23: { to: 22, pricePerW: 1.38 },
+            24: { to: 23, pricePerW: 1.38 },
+            25: { to: 24, pricePerW: 1.38 },
+            26: { to: 25, pricePerW: 1.38 },
+            27: { to: 26, pricePerW: 1.38 },
+            28: { to: 27, pricePerW: 1.38 },
+            29: { to: 28, pricePerW: 0.72 },
+            30: { to: 29, pricePerW: 0.72 },
+            31: { to: 30, pricePerW: 0.72 },
+            32: { to: 31, pricePerW: 0.72 },
+            33: { to: 32, pricePerW: 0.72 },
+            34: { to: 33, pricePerW: 0.72 },
+            35: { to: 34, pricePerW: 0.72 },
+            36: { to: 35, pricePerW: 0.15 },
+            37: { to: 36, pricePerW: 0.15 },
+            38: { to: 37, pricePerW: 0.15 },
+            39: { to: 38, pricePerW: 0.15 },
+            40: { to: 39, pricePerW: 0.15 },
+            41: { to: 40, pricePerW: 0.15 },
+            42: { to: 41, pricePerW: 0.15 },
+            43: { to: 42, pricePerW: 0.15 },
+            44: { to: 43, pricePerW: 0.15 },
+            45: { to: 44, pricePerW: 0.15 },
+            46: { to: 45, pricePerW: 0.15 },
+            47: { to: 46, pricePerW: 0.15 },
+            48: { to: 47, pricePerW: 0.15 },
+            49: { to: 48, pricePerW: 0.15 },
+            50: { to: 49, pricePerW: 0.15 }
+        };
+/* old since 22.11.2025
+const efficiencyMatrixbefore = {
             16: { to: 15, pricePerW: 1.02 },
             17: { to: 16, pricePerW: 1.02 },
             18: { to: 17, pricePerW: 1.02 },
@@ -35,6 +73,7 @@ const efficiencyMatrix = {
             49: { to: 48, pricePerW: 0.15 },
             50: { to: 49, pricePerW: 0.15 }
         };
+*/
         
     /*    const efficiencyMatrix = {
             16: { to: 15, pricePerW: 1.14 },
