@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="de" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HashRace Christmas Raffle 2025</title>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- HashRace Styles -->
+    <link rel="stylesheet" href="src/styles/hashrace.css">
+</head>
+<body>
+    <!-- ====================================== -->
+    <!-- PUBLIC LANDING SECTION (ALWAYS VISIBLE) -->
+    <!-- ====================================== -->
+    
+    <div id="publicLanding">
+        <!-- 1. HERO SECTION -->
+        <section id="hero" class="hero-section">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="christmas-glow"></div>
+                    <h1 class="hero-title">
+                        <span class="snowflake">❄</span>
+                        HashRace Christmas Raffle 2025
+                        <span class="snowflake">❄</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Earn tickets by participating — more tickets unlock more prizes
+                    </p>
+                    <p class="hero-period">
+                        📅 06 December – 25 December 2025
+                    </p>
+                    <div class="hero-cta">
+                        <button id="authButton" class="btn-primary" onclick="handleAuthClick()">
+                            <span id="authButtonText">Login / Join</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. TOTAL TICKETS (GLOBAL) -->
+        <section id="globalStats" class="stats-section">
+            <div class="container">
+                <div class="stats-card">
+                    <div class="stats-icon">🎫</div>
+                    <div class="stats-number" id="totalTicketsDisplay">0</div>
+                    <div class="stats-label">Total Tickets in the HashRace</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. PRIZE TIER PROGRESS BAR -->
+        <section id="prizeTiers" class="prize-tiers-section">
+            <div class="container">
+                <h2 class="section-title">🏆 Prize Tier Progress</h2>
+                <div class="prize-tier-progress">
+                    <!-- Tier 1: 0-100 tickets -->
+                    <div class="tier-item" data-tier="1">
+                        <div class="tier-header">
+                            <span class="tier-name">Tier 1</span>
+                            <span class="tier-range">0-100 tickets</span>
+                        </div>
+                        <div class="tier-prizes">
+                            <span class="prize-badge">1 winner</span>
+                            <span class="prize-value">50 GMT</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Tier 2: 101-200 tickets -->
+                    <div class="tier-item" data-tier="2">
+                        <div class="tier-header">
+                            <span class="tier-name">Tier 2</span>
+                            <span class="tier-range">101-200 tickets</span>
+                        </div>
+                        <div class="tier-prizes">
+                            <span class="prize-badge">2 winners</span>
+                            <span class="prize-value">50 GMT + 25 GMT</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Tier 3: 201-300 tickets -->
+                    <div class="tier-item" data-tier="3">
+                        <div class="tier-header">
+                            <span class="tier-name">Tier 3</span>
+                            <span class="tier-range">201-300 tickets</span>
+                        </div>
+                        <div class="tier-prizes">
+                            <span class="prize-badge">3 winners</span>
+                            <span class="prize-value">100 GMT/2TH + 50 + 25 GMT</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Tier 4: 301+ tickets -->
+                    <div class="tier-item" data-tier="4">
+                        <div class="tier-header">
+                            <span class="tier-name">Tier 4</span>
+                            <span class="tier-range">301+ tickets</span>
+                        </div>
+                        <div class="tier-prizes">
+                            <span class="prize-badge">5 winners</span>
+                            <span class="prize-value">100/2TH + 50 + 50 + 25 + 25 GMT</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="tier-progress-bar">
+                    <div class="tier-progress-fill" id="tierProgressFill"></div>
+                    <div class="tier-progress-marker" id="tierProgressMarker"></div>
+                </div>
+                
+                <p class="tier-next-info" id="nextTierInfo">
+                    Next prize tier at 101 tickets
+                </p>
+            </div>
+        </section>
+
+        <!-- 4. HOW TO EARN TICKETS -->
+        <section id="howToEarn" class="how-to-earn-section">
+            <div class="container">
+                <h2 class="section-title">💎 How to Earn Tickets</h2>
+                <div class="earn-grid">
+                    <div class="earn-card">
+                        <div class="earn-icon">💰</div>
+                        <h3>Spend $10</h3>
+                        <p>on GoMining</p>
+                        <div class="earn-value">+1 Ticket</div>
+                    </div>
+                    
+                    <div class="earn-card">
+                        <div class="earn-icon">🤝</div>
+                        <h3>Bring a Friend</h3>
+                        <p>ICjK3 referral</p>
+                        <div class="earn-value">+2 Tickets</div>
+                    </div>
+                    
+                    <div class="earn-card">
+                        <div class="earn-icon">📢</div>
+                        <h3>Share HashRace</h3>
+                        <p>max 3 shares</p>
+                        <div class="earn-value">+1 Ticket each</div>
+                    </div>
+                    
+                    <div class="earn-card highlight">
+                        <div class="earn-icon">⭐</div>
+                        <h3>Required</h3>
+                        <p>Be an ICjK3 Referral</p>
+                        <div class="earn-value">Mandatory</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. TIMELINE -->
+        <section id="timeline" class="timeline-section">
+            <div class="container">
+                <h2 class="section-title">📅 Timeline</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">06.12</div>
+                        <div class="timeline-content">
+                            <h3>Raffle Starts</h3>
+                            <p>Registration opens</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">06-25.12</div>
+                        <div class="timeline-content">
+                            <h3>Earn Tickets</h3>
+                            <p>Active participation period</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">25.12</div>
+                        <div class="timeline-content">
+                            <h3>Last Day</h3>
+                            <p>Final day for earning tickets</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">26.12</div>
+                        <div class="timeline-content">
+                            <h3>Final Export</h3>
+                            <p>Ticket counts finalized</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item highlight">
+                        <div class="timeline-date">27.12+</div>
+                        <div class="timeline-content">
+                            <h3>Winners Drawn</h3>
+                            <p>Results announced</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. RULES SECTION -->
+        <section id="rules" class="rules-section">
+            <div class="container">
+                <h2 class="section-title">📜 Rules</h2>
+                <div class="rules-grid">
+                    <div class="rule-card">
+                        <div class="rule-number">1</div>
+                        <h3>Eligibility</h3>
+                        <p>Only verified ICjK3 referrals can participate. You must be registered on GoMining with promo code ICjK3.</p>
+                    </div>
+                    
+                    <div class="rule-card">
+                        <div class="rule-number">2</div>
+                        <h3>Raffle Period</h3>
+                        <p>06 December – 25 December 2025. Tickets earned during this period count.</p>
+                    </div>
+                    
+                    <div class="rule-card">
+                        <div class="rule-number">3</div>
+                        <h3>Registration</h3>
+                        <p>Send a DM with your GoMining UserID to join. Manual activation required.</p>
+                    </div>
+                    
+                    <div class="rule-card">
+                        <div class="rule-number">4</div>
+                        <h3>Ticket System</h3>
+                        <p>$10 spent = 1 ticket. Friend referral = 2 tickets. Share = 1 ticket (max 3).</p>
+                    </div>
+                    
+                    <div class="rule-card">
+                        <div class="rule-number">5</div>
+                        <h3>Social Sharing</h3>
+                        <p>Share the HashRace on your social media. Max 3 shares count for tickets.</p>
+                    </div>
+                    
+                    <div class="rule-card">
+                        <div class="rule-number">6</div>
+                        <h3>Manual Updates</h3>
+                        <p>Tickets are updated daily or after verified actions. This raffle is manually maintained.</p>
+                    </div>
+                    
+                    <div class="rule-card">
+                        <div class="rule-number">7</div>
+                        <h3>Prize Tiers</h3>
+                        <p>More total tickets unlock higher prize tiers for all participants.</p>
+                    </div>
+                    
+                    <div class="rule-card">
+                        <div class="rule-number">8</div>
+                        <h3>Start Bonus</h3>
+                        <p>50 GMT start bonus is included in Tier 1 prize pool.</p>
+                    </div>
+                    
+                    <div class="rule-card">
+                        <div class="rule-number">9</div>
+                        <h3>Draw Mechanism</h3>
+                        <p>1 ticket = 1 entry. Winners are removed after each draw for fairness.</p>
+                    </div>
+                    
+                    <div class="rule-card">
+                        <div class="rule-number">10</div>
+                        <h3>Payout</h3>
+                        <p>Prizes paid in GMT or 2 TH miner via BNB wallet. TX hash provided for transparency.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ====================================== -->
+    <!-- DASHBOARD SECTION (CONDITIONAL) -->
+    <!-- ====================================== -->
+    
+    <div id="dashboardSection" style="display: none;">
+        <!-- STATE: NOT ACTIVE -->
+        <div id="notActiveDashboard" style="display: none;">
+            <section class="dashboard-section">
+                <div class="container">
+                    <div class="dashboard-card not-active-card">
+                        <div class="dashboard-icon">🔒</div>
+                        <h2>Not registered yet</h2>
+                        <p>
+                            You are not registered for the HashRace yet.
+                            <br>
+                            Please send me a DM with your <strong>GoMining UserID</strong> to join.
+                            <br>
+                            Only verified <strong>ICjK3 referrals</strong> can participate.
+                        </p>
+                        <button class="btn-secondary" onclick="window.open('https://t.me/yourusername', '_blank')">
+                            📱 Send DM
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- STATE: ACTIVE PARTICIPANT -->
+        <div id="activeDashboard" style="display: none;">
+            <section class="dashboard-section">
+                <div class="container">
+                    <h2 class="section-title">📊 Your Dashboard</h2>
+                    
+                    <!-- Personal Stats Grid -->
+                    <div class="personal-stats-grid">
+                        <!-- Your Tickets -->
+                        <div class="personal-card main-ticket-card">
+                            <div class="personal-icon">🎫</div>
+                            <div class="personal-number" id="userTicketsDisplay">0</div>
+                            <div class="personal-label">Your Tickets</div>
+                        </div>
+                        
+                        <!-- Referral Status -->
+                        <div class="personal-card">
+                            <div class="personal-icon">✅</div>
+                            <div class="personal-status">Verified</div>
+                            <div class="personal-label">Referral Status</div>
+                        </div>
+                        
+                        <!-- Total Tickets (Repeated) -->
+                        <div class="personal-card">
+                            <div class="personal-icon">🌍</div>
+                            <div class="personal-number" id="totalTicketsDisplayDashboard">0</div>
+                            <div class="personal-label">Total Tickets</div>
+                        </div>
+                        
+                        <!-- Current Tier -->
+                        <div class="personal-card">
+                            <div class="personal-icon">🏆</div>
+                            <div class="personal-tier" id="currentTierDisplay">Tier 1</div>
+                            <div class="personal-label">Current Prize Tier</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Next Tier Info -->
+                    <div class="dashboard-card info-card">
+                        <h3>📈 Next Prize Tier</h3>
+                        <p id="nextTierDashboardInfo">
+                            Next prize tier at 101 tickets (Tier 2 - 2 winners unlocked)
+                        </p>
+                    </div>
+                    
+                    <!-- How to Earn More (Compact) -->
+                    <div class="dashboard-card earn-more-card">
+                        <h3>💎 How to Earn More Tickets</h3>
+                        <ul class="earn-list">
+                            <li><strong>$10 spent</strong> on GoMining → <span class="ticket-badge">+1 Ticket</span></li>
+                            <li><strong>Bring a friend</strong> (ICjK3 referral) → <span class="ticket-badge">+2 Tickets</span></li>
+                            <li><strong>Share HashRace</strong> (max 3) → <span class="ticket-badge">+1 Ticket each</span></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Update Hint -->
+                    <div class="dashboard-card hint-card">
+                        <p>
+                            <strong>⏱ Update Frequency:</strong>
+                            Tickets are updated daily or after verified actions. This raffle is manually maintained.
+                        </p>
+                    </div>
+                    
+                    <!-- Logout Button -->
+                    <div class="dashboard-actions">
+                        <button class="btn-secondary" onclick="handleLogout()">
+                            🚪 Logout
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- ====================================== -->
+    <!-- FOOTER -->
+    <!-- ====================================== -->
+    
+    <footer class="footer">
+        <div class="container">
+            <p>❄ HashRace Christmas Raffle 2025 ❄</p>
+            <p class="footer-small">
+                Manually maintained raffle. Updates processed daily.
+            </p>
+        </div>
+    </footer>
+
+    <!-- ====================================== -->
+    <!-- SCRIPTS -->
+    <!-- ====================================== -->
+    
+    <script src="src/scripts/HashRace.js"></script>
+</body>
+</html>
