@@ -1,4 +1,4 @@
-const priceMatrix = {"15":[{"minTH":1,"pricePerTH":23.37,"minerCost":24.99},
+const priceMatrixdatei = {"15":[{"minTH":1,"pricePerTH":23.37,"minerCost":24.99},
 {"minTH":2,"pricePerTH":23.21},
 {"minTH":4,"pricePerTH":23.05},
 {"minTH":8,"pricePerTH":22.89},
