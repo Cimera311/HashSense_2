@@ -390,6 +390,38 @@
     </footer>
 
     <!-- ====================================== -->
+    <!-- AUTH MODAL (Password + Magic Link Hybrid) -->
+    <!-- ====================================== -->
+    <div id="authModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeAuthModal()">&times;</span>
+            
+            <!-- Login Form -->
+            <div id="loginForm">
+                <h2>🔐 Sign In</h2>
+                <input type="email" id="authEmail" placeholder="your@email.com" class="input-field">
+                <input type="password" id="authPassword" placeholder="Password (optional)" class="input-field">
+                <button onclick="handleLogin()" class="btn-primary">Sign In</button>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #9ca3af;">
+                    No password? We'll send you a magic link instead.
+                </p>
+                <div id="authMessage" style="margin-top: 15px;"></div>
+            </div>
+            
+            <!-- Password Setup Form (after first magic link login) -->
+            <div id="passwordSetupForm" style="display: none;">
+                <h2>🔒 Set Up Password</h2>
+                <p>Set a password to make future logins faster!</p>
+                <input type="password" id="newPassword" placeholder="New Password (min. 6 characters)" class="input-field">
+                <input type="password" id="confirmPassword" placeholder="Confirm Password" class="input-field">
+                <button onclick="setupPassword()" class="btn-primary">Set Password</button>
+                <button onclick="skipPasswordSetup()" class="btn-secondary" style="margin-top: 10px;">Skip for Now</button>
+                <div id="passwordSetupMessage" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================== -->
     <!-- SCRIPTS -->
     <!-- ====================================== -->
     

@@ -146,8 +146,8 @@ CREATE POLICY "Admin actions readable by admins only"
     ON public.admin_actions FOR SELECT
     USING (
         auth.jwt() ->> 'email' IN (
-            'admin@yourdomain.com', 
-            'another-admin@yourdomain.com'
+            'hashfarm@gmail.com', 
+            'sebmller@googlemail.com'
         )
     );
 
@@ -155,8 +155,8 @@ CREATE POLICY "Admin actions writable by admins only"
     ON public.admin_actions FOR INSERT
     WITH CHECK (
         auth.jwt() ->> 'email' IN (
-            'admin@yourdomain.com',
-            'another-admin@yourdomain.com'
+            'hashfarm@gmail.com', 
+            'sebmller@googlemail.com'
         )
     );
 

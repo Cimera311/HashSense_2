@@ -5,8 +5,8 @@
 // ========== CONFIG ==========
 const HASHRACE_CONFIG = {
     supabase: {
-        url: 'YOUR_SUPABASE_URL',
-        anonKey: 'YOUR_SUPABASE_ANON_KEY'
+        url: 'https://zdphhfnsijuevfpivdvl.supabase.co',
+        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkcGhoZm5zaWp1ZXZmcGl2ZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3ODE0NzQsImV4cCI6MjA4MDM1NzQ3NH0.Si_ljivloBb9QFT7bL3wBruH0074NO9wpz0dk5sGFsk'
     },
     prizeTiers: [
         { id: 1, min: 0, max: 100, winners: 1, prizes: '50 GMT' },
@@ -118,21 +118,58 @@ async function checkParticipantStatus(userId) {
 
 async function handleAuthClick() {
     if (userState === 'not_logged_in') {
-        // Show login modal or redirect to auth
-        await handleLogin();
+        openAuthModal();
     } else {
-        // User is logged in, show dashboard
         scrollToDashboard();
     }
 }
 
 async function handleLogin() {
+    const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value;
+    const messageDiv = document.getElementById('authMessage');
+    
+    if (!email) {
+        messageDiv.innerHTML = '<p style="color: #ef4444;">❌ Please enter an email address</p>';
+        return;
+    }
+    
+    messageDiv.innerHTML = '<p style="color: #3b82f6;">⏳ Signing in...</p>';
+    
     try {
-        // Using Magic Link authentication
-        const email = prompt('Enter your email address:');
-        
-        if (!email) return;
-        
+        if (password) {
+            // Try password login first
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            if (error) {
+                // Password login failed - show error, don't fallback automatically
+                if (error.message.includes('Invalid login credentials')) {
+                    messageDiv.innerHTML = '<p style="color: #ef4444;">❌ Wrong password. <a href="#" onclick="document.getElementById(\'authPassword\').value=\'\'; document.getElementById(\'authMessage\').innerHTML=\'\'; return false;" style="color: #3b82f6; text-decoration: underline;">Try magic link instead?</a></p>';
+                } else {
+                    messageDiv.innerHTML = `<p style="color: #ef4444;">❌ ${error.message}</p>`;
+                }
+            } else {
+                // Success! Close immediately
+                closeAuthModal();
+                // Update state
+                await checkAuthState();
+                updateUI();
+            }
+        } else {
+            // No password provided, send magic link
+            await sendMagicLink(email, messageDiv);
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        messageDiv.innerHTML = `<p style="color: #ef4444;">❌ Error: ${error.message}</p>`;
+    }
+}
+
+async function sendMagicLink(email, messageDiv) {
+    try {
         const { error } = await supabase.auth.signInWithOtp({
             email: email,
             options: {
@@ -141,16 +178,28 @@ async function handleLogin() {
         });
         
         if (error) {
-            alert('Error sending magic link: ' + error.message);
-            return;
+            console.error('Magic link error:', error);
+            messageDiv.innerHTML = `<p style="color: #ef4444;">❌ Error: ${error.message}</p>`;
+        } else {
+            messageDiv.innerHTML = '<p style="color: #10b981;">✅ Magic link sent! Check your email.</p>';
         }
-        
-        alert('Check your email for the magic link!');
-        
     } catch (error) {
-        console.error('Login error:', error);
-        alert('Login failed. Please try again.');
+        console.error('Error sending magic link:', error);
+        messageDiv.innerHTML = '<p style="color: #ef4444;">❌ Error sending magic link</p>';
     }
+}
+
+function openAuthModal() {
+    document.getElementById('authModal').style.display = 'flex';
+    resetPasswordSetupForm();
+}
+
+function closeAuthModal() {
+    document.getElementById('authModal').style.display = 'none';
+    document.getElementById('authEmail').value = '';
+    document.getElementById('authPassword').value = '';
+    document.getElementById('authMessage').innerHTML = '';
+    resetPasswordSetupForm();
 }
 
 async function handleLogout() {
@@ -417,6 +466,27 @@ function setupAuthListener() {
         if (event === 'SIGNED_IN') {
             await checkAuthState();
             updateUI();
+            
+            // Close login form first
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm && loginForm.style.display !== 'none') {
+                // User just logged in, close the login form
+                closeAuthModal();
+            }
+            
+            // Check if user needs to set up password (first time magic link login)
+            // Only show if they logged in via magic link (no password method)
+            if (session?.user && event === 'SIGNED_IN') {
+                const hasPassword = await checkIfUserHasPassword(session.user);
+                const justUsedMagicLink = !session.user.app_metadata?.provider || session.user.app_metadata?.provider === 'email';
+                
+                if (!hasPassword && justUsedMagicLink) {
+                    // Small delay to ensure auth flow is complete
+                    setTimeout(() => {
+                        showPasswordSetupForm();
+                    }, 800);
+                }
+            }
         } else if (event === 'SIGNED_OUT') {
             currentUser = null;
             userState = 'not_logged_in';
@@ -424,6 +494,73 @@ function setupAuthListener() {
             updateUI();
         }
     });
+}
+
+async function checkIfUserHasPassword(user) {
+    // Check if user has set password via our metadata flag
+    if (user?.user_metadata?.has_password) {
+        return true;
+    }
+    
+    // Also check if password was set (they can login with password)
+    // This is implicit - if they used password login, they have one
+    return false;
+}
+
+function showPasswordSetupForm() {
+    // Only show if modal is still open or shortly after login
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('passwordSetupForm').style.display = 'block';
+    document.getElementById('authModal').style.display = 'flex';
+}
+
+async function setupPassword() {
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const messageDiv = document.getElementById('passwordSetupMessage');
+    
+    if (!newPassword || newPassword.length < 6) {
+        messageDiv.innerHTML = '<p style="color: #ef4444;">❌ Password must be at least 6 characters</p>';
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        messageDiv.innerHTML = '<p style="color: #ef4444;">❌ Passwords do not match</p>';
+        return;
+    }
+    
+    try {
+        const { error } = await supabase.auth.updateUser({
+            password: newPassword,
+            data: { has_password: true }
+        });
+        
+        if (error) {
+            messageDiv.innerHTML = `<p style="color: #ef4444;">❌ Error: ${error.message}</p>`;
+        } else {
+            messageDiv.innerHTML = '<p style="color: #10b981;">✅ Password set! You can now login with email + password.</p>';
+            setTimeout(() => {
+                closeAuthModal();
+                resetPasswordSetupForm();
+            }, 2000);
+        }
+    } catch (error) {
+        console.error('Password setup error:', error);
+        messageDiv.innerHTML = '<p style="color: #ef4444;">❌ Error setting password</p>';
+    }
+}
+
+function skipPasswordSetup() {
+    closeAuthModal();
+    resetPasswordSetupForm();
+}
+
+function resetPasswordSetupForm() {
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('passwordSetupForm').style.display = 'none';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+    document.getElementById('passwordSetupMessage').innerHTML = '';
 }
 
 // ========== UTILITY FUNCTIONS ==========
