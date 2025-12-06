@@ -2,13 +2,19 @@
 // HashRace Christmas Raffle 2025 - Main Logic
 // ============================================
 
-// Prize Tiers Configuration (inline, no external config needed)
-const PRIZE_TIERS = [
-    { id: 1, min: 0, max: 100, winners: 1, prizes: '50 GMT' },
-    { id: 2, min: 101, max: 200, winners: 2, prizes: '50 GMT + 25 GMT' },
-    { id: 3, min: 201, max: 300, winners: 3, prizes: '100 GMT/2TH + 50 + 25 GMT' },
-    { id: 4, min: 301, max: Infinity, winners: 5, prizes: '100/2TH + 50 + 50 + 25 + 25 GMT' }
-];
+// ========== CONFIG ==========
+const HASHRACE_CONFIG = {
+    supabase: {
+        url: 'https://zdphhfnsijuevfpivdvl.supabase.co',
+        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkcGhoZm5zaWp1ZXZmcGl2ZHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3ODE0NzQsImV4cCI6MjA4MDM1NzQ3NH0.Si_ljivloBb9QFT7bL3wBruH0074NO9wpz0dk5sGFsk'
+    },
+    prizeTiers: [
+        { id: 1, min: 0, max: 100, winners: 1, prizes: '50 GMT' },
+        { id: 2, min: 101, max: 200, winners: 2, prizes: '50 GMT + 25 GMT' },
+        { id: 3, min: 201, max: 300, winners: 3, prizes: '100 GMT/2TH + 50 + 25 GMT' },
+        { id: 4, min: 301, max: Infinity, winners: 5, prizes: '100/2TH + 50 + 50 + 25 + 25 GMT' }
+    ]
+};
 
 // ========== GLOBAL STATE ==========
 let supabase = null;
@@ -26,44 +32,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize Supabase
     initSupabase();
     
+    // Setup auth listener
+    setupAuthListener();
+    
     // Load global stats
     await loadGlobalStats();
     
-    // Check auth state FIRST (this sets userState correctly)
+    // Check auth state
     await checkAuthState();
     
-    // Setup auth listener AFTER initial check
-    setupAuthListener();
-    
-    // Update UI (this will set the correct button text)
+    // Update UI
     updateUI();
     
     console.log('✅ HashRace bereit!');
 });
 
 // ========== SUPABASE INIT ==========
+// Zeile 56
+
 function initSupabase() {
     if (!window.supabase || !window.supabase.createClient) {
-        console.error('❌ Supabase CDN nicht geladen!');
-        showMessage('loginMessage', 'Supabase nicht verfügbar. Bitte Seite neu laden.', 'error');
-        return;
-    }
-    
-    // Load config from external file
-    if (typeof HASHRACE_CONFIG === 'undefined') {
-        console.error('❌ HashRace_config.js nicht geladen!');
-        showMessage('loginMessage', 'Konfiguration fehlt. Bitte Admin kontaktieren.', 'error');
+        console.error('❌ Supabase CDN not loaded!');
         return;
     }
     
     const { createClient } = window.supabase;
     
     supabase = createClient(
-        HASHRACE_CONFIG.supabaseUrl,
-        HASHRACE_CONFIG.supabaseAnonKey
+        HASHRACE_CONFIG.supabase.url,
+        HASHRACE_CONFIG.supabase.anonKey
     );
     
     console.log('✅ Supabase initialisiert');
+    
+    // ✅ Test if signInWithPassword exists
+    console.log('Has signInWithPassword?', typeof supabase.auth.signInWithPassword);
+    console.log('Auth object:', supabase.auth);
 }
 
 // ========== AUTH FUNCTIONS ==========
@@ -83,17 +87,6 @@ async function checkAuthState() {
         }
         
         currentUser = user;
-        
-        // Check email confirmation status
-        const emailConfirmationHint = document.getElementById('emailConfirmationHint');
-        if (emailConfirmationHint) {
-            // Show hint if email is not confirmed
-            if (user.email_confirmed_at) {
-                emailConfirmationHint.style.display = 'none';
-            } else {
-                emailConfirmationHint.style.display = 'block';
-            }
-        }
         
         // Check if user is active participant
         const isActive = await checkParticipantStatus(user.id);
@@ -132,7 +125,6 @@ async function checkParticipantStatus(userId) {
     }
 }
 
-// ========== AUTH HANDLERS ==========
 async function handleAuthClick() {
     if (userState === 'not_logged_in') {
         openAuthModal();
@@ -141,177 +133,89 @@ async function handleAuthClick() {
     }
 }
 
-/**
- * Handle Login (Email + Password)
- */
+
 async function handleLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value.trim();
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value.trim();
+    const messageDiv = document.getElementById('authMessage');
     
-    if (!email || !password) {
-        showMessage('loginMessage', '❌ Bitte Email und Passwort eingeben', 'error');
+    if (!email) {
+        messageDiv.innerHTML = '<p style="color: #ef4444;">❌ Please enter your email</p>';
         return;
     }
     
-    showMessage('loginMessage', '⏳ Anmeldung läuft...', 'loading');
+    messageDiv.innerHTML = '<p style="color: #fbbf24;">⏳ Signing in...</p>';
     
     try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password
-        });
-        
-        if (error) {
-            console.error('Login error:', error);
-            showMessage('loginMessage', `❌ Login fehlgeschlagen: ${error.message}`, 'error');
-            return;
+        if (password) {
+            // Try password login first
+            console.log('Attempting password login...');
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+            
+            if (error) {
+                console.log('Password login failed, trying magic link...', error);
+                // Fallback to magic link
+                await sendMagicLink(email, messageDiv);
+            } else {
+                console.log('✅ Password login successful!', data);
+                messageDiv.innerHTML = '<p style="color: #10b981;">✅ Login successful!</p>';
+                
+                // ✅ FIX: Close modal and update UI
+                setTimeout(() => {
+                    closeAuthModal();
+                    //checkUserStatus(); // Update dashboard
+                }, 1000);
+            }
+        } else {
+            // No password provided - send magic link
+            await sendMagicLink(email, messageDiv);
         }
-        
-        console.log('✅ Login erfolgreich!', data);
-        showMessage('loginMessage', '✅ Anmeldung erfolgreich!', 'success');
-        
-        // Close modal and update UI
-        setTimeout(() => {
-            closeAuthModal();
-        }, 1000);
-        
     } catch (error) {
         console.error('Login error:', error);
-        showMessage('loginMessage', `❌ Fehler: ${error.message}`, 'error');
+        messageDiv.innerHTML = `<p style="color: #ef4444;">❌ Error: ${error.message}</p>`;
     }
 }
 
-/**
- * Handle Signup (Email + Password)
- */
-async function handleSignup() {
-    const email = document.getElementById('signupEmail').value.trim();
-    const password = document.getElementById('signupPassword').value.trim();
-    const passwordConfirm = document.getElementById('signupPasswordConfirm').value.trim();
+async function sendMagicLink(email, messageDiv) {
+    console.log('Sending magic link to:', email);
     
-    // Validation
-    if (!email || !password || !passwordConfirm) {
-        showMessage('signupMessage', '❌ Bitte alle Felder ausfüllen', 'error');
-        return;
-    }
-    
-    if (password.length < 6) {
-        showMessage('signupMessage', '❌ Passwort muss mindestens 6 Zeichen haben', 'error');
-        return;
-    }
-    
-    if (password !== passwordConfirm) {
-        showMessage('signupMessage', '❌ Passwörter stimmen nicht überein', 'error');
-        return;
-    }
-    
-    showMessage('signupMessage', '⏳ Account wird erstellt...', 'loading');
-    
-    try {
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                emailRedirectTo: window.location.origin + '/Hashrace.html'
-            }
-        });
-        
-        if (error) {
-            console.error('Signup error:', error);
-            showMessage('signupMessage', `❌ Registrierung fehlgeschlagen: ${error.message}`, 'error');
-            return;
+    const { error } = await supabase.auth.signInWithOtp({
+        email: email,
+        options: {
+            emailRedirectTo: window.location.origin + '/Hashrace.html'
         }
+    });
+    
+    if (error) {
+        console.error('Magic link error:', error);
+        messageDiv.innerHTML = `<p style="color: #ef4444;">❌ Error: ${error.message}</p>`;
+    } else {
+        console.log('✅ Magic link sent!');
+        messageDiv.innerHTML = '<p style="color: #10b981;">✅ Check your email for the magic link!</p>';
         
-        console.log('✅ Signup erfolgreich!', data);
-        
-        // Check if email confirmation is required
-        if (data.user && !data.session) {
-            // Email confirmation required
-            showMessage('signupMessage', '✅ Account erstellt! Bitte bestätige deine Email.', 'success');
-            setTimeout(() => {
-                closeAuthModal();
-            }, 3000);
-        } else if (data.session) {
-            // Immediate login (email confirmation disabled in Supabase)
-            showMessage('signupMessage', '✅ Account erstellt! Du wirst eingeloggt...', 'success');
-            setTimeout(() => {
-                closeAuthModal();
-            }, 1500);
-        }
-        
-    } catch (error) {
-        console.error('Signup error:', error);
-        showMessage('signupMessage', `❌ Fehler: ${error.message}`, 'error');
+        // ✅ FIX: Close modal after showing message
+        setTimeout(() => {
+            closeAuthModal();
+        }, 3000);
     }
 }
 
-/**
- * Switch between Login and Signup tabs
- */
-function switchAuthTab(tab) {
-    const loginForm = document.getElementById('loginForm');
-    const signupForm = document.getElementById('signupForm');
-    const tabs = document.querySelectorAll('.auth-tab');
-    
-    // Reset messages
-    document.getElementById('loginMessage').innerHTML = '';
-    document.getElementById('signupMessage').innerHTML = '';
-    
-    if (tab === 'login') {
-        loginForm.style.display = 'block';
-        signupForm.style.display = 'none';
-        tabs[0].classList.add('active');
-        tabs[1].classList.remove('active');
-    } else if (tab === 'signup') {
-        loginForm.style.display = 'none';
-        signupForm.style.display = 'block';
-        tabs[0].classList.remove('active');
-        tabs[1].classList.add('active');
-    }
-}
 
-/**
- * Open Auth Modal
- */
+function closeAuthModal() {
+    console.log('Closing auth modal...');
+    document.getElementById('authModal').style.display = 'none';
+    document.getElementById('authEmail').value = '';
+    document.getElementById('authPassword').value = '';
+    document.getElementById('authMessage').innerHTML = '';
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('passwordSetupForm').style.display = 'none';
+}
 function openAuthModal() {
     document.getElementById('authModal').style.display = 'flex';
-    switchAuthTab('login'); // Default to login tab
-}
-
-/**
- * Close Auth Modal
- */
-function closeAuthModal() {
-    document.getElementById('authModal').style.display = 'none';
-    
-    // Clear all inputs
-    document.getElementById('loginEmail').value = '';
-    document.getElementById('loginPassword').value = '';
-    document.getElementById('signupEmail').value = '';
-    document.getElementById('signupPassword').value = '';
-    document.getElementById('signupPasswordConfirm').value = '';
-    
-    // Clear messages
-    document.getElementById('loginMessage').innerHTML = '';
-    document.getElementById('signupMessage').innerHTML = '';
-    
-    // Reset to login tab
-    switchAuthTab('login');
-}
-
-/**
- * Helper: Show message in UI
- */
-function showMessage(elementId, message, type) {
-    const element = document.getElementById(elementId);
-    if (!element) return;
-    
-    let color = '#9ca3af';
-    if (type === 'error') color = '#ef4444';
-    if (type === 'success') color = '#10b981';
-    if (type === 'loading') color = '#fbbf24';
-    
-    element.innerHTML = `<p style="color: ${color};">${message}</p>`;
+    resetPasswordSetupForm();
 }
 
 
@@ -497,22 +401,22 @@ function updateActiveDashboard() {
 function getCurrentTier() {
     const total = globalStats.totalTickets;
     
-    for (const tier of PRIZE_TIERS) {
+    for (const tier of HASHRACE_CONFIG.prizeTiers) {
         if (total >= tier.min && total <= tier.max) {
             return tier;
         }
     }
     
     // Default to tier 4 if exceeds all
-    return PRIZE_TIERS[PRIZE_TIERS.length - 1];
+    return HASHRACE_CONFIG.prizeTiers[HASHRACE_CONFIG.prizeTiers.length - 1];
 }
 
 function getNextTier() {
     const currentTier = getCurrentTier();
-    const currentIndex = PRIZE_TIERS.findIndex(t => t.id === currentTier.id);
+    const currentIndex = HASHRACE_CONFIG.prizeTiers.findIndex(t => t.id === currentTier.id);
     
-    if (currentIndex < PRIZE_TIERS.length - 1) {
-        return PRIZE_TIERS[currentIndex + 1];
+    if (currentIndex < HASHRACE_CONFIG.prizeTiers.length - 1) {
+        return HASHRACE_CONFIG.prizeTiers[currentIndex + 1];
     }
     
     return null; // No next tier (already at max)
@@ -569,25 +473,41 @@ function updatePrizeTierProgress() {
 }
 
 // ========== LISTEN TO AUTH CHANGES ==========
+// This will be set up after supabase is initialized
 function setupAuthListener() {
     if (!supabase) return;
     
     supabase.auth.onAuthStateChange(async (event, session) => {
-        console.log('🔔 Auth state changed:', event);
+        console.log('Auth state changed:', event);
         
         if (event === 'SIGNED_IN') {
-            console.log('✅ User signed in');
             await checkAuthState();
             updateUI();
+            
+            // Close login form first
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm && loginForm.style.display !== 'none') {
+                // User just logged in, close the login form
+                closeAuthModal();
+            }
+            
+            // Check if user needs to set up password (first time magic link login)
+            // Only show if they logged in via magic link (no password method)
+            if (session?.user && event === 'SIGNED_IN') {
+                const hasPassword = await checkIfUserHasPassword(session.user);
+                const justUsedMagicLink = !session.user.app_metadata?.provider || session.user.app_metadata?.provider === 'email';
+                
+                if (!hasPassword && justUsedMagicLink) {
+                    // Small delay to ensure auth flow is complete
+                    setTimeout(() => {
+                        showPasswordSetupForm();
+                    }, 800);
+                }
+            }
         } else if (event === 'SIGNED_OUT') {
-            console.log('👋 User signed out');
             currentUser = null;
             userState = 'not_logged_in';
             userTickets = 0;
-            updateUI();
-        } else if (event === 'USER_UPDATED') {
-            console.log('🔄 User data updated');
-            await checkAuthState();
             updateUI();
         }
     });
@@ -602,6 +522,62 @@ async function checkIfUserHasPassword(user) {
     // Also check if password was set (they can login with password)
     // This is implicit - if they used password login, they have one
     return false;
+}
+
+function showPasswordSetupForm() {
+    // Only show if modal is still open or shortly after login
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('passwordSetupForm').style.display = 'block';
+    document.getElementById('authModal').style.display = 'flex';
+}
+
+async function setupPassword() {
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const messageDiv = document.getElementById('passwordSetupMessage');
+    
+    if (!newPassword || newPassword.length < 6) {
+        messageDiv.innerHTML = '<p style="color: #ef4444;">❌ Password must be at least 6 characters</p>';
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        messageDiv.innerHTML = '<p style="color: #ef4444;">❌ Passwords do not match</p>';
+        return;
+    }
+    
+    try {
+        const { error } = await supabase.auth.updateUser({
+            password: newPassword,
+            data: { has_password: true }
+        });
+        
+        if (error) {
+            messageDiv.innerHTML = `<p style="color: #ef4444;">❌ Error: ${error.message}</p>`;
+        } else {
+            messageDiv.innerHTML = '<p style="color: #10b981;">✅ Password set! You can now login with email + password.</p>';
+            setTimeout(() => {
+                closeAuthModal();
+                resetPasswordSetupForm();
+            }, 2000);
+        }
+    } catch (error) {
+        console.error('Password setup error:', error);
+        messageDiv.innerHTML = '<p style="color: #ef4444;">❌ Error setting password</p>';
+    }
+}
+
+function skipPasswordSetup() {
+    closeAuthModal();
+    resetPasswordSetupForm();
+}
+
+function resetPasswordSetupForm() {
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('passwordSetupForm').style.display = 'none';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+    document.getElementById('passwordSetupMessage').innerHTML = '';
 }
 
 // ========== UTILITY FUNCTIONS ==========

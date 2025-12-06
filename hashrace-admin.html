@@ -262,6 +262,7 @@
                     <p style="color: var(--text-secondary); margin: 0.5rem 0 0 0;" id="adminUserEmail"></p>
                 </div>
                 <button onclick="adminLogout()" class="btn-secondary">Logout</button>
+                
             </div>
 
             <!-- Stats -->
@@ -285,8 +286,22 @@
             </div>
 
             <!-- Search -->
-            <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="🔍 Search by email or GoMining ID..." onkeyup="filterUsers()">
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="🔍 Search by email or GoMining ID..." 
+                    oninput="filterUsers()"
+                    style="flex: 1; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.05); color: var(--text-primary);"
+                >
+                <button 
+                    id="refreshBtn"
+                    onclick="loadAllData()" 
+                    class="btn-primary"
+                    style="white-space: nowrap;"
+                >
+                    🔄 Refresh
+                </button>
             </div>
 
             <!-- Users Table -->

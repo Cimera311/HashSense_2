@@ -131,14 +131,13 @@
                     <div class="earn-card">
                         <div class="earn-icon">💰</div>
                         <h3>Spend $10</h3>
-                        <p>on GoMining</p>
+                        <p>on GoMining as my referral, new ones or existing ones</p>
                         <div class="earn-value">+1 Ticket</div>
                     </div>
                     
                     <div class="earn-card">
                         <div class="earn-icon">🤝</div>
                         <h3>Bring a Friend</h3>
-                        <p>ICjK3 referral</p>
                         <div class="earn-value">+2 Tickets</div>
                     </div>
                     
@@ -152,7 +151,7 @@
                     <div class="earn-card highlight">
                         <div class="earn-icon">⭐</div>
                         <h3>Required</h3>
-                        <p>Be an ICjK3 Referral</p>
+                        <p>Be my Referral</p>
                         <div class="earn-value">Mandatory</div>
                     </div>
                 </div>
@@ -254,22 +253,17 @@
                         <p>More total tickets unlock higher prize tiers for all participants.</p>
                     </div>
                     
-                    <div class="rule-card">
-                        <div class="rule-number">8</div>
-                        <h3>Start Bonus</h3>
-                        <p>50 GMT start bonus is included in Tier 1 prize pool.</p>
-                    </div>
                     
                     <div class="rule-card">
-                        <div class="rule-number">9</div>
+                        <div class="rule-number">8</div>
                         <h3>Draw Mechanism</h3>
                         <p>1 ticket = 1 entry. Winners are removed after each draw for fairness.</p>
                     </div>
                     
                     <div class="rule-card">
-                        <div class="rule-number">10</div>
+                        <div class="rule-number">9</div>
                         <h3>Payout</h3>
-                        <p>Prizes paid in GMT or 2 TH miner via BNB wallet. TX hash provided for transparency.</p>
+                        <p>Prizes paid in GMT or NFT miner via BNB Chain wallet.</p>
                     </div>
                 </div>
             </div>
@@ -298,6 +292,11 @@
                         <button class="btn-secondary" onclick="window.open('https://t.me/yourusername', '_blank')">
                             📱 Send DM
                         </button>
+                        <div id="emailConfirmationHint" style="margin-top: 20px; padding: 15px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; border: 1px solid rgba(59, 130, 246, 0.3); display: none;">
+                            <p style="margin: 0; color: #60a5fa; font-size: 0.95em;">
+                                📧 <strong>Bitte bestätige deine Email-Adresse</strong>, indem du auf den Link in der Bestätigungsmail klickst.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -391,33 +390,41 @@
     </footer>
 
     <!-- ====================================== -->
-    <!-- AUTH MODAL (Password + Magic Link Hybrid) -->
+    <!-- AUTH MODAL (Login/Signup Tabs) -->
     <!-- ====================================== -->
     <div id="authModal" class="modal" style="display: none;">
         <div class="modal-content">
             <span class="modal-close" onclick="closeAuthModal()">&times;</span>
             
-            <!-- Login Form -->
-            <div id="loginForm">
-                <h2>🔐 Sign In</h2>
-                <input type="email" id="authEmail" placeholder="your@email.com" class="input-field">
-                <input type="password" id="authPassword" placeholder="Password (optional)" class="input-field">
-                <button onclick="handleLogin()" class="btn-primary">Sign In</button>
-                <p style="margin-top: 10px; font-size: 0.9em; color: #9ca3af;">
-                    No password? We'll send you a magic link instead.
-                </p>
-                <div id="authMessage" style="margin-top: 15px;"></div>
+            <!-- Tab Navigation -->
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('login')">🔐 Login</button>
+                <button class="auth-tab" onclick="switchAuthTab('signup')">✨ Sign Up</button>
             </div>
             
-            <!-- Password Setup Form (after first magic link login) -->
-            <div id="passwordSetupForm" style="display: none;">
-                <h2>🔒 Set Up Password</h2>
-                <p>Set a password to make future logins faster!</p>
-                <input type="password" id="newPassword" placeholder="New Password (min. 6 characters)" class="input-field">
-                <input type="password" id="confirmPassword" placeholder="Confirm Password" class="input-field">
-                <button onclick="setupPassword()" class="btn-primary">Set Password</button>
-                <button onclick="skipPasswordSetup()" class="btn-secondary" style="margin-top: 10px;">Skip for Now</button>
-                <div id="passwordSetupMessage" style="margin-top: 15px;"></div>
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form-container">
+                <h2>Welcome Back!</h2>
+                <input type="email" id="loginEmail" placeholder="your@email.com" class="input-field">
+                <input type="password" id="loginPassword" placeholder="Password" class="input-field">
+                <button onclick="handleLogin()" class="btn-primary">Sign In</button>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #9ca3af;">
+                    <a href="hashrace-reset.html" style="color: #3b82f6; text-decoration: none;">Forgot password?</a>
+                </p>
+                <div id="loginMessage" style="margin-top: 15px;"></div>
+            </div>
+            
+            <!-- Signup Form -->
+            <div id="signupForm" class="auth-form-container" style="display: none;">
+                <h2>Join the HashRace!</h2>
+                <input type="email" id="signupEmail" placeholder="your@email.com" class="input-field">
+                <input type="password" id="signupPassword" placeholder="Password (min. 6 characters)" class="input-field">
+                <input type="password" id="signupPasswordConfirm" placeholder="Confirm Password" class="input-field">
+                <button onclick="handleSignup()" class="btn-primary">Create Account</button>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #9ca3af;">
+                    Already have an account? <a href="#" onclick="switchAuthTab('login'); return false;" style="color: #3b82f6; text-decoration: none;">Login</a>
+                </p>
+                <div id="signupMessage" style="margin-top: 15px;"></div>
             </div>
         </div>
     </div>
@@ -426,6 +433,7 @@
     <!-- SCRIPTS -->
     <!-- ====================================== -->
     
+    <script src="src/scripts/HashRace_config.js"></script>
     <script src="src/scripts/HashRace.js"></script>
 </body>
 </html>
