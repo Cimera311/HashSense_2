@@ -4,10 +4,10 @@
 
 // Prize Tiers Configuration (inline, no external config needed)
 const PRIZE_TIERS = [
-    { id: 1, min: 0, max: 100, winners: 1, prizes: '50 GMT' },
-    { id: 2, min: 101, max: 200, winners: 2, prizes: '50 GMT + 25 GMT' },
-    { id: 3, min: 201, max: 300, winners: 3, prizes: '100 GMT/2TH + 50 + 25 GMT' },
-    { id: 4, min: 301, max: Infinity, winners: 5, prizes: '100/2TH + 50 + 50 + 25 + 25 GMT' }
+    { id: 1, min: 0, max: 25, winners: 1, prizes: '50 GMT or 1TH/20W/TH' },
+    { id: 2, min: 26, max: 100, winners: 2, prizes: '50 GMT or 1TH/20W/TH + 25 GMT' },
+    { id: 3, min: 101, max: 200, winners: 3, prizes: '100 GMT/2TH + 50GMT/1TH + 25 GMT' },
+    { id: 4, min: 201, max: Infinity, winners: 5, prizes: '100/2TH + 50GMT/1TH + 50GMT/1TH + 25 + 25 GMT' }
 ];
 
 // ========== GLOBAL STATE ==========
@@ -212,7 +212,7 @@ async function handleSignup() {
             email,
             password,
             options: {
-                emailRedirectTo: window.location.origin + '/Hashrace.html'
+                emailRedirectTo: 'https://Hashfarm.me/Hashrace.html'
             }
         });
         
