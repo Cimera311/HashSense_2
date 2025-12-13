@@ -8,6 +8,8 @@ let btcPriceUSD = 0;
 let gmtPriceUSD = 0;
 let selectedTypes = []; // Filter by transaction type
 let showUSD = false; // Toggle between original currency and USD
+let currentChartType = 'stacked'; // Current chart type
+let currentWeekData = null; // Store current data for chart switching
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -577,18 +579,31 @@ function updateDisplayForSelectedWeeks() {
         const weekExpensesUSD = (weekExpensesGMT * gmtPriceUSD) + (weekExpensesBTC * btcPriceUSD);
         const weekRewardsUSD = (weekRewardsGMT * gmtPriceUSD) + (weekRewardsBTC * btcPriceUSD);
 
+        // Convert transactions to USD for chart breakdown
+        const txWithUSD = weekTx.map(t => {
+            const priceUSD = t.currency === 'GMT' ? gmtPriceUSD : btcPriceUSD;
+            return {
+                ...t,
+                valueUSD: Math.abs(t.value) * priceUSD
+            };
+        });
+
         return {
             label: week.label,
             expenses: weekExpensesUSD,
-            rewards: weekRewardsUSD
+            rewards: weekRewardsUSD,
+            transactions: txWithUSD
         };
     });
 
     // Update Stats
     updateStats(totalSpells, totalExpenses, totalRewards);
 
+    // Store data for chart switching
+    currentWeekData = weekData;
+
     // Update Chart (multi-week comparison)
-    updateChart(weekData);
+    updateChart(weekData, currentChartType);
 
     // Update Table
     updateTable(allFilteredTx);
@@ -657,66 +672,396 @@ function updateStats(spells, expenses, rewards) {
 }
 
 // Update Chart (Multi-Week)
-function updateChart(weekData) {
+// Switch Chart Type
+window.switchChartType = function(type) {
+    currentChartType = type;
+    
+    // Update button states
+    ['Stacked', 'Grouped', 'Line', 'Pie', 'Doughnut'].forEach(t => {
+        const btn = document.getElementById('btn' + t);
+        if (btn) {
+            btn.classList.toggle('active', t.toLowerCase() === type);
+        }
+    });
+    
+    // Redraw chart with current data
+    if (currentWeekData) {
+        updateChart(currentWeekData, type);
+    }
+};
+
+function updateChart(weekData, chartType = 'stacked') {
     const ctx = document.getElementById('mwChart').getContext('2d');
 
     if (chart) chart.destroy();
 
     const labels = weekData.map(w => w.label);
-    const expensesData = weekData.map(w => w.expenses);
-    const rewardsData = weekData.map(w => w.rewards);
-
-    chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Expenses (USD)',
-                    data: expensesData,
-                    backgroundColor: 'rgba(255, 77, 77, 0.8)',
-                    borderColor: '#ff4d4d',
-                    borderWidth: 2
-                },
-                {
-                    label: 'Rewards (USD)',
-                    data: rewardsData,
-                    backgroundColor: 'rgba(0, 255, 127, 0.8)',
-                    borderColor: '#00ff7f',
-                    borderWidth: 2
-                }
-            ]
+    
+    // Type Configuration mit korrekten Namen aus TYPE_CONFIG
+    const typeCategories = {
+        // === EXPENSES (Rot Töne) ===
+        // During Cycle
+        'Spell purchase': { 
+            color: '#ff3b3b', 
+            label: '🎯 Spells', 
+            stack: 'expenses',
+            order: 1
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { 
-                    display: true,
-                    labels: { color: '#adb5bd' }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: (ctx) => `${ctx.dataset.label}: $${ctx.parsed.y.toFixed(2)}`
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { color: '#adb5bd' },
-                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                },
-                x: {
-                    ticks: { 
-                        color: '#adb5bd',
-                        maxRotation: 45,
-                        minRotation: 45
-                    },
-                    grid: { display: false }
-                }
-            }
+        'Power upgrade': { 
+            color: '#ff6b6b', 
+            label: '⚡ Power Upgrades', 
+            stack: 'expenses',
+            order: 2
+        },
+        'Miner purchase': { 
+            color: '#ff9b9b', 
+            label: '⛏️ Miner Purchases', 
+            stack: 'expenses',
+            order: 3
+        },
+        // After Cycle
+        'Miner maintenance': { 
+            color: '#ffcbcb', 
+            label: '🔧 Miner Maintenance', 
+            stack: 'expenses',
+            order: 4
+        },
+        
+        // === INCOME (Grün Töne) ===
+        // After Cycle (wichtigste zuerst)
+        'Miner Wars reward': { 
+            color: '#00ff7f', 
+            label: '🏆 Miner Wars Rewards', 
+            stack: 'income',
+            order: 5
+        },
+        'Personal game rewards': { 
+            color: '#00d966', 
+            label: '🎮 Personal Game Rewards', 
+            stack: 'income',
+            order: 6
+        },
+        'Clan ownership rewards': { 
+            color: '#00b34d', 
+            label: '👥 Clan Ownership', 
+            stack: 'income',
+            order: 7
+        },
+        // During Cycle
+        'Referral bonus': { 
+            color: '#009933', 
+            label: '🤝 Referral Bonus', 
+            stack: 'income',
+            order: 8
+        },
+        'GOMINING purchase': { 
+            color: '#007722', 
+            label: '💰 GOMINING Purchase', 
+            stack: 'income',
+            order: 9
+        },
+        'Bounty program': { 
+            color: '#006611', 
+            label: '🎁 Bounty Program', 
+            stack: 'income',
+            order: 10
+        },
+        'Liquidity provider reward': { 
+            color: '#005500', 
+            label: '💧 Liquidity Provider', 
+            stack: 'income',
+            order: 11
+        }
+    };
+    
+    // Erstelle Datasets für jeden Typ
+    const datasets = [];
+    
+    Object.entries(typeCategories).forEach(([type, config]) => {
+        const data = weekData.map(w => {
+            const transactions = w.transactions || [];
+            const filtered = transactions.filter(t => t.type === type);
+            return filtered.reduce((sum, t) => sum + Math.abs(t.valueUSD || 0), 0);
+        });
+        
+        // Nur hinzufügen wenn es Daten gibt
+        const hasData = data.some(val => val > 0);
+        if (hasData) {
+            datasets.push({
+                label: config.label,
+                data: data,
+                backgroundColor: config.color + 'dd', // 85% opacity
+                borderColor: config.color,
+                borderWidth: 1,
+                stack: config.stack,
+                order: config.order
+            });
         }
     });
+
+    // Sort datasets by order
+    datasets.sort((a, b) => a.order - b.order);
+
+    // Prepare chart configuration based on type
+    let chartConfig = {};
+    
+    if (chartType === 'pie' || chartType === 'doughnut') {
+        // For pie/doughnut, aggregate all weeks into total expenses vs income
+        let totalExpenses = 0;
+        let totalIncome = 0;
+        
+        weekData.forEach(w => {
+            const transactions = w.transactions || [];
+            transactions.forEach(t => {
+                const value = Math.abs(t.valueUSD || 0);
+                if (TYPE_CONFIG.expensesDuringCycle.includes(t.type) || 
+                    TYPE_CONFIG.expensesAfterCycle.includes(t.type)) {
+                    totalExpenses += value;
+                } else {
+                    totalIncome += value;
+                }
+            });
+        });
+        
+        chartConfig = {
+            type: chartType,
+            data: {
+                labels: ['Expenses', 'Income'],
+                datasets: [{
+                    data: [totalExpenses, totalIncome],
+                    backgroundColor: [
+                        'rgba(255, 77, 77, 0.8)',
+                        'rgba(0, 255, 127, 0.8)'
+                    ],
+                    borderColor: ['#ff4d4d', '#00ff7f'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            color: '#adb5bd',
+                            padding: 15,
+                            font: { size: 13 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                        padding: 16,
+                        callbacks: {
+                            label: (ctx) => {
+                                const value = ctx.parsed;
+                                const total = totalExpenses + totalIncome;
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `  ${ctx.label}: $${value.toFixed(2)} (${percentage}%)`;
+                            },
+                            footer: () => {
+                                const net = totalIncome - totalExpenses;
+                                return [
+                                    '',
+                                    '━━━━━━━━━━━━━━━━━━━━',
+                                    `${net >= 0 ? '✅' : '❌'} Net: ${net >= 0 ? '+' : ''}$${net.toFixed(2)}`
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+        };
+    } else if (chartType === 'line') {
+        // Line chart - show trends over weeks
+        chartConfig = {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: datasets.map(ds => ({
+                    ...ds,
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }))
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        labels: {
+                            color: '#adb5bd',
+                            padding: 12,
+                            font: { size: 11 },
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                        padding: 16,
+                        callbacks: {
+                            label: (ctx) => {
+                                const value = ctx.parsed.y;
+                                if (value === 0) return null;
+                                return `  ${ctx.dataset.label}: $${value.toFixed(2)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#adb5bd',
+                            font: { size: 11 },
+                            callback: (value) => {
+                                if (value >= 1000) return '$' + (value / 1000).toFixed(1) + 'k';
+                                return '$' + value.toFixed(0);
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.08)',
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#adb5bd',
+                            font: { size: 11 }
+                        },
+                        grid: { display: false }
+                    }
+                }
+            }
+        };
+    } else {
+        // Bar chart (stacked or grouped)
+        const isStacked = chartType === 'stacked';
+        
+        chartConfig = {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: { 
+                        display: true,
+                        position: 'right',
+                        labels: { 
+                            color: '#adb5bd',
+                            padding: 12,
+                            font: { size: 11 },
+                            usePointStyle: true,
+                            pointStyle: 'rectRounded',
+                            boxWidth: 12,
+                            boxHeight: 12
+                        },
+                        onClick: (e, legendItem, legend) => {
+                            const index = legendItem.datasetIndex;
+                            const ci = legend.chart;
+                            const meta = ci.getDatasetMeta(index);
+                            meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+                            ci.update();
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+                        padding: 16,
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 13 },
+                        footerFont: { size: 12, weight: 'bold' },
+                        footerColor: '#ffc107',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1,
+                        displayColors: true,
+                        callbacks: {
+                            label: (ctx) => {
+                                const value = ctx.parsed.y;
+                                if (value === 0) return null;
+                                return `  ${ctx.dataset.label}: $${value.toFixed(2)}`;
+                            },
+                            footer: (tooltipItems) => {
+                                let expenses = 0;
+                                let income = 0;
+                                
+                                tooltipItems.forEach(item => {
+                                    const dataset = item.dataset;
+                                    const value = item.parsed.y;
+                                    if (dataset.stack === 'expenses') {
+                                        expenses += value;
+                                    } else if (dataset.stack === 'income') {
+                                        income += value;
+                                    }
+                                });
+                                
+                                const net = income - expenses;
+                                const lines = [
+                                    '',
+                                    '━━━━━━━━━━━━━━━━━━━━',
+                                    `💸 Total Expenses: $${expenses.toFixed(2)}`,
+                                    `💰 Total Income: $${income.toFixed(2)}`,
+                                    '━━━━━━━━━━━━━━━━━━━━',
+                                    `${net >= 0 ? '✅' : '❌'} Net Result: ${net >= 0 ? '+' : ''}$${net.toFixed(2)}`
+                                ];
+                                return lines;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        stacked: isStacked,
+                        beginAtZero: true,
+                        ticks: { 
+                            color: '#adb5bd',
+                            font: { size: 11 },
+                            callback: (value) => {
+                                if (value >= 1000) {
+                                    return '$' + (value / 1000).toFixed(1) + 'k';
+                                }
+                                return '$' + value.toFixed(0);
+                            }
+                        },
+                        grid: { 
+                            color: 'rgba(255, 255, 255, 0.08)',
+                            drawBorder: false
+                        },
+                        border: { display: false }
+                    },
+                    x: {
+                        stacked: isStacked,
+                        ticks: { 
+                            color: '#adb5bd',
+                            font: { size: 11 },
+                            maxRotation: 45,
+                            minRotation: 45
+                        },
+                        grid: { display: false },
+                        border: { display: false }
+                    }
+                }
+            }
+        };
+    }
+
+    chart = new Chart(ctx, chartConfig);
 }
 
 // Update Table

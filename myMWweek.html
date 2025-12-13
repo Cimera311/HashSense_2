@@ -158,11 +158,58 @@
 
         <!-- Chart Section -->
         <div class="row mb-4" id="chartSection" style="display: none;">
-            <div class="col-lg-8">
+            <div class="col-12">
                 <div class="card">
-                    <div class="card-header">📈 Expenses vs Rewards</div>
-                    <div class="card-body">
-                        <canvas id="mwChart"></canvas>
+                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                        <div class="mb-2 mb-md-0">
+                            <h5 class="mb-0">📊 Transaction Analysis Dashboard</h5>
+                            <small class="text-muted">Detailed breakdown by transaction type</small>
+                        </div>
+                        <div class="d-flex gap-2 align-items-center flex-wrap">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-primary active" onclick="switchChartType('stacked')" id="btnStacked">
+                                    <span class="material-symbols-outlined" style="font-size: 1rem;">bar_chart</span>
+                                    Stacked
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" onclick="switchChartType('grouped')" id="btnGrouped">
+                                    <span class="material-symbols-outlined" style="font-size: 1rem;">insert_chart</span>
+                                    Grouped
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" onclick="switchChartType('line')" id="btnLine">
+                                    <span class="material-symbols-outlined" style="font-size: 1rem;">show_chart</span>
+                                    Line
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" onclick="switchChartType('pie')" id="btnPie">
+                                    <span class="material-symbols-outlined" style="font-size: 1rem;">pie_chart</span>
+                                    Pie
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" onclick="switchChartType('doughnut')" id="btnDoughnut">
+                                    <span class="material-symbols-outlined" style="font-size: 1rem;">donut_small</span>
+                                    Doughnut
+                                </button>
+                            </div>
+                            <div class="vr d-none d-md-block"></div>
+                            <span class="badge bg-danger">Expenses</span>
+                            <span class="badge bg-success">Income</span>
+                        </div>
+                    </div>
+                    <div class="card-body" style="min-height: 450px;">
+                        <div style="position: relative; height: 400px;">
+                            <canvas id="mwChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <small>
+                                <strong>Legend:</strong>
+                                🎯 Spells | ⚡ Power Upgrades | ⛏️ Miner Purchases | 🔧 Maintenance | 
+                                🏆 MW Rewards | 🎮 Game Rewards | 👥 Clan | 🤝 Referrals | 💰 Purchases | 🎁 Bounty | 💧 Liquidity
+                            </small>
+                            <small class="text-muted">
+                                <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">info</span>
+                                Click legend to toggle types
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>
