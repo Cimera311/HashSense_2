@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HashSense - Mining Calculator</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Scripts -->
+    <script src="priceMatrix.js"></script>
+    <script src="src/scripts/skript.js"></script>
+    <script src="src/scripts/skript-prices.js"></script>
+    <script src="src/scripts/skript-tables.js"></script>
+    <script src="src/scripts/skriptreferral.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="src/scripts/footer-component.js"></script>
+    
+    <!-- Plausible Analytics -->
+    <script defer data-domain="hashfarm.me" src="https://plausible.io/js/script.js"></script>
+
+    <!-- SEO Meta -->
+    <meta name="description" content="Complete GoMining calculator suite: Mining profitability, ROI analysis, and investment optimizer. Calculate daily profits, maintenance costs, and optimize your Bitcoin mining strategy with real-time BTC and GMT prices.">
+    <meta name="keywords" content="GoMining calculator, Bitcoin mining profitability, mining ROI calculator, BTC mining tools, GMT token calculator, mining investment optimizer, hashrate calculator, mining maintenance cost">
+    <meta name="author" content="HashSense">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://hashfarm.me/HashSense.html">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="HashSense – GoMining Calculator">
+    <meta property="og:description" content="Calculate mining profitability, ROI, and optimize your GoMining investments.">
+    <meta property="og:image" content="https://hashfarm.me/assets/preview.png">
+    <meta property="og:url" content="https://hashfarm.me/HashSense.html">
+    <meta property="og:type" content="website">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    <link rel="manifest" href="assets/site.webmanifest">
+
+    <!-- Google Analytics (Cookie-Consent) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      
+      const cookieConsent = localStorage.getItem('cookieConsent');
+      if (cookieConsent === 'accepted') {
+        const gaScript = document.createElement('script');
+        gaScript.async = true;
+        gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-VQ2RT4JL4L';
+        document.head.appendChild(gaScript);
+        
+        gaScript.onload = () => {
+          gtag('js', new Date());
+          gtag('config', 'G-VQ2RT4JL4L');
+        };
+      }
+    </script>
+
+    <style>
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        .float-animation {
+          animation: float 3s ease-in-out infinite;
+        }
+        @keyframes glow {
+          0%, 100% { box-shadow: 0 0 20px rgba(124, 58, 237, 0.5); }
+          50% { box-shadow: 0 0 40px rgba(124, 58, 237, 0.8); }
+        }
+        .glow-animation {
+          animation: glow 2s ease-in-out infinite;
+        }
+        .gradient-text {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        
+        /* Sidebar animations */
+        .sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        
+        /* Range slider fix */
+        input[type="range"] {
+            outline: none !important;
+            pointer-events: auto;
+        }
+        
+        input[type="range"]:focus {
+            outline: none !important;
+        }
+    </style>
+
+    <script>
+        // Global variables for prices
+        window.btcPrice = 100000;
+        window.gmtPrice = 0.4269;
+        
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("HashSense_new loaded");
+            
+            // Load price matrix
+            if (typeof loadPriceMatrix === 'function') {
+                loadPriceMatrix();
+            }
+        });
+    </script>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white min-h-screen">
+
+    <!-- Modern Header -->
+    <header class="bg-gray-900/80 backdrop-blur-lg border-b border-purple-500/30 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto p-4">
+            <!-- Header Top Row -->
+            <div class="flex items-center justify-between mb-4">
+                <button onclick="toggleSidebar()" 
+                        class="bg-gray-800/80 hover:bg-gray-700 p-2 rounded-lg transition-all duration-300 hover:scale-105">
+                    <span class="material-icons text-white">menu</span>
+                </button>
+                
+                <div class="flex items-center gap-3">
+                    <img src="assets/android-chrome-512x512.png" alt="HashSense" class="w-8 h-8 rounded-lg">
+                    <h1 class="text-xl font-bold gradient-text hidden sm:block">HashSense Calculator</h1>
+                </div>
+                
+                <a href="index.html" class="bg-purple-600/80 hover:bg-purple-700 px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 flex items-center gap-2">
+                    <span class="material-icons text-sm">home</span>
+                    <span class="hidden sm:inline">Home</span>
+                </a>
+            </div>
+            
+            <!-- Price Cards Grid -->
+            <div class="grid gap-3 md:grid-cols-3">
+                <!-- BTC Price Card -->
+                <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl p-4 border border-purple-500/30 hover:border-purple-500/60 transition-all">
+                    <h2 class="text-xs font-semibold mb-2 text-gray-400 uppercase">Bitcoin Price</h2>
+                    <div class="flex items-center gap-2">
+                        <img src="bitcoin-910307_1280.webp" alt="BTC" class="w-8 h-8">
+                        <select id="bitcoin-price-dropdown" onchange="updateBTCPrice();" 
+                                class="flex-1 bg-gray-700/50 border border-gray-600 rounded-lg px-2 py-1.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="10000">$10,000</option>
+                            <option value="20000">$20,000</option>
+                            <option value="30000">$30,000</option>    
+                            <option value="40000">$40,000</option>
+                            <option value="50000">$50,000</option>
+                            <option value="60000">$60,000</option>   
+                            <option value="70000">$70,000</option>
+                            <option value="80000">$80,000</option>
+                            <option value="90000">$90,000</option>
+                            <option id="currentp" value="0">Current Price</option>
+                            <option value="100000">$100,000</option>
+                            <option value="110000">$110,000</option>
+                            <option value="120000">$120,000</option>
+                            <option value="130000">$130,000</option>
+                            <option value="140000">$140,000</option>
+                            <option value="150000">$150,000</option>
+                            <option value="200000">$200,000</option>
+                            <option value="250000">$250,000</option>
+                            <option value="300000">$300,000</option>
+                            <option value="400000">$400,000</option>   
+                        </select>
+                    </div>
+                </div>
+
+                <!-- GMT Price Card -->
+                <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl p-4 border border-purple-500/30 hover:border-purple-500/60 transition-all">
+                    <h2 class="text-xs font-semibold mb-2 text-gray-400 uppercase">GMT Price</h2>
+                    <div class="flex items-center gap-2">
+                        <img src="GoMining_Logo.webp" alt="GMT" class="w-8 h-8">
+                        <input type="number" id="gmt-token-price" placeholder="0.4269" step="0.0001"
+                               class="flex-1 bg-gray-700/50 border border-gray-600 rounded-lg px-2 py-1.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                </div>
+
+                <!-- SAT per TH Card -->
+                <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl p-4 border border-purple-500/30 hover:border-purple-500/60 transition-all">
+                    <h2 class="text-xs font-semibold mb-2 text-gray-400 uppercase">Sats per TH</h2>
+                    <div class="flex items-center gap-2">
+                        <img src="sats-ordinals-sats-logo.png" alt="Sats" class="w-8 h-8">
+                        <input type="number" id="sat-TH" value="42" min="0" step="1" oninput="calculateDailyReward();"
+                               class="flex-1 bg-gray-700/50 border border-gray-600 rounded-lg px-2 py-1.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Modern Sidebar -->
+    <aside class="sidebar fixed left-0 top-0 w-72 h-full bg-gray-900/95 backdrop-blur-lg z-40 shadow-2xl border-r border-purple-500/30" id="sidebar">
+        <div class="p-6">
+            <!-- Sidebar Header -->
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center gap-3">
+                    <img src="assets/android-chrome-512x512.png" alt="HashSense" class="w-10 h-10 rounded-lg">
+                    <h2 class="text-xl font-bold gradient-text">HashSense</h2>
+                </div>
+                <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            
+            <nav class="space-y-2">
+                <!-- Home Button -->
+                <a href="index.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/20 transition-all duration-300 text-left group">
+                    <span class="material-icons text-blue-400 group-hover:scale-110 transition-transform">home</span>
+                    <span class="text-white">Home</span>
+                </a>
+                
+                <div class="border-t border-gray-700 my-4"></div>
+                
+                <!-- Calculator Buttons -->
+                <button onclick="showSection('calc', event)" 
+                        class="nav-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/20 transition-all duration-300 bg-purple-600/30 group">
+                    <span class="material-icons text-purple-400 group-hover:scale-110 transition-transform">calculate</span>
+                    <span>Mining Calculator</span>
+                </button>
+                
+                <button onclick="showSection('roi', event)" 
+                        class="nav-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/20 transition-all duration-300 group">
+                    <span class="material-icons text-green-400 group-hover:scale-110 transition-transform">trending_up</span>
+                    <span>ROI Calculator</span>
+                </button>
+                
+                <button onclick="showSection('invest', event)" 
+                        class="nav-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/20 transition-all duration-300 group">
+                    <span class="material-icons text-yellow-400 group-hover:scale-110 transition-transform">savings</span>
+                    <span>Investment Optimizer</span>
+                </button>
+                
+                <div class="border-t border-gray-700 my-4"></div>
+                
+                <!-- External Links -->
+                <a href="reinvest-calculator.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/20 transition-all duration-300 text-left group">
+                    <span class="material-icons text-purple-400 group-hover:scale-110 transition-transform">autorenew</span>
+                    <span class="text-white">Reinvestment Calc</span>
+                </a>
+                
+                <a href="GoBoxMatrix.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/20 transition-all duration-300 text-left group">
+                    <span class="material-icons text-orange-400 group-hover:scale-110 transition-transform">inventory_2</span>
+                    <span class="text-white">GOBoxes Chances</span>
+                </a>
+                
+                <a href="farm.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/20 transition-all duration-300 text-left group">
+                    <span class="material-icons text-blue-400 group-hover:scale-110 transition-transform">dashboard</span>
+                    <span class="text-white">My HashFarm</span>
+                </a>
+                
+                <div class="border-t border-gray-700 my-4"></div>
+                
+                <!-- Refresh Button -->
+                <button onclick="refreshPrices()" 
+                        class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-purple-600/20 transition-all duration-300 text-left group">
+                    <span class="material-icons text-blue-400 group-hover:rotate-180 transition-transform duration-500">refresh</span>
+                    <div class="flex-1">
+                        <span class="block text-white font-medium">Refresh Prices</span>
+                        <span class="block text-xs text-gray-400">Update BTC & GMT</span>
+                    </div>
+                </button>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-30 hidden" 
+         onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="min-h-screen p-4 md:p-6">
+        <div class="max-w-7xl mx-auto">
+            
+            <!-- Info Banner -->
+            <div class="bg-gradient-to-r from-purple-900/50 to-blue-900/50 backdrop-blur-lg rounded-xl p-6 mb-6 border border-purple-500/30">
+                <div class="flex items-start gap-4">
+                    <span class="material-icons text-purple-400 text-3xl">info</span>
+                    <div class="flex-1">
+                        <h2 class="text-xl font-bold mb-2">Welcome to HashSense</h2>
+                        <p class="text-gray-300">
+                            Your comprehensive GoMining calculator toolkit. Calculate profitability, analyze ROI, and optimize your mining investments with real-time data.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Sections will be loaded here via JavaScript -->
+            <div id="content-area">
+                <!-- Mining Calculator Section -->
+                <section id="calc-section" class="content-section">
+                    <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 border border-purple-500/30">
+                        <h2 class="text-2xl font-bold mb-6 gradient-text flex items-center gap-2">
+                            <span class="material-icons">calculate</span>
+                            Mining Calculator
+                        </h2>
+                        
+                        <p class="text-gray-400 mb-4">
+                            This section will contain the full mining calculator interface from the original HashSense.html.
+                            All calculations, sliders, and result tables will be integrated here.
+                        </p>
+                        
+                        <!-- Original calculator content goes here -->
+                        <!-- Copy from original HashSense.html lines ~450-800 -->
+                    </div>
+                </section>
+
+                <!-- ROI Calculator Section -->
+                <section id="roi-section" class="content-section hidden">
+                    <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 border border-purple-500/30">
+                        <h2 class="text-2xl font-bold mb-6 gradient-text flex items-center gap-2">
+                            <span class="material-icons">trending_up</span>
+                            ROI Calculator
+                        </h2>
+                        
+                        <!-- Original ROI calculator content goes here -->
+                    </div>
+                </section>
+
+                <!-- Investment Optimizer Section -->
+                <section id="invest-section" class="content-section hidden">
+                    <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl p-6 border border-purple-500/30">
+                        <h2 class="text-2xl font-bold mb-6 gradient-text flex items-center gap-2">
+                            <span class="material-icons">savings</span>
+                            Investment Optimizer
+                        </h2>
+                        
+                        <!-- Original investment optimizer content goes here -->
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900/80 backdrop-blur-lg border-t border-purple-500/30 py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex justify-center gap-6 mb-4">
+                <a href="HashRace.html" class="text-gray-400 hover:text-purple-400 transition-colors">🎄 HashRace</a>
+                <a href="linkview.html" class="text-gray-400 hover:text-purple-400 transition-colors">Links</a>
+                <a href="privacy-policy.html" class="text-gray-400 hover:text-purple-400 transition-colors">Privacy</a>
+            </div>
+            <p class="text-gray-500 text-sm">
+                © 2025 HashFarm.me – Mining Tools & Calculators
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Section Navigation
+        function showSection(sectionId, event) {
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('bg-purple-600/30');
+            });
+            
+            // Add active class to clicked item
+            if (event) {
+                event.currentTarget.classList.add('bg-purple-600/30');
+            }
+            
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show selected section
+            const section = document.getElementById(sectionId + '-section');
+            if (section) {
+                section.classList.remove('hidden');
+            }
+            
+            // Close sidebar on mobile
+            if (window.innerWidth < 768) {
+                toggleSidebar();
+            }
+        }
+
+        // Refresh Prices
+        async function refreshPrices() {
+            console.log('🔄 Refreshing prices...');
+            if (typeof updateBTCPrice === 'function') {
+                await updateBTCPrice();
+            }
+            if (typeof updateGMTPrice === 'function') {
+                await updateGMTPrice();
+            }
+            console.log('✅ Prices refreshed');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 HashSense_new initialized');
+            
+            // Load prices
+            refreshPrices();
+        });
+    </script>
+
+</body>
+</html>
