@@ -43,7 +43,7 @@ const priceMatrixdatei = {
         {"minTH":2560,"pricePerTH":24.72},
         {"minTH":3584,"pricePerTH":24.55},
     ],
-};*/
+};
 const priceMatrixdatei = {
     "15": [
         {"minTH":1,"pricePerTH":23.37,"minerCost":24.99},
@@ -65,5 +65,28 @@ const priceMatrixdatei = {
         {"minTH":1536,"pricePerTH":20.94},
         {"minTH":2560,"pricePerTH":20.80},
         {"minTH":3584,"pricePerTH":20.66},
+    ],
+};*/
+const priceMatrixdatei = {
+    "15": [
+        {"minTH":1,"pricePerTH":20.69,"minerCost":22.99},
+        {"minTH":2,"pricePerTH":20.56},
+        {"minTH":4,"pricePerTH":20.43},
+        {"minTH":8,"pricePerTH":20.3},
+        {"minTH":16,"pricePerTH":20.17},
+        {"minTH":32,"pricePerTH":20.04},
+        {"minTH":48,"pricePerTH":19.92},
+        {"minTH":64,"pricePerTH":19.79},
+        {"minTH":96,"pricePerTH":19.67},
+        {"minTH":128,"pricePerTH":19.55},
+        {"minTH":192,"pricePerTH":19.43},
+        {"minTH":256,"pricePerTH":19.3},
+        {"minTH":384,"pricePerTH":19.19},
+        {"minTH":512,"pricePerTH":19.07},
+        {"minTH":768,"pricePerTH":18.95},
+        {"minTH":1024,"pricePerTH":18.83},
+        {"minTH":1536,"pricePerTH":18.72},
+        {"minTH":2560,"pricePerTH":18.6},
+        {"minTH":3584,"pricePerTH":18.49},
     ],
 };
