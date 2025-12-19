@@ -1,5 +1,17 @@
 // filepath: src/scripts/footer-component.js
 function renderFooter() {
+    // Festes Datum - wird manuell aktualisiert wenn Preise geändert werden
+    const PRICE_UPDATE_DATE = '2025-12-19'; // Format: YYYY-MM-DD
+    
+    const updateDate = new Date(PRICE_UPDATE_DATE + 'T00:00:00');
+    const updateTimeString = updateDate.toLocaleString('de-DE', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
     return `
     <footer class="bg-gray-800 border-t border-gray-700 py-8 mt-12">
         <div class="max-w-6xl mx-auto px-4">
@@ -19,7 +31,6 @@ function renderFooter() {
                     <ul class="space-y-2">
                         <li><a href="HashSense.html" class="text-gray-400 hover:text-purple-400 transition-colors">Mining Calculators</a></li>
                         <li><a href="reinvest-calculator.html" class="text-gray-400 hover:text-purple-400 transition-colors">Reinvest Calculator</a></li>
-                       <!-- <li><a href="miner-history-import.html" class="text-gray-400 hover:text-purple-400 transition-colors">Miner History</a></li> -->
                         <li><a href="farm2.html" class="text-gray-400 hover:text-purple-400 transition-colors">Hashfarm</a></li>
                         <li><a href="gomining-promocode.html" class="text-gray-400 hover:text-purple-400 transition-colors">Promo Codes</a></li>
                     </ul>
@@ -29,7 +40,6 @@ function renderFooter() {
                 <div>
                     <h3 class="text-lg font-semibold text-white mb-4">Resources</h3>
                     <ul class="space-y-2">
-                       <!-- <li><a href="how-to-copy-paste-miners.html" class="text-gray-400 hover:text-purple-400 transition-colors">Import Guide</a></li> -->
                         <li><a href="https://gomining.com/?ref=ICjK3" target="_blank" rel="noopener" class="text-gray-400 hover:text-purple-400 transition-colors">GoMining ↗</a></li>
                     </ul>
                     
@@ -71,6 +81,15 @@ function renderFooter() {
                             DYOR - Do Your Own Research
                         </li>
                     </ul>
+                    
+                    <!-- Price Update Info -->
+                    <div class="mt-4 pt-4 border-t border-gray-700">
+                        <p class="text-xs text-gray-500 flex items-center gap-2">
+                            <span class="material-icons text-sm">schedule</span>
+                            Price date::
+                        </p>
+                        <p class="text-sm text-gray-300 font-mono mt-1">${updateTimeString}</p>
+                    </div>
                 </div>
             </div>
             
@@ -91,6 +110,7 @@ function renderFooter() {
     </footer>
     `;
 }
+
 // Auto-render footer on page load
 document.addEventListener('DOMContentLoaded', () => {
     const footerContainer = document.getElementById('footer-container');
