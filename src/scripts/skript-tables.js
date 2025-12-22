@@ -612,7 +612,7 @@ function getPricePerTH(efficiency, thAmount) {
 
 /**
  * Ermittelt den aktuellen Discount-Wert aus den verschiedenen Discount-Feldern
- */
+ 
 function getDiscount() {
     // Try different possible discount input elements
     const discountElements = [
@@ -636,7 +636,7 @@ function getDiscount() {
     }
     
     return 0; // Default: no discount
-}
+} */
 
 // ===== ROI CALCULATION FUNCTIONS =====
 // Imported from skriptfarm.js

@@ -682,7 +682,7 @@ function getPriceMatrix(efficiency) {
                     const costPerKWh = 0.05; // Strompreis pro kWh in USD
                     const hoursPerDay = 24;
 
-                    const discount = getDiscount(); // Rabattwert (z.B. 0.1 für 10%)
+                    const discount = getDiscount('lalala'); // Rabattwert (z.B. 0.1 für 10%)
 
                     // Berechnung der Kosten in USD mit Rabatt
                     const dailyElectricityUSD = ((efficiency * myTH * costPerKWh * hoursPerDay) / 1000) * (1 - discount);
@@ -699,11 +699,11 @@ function getPriceMatrix(efficiency) {
                         gmt: dailyElectricityGMT
                     };
                 }
-                function getDiscount() {
-                    const discountI = document.getElementById('gomining-discount-I');
+               /* function getDiscount() {
+                   // const discountI = document.getElementById('gomining-discount-I');
                     const discountFarm = document.getElementById('gomining-discount');
                     const discountROI = document.getElementById('gomining-discount_ROI');
-                
+                    const discountInvest = document.getElementById('gomining-discount_INVEST');
                     // Neuer Fallback: aus Tabellenzelle farm2
                     let discountTable = 0;
                     try {
@@ -725,7 +725,71 @@ function getPriceMatrix(efficiency) {
                         0;
                 
                     return Math.max(0, Math.min(value, 100)) / 100;
+                } */
+               function getDiscount() {
+                let value = 0;
+                let source = 0
+                // Falls source angegeben wird, direkt das entsprechende Feld nutzen
+                if (source) {
+                    switch(source) {
+                        case 'calc':
+                            const discountCalc = document.getElementById('gomining-discount');
+                            value = parseFloat(discountCalc?.value) || 0;
+                            break;
+                        case 'roi':
+                            const discountROI = document.getElementById('gomining-discount_ROI');
+                            value = parseFloat(discountROI?.value) || 0;
+                            break;
+                        case 'invest':
+                            const discountInvest = document.getElementById('gomining-discount_INVEST');
+                            value = parseFloat(discountInvest?.value) || 0;
+                            break;
+                    }
+                } else {
+                    // Kein source angegeben → prüfe welche Section NICHT hidden ist
+                    const calcSection = document.getElementById('calc-section');
+                    const roiSection = document.getElementById('roi-section');
+                    const investSection = document.getElementById('invest-section');
+                    
+                    if (calcSection && !calcSection.classList.contains('hidden')) {
+                        // Calc Tab ist aktiv
+                        const discountCalc = document.getElementById('gomining-discount');
+                        value = parseFloat(discountCalc?.value) || 0;
+                        
+                    } else if (roiSection && !roiSection.classList.contains('hidden')) {
+                        // ROI Tab ist aktiv
+                        const discountROI = document.getElementById('gomining-discount_ROI');
+                        value = parseFloat(discountROI?.value) || 0;
+                        
+                    } else if (investSection && !investSection.classList.contains('hidden')) {
+                        // Invest Tab ist aktiv
+                        const discountInvest = document.getElementById('gomining-discount_INVEST');
+                        value = parseFloat(discountInvest?.value) || 0;
+                    }
                 }
+                
+                // Fallback: aus farm2 Tabelle lesen
+                if (value === 0) {
+                    try {
+                        const row = document.querySelector('#farm-tbody tr');
+                        const cell = row?.children?.[2]; // 3. Spalte (Discount)
+                        if (cell) {
+                            value = parseFloat(cell.textContent.trim()) || 0;
+                        }
+                    } catch (e) {
+                        value = 0;
+                    }
+                }
+                
+                // Letzter Fallback: LocalStorage
+                if (value === 0) {
+                    let user_data = JSON.parse(localStorage.getItem('user_data')) || { total_discount: 0 };
+                    value = user_data.total_discount || 0;
+                }
+                
+                // Begrenze auf 0-100% und konvertiere zu Dezimalzahl (0-1)
+                return Math.max(0, Math.min(value, 100)) / 100;
+            }
                 
                 
 
@@ -733,7 +797,7 @@ function getPriceMatrix(efficiency) {
                 function calculateDailyService(myTH, btcPrice, gmtPrice) {
                     const serviceCostPerTHUSD = 0.0089; // Servicekosten pro TH pro Tag in USD
 
-                    const discount = getDiscount(); // Rabattwert
+                    const discount = getDiscount('lalala'); // Rabattwert
 
                     // Berechnung der Kosten in USD mit Rabatt
                     const dailyServiceUSD = serviceCostPerTHUSD * myTH * (1 - discount);
