@@ -170,16 +170,33 @@
                     // Look for "Miner" line
                     if (lines[i] === 'Miner' && i + 1 < lines.length) {
                         try {
-                            const minerLine = lines[i + 1];
-                            const minerMatch = minerLine.match(/^(.+?)\s+#(\d+)$/);
+                            let minerLine = lines[i + 1];
+                            let minerMatch = minerLine.match(/^(.+?)\s+#(\d+)$/);
+                            let minerName = null;
+                            let minerId = null;
                             
-                            if (!minerMatch) {
+                            // Neues Format: Name und ID auf separaten Zeilen
+                            if (!minerMatch && i + 2 < lines.length) {
+                                const nextLine = lines[i + 2];
+                                // Prüfe ob nächste Zeile mit " #" oder "#" beginnt (ID-Zeile)
+                                const idMatch = nextLine.trim().match(/^#(\d+)$/);
+                                if (idMatch) {
+                                    minerName = minerLine.trim();
+                                    minerId = idMatch[1];
+                                }
+                            }
+                            
+                            // Altes Format: Name und ID in einer Zeile
+                            if (!minerName && minerMatch) {
+                                minerName = minerMatch[1].trim();
+                                minerId = minerMatch[2];
+                            }
+                            
+                            if (!minerName || !minerId) {
                                 i++;
                                 continue;
                             }
 
-                            const minerName = minerMatch[1].trim();
-                            const minerId = minerMatch[2];
                             const fullName = `${minerName} #${minerId}`;
 
                             // Extract TH and W/TH (these are CURRENT values from GoMining)
@@ -342,10 +359,25 @@
                     // Look for "Miner" line
                     if (lines[i] === 'Miner' && i + 1 < lines.length) {
                         try {
-                            const minerLine = lines[i + 1];
-                            const minerMatch = minerLine.match(/^(.+?)\s+#(\d+)$/);
-                            if (!minerMatch) { i++; continue; }
-                            const minerId = minerMatch[2];
+                            let minerLine = lines[i + 1];
+                            let minerMatch = minerLine.match(/^(.+?)\s+#(\d+)$/);
+                            let minerId = null;
+                            
+                            // Neues Format: Name und ID auf separaten Zeilen
+                            if (!minerMatch && i + 2 < lines.length) {
+                                const nextLine = lines[i + 2];
+                                const idMatch = nextLine.trim().match(/^#(\d+)$/);
+                                if (idMatch) {
+                                    minerId = idMatch[1];
+                                }
+                            }
+                            
+                            // Altes Format: Name und ID in einer Zeile
+                            if (!minerId && minerMatch) {
+                                minerId = minerMatch[2];
+                            }
+                            
+                            if (!minerId) { i++; continue; }
                             if (!minerData[minerId]) { notFound++; i++; continue; }
 
                             // Try to parse upgrades in both formats:
@@ -590,15 +622,28 @@
                     // Look for "Miner" line
                     if (lines[i] === 'Miner' && i + 1 < lines.length) {
                         try {
-                            const minerLine = lines[i + 1];
-                            const minerMatch = minerLine.match(/^(.+?)\s+#(\d+)$/);
+                            let minerLine = lines[i + 1];
+                            let minerMatch = minerLine.match(/^(.+?)\s+#(\d+)$/);
+                            let minerId = null;
                             
-                            if (!minerMatch) {
+                            // Neues Format: Name und ID auf separaten Zeilen
+                            if (!minerMatch && i + 2 < lines.length) {
+                                const nextLine = lines[i + 2];
+                                const idMatch = nextLine.trim().match(/^#(\d+)$/);
+                                if (idMatch) {
+                                    minerId = idMatch[1];
+                                }
+                            }
+                            
+                            // Altes Format: Name und ID in einer Zeile
+                            if (!minerId && minerMatch) {
+                                minerId = minerMatch[2];
+                            }
+                            
+                            if (!minerId) {
                                 i++;
                                 continue;
                             }
-
-                            const minerId = minerMatch[2];
 
                             // Check if miner exists
                             if (!minerData[minerId]) {
