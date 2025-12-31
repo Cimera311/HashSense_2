@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HashFarm</title>
+  <script src="src/scripts/skript.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+      <!-- Footer Script -->
+    <script src="src/scripts/footer-component.js"></script>
+     <!-- Material Icons hinzufügen für check_circle, warning etc. -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      
+    <!-- Plausible Analytics -->
+    <script defer data-domain="hashfarm.me" src="https://plausible.io/js/script.js"></script>
+    <!-- SEO essentials -->
+    <meta name="description" content="Calculate realistic net Bitcoin-mining returns for GoMining: sats/TH, electricity & service fees, and ROI scenarios. Tools, guides, and link manager — without hype.">
+    <link rel="canonical" href="https://hashfarm.me/">
+    <meta name="theme-color" content="#0b0f17">
+
+    <!-- Open Graph extras -->
+    <meta property="og:site_name" content="HashFarm">
+    <meta property="og:image:alt" content="HashFarm – GoMining tools & calculator preview">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HashFarm – GoMining Tools">
+    <meta name="twitter:description" content="Track, calculate, and optimize your GoMining ROI.">
+    <meta name="twitter:image" content="https://hashfarm.me/assets/preview.png">
+
+    <!-- (Optional) Preload preview image for faster social/first paint -->
+    <link rel="preload" as="image" href="https://hashfarm.me/assets/preview.png" fetchpriority="high">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "name": "HashFarm",
+          "url": "https://hashfarm.me/",
+          "inLanguage": "en",
+          "description": "Bitcoin mining calculator for GoMining."
+        },
+        {
+          "@type": "Organization",
+          "name": "HashFarm",
+          "url": "https://hashfarm.me/",
+          "logo": "https://hashfarm.me/assets/android-chrome-192x192.png"
+        }
+      ]
+    }
+    </script>
+    <!-- Open Graph Meta -->
+  <meta property="og:title" content="HashFarm – Bitcoin Mining Tools">
+  <meta property="og:description" content="Track, calculate and optimize your Bitcoin mining ROI with HashFarm.">
+  <meta property="og:image" content="https://hashfarm.me/assets/preview.png">
+  <meta property="og:url" content="https://hashfarm.me/">
+  <meta property="og:type" content="website">
+
+  <!-- Favicons -->
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+
+<!-- Android/Chrome -->
+<link rel="icon" type="image/png" sizes="192x192" href="assets/android-chrome-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/android-chrome-512x512.png">
+
+<!-- Apple iOS -->
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="assets/site.webmanifest">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-VQ2RT4JL4L"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-VQ2RT4JL4L');
+</script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <!-- BTC -->
+    <div class="bg-gray-800 rounded-xl p-4 shadow-lg flex flex-col">
+      <h2 class="text-lg font-semibold mb-2">CURRENT BITCOIN PRICE</h2>
+      <div class="flex items-center gap-3">
+        <img src="bitcoin-910307_1280.webp" alt="BTC" class="w-10 h-10">
+        <select id="bitcoin-price-dropdown" onchange="updateBTCPrice();" 
+                class="flex-1 bg-gray-700 rounded px-2 py-1">
+          <option value="10000">10,000 $</option>
+          <option value="20000">20,000 $</option>
+          <option value="30000">30,000 $</option>
+          <option value="40000">40,000 $</option>
+          <option value="50000">50,000 $</option>
+          <option value="60000">60,000 $</option>
+          <option value="70000">70,000 $</option>
+          <option value="80000">80,000 $</option>
+          <option value="90000">90,000 $</option>
+          <option id="currentp" value="0">current price</option>
+          <option value="100000">100,000 $</option>
+          <option value="110000">110,000 $</option>
+          <option value="120000">120,000 $</option>
+          <option value="130000">130,000 $</option>
+          <option value="140000">140,000 $</option>
+          <option value="150000">150,000 $</option>
+          <option value="160000">160,000 $</option>
+          <option value="200000">200,000 $</option>
+          <option value="250000">250,000 $</option>
+          <option value="300000">300,000 $</option>
+          <option value="400000">400,000 $</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- GMT -->
+    <div class="bg-gray-800 rounded-xl p-4 shadow-lg flex flex-col">
+      <h2 class="text-lg font-semibold mb-2">CURRENT GMT PRICE</h2>
+      <div class="flex items-center gap-3">
+        <img src="GoMining_Logo.webp" alt="GMT" class="w-10 h-10">
+        <input type="number" id="gmt-token-price" placeholder="0.4269" step="0.0001"
+               class="flex-1 bg-gray-700 rounded px-2 py-1">
+      </div>
+    </div>
+
+    <!-- SAT/TH -->
+    <div class="bg-gray-800 rounded-xl p-4 shadow-lg flex flex-col">
+      <h2 class="text-lg font-semibold mb-2">SAT PER TH</h2>
+      <div class="flex items-center gap-3">
+        <img src="sats-ordinals-sats-logo.png" alt="⚡" class="w-10 h-10">
+        <input type="number" id="sat-TH" value="44" min="0" step="1"
+               class="flex-1 bg-gray-700 rounded px-2 py-1">
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex flex-1 flex-col items-center justify-center gap-6">
+    <button onclick="window.location.href='login.html'" 
+            class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded-lg shadow">
+      Login
+    </button>
+    <button onclick="window.location.href='HashSense.html'" 
+            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow">
+      HashSense
+    </button>
+  </main>
+
+  <!-- Footer -->
+<!-- Footer Container -->
+<div id="footer-container"></div>
+</body>
+</html>

@@ -321,6 +321,51 @@
         .material-icons {
             vertical-align: middle;
         }
+
+        /* Settings Bar */
+        .settings-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 10px;
+            border: 1px solid rgba(103, 61, 236, 0.3);
+        }
+
+        .setting-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .setting-group label {
+            color: #aaa;
+            font-weight: 600;
+        }
+
+        .toggle-btn {
+            padding: 8px 16px;
+            background: rgba(103, 61, 236, 0.3);
+            border: 2px solid #673dec;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(103, 61, 236, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .toggle-btn.active {
+            background: #673dec;
+            box-shadow: 0 0 15px rgba(103, 61, 236, 0.6);
+        }
     </style>
 </head>
 <body>
@@ -406,6 +451,27 @@
                     <div class="label">Sales Revenue</div>
                     <div class="value" id="salesRevenue">$0</div>
                     <div class="subvalue" id="revenueGMT">0 GMT</div>
+                </div>
+            </div>
+
+            <!-- View Mode Settings -->
+            <div class="settings-bar" style="margin-bottom: 30px;">
+                <div class="setting-group">
+                    <label>👁️ Active Portfolio View:</label>
+                    <button class="toggle-btn active" id="viewCards">Cards</button>
+                    <button class="toggle-btn" id="viewTable">Table</button>
+                    <button class="toggle-btn" id="viewAccordion">Accordion</button>
+                </div>
+            </div>
+
+            <!-- Active Portfolio Section -->
+            <div class="performers-section" id="activePortfolioSection" style="margin-bottom: 30px;">
+                <h2 style="color: #673dec;">
+                    <span class="material-icons">account_balance_wallet</span>
+                    Active Portfolio
+                </h2>
+                <div id="activePortfolioDisplay">
+                    <!-- Filled by JS based on view mode -->
                 </div>
             </div>
 

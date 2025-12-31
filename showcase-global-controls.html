@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Controls Showcase - HashSense</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .global-controls-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 800px;
+            margin: 30px auto;
+        }
+
+        .control-section {
+            margin-bottom: 40px;
+        }
+
+        .control-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .main-value {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .main-value .label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .main-value .value {
+            font-size: 56px;
+            font-weight: 700;
+            color: #667eea;
+            line-height: 1;
+            font-family: 'Courier New', monospace;
+        }
+
+        .main-value .unit {
+            font-size: 28px;
+            color: #764ba2;
+            margin-left: 10px;
+        }
+
+        .slider-controls {
+            background: #f8f9fa;
+            border-radius: 50px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .slider-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            padding: 0;
+        }
+
+        .slider-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.5);
+        }
+
+        .slider-btn:active {
+            transform: scale(0.95);
+        }
+
+        .slider-btn.large {
+            width: 36px;
+            height: 36px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .slider-btn.medium {
+            width: 34px;
+            height: 34px;
+            font-size: 12px;
+        }
+
+        .slider-btn.small {
+            width: 32px;
+            height: 32px;
+            font-size: 11px;
+        }
+
+        .custom-slider {
+            flex: 1;
+            height: 10px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #dee2e6 0%, #667eea 50%, #764ba2 100%);
+            outline: none;
+            -webkit-appearance: none;
+            margin: 0 8px;
+        }
+
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: grab;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            border: 3px solid white;
+            margin-top: -9px;
+        }
+
+        .custom-slider::-webkit-slider-thumb:hover {
+            width: 32px;
+            height: 32px;
+            margin-top: -11px;
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .custom-slider::-webkit-slider-thumb:active {
+            cursor: grabbing;
+        }
+
+        .custom-slider::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: grab;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .custom-slider::-moz-range-thumb:active {
+            cursor: grabbing;
+        }
+
+        .secondary-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .secondary-control {
+            text-align: center;
+        }
+
+        .secondary-control .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .secondary-control .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #495057;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .secondary-control .unit {
+            font-size: 18px;
+            color: #764ba2;
+            margin-left: 5px;
+        }
+
+        .secondary-slider-controls {
+            background: #f8f9fa;
+            border-radius: 50px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .secondary-slider-controls .slider-btn {
+            width: 34px;
+            height: 34px;
+            font-size: 11px;
+        }
+
+        .secondary-slider-controls .custom-slider {
+            margin: 0 8px;
+            height: 12px;
+        }
+
+        .secondary-slider-controls .custom-slider::-webkit-slider-thumb {
+            width: 26px;
+            height: 26px;
+            margin-top: -7px;
+        }
+
+        .secondary-slider-controls .custom-slider::-webkit-slider-thumb:hover {
+            width: 30px;
+            height: 30px;
+            margin-top: -9px;
+        }
+
+        .secondary-slider-controls .custom-slider::-moz-range-thumb {
+            width: 26px;
+            height: 26px;
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            color: white;
+            font-weight: 700;
+            border-radius: 12px;
+            padding: 14px 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+            margin-top: 30px;
+            width: 100%;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        .showcase-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .showcase-header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .showcase-header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .info-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* Custom slider thumb styling for all variants */
+        #th-slider-v2::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #212529;
+            cursor: grab;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        #wth-slider-v2::-webkit-slider-thumb,
+        #discount-slider-v2::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #495057;
+            cursor: grab;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        #th-slider-v3::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(10px);
+            cursor: grab;
+            border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        #wth-slider-v3::-webkit-slider-thumb,
+        #discount-slider-v3::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.35);
+            backdrop-filter: blur(10px);
+            cursor: grab;
+            border: 2px solid rgba(255,255,255,0.4);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        #th-slider-v4::-webkit-slider-thumb,
+        #wth-slider-v4::-webkit-slider-thumb,
+        #discount-slider-v4::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            cursor: grab;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            border: 2px solid white;
+        }
+
+        #th-slider-v4::-webkit-slider-thumb:active,
+        #wth-slider-v4::-webkit-slider-thumb:active,
+        #discount-slider-v4::-webkit-slider-thumb:active {
+            cursor: grabbing;
+        }
+
+        /* Enhanced Slider Styles for Variant 4 */
+        .slider-container-v4 {
+            position: relative;
+            width: 100%;
+        }
+
+        .slider-value-display {
+            position: absolute;
+            top: -35px;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateX(-50%) scale(0.8);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
+            white-space: nowrap;
+        }
+
+        .slider-value-display::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #3b82f6;
+        }
+
+        .slider-value-display.active {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        .slider-v4-enhanced {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 10px;
+            outline: none;
+            position: relative;
+            background: linear-gradient(90deg, #374151 0%, #374151 100%);
+        }
+
+        .slider-v4-enhanced::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            cursor: grab;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            border: 3px solid white;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        .slider-v4-enhanced::-webkit-slider-thumb:hover {
+            width: 32px;
+            height: 32px;
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.8), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .slider-v4-enhanced::-webkit-slider-thumb:active {
+            cursor: grabbing;
+            box-shadow: 0 2px 12px rgba(59, 130, 246, 0.9), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .slider-v4-enhanced::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            cursor: grab;
+            border: 3px solid white;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Secondary sliders for v4 */
+        .slider-v4-wth {
+            background: linear-gradient(90deg, #374151 0%, #374151 100%);
+        }
+
+        .slider-v4-wth::-webkit-slider-thumb {
+            background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .slider-v4-wth::-webkit-slider-thumb:hover {
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.8), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .slider-v4-discount {
+            background: linear-gradient(90deg, #374151 0%, #374151 100%);
+        }
+
+        .slider-v4-discount::-webkit-slider-thumb {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            box-shadow: 0 4px 16px rgba(168, 85, 247, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .slider-v4-discount::-webkit-slider-thumb:hover {
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.8), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Pulsing animation for active slider */
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 4px 16px rgba(59, 130, 246, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 6px 24px rgba(59, 130, 246, 0.9), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        .slider-v4-enhanced:active::-webkit-slider-thumb {
+            animation: pulse-glow 1s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .secondary-controls {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .slider-controls {
+                flex-wrap: wrap;
+            }
+
+            .main-value .value {
+                font-size: 42px;
+            }
+
+            .global-controls-card {
+                padding: 25px;
+            }
+        }
+
+        /* noUiSlider Custom Styling */
+        .noUi-target {
+            background: #374151;
+            border: none;
+            box-shadow: none;
+            height: 10px;
+            border-radius: 10px;
+        }
+
+        .noUi-connect {
+            background: linear-gradient(90deg, #06b6d4 0%, #3b82f6 100%);
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+        }
+
+        #wth-slider-nouiv4 .noUi-connect {
+            background: linear-gradient(90deg, #10b981 0%, #14b8a6 100%);
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+        }
+
+        #discount-slider-nouiv4 .noUi-connect {
+            background: linear-gradient(90deg, #a855f7 0%, #ec4899 100%);
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+        }
+
+        .noUi-handle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            border: 3px solid white;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+            cursor: grab;
+            top: -9px;
+            right: -14px;
+            transition: all 0.3s ease;
+        }
+
+        .noUi-handle:before,
+        .noUi-handle:after {
+            display: none;
+        }
+
+        .noUi-handle:hover {
+            width: 32px;
+            height: 32px;
+            top: -11px;
+            right: -16px;
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.8), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .noUi-handle:active {
+            cursor: grabbing;
+        }
+
+        #wth-slider-nouiv4 .noUi-handle {
+            background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        #wth-slider-nouiv4 .noUi-handle:hover {
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.8), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        #discount-slider-nouiv4 .noUi-handle {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            box-shadow: 0 4px 16px rgba(168, 85, 247, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        #discount-slider-nouiv4 .noUi-handle:hover {
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.8), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .noUi-tooltip {
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            border: none;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
+        }
+
+        #wth-slider-nouiv4 .noUi-tooltip {
+            background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        #discount-slider-nouiv4 .noUi-tooltip {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+        }
+
+        .noUi-horizontal {
+            height: 10px;
+        }
+
+        #wth-slider-nouiv4.noUi-horizontal,
+        #discount-slider-nouiv4.noUi-horizontal {
+            height: 8px;
+        }
+
+        #wth-slider-nouiv4 .noUi-handle,
+        #discount-slider-nouiv4 .noUi-handle {
+            width: 24px;
+            height: 24px;
+            top: -8px;
+            right: -12px;
+        }
+
+        #wth-slider-nouiv4 .noUi-handle:hover,
+        #discount-slider-nouiv4 .noUi-handle:hover {
+            width: 28px;
+            height: 28px;
+            top: -10px;
+            right: -14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <div class="showcase-header">
+        <h1>🎛️ Global Controls Showcase</h1>
+        <p>Interaktive Steuerung für TH, W/TH und GoMining Discount</p>
+        <span class="info-badge">✨ Design Preview - 4 verschiedene Varianten</span>
+    </div>
+
+    <!-- Variante 1: Gradient Design (Original verbessert) -->
+    <div class="global-controls-card">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h3 style="color: #667eea; font-size: 18px; font-weight: 600; margin-bottom: 5px;">Variante 1: Gradient Design</h3>
+            <p style="color: #6c757d; font-size: 13px;">Original mit Verbesserungen</p>
+        </div>
+
+        <!-- Main TH Control -->
+        <div class="control-section">
+            <div class="main-value">
+                <div class="label">Total Hashrate</div>
+                <div>
+                    <span class="value" id="th-value">1000</span>
+                    <span class="unit">TH/s</span>
+                </div>
+            </div>
+
+            <div class="slider-controls">
+                <button class="slider-btn large" onclick="adjustTH(-100, 'v1')" title="−100 TH/s">&lt;&lt;&lt;</button>
+                <button class="slider-btn medium" onclick="adjustTH(-10, 'v1')" title="−10 TH/s">&lt;&lt;</button>
+                <button class="slider-btn small" onclick="adjustTH(-1, 'v1')" title="−1 TH/s">&lt;</button>
+                
+                <input type="range" class="custom-slider" id="th-slider" min="0" max="10000" value="1000" step="1" oninput="updateTH(this.value, 'v1')">
+                
+                <button class="slider-btn small" onclick="adjustTH(1, 'v1')" title="+1 TH/s">&gt;</button>
+                <button class="slider-btn medium" onclick="adjustTH(10, 'v1')" title="+10 TH/s">&gt;&gt;</button>
+                <button class="slider-btn large" onclick="adjustTH(100, 'v1')" title="+100 TH/s">&gt;&gt;&gt;</button>
+            </div>
+        </div>
+
+        <!-- Secondary Controls: W/TH and Discount -->
+        <div class="secondary-controls">
+            <!-- W/TH Control -->
+            <div class="secondary-control">
+                <div class="label">Watt pro Terahash</div>
+                <div>
+                    <span class="value" id="wth-value">25.00</span>
+                    <span class="unit">W/TH</span>
+                </div>
+                
+                <div class="secondary-slider-controls">
+                    <button class="slider-btn" onclick="adjustWTH(-1, 'v1')" title="−1 W/TH">&lt;&lt;&lt;</button>
+                    <button class="slider-btn" onclick="adjustWTH(-0.1, 'v1')" title="−0.1 W/TH">&lt;&lt;</button>
+                    <button class="slider-btn" onclick="adjustWTH(-0.01, 'v1')" title="−0.01 W/TH">&lt;</button>
+                    
+                    <input type="range" class="custom-slider" id="wth-slider" min="10" max="100" value="25" step="0.01" oninput="updateWTH(this.value, 'v1')">
+                    
+                    <button class="slider-btn" onclick="adjustWTH(0.01, 'v1')" title="+0.01 W/TH">&gt;</button>
+                    <button class="slider-btn" onclick="adjustWTH(0.1, 'v1')" title="+0.1 W/TH">&gt;&gt;</button>
+                    <button class="slider-btn" onclick="adjustWTH(1, 'v1')" title="+1 W/TH">&gt;&gt;&gt;</button>
+                </div>
+            </div>
+
+            <!-- Discount Control -->
+            <div class="secondary-control">
+                <div class="label">GoMining Discount</div>
+                <div>
+                    <span class="value" id="discount-value">5.00</span>
+                    <span class="unit">%</span>
+                </div>
+                
+                <div class="secondary-slider-controls">
+                    <button class="slider-btn" onclick="adjustDiscount(-1, 'v1')" title="−1%">&lt;&lt;&lt;</button>
+                    <button class="slider-btn" onclick="adjustDiscount(-0.1, 'v1')" title="−0.1%">&lt;&lt;</button>
+                    <button class="slider-btn" onclick="adjustDiscount(-0.01, 'v1')" title="−0.01%">&lt;</button>
+                    
+                    <input type="range" class="custom-slider" id="discount-slider" min="0" max="50" value="5" step="0.01" oninput="updateDiscount(this.value, 'v1')">
+                    
+                    <button class="slider-btn" onclick="adjustDiscount(0.01, 'v1')" title="+0.01%">&gt;</button>
+                    <button class="slider-btn" onclick="adjustDiscount(0.1, 'v1')" title="+0.1%">&gt;&gt;</button>
+                    <button class="slider-btn" onclick="adjustDiscount(1, 'v1')" title="+1%">&gt;&gt;&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="reset-btn" onclick="resetAll('v1')">🔄 Alle Werte zurücksetzen</button>
+    </div>
+
+    <!-- Variante 2: Minimalistisch / Clean -->
+    <div class="global-controls-card" style="background: #ffffff; border: 2px solid #e9ecef;">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h3 style="color: #495057; font-size: 18px; font-weight: 600; margin-bottom: 5px;">Variante 2: Minimalistisch</h3>
+            <p style="color: #6c757d; font-size: 13px;">Clean & Simple Design</p>
+        </div>
+        
+        <div class="control-section">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <div style="font-size: 12px; color: #6c757d; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px;">Hashrate</div>
+                <div style="font-size: 48px; font-weight: 300; color: #212529; font-family: 'Segoe UI', sans-serif;">
+                    <span id="th-value-v2">1000</span><span style="font-size: 20px; color: #6c757d; margin-left: 8px;">TH/s</span>
+                </div>
+            </div>
+            
+            <div style="background: white; border: 1px solid #dee2e6; border-radius: 30px; padding: 6px 10px; display: flex; align-items: center; gap: 5px;">
+                <button class="slider-btn" style="background: #212529; width: 30px; height: 30px; font-size: 10px;" onclick="adjustTH(-100, 'v2')">≪</button>
+                <button class="slider-btn" style="background: #495057; width: 28px; height: 28px; font-size: 9px;" onclick="adjustTH(-10, 'v2')">‹‹</button>
+                <button class="slider-btn" style="background: #6c757d; width: 26px; height: 26px; font-size: 9px;" onclick="adjustTH(-1, 'v2')">‹</button>
+                
+                <input type="range" id="th-slider-v2" min="0" max="10000" value="1000" step="1" 
+                    style="flex: 1; height: 4px; background: #dee2e6; border-radius: 10px; outline: none; -webkit-appearance: none; margin: 0 10px;"
+                    oninput="updateTH(this.value, 'v2')">
+                
+                <button class="slider-btn" style="background: #6c757d; width: 26px; height: 26px; font-size: 9px;" onclick="adjustTH(1, 'v2')">›</button>
+                <button class="slider-btn" style="background: #495057; width: 28px; height: 28px; font-size: 9px;" onclick="adjustTH(10, 'v2')">››</button>
+                <button class="slider-btn" style="background: #212529; width: 30px; height: 30px; font-size: 10px;" onclick="adjustTH(100, 'v2')">≫</button>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 35px; padding-top: 35px; border-top: 1px solid #e9ecef;">
+            <div style="text-align: center;">
+                <div style="font-size: 11px; color: #6c757d; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1.5px;">W/TH</div>
+                <div style="font-size: 28px; font-weight: 300; color: #212529; margin-bottom: 15px;">
+                    <span id="wth-value-v2">25.00</span><span style="font-size: 14px; color: #6c757d; margin-left: 4px;">W/TH</span>
+                </div>
+                
+                <div style="background: white; border: 1px solid #dee2e6; border-radius: 30px; padding: 5px 8px; display: flex; align-items: center; gap: 4px;">
+                    <button class="slider-btn" style="background: #495057; width: 26px; height: 26px; font-size: 9px;" onclick="adjustWTH(-1, 'v2')">≪</button>
+                    <button class="slider-btn" style="background: #6c757d; width: 24px; height: 24px; font-size: 8px;" onclick="adjustWTH(-0.1, 'v2')">‹‹</button>
+                    <button class="slider-btn" style="background: #868e96; width: 22px; height: 22px; font-size: 8px;" onclick="adjustWTH(-0.01, 'v2')">‹</button>
+                    <input type="range" id="wth-slider-v2" min="10" max="100" value="25" step="0.01" 
+                        style="flex: 1; height: 4px; background: #dee2e6; border-radius: 10px; outline: none; -webkit-appearance: none;"
+                        oninput="updateWTH(this.value, 'v2')">
+                    <button class="slider-btn" style="background: #868e96; width: 22px; height: 22px; font-size: 8px;" onclick="adjustWTH(0.01, 'v2')">›</button>
+                    <button class="slider-btn" style="background: #6c757d; width: 24px; height: 24px; font-size: 8px;" onclick="adjustWTH(0.1, 'v2')">››</button>
+                    <button class="slider-btn" style="background: #495057; width: 26px; height: 26px; font-size: 9px;" onclick="adjustWTH(1, 'v2')">≫</button>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <div style="font-size: 11px; color: #6c757d; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1.5px;">Discount</div>
+                <div style="font-size: 28px; font-weight: 300; color: #212529; margin-bottom: 15px;">
+                    <span id="discount-value-v2">5.00</span><span style="font-size: 14px; color: #6c757d; margin-left: 4px;">%</span>
+                </div>
+                
+                <div style="background: white; border: 1px solid #dee2e6; border-radius: 30px; padding: 5px 8px; display: flex; align-items: center; gap: 4px;">
+                    <button class="slider-btn" style="background: #495057; width: 26px; height: 26px; font-size: 9px;" onclick="adjustDiscount(-1, 'v2')">≪</button>
+                    <button class="slider-btn" style="background: #6c757d; width: 24px; height: 24px; font-size: 8px;" onclick="adjustDiscount(-0.1, 'v2')">‹‹</button>
+                    <button class="slider-btn" style="background: #868e96; width: 22px; height: 22px; font-size: 8px;" onclick="adjustDiscount(-0.01, 'v2')">‹</button>
+                    <input type="range" id="discount-slider-v2" min="0" max="50" value="5" step="0.01" 
+                        style="flex: 1; height: 4px; background: #dee2e6; border-radius: 10px; outline: none; -webkit-appearance: none;"
+                        oninput="updateDiscount(this.value, 'v2')">
+                    <button class="slider-btn" style="background: #868e96; width: 22px; height: 22px; font-size: 8px;" onclick="adjustDiscount(0.01, 'v2')">›</button>
+                    <button class="slider-btn" style="background: #6c757d; width: 24px; height: 24px; font-size: 8px;" onclick="adjustDiscount(0.1, 'v2')">››</button>
+                    <button class="slider-btn" style="background: #495057; width: 26px; height: 26px; font-size: 9px;" onclick="adjustDiscount(1, 'v2')">≫</button>
+                </div>
+            </div>
+        </div>
+
+        <button style="background: #212529; border: none; color: white; font-weight: 500; border-radius: 8px; padding: 12px; cursor: pointer; margin-top: 25px; width: 100%; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;" 
+            onclick="resetAll('v2')" onmouseover="this.style.background='#495057'" onmouseout="this.style.background='#212529'">Reset</button>
+    </div>
+
+    <!-- Variante 3: Glassmorphism -->
+    <div class="global-controls-card" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h3 style="color: white; font-size: 18px; font-weight: 600; margin-bottom: 5px; text-shadow: 0 2px 8px rgba(0,0,0,0.3);">Variante 3: Glassmorphism</h3>
+            <p style="color: rgba(255,255,255,0.8); font-size: 13px;">Modern & Transparent</p>
+        </div>
+        
+        <div class="control-section">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <div style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px;">Total Hashrate</div>
+                <div style="font-size: 52px; font-weight: 700; color: white; text-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                    <span id="th-value-v3">1000</span><span style="font-size: 24px; color: rgba(255,255,255,0.8); margin-left: 8px;">TH/s</span>
+                </div>
+            </div>
+            
+            <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 40px; padding: 8px 12px; display: flex; align-items: center; gap: 6px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);">
+                <button class="slider-btn" style="background: rgba(255,255,255,0.3); backdrop-filter: blur(10px); width: 34px; height: 34px; font-size: 11px; border: 1px solid rgba(255,255,255,0.3);" onclick="adjustTH(-100, 'v3')">≪</button>
+                <button class="slider-btn" style="background: rgba(255,255,255,0.25); backdrop-filter: blur(10px); width: 32px; height: 32px; font-size: 10px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustTH(-10, 'v3')">‹‹</button>
+                <button class="slider-btn" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); width: 30px; height: 30px; font-size: 10px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustTH(-1, 'v3')">‹</button>
+                
+                <input type="range" id="th-slider-v3" min="0" max="10000" value="1000" step="1" 
+                    style="flex: 1; height: 8px; background: rgba(255,255,255,0.2); border-radius: 10px; outline: none; -webkit-appearance: none; margin: 0 10px;"
+                    oninput="updateTH(this.value, 'v3')">
+                
+                <button class="slider-btn" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); width: 30px; height: 30px; font-size: 10px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustTH(1, 'v3')">›</button>
+                <button class="slider-btn" style="background: rgba(255,255,255,0.25); backdrop-filter: blur(10px); width: 32px; height: 32px; font-size: 10px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustTH(10, 'v3')">››</button>
+                <button class="slider-btn" style="background: rgba(255,255,255,0.3); backdrop-filter: blur(10px); width: 34px; height: 34px; font-size: 11px; border: 1px solid rgba(255,255,255,0.3);" onclick="adjustTH(100, 'v3')">≫</button>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 35px; padding-top: 35px; border-top: 1px solid rgba(255,255,255,0.2);">
+            <div style="text-align: center;">
+                <div style="font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1.5px;">Effizienz</div>
+                <div style="font-size: 30px; font-weight: 600; color: white; margin-bottom: 15px; text-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                    <span id="wth-value-v3">25.00</span><span style="font-size: 15px; color: rgba(255,255,255,0.8); margin-left: 4px;">W/TH</span>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 30px; padding: 6px 10px; display: flex; align-items: center; gap: 4px;">
+                    <button class="slider-btn" style="background: rgba(255,255,255,0.25); width: 28px; height: 28px; font-size: 9px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustWTH(-1, 'v3')">≪</button>
+                    <button class="slider-btn" style="background: rgba(255,255,255,0.2); width: 26px; height: 26px; font-size: 8px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustWTH(-0.1, 'v3')">‹‹</button>
+                    <button class="slider-btn" style="background: rgba(255,255,255,0.15); width: 24px; height: 24px; font-size: 8px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustWTH(-0.01, 'v3')">‹</button>
+                    <input type="range" id="wth-slider-v3" min="10" max="100" value="25" step="0.01" 
+                        style="flex: 1; height: 6px; background: rgba(255,255,255,0.2); border-radius: 10px; outline: none; -webkit-appearance: none;"
+                        oninput="updateWTH(this.value, 'v3')">
+                    <button class="slider-btn" style="background: rgba(255,255,255,0.15); width: 24px; height: 24px; font-size: 8px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustWTH(0.01, 'v3')">›</button>
+                    <button class="slider-btn" style="background: rgba(255,255,255,0.2); width: 26px; height: 26px; font-size: 8px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustWTH(0.1, 'v3')">››</button>
+                    <button class="slider-btn" style="background: rgba(255,255,255,0.25); width: 28px; height: 28px; font-size: 9px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustWTH(1, 'v3')">≫</button>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <div style="font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1.5px;">Rabatt</div>
+                <div style="font-size: 30px; font-weight: 600; color: white; margin-bottom: 15px; text-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                    <span id="discount-value-v3">5.00</span><span style="font-size: 15px; color: rgba(255,255,255,0.8); margin-left: 4px;">%</span>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 30px; padding: 6px 10px; display: flex; align-items: center; gap: 4px;">
+                    <button class="slider-btn" style="background: rgba(255,255,255,0.25); width: 28px; height: 28px; font-size: 9px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustDiscount(-1, 'v3')">≪</button>
+                    <button class="slider-btn" style="background: rgba(255,255,255,0.2); width: 26px; height: 26px; font-size: 8px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustDiscount(-0.1, 'v3')">‹‹</button>
+                    <button class="slider-btn" style="background: rgba(255,255,255,0.15); width: 24px; height: 24px; font-size: 8px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustDiscount(-0.01, 'v3')">‹</button>
+                    <input type="range" id="discount-slider-v3" min="0" max="50" value="5" step="0.01" 
+                        style="flex: 1; height: 6px; background: rgba(255,255,255,0.2); border-radius: 10px; outline: none; -webkit-appearance: none;"
+                        oninput="updateDiscount(this.value, 'v3')">
+                    <button class="slider-btn" style="background: rgba(255,255,255,0.15); width: 24px; height: 24px; font-size: 8px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustDiscount(0.01, 'v3')">›</button>
+                    <button class="slider-btn" style="background: rgba(255,255,255,0.2); width: 26px; height: 26px; font-size: 8px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustDiscount(0.1, 'v3')">››</button>
+                    <button class="slider-btn" style="background: rgba(255,255,255,0.25); width: 28px; height: 28px; font-size: 9px; border: 1px solid rgba(255,255,255,0.2);" onclick="adjustDiscount(1, 'v3')">≫</button>
+                </div>
+            </div>
+        </div>
+
+        <button style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); color: white; font-weight: 600; border-radius: 12px; padding: 14px; cursor: pointer; margin-top: 25px; width: 100%; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);" 
+            onclick="resetAll('v3')" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">🔄 Reset</button>
+    </div>
+
+    <!-- Variante 4: noUiSlider Professional -->
+    <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl shadow-2xl p-10 max-w-[800px] mx-auto mt-8">
+        <div class="text-center mb-8">
+            <h3 class="text-white text-xl font-bold mb-2">Variante 4: noUiSlider (Professional)</h3>
+            <p class="text-gray-400 text-sm">Industry-Standard Slider Library</p>
+        </div>
+        
+        <div class="mb-10">
+            <div class="text-center mb-6">
+                <div class="text-xs text-gray-500 uppercase tracking-widest mb-2">Mining Power</div>
+                <div class="text-6xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                    <span id="th-value-v4">1000</span><span class="text-2xl text-gray-400 ml-2">TH/s</span>
+                </div>
+            </div>
+            
+            <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full px-4 py-3 flex items-center gap-3 shadow-inner">
+                <button class="w-9 h-9 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs hover:scale-110 active:scale-95 transition-transform shadow-lg" onclick="adjustSlider('th-slider-nouiv4', -100)">≪</button>
+                <button class="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs hover:scale-110 active:scale-95 transition-transform shadow-md" onclick="adjustSlider('th-slider-nouiv4', -10)">‹‹</button>
+                <button class="w-7 h-7 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold text-xs hover:scale-110 active:scale-95 transition-transform shadow-sm" onclick="adjustSlider('th-slider-nouiv4', -1)">‹</button>
+                
+                <div class="flex-1 mx-2" id="th-slider-nouiv4"></div>
+                
+                <button class="w-7 h-7 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold text-xs hover:scale-110 active:scale-95 transition-transform shadow-sm" onclick="adjustSlider('th-slider-nouiv4', 1)">›</button>
+                <button class="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs hover:scale-110 active:scale-95 transition-transform shadow-md" onclick="adjustSlider('th-slider-nouiv4', 10)">››</button>
+                <button class="w-9 h-9 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs hover:scale-110 active:scale-95 transition-transform shadow-lg" onclick="adjustSlider('th-slider-nouiv4', 100)">≫</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-8 pt-8 border-t border-gray-700">
+            <div class="text-center">
+                <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Efficiency</div>
+                <div class="text-3xl font-bold text-white mb-4">
+                    <span id="wth-value-v4">25.00</span><span class="text-sm text-gray-400 ml-1">W/TH</span>
+                </div>
+                
+                <div class="bg-gray-800/50 border border-gray-700 rounded-full px-3 py-2.5 flex items-center gap-2 shadow-inner">
+                    <button class="w-7 h-7 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs hover:scale-110 active:scale-95 transition-transform" onclick="adjustSlider('wth-slider-nouiv4', -1)">≪</button>
+                    <button class="w-6 h-6 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs hover:scale-110 active:scale-95 transition-transform" onclick="adjustSlider('wth-slider-nouiv4', -0.1)">‹‹</button>
+                    <button class="w-5 h-5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[9px] hover:scale-110 active:scale-95 transition-transform" onclick="adjustSlider('wth-slider-nouiv4', -0.01)">‹</button>
+                    
+                    <div class="flex-1" id="wth-slider-nouiv4"></div>
+                    
+                    <button class="w-5 h-5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[9px] hover:scale-110 active:scale-95 transition-transform" onclick="adjustSlider('wth-slider-nouiv4', 0.01)">›</button>
+                    <button class="w-6 h-6 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs hover:scale-110 active:scale-95 transition-transform" onclick="adjustSlider('wth-slider-nouiv4', 0.1)">››</button>
+                    <button class="w-7 h-7 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs hover:scale-110 active:scale-95 transition-transform" onclick="adjustSlider('wth-slider-nouiv4', 1)">≫</button>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Discount</div>
+                <div class="text-3xl font-bold text-white mb-4">
+                    <span id="discount-value-v4">5.00</span><span class="text-sm text-gray-400 ml-1">%</span>
+                </div>
+                
+                <div class="bg-gray-800/50 border border-gray-700 rounded-full px-3 py-2.5 flex items-center gap-2 shadow-inner">
+                    <button class="w-7 h-7 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs hover:scale-110 active:scale-95 transition-transform" onclick="adjustSlider('discount-slider-nouiv4', -1)">≪</button>
+                    <button class="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs hover:scale-110 active:scale-95 transition-transform" onclick="adjustSlider('discount-slider-nouiv4', -0.1)">‹‹</button>
+                    <button class="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white text-[9px] hover:scale-110 active:scale-95 transition-transform" onclick="adjustSlider('discount-slider-nouiv4', -0.01)">‹</button>
+                    
+                    <div class="flex-1" id="discount-slider-nouiv4"></div>
+                    
+                    <button class="w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white text-[9px] hover:scale-110 active:scale-95 transition-transform" onclick="adjustSlider('discount-slider-nouiv4', 0.01)">›</button>
+                    <button class="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs hover:scale-110 active:scale-95 transition-transform" onclick="adjustSlider('discount-slider-nouiv4', 0.1)">››</button>
+                    <button class="w-7 h-7 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs hover:scale-110 active:scale-95 transition-transform" onclick="adjustSlider('discount-slider-nouiv4', 1)">≫</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="w-full mt-8 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-bold py-3.5 px-8 rounded-xl uppercase tracking-wider text-sm transition-all shadow-lg hover:shadow-xl" 
+            onclick="resetNoUiSliders()">🔄 Reset All Values</button>
+    </div>
+
+    <script>
+        // Default Values
+        const DEFAULT_TH = 1000;
+        const DEFAULT_WTH = 25.00;
+        const DEFAULT_DISCOUNT = 5.00;
+
+        // TH Controls
+        function adjustTH(delta, version = 'v1') {
+            const suffix = version === 'v1' ? '' : '-' + version;
+            const currentValue = parseFloat(donouislider@15.7.1/dist/nouislider.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Initialize noUiSlider for Variant 4
+        let thSliderNoui, wthSliderNoui, discountSliderNoui;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // TH Slider
+            const thSliderElement = document.getElementById('th-slider-nouiv4');
+            if (thSliderElement) {
+                thSliderNoui = noUiSlider.create(thSliderElement, {
+                    start: [1000],
+                    connect: [true, false],
+                    range: {
+                        'min': 0,
+                        'max': 10000
+                    },
+                    step: 1,
+                    tooltips: {
+                        to: function(value) {
+                            return Math.round(value) + ' TH/s';
+                        }
+                    }
+                });
+
+                thSliderNoui.on('update', function(values) {
+                    document.getElementById('th-value-v4').textContent = Math.round(values[0]);
+                });
+            }
+
+            // W/TH Slider
+            const wthSliderElement = document.getElementById('wth-slider-nouiv4');
+            if (wthSliderElement) {
+                wthSliderNoui = noUiSlider.create(wthSliderElement, {
+                    start: [25],
+                    connect: [true, false],
+                    range: {
+                        'min': 10,
+                        'max': 100
+                    },
+                    step: 0.01,
+                    tooltips: {
+                        to: function(value) {
+                            return parseFloat(value).toFixed(2) + ' W/TH';
+                        }
+                    }
+                });
+
+                wthSliderNoui.on('update', function(values) {
+                    document.getElementById('wth-value-v4').textContent = parseFloat(values[0]).toFixed(2);
+                });
+            }
+
+            // Discount Slider
+            const discountSliderElement = document.getElementById('discount-slider-nouiv4');
+            if (discountSliderElement) {
+                discountSliderNoui = noUiSlider.create(discountSliderElement, {
+                    start: [5],
+                    connect: [true, false],
+                    range: {
+                        'min': 0,
+                        'max': 50
+                    },
+                    step: 0.01,
+                    tooltips: {
+                        to: function(value) {
+                            return parseFloat(value).toFixed(2) + '%';
+                        }
+                    }
+                });
+
+                discountSliderNoui.on('update', function(values) {
+                    document.getElementById('discount-value-v4').textContent = parseFloat(values[0]).toFixed(2);
+                });
+            }
+        });
+
+        // Adjust slider by delta
+        function adjustSlider(sliderId, delta) {
+            let slider;
+            if (sliderId === 'th-slider-nouiv4') slider = thSliderNoui;
+            else if (sliderId === 'wth-slider-nouiv4') slider = wthSliderNoui;
+            else if (sliderId === 'discount-slider-nouiv4') slider = discountSliderNoui;
+            
+            if (slider) {
+                const currentValue = parseFloat(slider.get());
+                const newValue = currentValue + delta;
+                slider.set(newValue);
+            }
+        }
+
+        // Reset noUiSliders
+        function resetNoUiSliders() {
+            if (thSliderNoui) thSliderNoui.set(DEFAULT_TH);
+            if (wthSliderNoui) wthSliderNoui.set(DEFAULT_WTH);
+            if (discountSliderNoui) discountSliderNoui.set(DEFAULT_DISCOUNT);
+            
+            // Visual feedback
+            const card = document.querySelector('.bg-gradient-to-br');
+            if (card) {
+                card.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    card.style.transform = 'scale(1)';
+                }, 200);
+            }
+        }
+    ntent);
+            const newValue = Math.max(0, Math.min(10000, currentValue + delta));
+            updateTH(newValue, version);
+        }
+
+        function updateTH(value, version = 'v1') {
+            const suffix = version === 'v1' ? '' : '-' + version;
+            document.getElementById(`th-value${suffix}`).textContent = Math.round(value);
+            document.getElementById(`th-slider${suffix}`).value = value;
+        }
+
+        // W/TH Controls
+        function adjustWTH(delta, version = 'v1') {
+            const suffix = version === 'v1' ? '' : '-' + version;
+            const currentValue = parseFloat(document.getElementById(`wth-value${suffix}`).textContent);
+            const newValue = Math.max(10, Math.min(100, currentValue + delta));
+            updateWTH(newValue, version);
+        }
+
+        function updateWTH(value, version = 'v1') {
+            const suffix = version === 'v1' ? '' : '-' + version;
+            document.getElementById(`wth-value${suffix}`).textContent = value.toFixed(2);
+            document.getElementById(`wth-slider${suffix}`).value = value;
+        }
+
+        // Discount Controls
+        function adjustDiscount(delta, version = 'v1') {
+            const suffix = version === 'v1' ? '' : '-' + version;
+            const currentValue = parseFloat(document.getElementById(`discount-value${suffix}`).textContent);
+            const newValue = Math.max(0, Math.min(50, currentValue + delta));
+            updateDiscount(newValue, version);
+        }
+
+        function updateDiscount(value, version = 'v1') {
+            const suffix = version === 'v1' ? '' : '-' + version;
+            document.getElementById(`discount-value${suffix}`).textContent = value.toFixed(2);
+            document.getElementById(`discount-slider${suffix}`).value = value;
+        }
+
+        // Enhanced update functions for V4 with tooltip and fill
+        function updateTHEnhanced(value, version) {
+            updateTH(value, version);
+            const percentage = (value / 10000) * 100;
+            document.getElementById('th-fill-v4').style.width = percentage + '%';
+            document.getElementById('th-tooltip-v4').textContent = Math.round(value) + ' TH/s';
+            updateTooltipPosition('th-tooltip-v4', 'th-slider-v4');
+        }
+
+        function updateWTHEnhanced(value, version) {
+            updateWTH(value, version);
+            const percentage = ((value - 10) / (100 - 10)) * 100;
+            document.getElementById('wth-fill-v4').style.width = percentage + '%';
+            document.getElementById('wth-tooltip-v4').textContent = parseFloat(value).toFixed(2) + ' W/TH';
+            updateTooltipPosition('wth-tooltip-v4', 'wth-slider-v4');
+        }
+
+        function updateDiscountEnhanced(value, version) {
+            updateDiscount(value, version);
+            const percentage = (value / 50) * 100;
+            document.getElementById('discount-fill-v4').style.width = percentage + '%';
+            document.getElementById('discount-tooltip-v4').textContent = parseFloat(value).toFixed(2) + '%';
+            updateTooltipPosition('discount-tooltip-v4', 'discount-slider-v4');
+        }
+
+        function showTooltip(tooltipId) {
+            document.getElementById(tooltipId).classList.add('active');
+        }
+
+        function hideTooltip(tooltipId) {
+            document.getElementById(tooltipId).classList.remove('active');
+        }
+
+        function updateTooltipPosition(tooltipId, sliderId) {
+            const slider = document.getElementById(sliderId);
+            const tooltip = document.getElementById(tooltipId);
+            const value = slider.value;
+            const min = slider.min;
+            const max = slider.max;
+            const percentage = ((value - min) / (max - min)) * 100;
+            tooltip.style.left = percentage + '%';
+        }
+
+        // Reset All
+        function resetAll(version = 'v1') {
+            updateTH(DEFAULT_TH, version);
+            updateWTH(DEFAULT_WTH, version);
+            updateDiscount(DEFAULT_DISCOUNT, version);
+            
+            // Reset enhanced sliders for v4
+            if (version === 'v4') {
+                updateTHEnhanced(DEFAULT_TH, version);
+                updateWTHEnhanced(DEFAULT_WTH, version);
+                updateDiscountEnhanced(DEFAULT_DISCOUNT, version);
+            }
+            
+            // Visual feedback
+            const cards = document.querySelectorAll('.global-controls-card, .bg-gradient-to-br');
+            cards.forEach(card => {
+                card.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    card.style.transform = 'scale(1)';
+                }, 200);
+            });
+        }
+
+        // Load header
+        fetch('header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header-container').innerHTML = data;
+                
+                const script = document.createElement('script');
+                script.src = 'header.js';
+                document.body.appendChild(script);
+            })
+            .catch(error => console.error('Error loading header:', error));
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

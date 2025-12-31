@@ -1,6 +1,7 @@
 // Global Variables
 let portfolioData = null;
 let charts = {};
+let viewMode = 'cards'; // Default view mode for active portfolio
 
 // Load Backup File
 function loadBackup(event) {
@@ -66,11 +67,17 @@ function renderDashboard() {
     renderChainChart(miners);
     renderProfitLossChart(miners, currency, currencySymbol);
     
+    // Render Active Portfolio
+    renderActivePortfolio(miners, currency, currencySymbol);
+    
     // Render Top Performers
     renderTopPerformers(miners, currency, currencySymbol);
     
     // Render Profit/Loss Lists
     renderProfitLossLists(miners, currency, currencySymbol);
+    
+    // Setup view mode toggles
+    setupViewModeToggles();
 }
 
 // Calculate All Statistics
@@ -802,6 +809,341 @@ function formatDate(dateStr) {
     
     const date = parseDate(dateStr);
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+// Initialize on load
+window.addEventListener('DOMContentLoaded', async () => {
+    // Load price data if available
+    if (typeof loadPriceData === 'function') {
+        await loadPriceData();
+    }
+});
+
+// Setup View Mode Toggles
+function setupViewModeToggles() {
+    const buttons = ['viewCards', 'viewTable', 'viewAccordion'];
+    
+    buttons.forEach(btnId => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            btn.addEventListener('click', () => {
+                // Remove active from all
+                buttons.forEach(id => document.getElementById(id)?.classList.remove('active'));
+                
+                // Add active to clicked
+                btn.classList.add('active');
+                
+                // Update view mode
+                if (btnId === 'viewCards') viewMode = 'cards';
+                else if (btnId === 'viewTable') viewMode = 'table';
+                else if (btnId === 'viewAccordion') viewMode = 'accordion';
+                
+                // Re-render active portfolio
+                if (portfolioData) {
+                    const miners = Object.values(portfolioData.data);
+                    const currency = portfolioData.settings?.currency || 'USD';
+                    const currencySymbol = currency === 'USD' ? '$' : '€';
+                    renderActivePortfolio(miners, currency, currencySymbol);
+                }
+            });
+        }
+    });
+}
+
+// Render Active Portfolio (with all 3 view modes)
+function renderActivePortfolio(miners, currency, currencySymbol) {
+    const container = document.getElementById('activePortfolioDisplay');
+    if (!container) return;
+    
+    const rate = portfolioData.settings?.exchangeRates?.[currency] || 0.45;
+    const currentGMTPrice = getCurrentGMTPrice(currency) || rate;
+    
+    // Get active miners (not sold)
+    const activeMiners = miners.filter(m => !m.sale);
+    
+    if (activeMiners.length === 0) {
+        container.innerHTML = '<div style=\"text-align: center; padding: 40px; color: #888;\">No active miners in portfolio</div>';
+        return;
+    }
+    
+    // Calculate data for each miner
+    const minerDataList = activeMiners.map(miner => {
+        // Calculate total investment in GMT
+        let investmentGMT = miner.purchase.price || 0;
+        let investmentFiat = (miner.purchase.price || 0) * (getPriceForDate(miner.purchase.date, 'GMT', currency) || rate);
+        
+        const investmentBreakdown = [{
+            type: 'Purchase',
+            date: miner.purchase.date,
+            amountGMT: miner.purchase.price || 0,
+            amountFiat: investmentFiat
+        }];
+        
+        // Add upgrade costs
+        miner.upgrades.th.forEach(u => {
+            const upgradeRate = getPriceForDate(u.date, 'GMT', currency) || rate;
+            let test_ergebnis = getPriceForDate(u.date, 'GMT', currency);
+            const upgradeFiat = (u.price || 0) * upgradeRate;
+            investmentGMT += (u.price || 0);
+            investmentFiat += upgradeFiat;
+            investmentBreakdown.push({
+                type: 'TH Upgrade',
+                date: u.date,
+                amountGMT: u.price || 0,
+                amountFiat: upgradeFiat,
+                from: u.from,
+                to: u.to
+            });
+        });
+        
+        miner.upgrades.efficiency.forEach(u => {
+            const upgradeRate = getPriceForDate(u.date, 'GMT', currency) || rate;
+            const upgradeFiat = (u.price || 0) * upgradeRate;
+            investmentGMT += (u.price || 0);
+            investmentFiat += upgradeFiat;
+            investmentBreakdown.push({
+                type: 'Efficiency Upgrade',
+                date: u.date,
+                amountGMT: u.price || 0,
+                amountFiat: upgradeFiat,
+                from: u.from,
+                to: u.to
+            });
+        });
+        
+        // Break-even calculation
+        const breakEvenFiat = investmentFiat; // Total $ invested (historical)
+        const breakEvenGMT = investmentFiat / currentGMTPrice; // How much GMT needed to sell at current price to break even
+        
+        // Additional metrics
+        const pricePerTH = miner.currentTH > 0 ? investmentFiat / miner.currentTH : 0;
+        const buyDate = parseDate(miner.purchase.date);
+        const daysHeld = Math.floor((new Date() - buyDate) / (1000 * 60 * 60 * 24));
+        
+        return {
+            miner,
+            investmentGMT,
+            investmentFiat,
+            breakEvenGMT,
+            breakEvenFiat,
+            pricePerTH,
+            daysHeld,
+            investmentBreakdown
+        };
+    });
+    
+    // Render based on view mode
+    if (viewMode === 'cards') {
+        renderActivePortfolioCards(container, minerDataList, currencySymbol);
+    } else if (viewMode === 'table') {
+        renderActivePortfolioTable(container, minerDataList, currencySymbol);
+    } else if (viewMode === 'accordion') {
+        renderActivePortfolioAccordion(container, minerDataList, currencySymbol);
+    }
+}
+
+// Render Cards View
+function renderActivePortfolioCards(container, minerDataList, currencySymbol) {
+    container.innerHTML = '<div style=\"display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px;\"></div>';
+    const grid = container.firstChild;
+    
+    minerDataList.forEach(item => {
+        const card = document.createElement('div');
+        card.style.cssText = `
+            background: rgba(30, 30, 46, 0.6);
+            border: 2px solid rgba(103, 61, 236, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        `;
+        
+        card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                <div>
+                    <div style="font-weight: 600; font-size: 1.2em; color: #00ff7f; margin-bottom: 5px;">${item.miner.fullName}</div>
+                    <div style="color: #aaa; font-size: 0.9em;">${item.miner.currentTH} TH · ${item.miner.currentWTH} W/TH</div>
+                    <div style="color: #888; font-size: 0.85em; margin-top: 3px;">Held for ${item.daysHeld} days</div>
+                </div>
+            </div>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <div style="color: #aaa; font-size: 0.85em; margin-bottom: 8px;">💰 Total Investment</div>
+                <div style="font-size: 1.5em; font-weight: bold; color: #673dec;">${item.investmentGMT.toFixed(2)} GMT</div>
+                <div style="color: #888; font-size: 0.9em; margin-top: 5px;">${currencySymbol}${item.investmentFiat.toFixed(2)} (historical)</div>
+            </div>
+            
+            <div style="background: rgba(0, 255, 127, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #00ff7f; margin-bottom: 15px;">
+                <div style="color: #00ff7f; font-size: 0.85em; margin-bottom: 8px;">🎯 Break-Even Price</div>
+                <div style="font-size: 1.3em; font-weight: bold; color: #00ff7f;">${item.breakEvenGMT.toFixed(2)} GMT</div>
+                <div style="color: #aaa; font-size: 0.9em; margin-top: 5px;">${currencySymbol}${item.breakEvenFiat.toFixed(2)} (at current rate)</div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="background: rgba(103, 61, 236, 0.1); padding: 10px; border-radius: 5px;">
+                    <div style="color: #888; font-size: 0.8em;">Price/TH</div>
+                    <div style="font-weight: 600; color: #a78bfa;">${currencySymbol}${item.pricePerTH.toFixed(2)}</div>
+                </div>
+                <div style="background: rgba(103, 61, 236, 0.1); padding: 10px; border-radius: 5px;">
+                    <div style="color: #888; font-size: 0.8em;">Chain</div>
+                    <div style="font-weight: 600; color: #a78bfa;">${item.miner.chain || 'N/A'}</div>
+                </div>
+            </div>
+        `;
+        
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-5px)';
+            card.style.boxShadow = '0 8px 25px rgba(103, 61, 236, 0.4)';
+            card.style.borderColor = '#673dec';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+            card.style.boxShadow = 'none';
+            card.style.borderColor = 'rgba(103, 61, 236, 0.5)';
+        });
+        
+        grid.appendChild(card);
+    });
+}
+
+// Render Table View
+function renderActivePortfolioTable(container, minerDataList, currencySymbol) {
+    let html = `
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: rgba(103, 61, 236, 0.2); border-bottom: 2px solid #673dec;">
+                        <th style="padding: 12px; text-align: left; color: #00ff7f;">Miner</th>
+                        <th style="padding: 12px; text-align: right; color: #00ff7f;">TH / W·TH</th>
+                        <th style="padding: 12px; text-align: right; color: #00ff7f;">Investment (GMT)</th>
+                        <th style="padding: 12px; text-align: right; color: #00ff7f;">Investment (${currencySymbol})</th>
+                        <th style="padding: 12px; text-align: right; color: #00ff7f;">Break-Even (GMT)</th>
+                        <th style="padding: 12px; text-align: right; color: #00ff7f;">Break-Even (${currencySymbol})</th>
+                        <th style="padding: 12px; text-align: right; color: #00ff7f;">Price/TH</th>
+                        <th style="padding: 12px; text-align: center; color: #00ff7f;">Days Held</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    minerDataList.forEach(item => {
+        html += `
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);" onmouseover="this.style.background='rgba(103, 61, 236, 0.1)'" onmouseout="this.style.background='transparent'">
+                <td style="padding: 12px;">
+                    <div style="font-weight: 600;">${item.miner.fullName}</div>
+                    <div style="font-size: 0.85em; color: #888;">${item.miner.chain || 'N/A'}</div>
+                </td>
+                <td style="padding: 12px; text-align: right;">${item.miner.currentTH} TH<br><span style="color: #888; font-size: 0.85em;">${item.miner.currentWTH} W/TH</span></td>
+                <td style="padding: 12px; text-align: right; font-weight: 600;">${item.investmentGMT.toFixed(2)}</td>
+                <td style="padding: 12px; text-align: right;">${currencySymbol}${item.investmentFiat.toFixed(2)}</td>
+                <td style="padding: 12px; text-align: right; font-weight: 600; color: #00ff7f;">${item.breakEvenGMT.toFixed(2)}</td>
+                <td style="padding: 12px; text-align: right; color: #00ff7f;">${currencySymbol}${item.breakEvenFiat.toFixed(2)}</td>
+                <td style="padding: 12px; text-align: right;">${currencySymbol}${item.pricePerTH.toFixed(2)}</td>
+                <td style="padding: 12px; text-align: center;">${item.daysHeld}</td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+// Render Accordion View
+function renderActivePortfolioAccordion(container, minerDataList, currencySymbol) {
+    container.innerHTML = '<div style=\"display: flex; flex-direction: column; gap: 10px;\"></div>';
+    const accordionContainer = container.firstChild;
+    
+    minerDataList.forEach((item, index) => {
+        const accordionItem = document.createElement('div');
+        accordionItem.style.cssText = `
+            background: rgba(30, 30, 46, 0.6);
+            border: 2px solid rgba(103, 61, 236, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+        `;
+        
+        const accordionId = `accordion-active-${index}`;
+        
+        accordionItem.innerHTML = `
+            <div onclick="toggleAccordionActive('${accordionId}')" style="padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: rgba(103, 61, 236, 0.2);">
+                <div>
+                    <div style="font-size: 1.1em; font-weight: 600; color: #00ff7f;">${item.miner.fullName}</div>
+                    <div style="font-size: 0.9em; color: #aaa; margin-top: 5px;">
+                        ${item.miner.currentTH} TH · ${item.miner.currentWTH} W/TH · ${currencySymbol}${item.investmentFiat.toFixed(2)} invested
+                    </div>
+                </div>
+                <div>
+                    <span class="material-icons" style="color: #673dec; font-size: 28px;">expand_more</span>
+                </div>
+            </div>
+            <div id="${accordionId}" style="display: none; padding: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div style="background: rgba(103, 61, 236, 0.1); padding: 15px; border-radius: 8px;">
+                        <div style="color: #aaa; font-size: 0.85em; margin-bottom: 5px;">💰 Total Investment</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #673dec;">${item.investmentGMT.toFixed(2)} GMT</div>
+                        <div style="color: #888; font-size: 0.85em;">${currencySymbol}${item.investmentFiat.toFixed(2)}</div>
+                    </div>
+                    
+                    <div style="background: rgba(0, 255, 127, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #00ff7f;">
+                        <div style="color: #00ff7f; font-size: 0.85em; margin-bottom: 5px;">🎯 Break-Even</div>
+                        <div style="font-size: 1.3em; font-weight: bold; color: #00ff7f;">${item.breakEvenGMT.toFixed(2)} GMT</div>
+                        <div style="color: #888; font-size: 0.85em;">${currencySymbol}${item.breakEvenFiat.toFixed(2)}</div>
+                    </div>
+                    
+                    <div style="background: rgba(103, 61, 236, 0.1); padding: 15px; border-radius: 8px;">
+                        <div style="color: #aaa; font-size: 0.85em; margin-bottom: 5px;">📊 Metrics</div>
+                        <div style="font-size: 1em; font-weight: 600;">Price/TH: ${currencySymbol}${item.pricePerTH.toFixed(2)}</div>
+                        <div style="color: #888; font-size: 0.85em;">Days held: ${item.daysHeld}</div>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
+                    <div style="color: #aaa; font-size: 0.9em; font-weight: 600; margin-bottom: 10px;">📋 Investment Breakdown</div>
+                    ${item.investmentBreakdown.map(inv => `
+                        <div style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between;">
+                            <div>
+                                <span style="color: #a78bfa;">${inv.type}</span>
+                                ${inv.from !== undefined ? `<span style="color: #888; font-size: 0.85em;"> (${inv.from} → ${inv.to})</span>` : ''}
+                                <div style="color: #888; font-size: 0.8em;">${formatDate(inv.date)}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 600;">${inv.amountGMT.toFixed(2)} GMT</div>
+                                <div style="color: #888; font-size: 0.85em;">${currencySymbol}${inv.amountFiat.toFixed(2)}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        
+        accordionContainer.appendChild(accordionItem);
+    });
+}
+
+// Toggle Accordion Helper
+function toggleAccordionActive(id) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.style.display = element.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+// Get Current GMT Price
+function getCurrentGMTPrice(currency) {
+    // Try to get the latest price from price data
+    const today = new Date();
+    const dateStr = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`;
+    
+    const price = getPriceForDate(dateStr, 'GMT', currency);
+    if (price) return price;
+    
+    // Fallback to settings exchange rate
+    return portfolioData.settings?.exchangeRates?.[currency] || 0.45;
 }
 
 // Initialize on load

@@ -43,7 +43,7 @@ function getPriceForDate(date, symbol = 'GMT', fiat = 'EUR') {
     if (cache[isoDate] && cache[isoDate][fiatKey]) {
         return cache[isoDate][fiatKey];
     }
-    
+    let test_ergebnis = findNearestPrice(isoDate, cache, fiatKey);
     // Fallback: Nächster verfügbarer Tag (falls Wochenende/Feiertag)
     return findNearestPrice(isoDate, cache, fiatKey);
 }
@@ -66,18 +66,20 @@ function convertToISO(dateStr) {
 function findNearestPrice(isoDate, cache, fiatKey) {
     const dates = Object.keys(cache).sort();
     const targetDate = new Date(isoDate);
-    
+        
+    const priceKey = `price_${fiatKey}`; // "price_usd" oder "price_eur"
     // Finde nächstes Datum
     for (let i = 0; i < dates.length; i++) {
         const cacheDate = new Date(dates[i]);
         if (cacheDate >= targetDate) {
-            return cache[dates[i]][fiatKey];
+            let test_ergebnis = cache[dates[i]][priceKey];
+            return cache[dates[i]][priceKey];
         }
     }
     
     // Fallback: Letzter verfügbarer Preis
     const lastDate = dates[dates.length - 1];
-    return cache[lastDate] ? cache[lastDate][fiatKey] : null;
+    return cache[lastDate] ? cache[lastDate][priceKey] : null;
 }
 
 function getTodayISO() {
