@@ -101,11 +101,11 @@ function calculateDiscount() {
     const totalGMT = costs.total / gmtPrice;
     
     document.getElementById('daily-electricity').innerText = `$${costs.electricity.toFixed(2)}`;
-    document.getElementById('daily-electricity-gmt').innerText = `${electricityGMT.toFixed(2)} GMT`;
+    document.getElementById('daily-electricity-gmt').innerText = `${electricityGMT.toFixed(8)} GMT`;
     document.getElementById('daily-service').innerText = `$${costs.service.toFixed(2)}`;
-    document.getElementById('daily-service-gmt').innerText = `${serviceGMT.toFixed(2)} GMT`;
+    document.getElementById('daily-service-gmt').innerText = `${serviceGMT.toFixed(8)} GMT`;
     document.getElementById('daily-total').innerText = `$${costs.total.toFixed(2)}`;
-    document.getElementById('daily-total-gmt').innerText = `${totalGMT.toFixed(2)} GMT`;
+    document.getElementById('daily-total-gmt').innerText = `${totalGMT.toFixed(8)} GMT`;
     
     // Generate discount level cards
     generateDiscountCards(costs.total, gmtPrice);
