@@ -179,8 +179,8 @@
                 const dailyElectricityCostBTC = dailyElectricityCost / BTC ;
                 const dailyElectricityCostGMT = dailyElectricityCost / GMT;
 
-                const dailyServiceCostBTC = (daily_cost * th) / BTC;
-                const dailyServiceCostGMT = (daily_cost * th) / GMT;
+                const dailyServiceCostBTC = ((daily_cost * th) * ((100 - discount) / 100)) / BTC;
+                const dailyServiceCostGMT = ((daily_cost * th) * ((100 - discount) / 100)) / GMT;
                 const dailyServiceCost = (daily_cost * th) * ((100 - discount) / 100);
 
                 const dailyTotalMaintenanceCost = dailyElectricityCost + dailyServiceCost;
