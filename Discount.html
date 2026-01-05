@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Discount Calculator - HashSense</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="src/scripts/skript.js"></script>
+    <script src="discount.js"></script>
+    
+    <!-- Plausible Analytics -->
+    <script defer data-domain="hashfarm.me" src="https://plausible.io/js/script.js"></script>
+
+    <!-- Open Graph Meta -->
+    <meta property="og:title" content="HashFarm – Maintenance Discount Calculator">
+    <meta property="og:description" content="Calculate required GMT for maintenance discounts in GoMining.">
+    <meta property="og:image" content="https://hashfarm.me/assets/preview.png">
+    <meta property="og:url" content="https://hashfarm.me/Discount.html">
+    <meta property="og:type" content="website">
+    <meta name="description" content="Calculate how much GMT you need on your wallet or locked to achieve specific maintenance discount levels. Maximum 20% discount at 378 days of maintenance coverage.">
+    <meta name="keywords" content="GoMining, maintenance discount, GMT calculator, mining discount, GMT token, maintenance cost">
+    <meta name="author" content="HashSense">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://hashfarm.me/Discount.html">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/android-chrome-512x512.png">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    <link rel="manifest" href="assets/site.webmanifest">
+
+    <!-- Google Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    <style>
+        /* Sidebar animations */
+        .sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        /* Range slider styling */
+        input[type="range"] {
+            outline: none !important;
+            scroll-margin: 0 !important;
+            scroll-padding: 0 !important;
+            pointer-events: auto;
+        }
+        
+        input[type="range"]:focus {
+            outline: none !important;
+            scroll-margin: 0 !important;
+            scroll-padding: 0 !important;
+            filter: none;
+        }
+    </style>
+
+    <script>
+        // Global variables for prices
+        window.gmtPrice = 0.4269; // Default GMT price
+        
+        // Sidebar toggle function
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+    </script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VQ2RT4JL4L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-VQ2RT4JL4L');
+    </script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+
+    <!-- Header with Price Cards -->
+    <header class="bg-gray-800 p-4">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header with Burger Button -->
+            <div class="flex items-center justify-between mb-4">
+                <button onclick="toggleSidebar()" 
+                        class="bg-gray-700 hover:bg-gray-600 p-2 rounded-lg transition-colors duration-200">
+                    <span class="material-icons text-white">menu</span>
+                </button>
+                <h1 class="text-xl font-bold text-white">Maintenance Discount Calculator</h1>
+                <div class="w-10"></div> <!-- Spacer for centering -->
+            </div>
+            
+            <!-- GMT Price Card -->
+            <div class="max-w-md mx-auto">
+                <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                    <h2 class="text-sm font-semibold mb-3 text-gray-300">CURRENT GMT PRICE</h2>
+                    <div class="flex items-center gap-3">
+                        <img src="GoMining_Logo.webp" alt="GMT" class="w-10 h-10">
+                        <input type="number" id="gmt-price" value="0.4269" step="0.0001"
+                               class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                               onchange="calculateDiscount()">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar fixed left-0 top-0 w-64 h-full bg-gray-800 z-40 shadow-xl" id="sidebar">
+        <div class="p-4">
+            <h2 class="text-xl font-bold mb-6 text-purple-400">HashSense</h2>
+            <nav class="space-y-2">
+                <!-- Home Button -->
+                <a href="index.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-blue-400">home</span>
+                    <span class="text-white">Main Dashboard</span>
+                </a>
+                
+                <!-- Divider -->
+                <div class="border-t border-gray-600 my-2"></div>
+                
+                <!-- HashSense Calculator -->
+                <a href="HashSense.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-purple-400">calculate</span>
+                    <span class="text-white">Mining Calculator</span>
+                </a>
+                
+                <!-- Discount Calculator (Current) -->
+                <button class="nav-item w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 bg-purple-600">
+                    <span class="material-icons text-yellow-400">local_offer</span>
+                    <span>Discount Calculator</span>
+                </button>
+                
+                <!-- Reinvestment Calculator -->
+                <a href="reinvest-calculator.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-purple-400">autorenew</span>
+                    <span class="text-white">Reinvestment Calculator</span>
+                </a>
+                
+                <!-- GOBoxes Button -->
+                <a href="GoBoxMatrix.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-orange-400">inventory_2</span>
+                    <span class="text-white">GOBoxes Chances</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden" 
+         onclick="toggleSidebar()"></div>
+
+    <!-- Main Content Area -->
+    <main class="min-h-screen p-4">
+        <div class="max-w-6xl mx-auto">
+            
+            <!-- Info Section -->
+            <section class="bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-purple-400 mb-4">How GMT Maintenance Discount Works</h2>
+                <div class="text-gray-300 space-y-3">
+                    <p>
+                        By holding or locking GMT tokens on your wallet, you can reduce your daily maintenance costs by up to <strong class="text-purple-400">20%</strong>.
+                    </p>
+                    <ul class="list-disc list-inside space-y-2 ml-4">
+                        <li><strong>Maximum Discount:</strong> 20% at 378 days of maintenance coverage</li>
+                        <li><strong>No Discount:</strong> Less than 36 days = 0%</li>
+                        <li><strong>Linear Scaling:</strong> 36 days = 1%, 54 days = 2%, 72 days = 3%, etc.</li>
+                        <li><strong>Coverage Days:</strong> GMT Value / Daily Maintenance Cost</li>
+                    </ul>
+                    <div class="bg-yellow-900/20 border border-yellow-600/30 rounded-lg p-3 mt-4">
+                        <strong class="text-yellow-400">💡 Tip:</strong> The calculator shows how much GMT you need for each discount level based on your mining setup.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Input Section -->
+            <section class="bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-purple-400 mb-4">Your Mining Setup</h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Total Hashrate -->
+                    <div>
+                        <label class="block text-sm font-semibold mb-2 text-gray-300">Total Hashrate (TH)</label>
+                        <input type="number" id="total-th" value="100" min="0" step="0.1"
+                               class="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                               oninput="calculateDiscount()">
+                        <div class="mt-2">
+                            <input type="range" id="th-slider" min="0" max="1000" value="100" step="1"
+                                   class="w-full"
+                                   oninput="document.getElementById('total-th').value = this.value; calculateDiscount()">
+                        </div>
+                    </div>
+
+                    <!-- Energy Efficiency -->
+                    <div>
+                        <label for="efficiency" class="block text-sm font-semibold mb-2 text-gray-300">Energy Efficiency (W/TH)</label>
+                        <input type="number" id="efficiency" value="20" placeholder="20" min="15" max="35" step="0.01"
+                               oninput="syncEfficiencySlider(event)"
+                               class="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3">
+                        <input type="range" id="efficiency-slider" min="15" max="35" step="0.01" value="20" tabindex="-1"
+                               oninput="syncEfficiencyInput(event)"
+                               class="w-full accent-purple-500">
+                    </div>
+                </div>
+
+                <!-- Calculate Button -->
+                <div class="mt-6">
+                    <button onclick="calculateDiscount()" 
+                            class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+                        <span class="material-icons">calculate</span>
+                        Calculate GMT Required
+                    </button>
+                </div>
+            </section>
+
+            <!-- Daily Maintenance Info -->
+            <section class="bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-purple-400 mb-4">Daily Maintenance Costs</h2>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <p class="text-sm text-gray-400 mb-1">Electricity Cost</p>
+                        <p id="daily-electricity" class="text-2xl font-bold text-white">$0.00</p>
+                        <p id="daily-electricity-gmt" class="text-sm text-gray-400 mt-1">0.00 GMT</p>
+                    </div>
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <p class="text-sm text-gray-400 mb-1">Service Cost</p>
+                        <p id="daily-service" class="text-2xl font-bold text-white">$0.00</p>
+                        <p id="daily-service-gmt" class="text-sm text-gray-400 mt-1">0.00 GMT</p>
+                    </div>
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <p class="text-sm text-gray-400 mb-1">Total Daily Cost</p>
+                        <p id="daily-total" class="text-2xl font-bold text-purple-400">$0.00</p>
+                        <p id="daily-total-gmt" class="text-sm text-gray-400 mt-1">0.00 GMT</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section - GMT Required for Each Discount Level -->
+            <section class="bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-purple-400 mb-4">GMT Required for Discount Levels</h2>
+                
+                <div id="discount-cards" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Cards will be generated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Current GMT Holdings -->
+            <section class="bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-purple-400 mb-4">Your Current GMT Holdings</h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Wallet GMT -->
+                    <div>
+                        <label class="block text-sm font-semibold mb-2 text-gray-300">GMT on Wallet / Locked</label>
+                        <input type="number" id="current-gmt" value="0" min="0" step="0.01"
+                               class="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                               oninput="calculateCurrentDiscount()">
+                    </div>
+
+                    <!-- Current Discount Display -->
+                    <div class="bg-gray-700 rounded-lg p-4 flex flex-col justify-center">
+                        <p class="text-sm text-gray-400 mb-1">Your Current Discount</p>
+                        <p id="current-discount" class="text-3xl font-bold text-green-400">0.0%</p>
+                        <p id="coverage-days" class="text-sm text-gray-400 mt-2">Coverage: 0 days</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-400 py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="mb-2">© 2026 HashSense - Mining Tools & Calculators</p>
+            <div class="flex justify-center gap-4 text-sm">
+                <a href="privacy-policy.html" class="hover:text-purple-400 transition-colors">Privacy Policy</a>
+                <a href="terms-of-service.html" class="hover:text-purple-400 transition-colors">Terms of Service</a>
+                <a href="imprint.html" class="hover:text-purple-400 transition-colors">Imprint</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
