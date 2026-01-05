@@ -89,6 +89,7 @@ function calculateStats(miners, currency) {
     let salesRevenueGMT = 0;
     let salesRevenueFiat = 0;
     let totalTH = 0;
+     let totalWeightedWTH = 0; // 🔥 NEU: Gewichtete W/TH Summe
     let totalWTH = 0;
     let activeCount = 0;
     let soldCount = 0;
@@ -122,14 +123,18 @@ function calculateStats(miners, currency) {
             salesRevenueFiat += (miner.sale.yourPrice || 0) * saleRate;
             soldCount++;
         } else {
-            // Active miner - add to total hashrate
-            totalTH += miner.currentTH || 0;
-            totalWTH += miner.currentWTH || 0;
+            // 🔥 FIX: Nur aktive Miner für Hashrate-Berechnung
+            const minerTH = miner.currentTH || 0;
+            const minerWTH = miner.currentWTH || 0;
+            
+            totalTH += minerTH;
+            totalWeightedWTH += (minerTH * minerWTH); // TH × W/TH
             activeCount++;
         }
     });
 
-    const avgWTH = activeCount > 0 ? totalWTH / activeCount : 0;
+   // 🔥 FIX: Gewichteter Durchschnitt = Σ(TH × W/TH) / Σ(TH)
+    const avgWTH = totalTH > 0 ? totalWeightedWTH / totalTH : 0;
     const profitLossGMT = salesRevenueGMT - totalInvestmentGMT;
     const profitLossFiat = salesRevenueFiat - totalInvestmentFiat;
     const roi = totalInvestmentFiat > 0 ? (profitLossFiat / totalInvestmentFiat) * 100 : 0;
@@ -879,10 +884,37 @@ function renderActivePortfolio(miners, currency, currencySymbol) {
             amountFiat: investmentFiat
         }];
         
-        // Add upgrade costs
-        miner.upgrades.th.forEach(u => {
+        // 🔥 FIX: Sortiere Upgrades nach Datum/Zeit/blockOrder BEVOR sie zum Breakdown hinzugefügt werden
+        const sortUpgrades = (upgrades) => {
+            return [...upgrades].sort((a, b) => {
+                // Parse dates
+                const parseDate = (dateStr) => {
+                    if (!dateStr || dateStr === 'Unknown') return new Date(0);
+                    const parts = dateStr.split(/[\/\.]/);
+                    return new Date(parts[2], parts[0] - 1, parts[1]);
+                };
+                const dateA = parseDate(a.date);
+                const dateB = parseDate(b.date);
+                
+                if (dateA.getTime() !== dateB.getTime()) {
+                    return dateA - dateB;
+                }
+                
+                // Same date? Compare times
+                if (a.time !== 'Unknown' && b.time !== 'Unknown') {
+                    const tComp = a.time.localeCompare(b.time);
+                    if (tComp !== 0) return tComp;
+                }
+                
+                // Fallback: blockOrder (DESCENDING weil höhere Zahl = später importiert)
+                return (b.blockOrder ?? 0) - (a.blockOrder ?? 0);
+            });
+        };
+        
+        // Sortiere TH upgrades
+        const sortedTHUpgrades = sortUpgrades(miner.upgrades.th);
+        sortedTHUpgrades.forEach(u => {
             const upgradeRate = getPriceForDate(u.date, 'GMT', currency) || rate;
-            let test_ergebnis = getPriceForDate(u.date, 'GMT', currency);
             const upgradeFiat = (u.price || 0) * upgradeRate;
             investmentGMT += (u.price || 0);
             investmentFiat += upgradeFiat;
@@ -896,7 +928,9 @@ function renderActivePortfolio(miners, currency, currencySymbol) {
             });
         });
         
-        miner.upgrades.efficiency.forEach(u => {
+        // Sortiere Efficiency upgrades
+        const sortedEffUpgrades = sortUpgrades(miner.upgrades.efficiency);
+        sortedEffUpgrades.forEach(u => {
             const upgradeRate = getPriceForDate(u.date, 'GMT', currency) || rate;
             const upgradeFiat = (u.price || 0) * upgradeRate;
             investmentGMT += (u.price || 0);
@@ -912,8 +946,8 @@ function renderActivePortfolio(miners, currency, currencySymbol) {
         });
         
         // Break-even calculation
-        const breakEvenFiat = investmentFiat; // Total $ invested (historical)
-        const breakEvenGMT = investmentFiat / currentGMTPrice; // How much GMT needed to sell at current price to break even
+        const breakEvenFiat = investmentFiat;
+        const breakEvenGMT = investmentFiat / currentGMTPrice;
         
         // Additional metrics
         const pricePerTH = miner.currentTH > 0 ? investmentFiat / miner.currentTH : 0;
@@ -1008,51 +1042,227 @@ function renderActivePortfolioCards(container, minerDataList, currencySymbol) {
 
 // Render Table View
 function renderActivePortfolioTable(container, minerDataList, currencySymbol) {
-    let html = `
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="background: rgba(103, 61, 236, 0.2); border-bottom: 2px solid #673dec;">
-                        <th style="padding: 12px; text-align: left; color: #00ff7f;">Miner</th>
-                        <th style="padding: 12px; text-align: right; color: #00ff7f;">TH / W·TH</th>
-                        <th style="padding: 12px; text-align: right; color: #00ff7f;">Investment (GMT)</th>
-                        <th style="padding: 12px; text-align: right; color: #00ff7f;">Investment (${currencySymbol})</th>
-                        <th style="padding: 12px; text-align: right; color: #00ff7f;">Break-Even (GMT)</th>
-                        <th style="padding: 12px; text-align: right; color: #00ff7f;">Break-Even (${currencySymbol})</th>
-                        <th style="padding: 12px; text-align: right; color: #00ff7f;">Price/TH</th>
-                        <th style="padding: 12px; text-align: center; color: #00ff7f;">Days Held</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
+    // Sort state für Table
+    let sortState = {
+        column: null,
+        direction: 'asc'
+    };
     
-    minerDataList.forEach(item => {
-        html += `
-            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);" onmouseover="this.style.background='rgba(103, 61, 236, 0.1)'" onmouseout="this.style.background='transparent'">
-                <td style="padding: 12px;">
-                    <div style="font-weight: 600;">${item.miner.fullName}</div>
-                    <div style="font-size: 0.85em; color: #888;">${item.miner.chain || 'N/A'}</div>
-                </td>
-                <td style="padding: 12px; text-align: right;">${item.miner.currentTH} TH<br><span style="color: #888; font-size: 0.85em;">${item.miner.currentWTH} W/TH</span></td>
-                <td style="padding: 12px; text-align: right; font-weight: 600;">${item.investmentGMT.toFixed(2)}</td>
-                <td style="padding: 12px; text-align: right;">${currencySymbol}${item.investmentFiat.toFixed(2)}</td>
-                <td style="padding: 12px; text-align: right; font-weight: 600; color: #00ff7f;">${item.breakEvenGMT.toFixed(2)}</td>
-                <td style="padding: 12px; text-align: right; color: #00ff7f;">${currencySymbol}${item.breakEvenFiat.toFixed(2)}</td>
-                <td style="padding: 12px; text-align: right;">${currencySymbol}${item.pricePerTH.toFixed(2)}</td>
-                <td style="padding: 12px; text-align: center;">${item.daysHeld}</td>
-            </tr>
-        `;
-    });
-    
-    html += `
-                </tbody>
-            </table>
-        </div>
-    `;
-    
-    container.innerHTML = html;
-}
+    let searchTerm = '';
 
+    function renderTable() {
+        // Filter nach Suchbegriff
+        let filteredList = minerDataList;
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            filteredList = minerDataList.filter(item => {
+                const miner = item.miner;
+                return (
+                    (miner.id || '').toString().toLowerCase().includes(term) ||
+                    (miner.collection || '').toLowerCase().includes(term) ||
+                    (miner.currentTH || '').toString().includes(term) ||
+                    (miner.currentWTH || '').toString().includes(term)
+                );
+            });
+        }
+
+        // Sortierung anwenden
+        if (sortState.column) {
+            filteredList = [...filteredList].sort((a, b) => {
+                let valA, valB;
+                
+                switch(sortState.column) {
+                    case 'id':
+                        valA = a.miner.id || '';
+                        valB = b.miner.id || '';
+                        break;
+                    case 'collection':
+                        valA = a.miner.collection || '';
+                        valB = b.miner.collection || '';
+                        break;
+                    case 'th':
+                        valA = a.miner.currentTH || 0;
+                        valB = b.miner.currentTH || 0;
+                        break;
+                    case 'wth':
+                        valA = a.miner.currentWTH || 0;
+                        valB = b.miner.currentWTH || 0;
+                        break;
+                    case 'pricePerTH':
+                        valA = a.pricePerTH || 0;
+                        valB = b.pricePerTH || 0;
+                        break;
+                    case 'investment':
+                        valA = a.investmentFiat || 0;
+                        valB = b.investmentFiat || 0;
+                        break;
+                    case 'breakeven':
+                        valA = a.breakEvenGMT || 0;
+                        valB = b.breakEvenGMT || 0;
+                        break;
+                    case 'days':
+                        valA = a.daysHeld || 0;
+                        valB = b.daysHeld || 0;
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (typeof valA === 'string') {
+                    return sortState.direction === 'asc' 
+                        ? valA.localeCompare(valB)
+                        : valB.localeCompare(valA);
+                } else {
+                    return sortState.direction === 'asc' 
+                        ? valA - valB
+                        : valB - valA;
+                }
+            });
+        }
+
+        // 🔥 FIX: Nur die Tabelle rendern, nicht das Suchfeld!
+        let tableHTML = `
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: rgba(103, 61, 236, 0.2); border-bottom: 2px solid #673dec;">
+                            ${createSortableHeader('id', '🆔 ID')}
+                            ${createSortableHeader('collection', '📦 Collection')}
+                            <th style="padding: 12px; text-align: left; color: #00ff7f; font-weight: 600;">⛓️ Chain</th>
+                            ${createSortableHeader('th', '⚡ TH/s')}
+                            ${createSortableHeader('wth', '💡 W/TH')}
+                            ${createSortableHeader('pricePerTH', '💰 Price/TH')}
+                            ${createSortableHeader('investment', '🏦 Investment')}
+                            ${createSortableHeader('breakeven', '🎯 Break-Even')}
+                            ${createSortableHeader('days', '📅 Days Held')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredList.length === 0 ? `
+                            <tr>
+                                <td colspan="9" style="padding: 40px; text-align: center; color: #888;">
+                                    No miners found matching "${searchTerm}"
+                                </td>
+                            </tr>
+                        ` : filteredList.map(item => {
+                            const m = item.miner;
+                            return `
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); transition: all 0.3s;">
+                                    <td style="padding: 12px; font-weight: 600; color: #00ff7f;">${m.id || 'N/A'}</td>
+                                    <td style="padding: 12px;">${m.collection || 'Unknown'}</td>
+                                    <td style="padding: 12px;">
+                                        <span class="badge" style="background: ${m.chain === 'BTC' ? 'rgba(255,152,0,0.2)' : 'rgba(103,61,236,0.2)'}; color: ${m.chain === 'BTC' ? '#ffa726' : '#a78bfa'}; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; font-weight: 600;">
+                                            ${m.chain || 'Unknown'}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 12px; font-weight: 600;">${(m.currentTH || 0).toFixed(2)}</td>
+                                    <td style="padding: 12px;">${(m.currentWTH || 0).toFixed(2)}</td>
+                                    <td style="padding: 12px;">${currencySymbol}${item.pricePerTH.toFixed(2)}</td>
+                                    <td style="padding: 12px; color: #ffa726;">
+                                        <div>${currencySymbol}${item.investmentFiat.toFixed(2)}</div>
+                                        <div style="font-size: 0.85em; color: #888;">${item.investmentGMT.toFixed(2)} GMT</div>
+                                    </td>
+                                    <td style="padding: 12px; color: #00ff7f;">
+                                        <div>${item.breakEvenGMT.toFixed(2)} GMT</div>
+                                        <div style="font-size: 0.85em; color: #888;">${currencySymbol}${item.breakEvenFiat.toFixed(2)}</div>
+                                    </td>
+                                    <td style="padding: 12px;">${item.daysHeld}</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        // 🔥 FIX: Nur Tabellen-Container updaten
+        const tableContainer = container.querySelector('#tableContainer');
+        if (tableContainer) {
+            tableContainer.innerHTML = tableHTML;
+        }
+
+        // 🔥 FIX: Counter updaten
+        const counterElement = container.querySelector('#minerCounter');
+        if (counterElement) {
+            counterElement.textContent = `${filteredList.length} / ${minerDataList.length} miners`;
+        }
+
+        // Sort header clicks (neu binden nach jedem Render)
+        container.querySelectorAll('[data-sort]').forEach(header => {
+            header.addEventListener('click', () => {
+                const column = header.dataset.sort;
+                if (sortState.column === column) {
+                    sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    sortState.column = column;
+                    sortState.direction = 'asc';
+                }
+                renderTable();
+            });
+        });
+    }
+
+    function createSortableHeader(columnId, label) {
+        const isActive = sortState.column === columnId;
+        const arrow = isActive 
+            ? (sortState.direction === 'asc' ? '▲' : '▼')
+            : '⇅';
+        
+        return `
+            <th 
+                data-sort="${columnId}"
+                style="
+                    padding: 12px;
+                    text-align: left;
+                    color: #00ff7f;
+                    font-weight: 600;
+                    cursor: pointer;
+                    user-select: none;
+                    transition: all 0.3s;
+                "
+                onmouseover="this.style.background='rgba(103,61,236,0.3)'"
+                onmouseout="this.style.background=''"
+            >
+                ${label} <span style="font-size: 0.8em; opacity: ${isActive ? 1 : 0.5};">${arrow}</span>
+            </th>
+        `;
+    }
+
+    // 🔥 FIX: Initiales Rendering - Suchfeld wird NUR EINMAL erstellt
+    container.innerHTML = `
+        <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+            <span class="material-icons" style="color: #673dec;">search</span>
+            <input 
+                type="text" 
+                id="tableSearch" 
+                placeholder="Search miners (ID, Collection, TH, W/TH)..."
+                style="
+                    flex: 1;
+                    padding: 10px 15px;
+                    background: rgba(103, 61, 236, 0.1);
+                    border: 2px solid rgba(103, 61, 236, 0.3);
+                    border-radius: 8px;
+                    color: #fff;
+                    font-size: 0.95em;
+                "
+            />
+            <span id="minerCounter" style="color: #aaa; font-size: 0.9em;">${minerDataList.length} / ${minerDataList.length} miners</span>
+        </div>
+        <div id="tableContainer"></div>
+    `;
+
+    // Event Listener für Suchfeld (nur EINMAL binden!)
+    const searchInput = container.querySelector('#tableSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            renderTable(); // Nur Tabelle neu rendern, nicht das Input!
+        });
+    }
+
+    // Initiales Tabellen-Rendering
+    renderTable();
+}
 // Render Accordion View
 function renderActivePortfolioAccordion(container, minerDataList, currencySymbol) {
     container.innerHTML = '<div style=\"display: flex; flex-direction: column; gap: 10px;\"></div>';

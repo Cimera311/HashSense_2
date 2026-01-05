@@ -39,13 +39,34 @@ function getPriceForDate(date, symbol = 'GMT', fiat = 'EUR') {
     
     const cache = symbol.toUpperCase() === 'BTC' ? btcPriceCache : gmtPriceCache;
     const fiatKey = fiat.toLowerCase();
-    
-    if (cache[isoDate] && cache[isoDate][fiatKey]) {
-        return cache[isoDate][fiatKey];
+    const priceKey = `price_${fiatKey}`; // "price_usd" oder "price_eur"
+
+    if (cache[isoDate] && cache[isoDate][priceKey]) {
+        let rawPrice = cache[isoDate][priceKey];
+        
+    // ✅ Entferne \r und konvertiere zu Number
+    if (typeof rawPrice === 'string') {
+            rawPrice = rawPrice
+                .replace(/\r/g, '')
+                .replace(/,/g, '.') // ← KOMMA durch PUNKT ersetzen!
+                .trim();
+            
+            rawPrice = parseFloat(rawPrice);
     }
-    let test_ergebnis = findNearestPrice(isoDate, cache, fiatKey);
+        
+        return rawPrice
+    }
+    let test_ergebnis = findNearestPrice(isoDate, cache, priceKey);
     // Fallback: Nächster verfügbarer Tag (falls Wochenende/Feiertag)
-    return findNearestPrice(isoDate, cache, fiatKey);
+    let nearestPrice = findNearestPrice(isoDate, cache, priceKey);
+    
+    // ✅ Prüfe findNearestPrice Ergebnis auf \r und bereinige
+    if (nearestPrice !== null && typeof nearestPrice === 'string') {
+        nearestPrice = nearestPrice.replace(/\r/g, '').trim();
+        return parseFloat(nearestPrice);
+    }
+    
+    return nearestPrice;
 }
 
 function convertToISO(dateStr) {
