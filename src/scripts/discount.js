@@ -88,6 +88,7 @@ function calculateDiscount() {
     const th = parseFloat(document.getElementById('total-th').value) || 0;
     const efficiency = parseFloat(document.getElementById('efficiency').value) || 20;
     const gmtPrice = parseFloat(document.getElementById('gmt-price').value) || 0.4269;
+    const baseDiscount = parseFloat(document.getElementById('base-discount').value) || 0;
     
     // Sync slider
     document.getElementById('th-slider').value = th;
@@ -95,20 +96,33 @@ function calculateDiscount() {
     // Calculate maintenance costs
     const costs = calculateMaintenanceCosts(th, efficiency);
     
-    // Display daily costs in USD and GMT
-    const electricityGMT = costs.electricity / gmtPrice;
-    const serviceGMT = costs.service / gmtPrice;
-    const totalGMT = costs.total / gmtPrice;
+    // Get current GMT and calculate total discount
+    const currentGMT = parseFloat(document.getElementById('current-gmt').value) || 0;
+    const gmtValue = currentGMT * gmtPrice;
+    const rawDailyCost = costs.total;
+    const actualDailyCost = rawDailyCost * (1 - baseDiscount / 100);
+    const coverageDays = actualDailyCost > 0 ? gmtValue / actualDailyCost : 0;
+    const tokenDiscount = calculateDiscountFromDays(coverageDays);
+    const totalDiscount = baseDiscount + tokenDiscount;
     
-    document.getElementById('daily-electricity').innerText = `$${costs.electricity.toFixed(2)}`;
+    // Apply total discount to costs for display
+    const discountedElectricity = costs.electricity * (1 - totalDiscount / 100);
+    const discountedService = costs.service * (1 - totalDiscount / 100);
+    const discountedTotal = costs.total * (1 - totalDiscount / 100);
+    
+    const electricityGMT = discountedElectricity / gmtPrice;
+    const serviceGMT = discountedService / gmtPrice;
+    const totalGMT = discountedTotal / gmtPrice;
+    
+    document.getElementById('daily-electricity').innerText = `$${discountedElectricity.toFixed(4)}`;
     document.getElementById('daily-electricity-gmt').innerText = `${electricityGMT.toFixed(8)} GMT`;
-    document.getElementById('daily-service').innerText = `$${costs.service.toFixed(2)}`;
+    document.getElementById('daily-service').innerText = `$${discountedService.toFixed(4)}`;
     document.getElementById('daily-service-gmt').innerText = `${serviceGMT.toFixed(8)} GMT`;
-    document.getElementById('daily-total').innerText = `$${costs.total.toFixed(2)}`;
+    document.getElementById('daily-total').innerText = `$${discountedTotal.toFixed(4)}`;
     document.getElementById('daily-total-gmt').innerText = `${totalGMT.toFixed(8)} GMT`;
     
-    // Generate discount level cards
-    generateDiscountCards(costs.total, gmtPrice);
+    // Generate discount level cards (based on actual daily cost with base discount)
+    generateDiscountCards(actualDailyCost, gmtPrice, baseDiscount);
     
     // Calculate current discount if GMT is entered
     calculateCurrentDiscount();
@@ -117,18 +131,22 @@ function calculateDiscount() {
 /**
  * Generate cards showing GMT needed for each discount level
  */
-function generateDiscountCards(dailyMaintenanceCost, gmtPrice) {
+function generateDiscountCards(actualDailyCost, gmtPrice, baseDiscount) {
     const container = document.getElementById('discount-cards');
     container.innerHTML = '';
+    
+    const currentGMT = parseFloat(document.getElementById('current-gmt').value) || 0;
     
     // Key discount levels to show: 1%, 5%, 10%, 15%, 20%
     const discountLevels = [1, 5, 10, 15, 20];
     
     discountLevels.forEach(discountPercent => {
-        const gmtNeeded = calculateGMTForDiscount(discountPercent, dailyMaintenanceCost);
-        const gmtTokens = gmtNeeded / gmtPrice;
+        // Calculate GMT needed based on actual daily cost (WITH base discount already applied)
         const daysNeeded = calculateDaysForDiscount(discountPercent);
-        const savingsPerDay = (dailyMaintenanceCost * discountPercent) / 100;
+        const gmtNeeded = daysNeeded * actualDailyCost;
+        const gmtTokens = gmtNeeded / gmtPrice;
+        const gmtStillNeeded = Math.max(0, gmtTokens - currentGMT);
+        const savingsPerDay = (actualDailyCost * discountPercent) / 100;
         const savingsPerMonth = savingsPerDay * 30;
         
         const card = document.createElement('div');
@@ -154,7 +172,8 @@ function generateDiscountCards(dailyMaintenanceCost, gmtPrice) {
             <div class="space-y-2">
                 <div>
                     <p class="text-xs text-gray-400">GMT Tokens Required</p>
-                    <p class="text-2xl font-bold text-purple-400">${gmtTokens.toFixed(2)}</p>
+                    <p class="text-2xl font-bold text-purple-400">${gmtTokens.toFixed(8)}</p>
+                    ${currentGMT > 0 ? `<p class="text-xs text-green-400 mt-1">Still need: ${gmtStillNeeded.toFixed(8)} GMT</p>` : ''}
                 </div>
                 
                 <div>
@@ -186,7 +205,7 @@ function generateDiscountCards(dailyMaintenanceCost, gmtPrice) {
         <label class="block text-xs text-gray-300 mb-2">Target Discount %</label>
         <input type="number" id="custom-discount" min="0" max="20" step="1" value="8"
                class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3"
-               oninput="updateCustomDiscount(${dailyMaintenanceCost}, ${gmtPrice})">
+               oninput="updateCustomDiscount(${actualDailyCost}, ${gmtPrice})">
         
         <div id="custom-result" class="space-y-2">
             <!-- Will be filled by updateCustomDiscount -->
@@ -196,24 +215,27 @@ function generateDiscountCards(dailyMaintenanceCost, gmtPrice) {
     container.appendChild(customCard);
     
     // Initialize custom discount
-    updateCustomDiscount(dailyMaintenanceCost, gmtPrice);
+    updateCustomDiscount(actualDailyCost, gmtPrice);
 }
 
 /**
  * Update custom discount calculation
  */
-function updateCustomDiscount(dailyMaintenanceCost, gmtPrice) {
+function updateCustomDiscount(actualDailyCost, gmtPrice) {
     const customDiscountInput = document.getElementById('custom-discount');
     if (!customDiscountInput) return;
+    
+    const currentGMT = parseFloat(document.getElementById('current-gmt').value) || 0;
     
     let discountPercent = parseInt(customDiscountInput.value) || 0;
     discountPercent = Math.max(0, Math.min(20, discountPercent)); // Clamp between 0-20
     customDiscountInput.value = discountPercent;
     
-    const gmtNeeded = calculateGMTForDiscount(discountPercent, dailyMaintenanceCost);
-    const gmtTokens = gmtNeeded / gmtPrice;
     const daysNeeded = calculateDaysForDiscount(discountPercent);
-    const savingsPerDay = (dailyMaintenanceCost * discountPercent) / 100;
+    const gmtNeeded = daysNeeded * actualDailyCost;
+    const gmtTokens = gmtNeeded / gmtPrice;
+    const gmtStillNeeded = Math.max(0, gmtTokens - currentGMT);
+    const savingsPerDay = (actualDailyCost * discountPercent) / 100;
     
     const savingsPerDayGMT = savingsPerDay / gmtPrice;
     
@@ -222,12 +244,13 @@ function updateCustomDiscount(dailyMaintenanceCost, gmtPrice) {
         resultDiv.innerHTML = `
             <div>
                 <p class="text-xs text-gray-400">GMT Tokens Required</p>
-                <p class="text-2xl font-bold text-purple-400">${gmtTokens.toFixed(2)}</p>
+                <p class="text-2xl font-bold text-purple-400">${gmtTokens.toFixed(8)}</p>
+                ${currentGMT > 0 ? `<p class="text-xs text-green-400 mt-1">Still need: ${gmtStillNeeded.toFixed(8)} GMT</p>` : ''}
             </div>
             <div>
                 <p class="text-xs text-gray-400">Coverage: ${daysNeeded} days</p>
                 <p class="text-sm text-gray-300">Daily Savings: $${savingsPerDay.toFixed(2)}</p>
-                <p class="text-xs text-gray-400">${savingsPerDayGMT.toFixed(2)} GMT/day</p>
+                <p class="text-xs text-gray-400">${savingsPerDayGMT.toFixed(8)} GMT/day</p>
             </div>
         `;
     }
@@ -241,26 +264,29 @@ function calculateCurrentDiscount() {
     const gmtPrice = parseFloat(document.getElementById('gmt-price').value) || 0.4269;
     const th = parseFloat(document.getElementById('total-th').value) || 0;
     const efficiency = parseFloat(document.getElementById('efficiency').value) || 20;
+    const baseDiscount = parseFloat(document.getElementById('base-discount').value) || 0;
     
-    if (currentGMT === 0 || th === 0) {
-        document.getElementById('current-discount').innerText = '0.0%';
+    if (th === 0) {
+        document.getElementById('current-discount').innerText = `${baseDiscount.toFixed(1)}%`;
         document.getElementById('coverage-days').innerText = 'Coverage: 0 days';
         return;
     }
     
     // Calculate maintenance costs
     const costs = calculateMaintenanceCosts(th, efficiency);
+    const actualDailyCost = costs.total * (1 - baseDiscount / 100);
     
-    // Calculate coverage days
+    // Calculate coverage days based on actual daily cost
     const gmtValue = currentGMT * gmtPrice;
-    const coverageDays = gmtValue / costs.total;
+    const coverageDays = gmtValue / actualDailyCost;
     
-    // Calculate discount
-    const discount = calculateDiscountFromDays(coverageDays);
+    // Calculate additional discount from tokens
+    const additionalDiscount = calculateDiscountFromDays(coverageDays);
+    const totalDiscount = baseDiscount + additionalDiscount;
     
-    // Display results
-    document.getElementById('current-discount').innerText = `${discount.toFixed(1)}%`;
-    document.getElementById('coverage-days').innerText = `Coverage: ${coverageDays.toFixed(0)} days`;
+    // Display results (show total discount and breakdown)
+    document.getElementById('current-discount').innerText = `${totalDiscount.toFixed(1)}%`;
+    document.getElementById('coverage-days').innerText = `Coverage: ${coverageDays.toFixed(0)} days (Base: ${baseDiscount.toFixed(1)}% + Token: ${additionalDiscount.toFixed(1)}%)`;
     
     // Update color based on discount level
     const discountElement = document.getElementById('current-discount');
@@ -292,6 +318,24 @@ function syncEfficiencySlider(event) {
 function syncEfficiencyInput(event) {
     const value = event.target.value;
     document.getElementById('efficiency').value = value;
+    calculateDiscount();
+}
+
+/**
+ * Sync base discount slider with input field
+ */
+function syncBaseDiscountSlider(event) {
+    const value = event.target.value;
+    document.getElementById('base-discount-slider').value = value;
+    calculateDiscount();
+}
+
+/**
+ * Sync base discount input with slider
+ */
+function syncBaseDiscountInput(event) {
+    const value = event.target.value;
+    document.getElementById('base-discount').value = value;
     calculateDiscount();
 }
 
