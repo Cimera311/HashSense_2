@@ -290,13 +290,13 @@ function calculateCurrentDiscount() {
     
     // Update color based on discount level
     const discountElement = document.getElementById('current-discount');
-    if (discount >= 15) {
+    if (totalDiscount >= 15) {
         discountElement.className = 'text-3xl font-bold text-green-400';
-    } else if (discount >= 10) {
+    } else if (totalDiscount >= 10) {
         discountElement.className = 'text-3xl font-bold text-yellow-400';
-    } else if (discount >= 5) {
+    } else if (totalDiscount >= 5) {
         discountElement.className = 'text-3xl font-bold text-orange-400';
-    } else if (discount >= 1) {
+    } else if (totalDiscount >= 1) {
         discountElement.className = 'text-3xl font-bold text-blue-400';
     } else {
         discountElement.className = 'text-3xl font-bold text-gray-400';
