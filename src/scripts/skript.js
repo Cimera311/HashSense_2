@@ -45,9 +45,46 @@
 
 
 
-
-       /* Preise jetzt in skript-prices.js*/
-
+        /**
+         * Holt den aktuellen BTC-Preis von der API und gibt ihn formatiert zurück
+         * @returns {Promise<string>} Formatierter BTC-Preis (z.B. "$97,123")
+         */
+        function getBTCPrice() {
+            console.log('Fetching BTC price...');
+            return fetch('https://api.coinpaprika.com/v1/tickers/btc-bitcoin')
+                .then(response => response.json())
+                .then(data => {
+                    const btcPrice = parseFloat(data.quotes.USD.price).toFixed(0);
+                    
+                    // Update global variable für andere Funktionen
+                    window.btcPrice = btcPrice;
+                    
+                    console.log('BTC Price fetched:', btcPrice);
+                    
+                    // Nur formatierten Preis zurückgeben
+                    return formatDollar(btcPrice);
+                })
+                .catch(error => {
+                    console.error('Error fetching BTC Price:', error);
+                    return "$0"; // Fallback bei Fehler
+                });
+        }
+        async function updateHeaderPrices() {
+            const formattedPrice = await getBTCPrice();
+            console.log('Header: BTC-Preis ist', formattedPrice);
+            
+            // Eigene DOM-Updates hier
+            const dropdown = document.getElementById('bitcoin-price-dropdown');
+            if (dropdown) {
+                const currentOption = dropdown.querySelector('#currentp');
+                if (currentOption) {
+                    currentOption.value = window.btcPrice; // Roher Wert
+                    currentOption.textContent = `${formattedPrice} (current)`;
+                    dropdown.value = window.btcPrice;
+                }
+            }
+        }
+/*
         function fetchBTCPrice() {
             console.log('Fetching BTC price...');
             fetch('https://api.coinpaprika.com/v1/tickers/btc-bitcoin')
@@ -107,8 +144,164 @@
                     console.error('Error fetching GMT Price:', error);
                   //  alert('Failed to fetch GMT Price. Please try again later.');
                 });
-        }
+        }  */
+/**
+ * Holt BTC-Preis mit Fallback-APIs
+ * @returns {Promise<string>} Formatierter BTC-Preis (z.B. "$97,123")
+ */
 
+function fetchBTCPrice() {
+    console.log('Fetching BTC price...');
+    
+    const apis = [
+        {
+            name: 'CoinGecko',
+            url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',
+            extract: (data) => data.bitcoin.usd
+        },
+        {
+            name: 'Blockchain.info',
+            url: 'https://blockchain.info/ticker',
+            extract: (data) => data.USD.last
+        },
+        {
+            name: 'Coinbase',
+            url: 'https://api.coinbase.com/v2/prices/BTC-USD/spot',
+            extract: (data) => parseFloat(data.data.amount)
+        },
+        {
+            name: 'CoinPaprika',
+            url: 'https://api.coinpaprika.com/v1/tickers/btc-bitcoin',
+            extract: (data) => data.quotes.USD.price
+        }
+    ];
+    
+    fetchWithFallback(apis)
+        .then(price => {
+            const btcPrice = parseFloat(price).toFixed(0);
+            const dropdown = document.getElementById('bitcoin-price-dropdown');
+            const priceInput = document.getElementById('bitcoin-price');
+            
+            if (dropdown) {
+                const selectedOption = dropdown.querySelector('#currentp');
+                if (selectedOption) {
+                    selectedOption.value = btcPrice;
+                    selectedOption.textContent = formatDollar(btcPrice);
+                    dropdown.value = btcPrice;
+                }
+            }
+            
+            if (priceInput) {
+                priceInput.value = btcPrice;
+            }
+            
+            window.btcPrice = btcPrice;
+            console.log('BTC Price updated:', btcPrice);
+        })
+        .catch(error => {
+            console.error('Error fetching BTC Price:', error);
+        });
+}
+
+
+function fetchGMTPrice() {
+    console.log('Fetching GMT price...');
+    
+    const apis = [
+        {
+            name: 'CoinGecko',
+            url: 'https://api.coingecko.com/api/v3/simple/price?ids=gomining-token&vs_currencies=usd',
+            extract: (data) => {
+                console.log('CoinGecko GMT response:', data);
+                return data['gomining-token']?.usd;
+            }
+        },
+        {
+            name: 'CoinMarketCap (free tier)',
+            url: 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=GMT&convert=USD',
+            headers: {
+                'X-CMC_PRO_API_KEY': 'eca3aac4519c4fbd893f3c96ce2d1afc' // Kostenlos 10k calls/Monat
+            },
+            extract: (data) => data.data?.GMT?.quote?.USD?.price
+        },
+        {
+            name: 'CryptoCompare',
+            url: 'https://min-api.cryptocompare.com/data/price?fsym=GMTT&tsyms=USD',
+            extract: (data) => data.USD
+        },
+        {
+            name: 'Gate.io',
+            url: 'https://api.gateio.ws/api/v4/spot/tickers?currency_pair=GOMINING_USDT',
+            extract: (data) => data[0]?.last ? parseFloat(data[0].last) : null
+        },
+        {
+            name: 'CoinPaprika (Fallback)',
+            url: 'https://api.coinpaprika.com/v1/tickers/gmt-gomining-token',
+            extract: (data) => data.quotes?.USD?.price
+        }
+    ];
+    
+    fetchWithFallback(apis)
+        .then(price => {
+            const gmtPrice = parseFloat(price).toFixed(4);
+            const priceInput = document.getElementById('gmt-token-price');
+            
+            if (priceInput) {
+                priceInput.value = gmtPrice;
+            }
+            
+            window.gmtPrice = gmtPrice;
+            console.log('GMT Price updated:', gmtPrice);
+        })
+        .catch(error => {
+            console.error('Error fetching GMT Price:', error);
+            // Fallback: Letzter bekannter Preis aus LocalStorage
+            const cachedPrice = localStorage.getItem('last_gmt_price');
+            if (cachedPrice) {
+                console.warn('⚠️ Using cached GMT price:', cachedPrice);
+                window.gmtPrice = cachedPrice;
+                const priceInput = document.getElementById('gmt-token-price');
+                if (priceInput) priceInput.value = cachedPrice;
+            }
+        });
+}
+
+/**
+ * Versucht APIs nacheinander bis eine funktioniert
+ * @param {Array} apis - Array von API-Konfigurationen
+ * @returns {Promise<number>} Preis
+ */
+async function fetchWithFallback(apis) {
+    let lastError;
+    
+    for (const api of apis) {
+        try {
+            console.log(`Trying ${api.name}...`);
+            const response = await fetch(api.url);
+            
+            if (!response.ok) {
+                throw new Error(`${api.name} HTTP error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            const price = api.extract(data);
+            
+            if (price && !isNaN(price)) {
+                console.log(`✅ ${api.name} successful: ${price}`);
+                return price;
+            }
+            
+            throw new Error(`${api.name} returned invalid price`);
+            
+        } catch (error) {
+            console.warn(`⚠️ ${api.name} failed:`, error.message);
+            lastError = error;
+            continue;
+        }
+    }
+    
+    throw new Error('All APIs failed. Last error: ' + lastError?.message);
+}
         function formatDollar(value) {
             // Versuche, den Wert in eine Zahl zu konvertieren, falls er kein numerischer Typ ist
             const numericValue = parseFloat(value);
@@ -156,11 +349,68 @@
                         return `$${usdValue.toFixed(2)}`;
                 }
             }
-
+            function getCurrentBTCPriceFromDropdown() {
+                // Versuche alle 3 Dropdowns in Reihenfolge
+                const dropdownIds = [
+                    'bitcoin-price-dropdown',         // Desktop
+                    'bitcoin-price-dropdown-tablet',  // Tablet
+                    'bitcoin-price-dropdown-mobile'   // Mobile
+                ];
+                
+                for (const id of dropdownIds) {
+                    const dropdown = document.getElementById(id);
+                    if (dropdown && dropdown.value) {
+                        const value = parseFloat(dropdown.value);
+                        if (!isNaN(value) && value > 0) {
+                            return value;
+                        }
+                    }
+                }
+                
+                // Fallback: window.btcPrice oder Standard
+                return window.btcPrice || 100000;
+            }
+            /**
+             * Holt den aktuellen GMT-Preis aus dem sichtbaren Preis-Display
+             * Funktioniert auf Desktop, Tablet und Mobile
+             * @returns {number} GMT-Preis
+             */
+            function getCurrentGMTPriceFromHeader() {
+                // Versuche alle 3 GMT-Preis-Anzeigen in Reihenfolge
+                const gmtPriceIds = [
+                    'header-gmt-price',          // Desktop
+                    'header-gmt-price-tablet',   // Tablet
+                    'header-gmt-price-mobile'    // Mobile
+                ];
+                
+                for (const id of gmtPriceIds) {
+                    const element = document.getElementById(id);
+                    if (element && element.textContent) {
+                        // Entferne "$" und parse zu Float
+                        const text = element.textContent.trim().replace('$', '');
+                        const value = parseFloat(text);
+                        if (!isNaN(value) && value > 0) {
+                            return value;
+                        }
+                    }
+                }
+                
+                // Fallback 1: Input-Feld (falls vorhanden)
+                const gmtInput = document.getElementById('gmt-token-price');
+                if (gmtInput && gmtInput.value) {
+                    const value = parseFloat(gmtInput.value);
+                    if (!isNaN(value) && value > 0) {
+                        return value;
+                    }
+                }
+                
+                // Fallback 2: window.gmtPrice oder Standard
+                return window.gmtPrice || 0.4269;
+            }
 
             function calculateCost() {
-                const BTC = parseFloat(document.getElementById('bitcoin-price-dropdown').value);
-                const GMT = parseFloat(document.getElementById('gmt-token-price').value);
+                const BTC = getCurrentBTCPriceFromDropdown(); // Statt parseFloat(document.getElementById('bitcoin-price-dropdown').value)
+                const GMT = getCurrentGMTPriceFromHeader();    // Nutzt die neue GMT-Funktion  parseFloat(document.getElementById('gmt-token-price').value);
 				const th = parseFloat(document.getElementById('My_TH').value);
                 const efficiency = parseFloat(document.getElementById('Energy-efficiency').value);
                 const discount = parseFloat(document.getElementById('gomining-discount').value);
@@ -284,8 +534,8 @@
 
 			function calculateROI() {
 				// Eingabefelder abrufen
-				const bitcoinPrice = parseFloat(document.getElementById('bitcoin-price-dropdown').value);
-				const gominingPrice = parseFloat(document.getElementById('gmt-token-price').value);
+				const bitcoinPrice = getCurrentBTCPriceFromDropdown(); // Statt parseFloat(document.getElementById('bitcoin-price-dropdown').value)
+				const gominingPrice = getCurrentGMTPriceFromHeader();   // Nutzt die neue GMT-Funktion parseFloat(document.getElementById('gmt-token-price').value);
 				const myTH = parseFloat(document.getElementById('My_TH_ROI').value);
 				const energyEfficiency = parseFloat(document.getElementById('Energy-efficiency_ROI').value);
 				const gominingDiscount = parseFloat(document.getElementById('gomining-discount_ROI').value);

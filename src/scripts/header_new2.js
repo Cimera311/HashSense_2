@@ -18,38 +18,14 @@ function renderHeader() {
                     <div class="flex items-center gap-2 px-3 py-1.5 bg-gray-800/50 rounded-lg border border-gray-700/50">
                         <img src="bitcoin-910307_1280.webp" alt="BTC" class="w-5 h-5">
                         <span class="text-gray-400">BTC</span>
-                            <select id="bitcoin-price-dropdown" onchange="updateBTCPrice();" 
-                                class="flex-1 bg-transparent text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                style="background-color: #1a1a2e !important; border-radius: 6px; padding: 4px 8px;">
-                            <option value="10000">10,000 $</option>
-                            <option value="20000">20,000 $</option>
-                            <option value="30000">30,000 $</option>    
-                            <option value="40000">40,000 $</option>
-                            <option value="50000">50,000 $</option>
-                            <option value="60000">60,000 $</option>   
-                            <option value="70000">70,000 $</option>
-                            <option value="80000">80,000 $</option>
-                            <option value="90000">90,000 $</option>
-                            <option id="currentp" value="0">current price</option>
-                            <option value="100000">100,000 $</option>
-                            <option value="110000">110,000 $</option>
-                            <option value="120000">120,000 $</option>
-                            <option value="130000">130,000 $</option>
-                            <option value="140000">140,000 $</option>
-                            <option value="150000">150,000 $</option>
-                            <option value="160000">160,000 $</option>
-                            <option value="200000">200,000 $</option>
-                            <option value="250000">250,000 $</option>
-                            <option value="300000">300,000 $</option>
-                            <option value="400000">400,000 $</option>   
-                        </select>
+                        <span class="font-mono text-white" id="header-btc-price">$--</span>
                     </div>
                     
                     <!-- GMT Price -->
                     <div class="flex items-center gap-2 px-3 py-1.5 bg-gray-800/50 rounded-lg border border-gray-700/50">
                         <img src="GoMining_Logo.webp" alt="GMT" class="w-5 h-5">
                         <span class="text-gray-400">GMT</span>
-                        <span class="font-mono text-white" id="header-gmt-price">$--</span>
+                        <span class="font-mono text-white" id="gmt-token-price">$--</span>
                     </div>
                     
                     <!-- Sats/TH - Fixed at 42 -->
@@ -87,16 +63,16 @@ function updateHeaderPrices() {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         });
-        const element = document.getElementById('currentp');
+        const element = document.getElementById('header-btc-price');
         if (element) {
-            element.value = `$${btcFormatted}`;
+            element.textContent = `$${btcFormatted}`;
         }
     }
     
     // GMT Price
     if (window.gmtPrice || window.GMTPrice) {
         const price = window.gmtPrice || window.GMTPrice;
-        const element = document.getElementById('header-gmt-price');
+        const element = document.getElementById('gmt-token-price');
         if (element) {
             element.textContent = `$${price}`;
         }

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Miner Card Variants – Gradient TH Borders</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <style>
+    body {
+      background: #f5f7fa;
+      font-family: 'Manrope', sans-serif;
+      padding: 2rem;
+      color: #1e1e1e;
+    }
+    h1 {
+      font-weight: 600;
+      color: #222;
+      margin-bottom: 2rem;
+    }
+    .card-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .card {
+      position: relative;
+      background: #fff;
+      padding: 18px;
+      border-radius: 16px;
+      max-width: 320px;
+      flex: 1 1 300px;
+      box-sizing: border-box;
+      transition: box-shadow 0.3s ease;
+      z-index: 0;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: 16px;
+      padding: 2px;
+      background: var(--border-gradient, linear-gradient(to right, #7C3AED 15%, #d1d5db 15%));
+      -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      z-index: -1;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .card-title {
+      font-size: 1rem;
+      color: #111;
+    }
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .card-actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .material-icons {
+      font-size: 20px;
+      color: #999;
+    }
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px dashed #eee;
+      font-size: 0.95rem;
+    }
+    .card-row:last-child {
+      border-bottom: none;
+    }
+    .card-field {
+      color: #666;
+      font-weight: 500;
+    }
+    .editable {
+      font-weight: 600;
+      color: #111;
+    }
+    .editable[contenteditable]:focus {
+      outline: 2px solid #aad4ff;
+      background: #eef6ff;
+      border-radius: 6px;
+    }
+    body.dark {
+    background: #121212;
+    color: #f5f5f5;
+  }
+  body.dark .card {
+    background: #1e1e1e;
+  }
+  body.dark .card::before {
+    background: var(--border-gradient, linear-gradient(to right, #7C3AED 15%, #2d2d2d 15%));
+  }
+  body.dark .card-field,
+  body.dark .editable,
+  body.dark .card-title {
+    color: #eee;
+  }
+  body.dark .material-icons {
+    color: #ccc;
+  }
+</style>
+</head>
+<body>
+  <button id="toggleMode" style="position: absolute; top: 1rem; right: 1rem; padding: 0.5rem 1rem; font-weight: 600; cursor: pointer;">Toggle Mode</button>
+  <h1>Miner Card Examples</h1>
+  <div class="card-wrapper">
+    <div class="card" data-th="4">
+      <div class="card-header">
+        <span class="card-title editable" contenteditable>#00011 Miner X</span>
+        <div class="card-actions">
+          <button><span class="material-icons">content_copy</span></button>
+          <button><span class="material-icons">delete_outline</span></button>
+        </div>
+      </div>
+      <div class="card-row"><span class="card-field">Hashrate:</span> <span class="editable th-value" contenteditable>4</span><span>&nbsp;TH</span></div>
+      <div class="card-row"><span class="card-field">Efficiency:</span> <span class="editable" contenteditable>30</span><span>&nbsp;W/TH</span></div>
+    </div>
+
+    <div class="card" data-th="8">
+      <div class="card-header">
+        <span class="card-title editable" contenteditable>#00012 Miner M</span>
+      </div>
+      <div class="card-row">
+        <span class="editable th-value" contenteditable>8</span><span>&nbsp;TH / </span><span class="editable" contenteditable>28</span><span>&nbsp;W/TH</span>
+      </div>
+    </div>
+
+    <div class="card" data-th="16">
+      <div class="card-header">
+        <span class="card-title editable" contenteditable>#00013 Miner F</span>
+        <span><span class="editable th-value" contenteditable>16</span><span>&nbsp;TH / </span><span class="editable" contenteditable>22.5</span><span>&nbsp;W/TH</span></span>
+      </div>
+      <div class="card-row"><span>Net earnings:</span> <span>$3.40 / day</span></div>
+      <div class="card-row"><span>Electricity:</span> <span>$1.02</span></div>
+      <div class="card-row"><span>Service fee:</span> <span>$0.25</span></div>
+      <div class="card-row"><span>Worth:</span> <span>$2,340</span></div>
+      <div class="card-row"><span>Invested:</span> <span>$2,000</span></div>
+    </div>
+  </div>
+
+  <script>
+    function determineTHLevel(th) {
+      if (th >= 5000) return '100';
+      if (th >= 3584) return '95';
+      if (th >= 2560) return '90';
+      if (th >= 1536) return '85';
+      if (th >= 1024) return '80';
+      if (th >= 768) return '75';
+      if (th >= 512) return '70';
+      if (th >= 384) return '65';
+      if (th >= 256) return '60';
+      if (th >= 192) return '55';
+      if (th >= 128) return '50';
+      if (th >= 96) return '45';
+      if (th >= 64) return '40';
+      if (th >= 48) return '35';
+      if (th >= 32) return '30';
+      if (th >= 16) return '25';
+      if (th >= 8) return '20';
+      if (th >= 4) return '15';
+      if (th >= 2) return '10';
+      if (th >= 1) return '5';
+      return '0';
+    }
+
+    function updateCardBorders() {
+      document.querySelectorAll('.card').forEach(card => {
+        const thField = card.querySelector('.th-value');
+        if (thField) {
+          const th = parseFloat(thField.innerText);
+          const level = determineTHLevel(th);
+          card.setAttribute('data-th', level);
+          card.style.setProperty('--border-progress', level + '%');
+          card.style.setProperty('--border-gradient', `linear-gradient(to right, #7C3AED ${level}%, #d1d5db ${level}%)`);
+          card.style.setProperty('--border-radius', '16px');
+          card.style.setProperty('--border-fill', `linear-gradient(to right, #7C3AED ${level}%, #d1d5db ${level}%)`);
+          card.style.setProperty('--border-background', `linear-gradient(to right, #7C3AED ${level}%, #d1d5db ${level}%)`);
+          card.style.setProperty('--card-radius', '16px');
+          card.style.setProperty('--shadow-color', '#e0e0e0');
+          card.style.setProperty('--border-color', '#7C3AED');
+          card.style.setProperty('--gradient-end', '#d1d5db');
+        }
+      });
+    }
+
+    document.querySelectorAll('.th-value').forEach(span => {
+      span.addEventListener('input', updateCardBorders);
+    });
+
+    updateCardBorders();
+  document.getElementById('toggleMode').addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+});
+</script>
+</body>
+</html>
