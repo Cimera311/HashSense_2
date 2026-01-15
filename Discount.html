@@ -65,6 +65,8 @@
     <script>
         // Global variables for prices
         window.gmtPrice = 0.4269; // Default GMT price
+        window.calculationMode = 'static'; // Default calculation mode: 'static' or 'iterative'
+        window.discountSystem = '36-378'; // Default discount system: '36-378' or '18-360'
         
         // Sidebar toggle function
         function toggleSidebar() {
@@ -72,6 +74,54 @@
             const overlay = document.getElementById('mobile-overlay');
             sidebar.classList.toggle('open');
             overlay.classList.toggle('hidden');
+        }
+        
+        // Discount system toggle function
+        function setDiscountSystem(system) {
+            window.discountSystem = system;
+            
+            // Update button styling
+            const btn36 = document.getElementById('system-36-378');
+            const btn18 = document.getElementById('system-18-360');
+            
+            if (system === '36-378') {
+                btn36.classList.remove('bg-gray-600', 'text-gray-300', 'hover:bg-gray-500');
+                btn36.classList.add('bg-blue-600', 'text-white');
+                btn18.classList.remove('bg-blue-600', 'text-white');
+                btn18.classList.add('bg-gray-600', 'text-gray-300', 'hover:bg-gray-500');
+            } else {
+                btn18.classList.remove('bg-gray-600', 'text-gray-300', 'hover:bg-gray-500');
+                btn18.classList.add('bg-blue-600', 'text-white');
+                btn36.classList.remove('bg-blue-600', 'text-white');
+                btn36.classList.add('bg-gray-600', 'text-gray-300', 'hover:bg-gray-500');
+            }
+            
+            // Trigger recalculation
+            calculateDiscount();
+        }
+        
+        // Calculation mode toggle function
+        function setCalculationMode(mode) {
+            window.calculationMode = mode;
+            
+            // Update button styling
+            const staticBtn = document.getElementById('calc-mode-static');
+            const iterativeBtn = document.getElementById('calc-mode-iterative');
+            
+            if (mode === 'static') {
+                staticBtn.classList.remove('bg-gray-600', 'text-gray-300', 'hover:bg-gray-500');
+                staticBtn.classList.add('bg-purple-600', 'text-white');
+                iterativeBtn.classList.remove('bg-purple-600', 'text-white');
+                iterativeBtn.classList.add('bg-gray-600', 'text-gray-300', 'hover:bg-gray-500');
+            } else {
+                iterativeBtn.classList.remove('bg-gray-600', 'text-gray-300', 'hover:bg-gray-500');
+                iterativeBtn.classList.add('bg-purple-600', 'text-white');
+                staticBtn.classList.remove('bg-purple-600', 'text-white');
+                staticBtn.classList.add('bg-gray-600', 'text-gray-300', 'hover:bg-gray-500');
+            }
+            
+            // Trigger recalculation
+            calculateDiscount();
         }
     </script>
 
@@ -188,7 +238,37 @@
 
             <!-- Input Section -->
             <section class="bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
-                <h2 class="text-2xl font-bold text-purple-400 mb-4">Your Mining Setup</h2>
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+                    <h2 class="text-2xl font-bold text-purple-400">Your Mining Setup</h2>
+                    
+                    <div class="flex gap-3 flex-wrap">
+                        <!-- Discount System Switch -->
+                        <div class="flex items-center gap-3 bg-gray-700 rounded-lg px-4 py-2">
+                            <span class="text-sm text-gray-300">System:</span>
+                            <button id="system-36-378" onclick="setDiscountSystem('36-378')" 
+                                    class="px-3 py-1 rounded-lg text-sm font-medium bg-blue-600 text-white transition-colors duration-200">
+                                36/378
+                            </button>
+                            <button id="system-18-360" onclick="setDiscountSystem('18-360')" 
+                                    class="px-3 py-1 rounded-lg text-sm font-medium bg-gray-600 text-gray-300 hover:bg-gray-500 transition-colors duration-200">
+                                18/360
+                            </button>
+                        </div>
+                        
+                        <!-- Calculation Mode Switch -->
+                        <div class="flex items-center gap-3 bg-gray-700 rounded-lg px-4 py-2">
+                            <span class="text-sm text-gray-300">Mode:</span>
+                            <button id="calc-mode-static" onclick="setCalculationMode('static')" 
+                                    class="px-3 py-1 rounded-lg text-sm font-medium bg-purple-600 text-white transition-colors duration-200">
+                                Static
+                            </button>
+                            <button id="calc-mode-iterative" onclick="setCalculationMode('iterative')" 
+                                    class="px-3 py-1 rounded-lg text-sm font-medium bg-gray-600 text-gray-300 hover:bg-gray-500 transition-colors duration-200">
+                                Iterative
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="grid md:grid-cols-2 gap-6">
                     <!-- Total Hashrate -->

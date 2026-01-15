@@ -2,12 +2,22 @@
  * Maintenance Discount Calculator for GoMining
  * 
  * Discount Rules:
+ * 
+ * System 36/378 (Default):
  * - Maximum 20% discount at 378 days of maintenance coverage
  * - < 36 days = 0%
  * - 36-53 days = 1%
  * - 54-71 days = 2%
  * - Linear scaling: Every 18 days of coverage = +1% discount
  * - Formula: Discount% = floor((coverageDays - 18) / 18), capped at 20%
+ * 
+ * System 18/360 (Alternative):
+ * - Maximum 20% discount at 360 days of maintenance coverage
+ * - < 18 days = 0%
+ * - 18-35 days = 1%
+ * - 36-53 days = 2%
+ * - Linear scaling: Every 18 days of coverage = +1% discount
+ * - Formula: Discount% = floor(coverageDays / 18), capped at 20%
  * 
  * Coverage Days = GMT Value / Daily Maintenance Cost
  */
@@ -16,9 +26,29 @@
 const ELECTRICITY_COST_PER_KWH = 0.05; // $0.05 per kWh
 const SERVICE_COST_PER_TH = 0.0089; // $0.0089 per TH per day
 const MAX_DISCOUNT_PERCENT = 20;
-const MAX_COVERAGE_DAYS = 378;
-const MIN_COVERAGE_DAYS = 36;
 const DAYS_PER_PERCENT = 18;
+
+// System-specific constants
+const SYSTEMS = {
+    '36-378': {
+        MIN_COVERAGE_DAYS: 36,
+        MAX_COVERAGE_DAYS: 378,
+        OFFSET: 18  // offset for formula
+    },
+    '18-360': {
+        MIN_COVERAGE_DAYS: 18,
+        MAX_COVERAGE_DAYS: 360,
+        OFFSET: 0   // no offset
+    }
+};
+
+/**
+ * Get current system configuration
+ */
+function getSystemConfig() {
+    const system = window.discountSystem || '36-378';
+    return SYSTEMS[system];
+}
 
 /**
  * Calculate daily maintenance costs
@@ -44,16 +74,20 @@ function calculateMaintenanceCosts(th, efficiency) {
  * Calculate discount percentage based on coverage days
  */
 function calculateDiscountFromDays(coverageDays) {
-    if (coverageDays < MIN_COVERAGE_DAYS) {
+    const config = getSystemConfig();
+    
+    if (coverageDays < config.MIN_COVERAGE_DAYS) {
         return 0;
     }
     
-    if (coverageDays >= MAX_COVERAGE_DAYS) {
+    if (coverageDays >= config.MAX_COVERAGE_DAYS) {
         return MAX_DISCOUNT_PERCENT;
     }
     
-    // Formula: floor((coverageDays - 18) / 18)
-    const discount = Math.floor((coverageDays - DAYS_PER_PERCENT) / DAYS_PER_PERCENT);
+    // Formula depends on system:
+    // 36/378: floor((coverageDays - 18) / 18)
+    // 18/360: floor(coverageDays / 18)
+    const discount = Math.floor((coverageDays - config.OFFSET) / DAYS_PER_PERCENT);
     
     // Cap at 20%
     return Math.min(discount, MAX_DISCOUNT_PERCENT);
@@ -63,13 +97,16 @@ function calculateDiscountFromDays(coverageDays) {
  * Calculate coverage days needed for a specific discount percentage
  */
 function calculateDaysForDiscount(discountPercent) {
+    const config = getSystemConfig();
+    
     if (discountPercent === 0) {
         return 0;
     }
     
-    // Formula: (discountPercent × 18) + 18
-    // 1% = 36 days, 2% = 54 days, etc.
-    return (discountPercent * DAYS_PER_PERCENT) + DAYS_PER_PERCENT;
+    // Formula depends on system:
+    // 36/378: (discountPercent × 18) + 18 = 36, 54, 72, ..., 378
+    // 18/360: (discountPercent × 18) = 18, 36, 54, ..., 360
+    return (discountPercent * DAYS_PER_PERCENT) + config.OFFSET;
 }
 
 /**
@@ -84,6 +121,20 @@ function calculateGMTForDiscount(discountPercent, dailyMaintenanceCost) {
  * Main calculation function
  */
 function calculateDiscount() {
+    // Check calculation mode
+    const mode = window.calculationMode || 'static';
+    
+    if (mode === 'static') {
+        calculateDiscountStatic();
+    } else if (mode === 'iterative') {
+        calculateDiscountIterative();
+    }
+}
+
+/**
+ * Static calculation (original method)
+ */
+function calculateDiscountStatic() {
     // Get input values
     const th = parseFloat(document.getElementById('total-th').value) || 0;
     const efficiency = parseFloat(document.getElementById('efficiency').value) || 20;
@@ -126,6 +177,219 @@ function calculateDiscount() {
     
     // Calculate current discount if GMT is entered
     calculateCurrentDiscount();
+}
+
+/**
+ * Iterative calculation 
+ * Calculates GMT requirements by stepping through each discount level (1% to 20%)
+ * and applying the discount to reduce daily costs for the next iteration
+ */
+function calculateDiscountIterative() {
+    // Get input values
+    const th = parseFloat(document.getElementById('total-th').value) || 0;
+    const efficiency = parseFloat(document.getElementById('efficiency').value) || 20;
+    const gmtPrice = parseFloat(document.getElementById('gmt-price').value) || 0.4269;
+    const baseDiscount = parseFloat(document.getElementById('base-discount').value) || 0;
+    
+    // Sync slider
+    document.getElementById('th-slider').value = th;
+    
+    // Calculate base maintenance costs (without any GMT discount)
+    const baseCosts = calculateMaintenanceCosts(th, efficiency);
+    const baseDailyCost = baseCosts.total;
+    
+    // Apply base discount to get starting daily cost
+    let currentDailyCost = baseDailyCost * (1 - baseDiscount / 100);
+    
+    // Tracking variables
+    let accumulatedGMTValue = 0; // Total $ value of GMT accumulated
+    let currentGMTDiscount = 0; // Current GMT-based discount (0-20%)
+    let previousCoverageDays = 0; // Track previous level's coverage days
+    
+    // Store results for each discount level
+    const iterativeResults = {};
+    
+    // Key discount levels to calculate: 1%, 5%, 10%, 15%, 20%
+    const targetLevels = [1, 5, 10, 15, 20];
+    
+    // Iterate through each percentage from 1 to 20
+    for (let discountLevel = 1; discountLevel <= MAX_DISCOUNT_PERCENT; discountLevel++) {
+        // Calculate coverage days required for this discount level
+        const requiredCoverageDays = calculateDaysForDiscount(discountLevel);
+        
+        // Calculate INCREMENTAL days (additional days needed from previous level)
+        const incrementalDays = requiredCoverageDays - previousCoverageDays;
+        
+        // How much GMT value needed for these INCREMENTAL days at CURRENT reduced cost?
+        const gmtValueNeeded = currentDailyCost * incrementalDays;
+        
+        // Accumulate total GMT value
+        accumulatedGMTValue += gmtValueNeeded;
+        
+        // Store result if this is a target level
+        if (targetLevels.includes(discountLevel)) {
+            const gmtTokens = accumulatedGMTValue / gmtPrice;
+            iterativeResults[discountLevel] = {
+                gmtTokens: gmtTokens,
+                gmtValue: accumulatedGMTValue,
+                coverageDays: requiredCoverageDays,
+                effectiveDailyCost: currentDailyCost,
+                totalDiscount: baseDiscount + discountLevel,
+                incrementalDays: incrementalDays
+            };
+        }
+        
+        // Update for next iteration
+        previousCoverageDays = requiredCoverageDays;
+        currentGMTDiscount = discountLevel;
+        const totalDiscount = baseDiscount + currentGMTDiscount;
+        currentDailyCost = baseDailyCost * (1 - totalDiscount / 100);
+    }
+    
+    // Calculate current user's discount
+    const currentGMT = parseFloat(document.getElementById('current-gmt').value) || 0;
+    const gmtValue = currentGMT * gmtPrice;
+    
+    // Find what discount level the user currently has by iterating
+    let userCoverageDays = 0;
+    let userTokenDiscount = 0;
+    let userEffectiveCost = baseDailyCost * (1 - baseDiscount / 100);
+    
+    if (currentGMT > 0) {
+        let tempAccumulatedValue = 0;
+        let tempDiscount = 0;
+        let tempDailyCost = baseDailyCost * (1 - baseDiscount / 100);
+        let tempPreviousCoverageDays = 0;
+        
+        // Iterate to find current discount
+        for (let level = 1; level <= MAX_DISCOUNT_PERCENT; level++) {
+            const daysNeeded = calculateDaysForDiscount(level);
+            const incrementalDays = daysNeeded - tempPreviousCoverageDays;
+            const valueNeeded = tempDailyCost * incrementalDays;
+            tempAccumulatedValue += valueNeeded;
+            
+            if (gmtValue >= tempAccumulatedValue) {
+                userTokenDiscount = level;
+                userEffectiveCost = tempDailyCost;
+                userCoverageDays = daysNeeded;
+                
+                // Update for next level
+                tempPreviousCoverageDays = daysNeeded;
+                tempDiscount = level;
+                tempDailyCost = baseDailyCost * (1 - (baseDiscount + tempDiscount) / 100);
+            } else {
+                break;
+            }
+        }
+    }
+    
+    const userTotalDiscount = baseDiscount + userTokenDiscount;
+    
+    // Display daily costs with user's current discount
+    const discountedElectricity = baseCosts.electricity * (1 - userTotalDiscount / 100);
+    const discountedService = baseCosts.service * (1 - userTotalDiscount / 100);
+    const discountedTotal = baseCosts.total * (1 - userTotalDiscount / 100);
+    
+    const electricityGMT = discountedElectricity / gmtPrice;
+    const serviceGMT = discountedService / gmtPrice;
+    const totalGMT = discountedTotal / gmtPrice;
+    
+    document.getElementById('daily-electricity').innerText = `$${discountedElectricity.toFixed(4)}`;
+    document.getElementById('daily-electricity-gmt').innerText = `${electricityGMT.toFixed(8)} GMT`;
+    document.getElementById('daily-service').innerText = `$${discountedService.toFixed(4)}`;
+    document.getElementById('daily-service-gmt').innerText = `${serviceGMT.toFixed(8)} GMT`;
+    document.getElementById('daily-total').innerText = `$${discountedTotal.toFixed(4)}`;
+    document.getElementById('daily-total-gmt').innerText = `${totalGMT.toFixed(8)} GMT`;
+    
+    // Generate discount cards using iterative results
+    generateDiscountCardsIterative(iterativeResults, gmtPrice, baseDiscount, baseDailyCost);
+    
+    // Update current discount display
+    document.getElementById('current-discount').innerText = `${userTotalDiscount.toFixed(1)}%`;
+    document.getElementById('coverage-days').innerText = `Coverage: ${userCoverageDays} days (Base: ${baseDiscount.toFixed(1)}% + Token: ${userTokenDiscount.toFixed(1)}%)`;
+    
+    // Update color based on discount level
+    const discountElement = document.getElementById('current-discount');
+    if (userTotalDiscount >= 15) {
+        discountElement.className = 'text-lg font-bold text-green-400';
+    } else if (userTotalDiscount >= 10) {
+        discountElement.className = 'text-lg font-bold text-yellow-400';
+    } else if (userTotalDiscount >= 5) {
+        discountElement.className = 'text-lg font-bold text-orange-400';
+    } else if (userTotalDiscount >= 1) {
+        discountElement.className = 'text-lg font-bold text-blue-400';
+    } else {
+        discountElement.className = 'text-lg font-bold text-gray-400';
+    }
+}
+
+/**
+ * Generate discount cards using iterative calculation results
+ */
+function generateDiscountCardsIterative(iterativeResults, gmtPrice, baseDiscount, baseDailyCost) {
+    const container = document.getElementById('discount-cards');
+    container.innerHTML = '';
+    
+    const currentGMT = parseFloat(document.getElementById('current-gmt').value) || 0;
+    
+    // Display cards for each target level
+    Object.keys(iterativeResults).sort((a, b) => a - b).forEach(discountPercent => {
+        const result = iterativeResults[discountPercent];
+        const gmtTokens = result.gmtTokens;
+        const gmtStillNeeded = Math.max(0, gmtTokens - currentGMT);
+        
+        // Calculate savings based on the effective daily cost at this level
+        const savingsPerDay = (baseDailyCost * discountPercent) / 100;
+        const savingsPerMonth = savingsPerDay * 30;
+        
+        const card = document.createElement('div');
+        card.className = 'bg-gray-700 rounded-xl p-5 shadow-lg hover:shadow-purple-500/20 transition-shadow duration-200';
+        
+        // Color coding based on discount level
+        let badgeColor = 'bg-gray-600';
+        if (discountPercent >= 15) badgeColor = 'bg-green-600';
+        else if (discountPercent >= 10) badgeColor = 'bg-yellow-600';
+        else if (discountPercent >= 5) badgeColor = 'bg-orange-600';
+        
+        const savingsPerDayGMT = savingsPerDay / gmtPrice;
+        const savingsPerMonthGMT = savingsPerMonth / gmtPrice;
+        
+        card.innerHTML = `
+            <div class="flex items-center justify-between mb-3">
+                <span class="${badgeColor} text-white px-3 py-1 rounded-full text-sm font-bold">
+                    ${discountPercent}% Discount
+                </span>
+                <span class="text-gray-400 text-sm">${result.coverageDays} days</span>
+            </div>
+            
+            <div class="space-y-2">
+                <div>
+                    <p class="text-xs text-gray-400">GMT Tokens Required (Iterative)</p>
+                    <p class="text-2xl font-bold text-purple-400">${gmtTokens.toFixed(8)}</p>
+                    ${currentGMT > 0 ? `<p class="text-xs text-green-400 mt-1">Still need: ${gmtStillNeeded.toFixed(8)} GMT</p>` : ''}
+                </div>
+                
+                <div>
+                    <p class="text-xs text-gray-400">Value in USD</p>
+                    <p class="text-lg font-semibold text-white">$${result.gmtValue.toFixed(2)}</p>
+                </div>
+                
+                <div>
+                    <p class="text-xs text-gray-400">Effective Daily Cost at this level</p>
+                    <p class="text-sm text-gray-300">$${result.effectiveDailyCost.toFixed(4)}</p>
+                </div>
+                
+                <div class="border-t border-gray-600 pt-2 mt-2">
+                    <p class="text-xs text-gray-400">Daily Savings vs Base</p>
+                    <p class="text-sm font-semibold text-green-400">$${savingsPerDay.toFixed(2)}/day</p>
+                    <p class="text-xs text-gray-400">${savingsPerDayGMT.toFixed(2)} GMT/day</p>
+                    <p class="text-xs text-gray-400 mt-1">Monthly: $${savingsPerMonth.toFixed(2)} (${savingsPerMonthGMT.toFixed(2)} GMT)</p>
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(card);
+    });
 }
 
 /**
