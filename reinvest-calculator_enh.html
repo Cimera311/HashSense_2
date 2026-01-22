@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoMining Reinvestment Calculator - HashSense</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="priceMatrix.js"></script>
+    <script src="src/scripts/skript.js"></script>
+    <script src="src/scripts/greedy-scripts.js"></script>
+    <script src="src/scripts/reinvest-calculator_enh.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <!-- Footer Script -->
+    <script src="src/scripts/footer-component.js"></script>
+    
+    <!-- Plausible Analytics -->
+    <script defer data-domain="hashfarm.me" src="https://plausible.io/js/script.js"></script>
+
+    <!-- Open Graph Meta -->
+    <meta property="og:title" content="GoMining Reinvestment Calculator – HashFarm">
+    <meta property="og:description" content="Calculate GoMining reinvestment strategies with 5% bonus and optimize your Bitcoin mining growth.">
+    <meta property="og:image" content="https://hashfarm.me/assets/preview.png">
+    <meta property="og:url" content="https://hashfarm.me/reinvest-calculator.html">
+    <meta property="og:type" content="website">
+
+    <meta name="description" content="Advanced GoMining reinvestment calculator with 5% auto-reinvest bonus. Compare strategies: Auto, Manual, Controlled Auto, and BTC accumulation. Optimize your Bitcoin mining growth with detailed projections and charts.">
+    <meta name="keywords" content="GoMining calculator, Bitcoin mining reinvestment, GMT token, crypto mining strategy, BTC accumulation, mining profitability, reinvestment bonus, mining calculator">
+
+    <link rel="canonical" href="https://hashfarm.me/reinvest-calculator.html">
+
+    <script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "GoMining Reinvestment Calculator",
+    "description": "Calculate and optimize GoMining reinvestment strategies with multiple approaches including automatic 5% bonus reinvestment, manual control, and BTC accumulation phases.",
+    "url": "https://hashfarm.me/reinvest-calculator.html",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "browserRequirements": "Requires JavaScript. Requires HTML5.",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+    },
+    "featureList": [
+        "Auto Reinvestment with 5% Bonus",
+        "GoMining Calculator",
+        "Manual Reinvestment Strategy",
+        "Controlled Auto Strategy",
+        "BTC Accumulation Phase",
+        "Greedy Miner Support",
+        "Interactive Charts",
+        "Detailed Timeline Projections",
+        "Real-time Bitcoin Price Integration",
+        "GMT Token Price Calculator",
+        "Multi-phase Cycle Planning"
+    ],
+    "screenshot": "https://hashfarm.me/assets/reinvest-calculator-screenshot.png",
+    "provider": {
+        "@type": "Organization",
+        "name": "HashSense",
+        "url": "https://hashfarm.me"
+    },
+    "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "127"
+    }
+    }
+    </script>
+
+    <!-- Zusätzlich: BreadcrumbList für bessere Navigation -->
+    <script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://hashfarm.me/"
+        },
+        {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Tools",
+        "item": "https://hashfarm.me/#tools"
+        },
+        {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Reinvestment Calculator",
+        "item": "https://hashfarm.me/reinvest-calculator.html"
+        }
+    ]
+    }
+    </script>
+
+    <!-- FAQ Schema für häufige Fragen (erweitert SEO Content Section) -->
+    <script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+        "@type": "Question",
+        "name": "What is the 5% reinvestment bonus in GoMining?",
+        "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "GoMining offers a 5% bonus when you automatically reinvest your daily mining rewards into additional TH (terahash) power. This bonus applies only to the Auto TH Reinvest strategy where rewards are converted directly into more mining power."
+        }
+        },
+        {
+        "@type": "Question",
+        "name": "How does the BTC accumulation strategy work?",
+        "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In BTC accumulation mode, you receive your full mining rewards as Bitcoin (BTC) while paying maintenance costs from your GMT wallet. This requires maintaining a sufficient GMT balance from previous saving phases or external sources."
+        }
+        },
+        {
+        "@type": "Question",
+        "name": "What is the Controlled Auto strategy?",
+        "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Controlled Auto strategy alternates between automatic TH reinvestment (with 5% bonus) and GMT saving phases. You can customize how many days to allocate to each phase, creating a balanced approach between growth and maintenance cost management."
+        }
+        },
+        {
+        "@type": "Question",
+        "name": "What does Greedy Miner mean?",
+        "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Greedy Miner is a special GoMining feature that provides automatic weekly TH growth (typically 0.12% every Tuesday) without any additional cost. This calculator can factor in this growth to show more accurate long-term projections."
+        }
+        }
+    ]
+    }
+    </script>
+
+    <!-- HowTo Schema für Verwendung -->
+    <script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Calculate GoMining Reinvestment Strategy",
+    "description": "Step-by-step guide to using the GoMining Reinvestment Calculator",
+    "step": [
+        {
+        "@type": "HowToStep",
+        "name": "Enter Starting Parameters",
+        "text": "Input your current GMT wallet balance, total farm TH, average efficiency, and target miner specifications."
+        },
+        {
+        "@type": "HowToStep",
+        "name": "Select Strategy",
+        "text": "Choose between Auto Reinvest (5% bonus), Manual, Controlled Auto, or Controlled Auto + BTC strategies based on your goals."
+        },
+        {
+        "@type": "HowToStep",
+        "name": "Configure Strategy Settings",
+        "text": "Adjust the number of days for reinvestment, BTC accumulation, and GMT saving phases according to your preference."
+        },
+        {
+        "@type": "HowToStep",
+        "name": "Set Calculation Period",
+        "text": "Choose your calculation timeframe in days, weeks, months, or years to see long-term projections."
+        },
+        {
+        "@type": "HowToStep",
+        "name": "Calculate and Review",
+        "text": "Click Calculate to see detailed results including growth charts, final TH amount, GMT balance, and BTC accumulation."
+        }
+    ]
+    }
+    </script>
+    <meta name="author" content="HashSense">
+    <meta name="robots" content="index, follow">
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+
+    <!-- Google Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-VQ2RT4JL4L"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-VQ2RT4JL4L');
+</script>
+    <style>
+        /* Range Slider Styling */
+        input[type="range"] {
+            outline: none !important;
+            scroll-margin: 0 !important;
+            scroll-padding: 0 !important;
+            pointer-events: auto;
+        }
+        
+        input[type="range"]:focus {
+            outline: none !important;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        /* Table Styling */
+        .results-table th,
+        .results-table td {
+            padding: 8px 12px;
+            text-align: right;
+            border-bottom: 1px solid #374151;
+        }
+        
+        .results-table th {
+            background-color: #1f2937;
+            font-weight: 600;
+            color: #d1d5db;
+        }
+        
+        .results-table tbody tr:hover {
+            background-color: #374151;
+        }
+
+        /* Strategy Cards */
+        .strategy-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .strategy-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .strategy-card.selected {
+            border: 2px solid #8b5cf6;
+            background-color: #1e1b4b;
+        }
+        /* Improved Toggle Switch Styling */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #4b5563;
+            transition: 0.3s;
+            border-radius: 12px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #8b5cf6;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Orange variant for v2 */
+        .toggle-slider.orange input:checked + .toggle-slider {
+            background-color: #f97316;
+        }
+
+        /* Green variant for Greedy */
+        input:checked + .toggle-slider.green {
+            background-color: #16a34a;
+        }
+        /* iOS Style Toggle Switch 
+        #save-first-toggle:checked + label .dot {
+            transform: translateX(24px);
+            background-color: #8b5cf6;
+        }
+
+        #save-first-toggle:checked + label div:first-child {
+            background-color: #6d28d9;
+        }
+
+        .dot {
+            transition: all 0.3s ease-in-out;
+        }
+            #save-first-toggle-v2:checked + label .dot {
+            transform: translateX(1.5rem);
+        }
+        #save-first-toggle-v2:checked + label > div {
+            background-color: rgb(249, 115, 22); /* Orange 
+        } 
+        */
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+
+    <!-- Header with Price Cards -->
+    <header class="bg-gray-800 p-4">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header with Burger Button -->
+            <div class="flex items-center justify-between mb-4">
+                <button onclick="toggleSidebar()" 
+                        class="bg-gray-700 hover:bg-gray-600 p-2 rounded-lg transition-colors duration-200">
+                    <span class="material-icons text-white">menu</span>
+                </button>
+                <h1 class="text-xl font-bold text-white">GoMining Reinvestment Calculator</h1>
+                <div class="w-10"></div> <!-- Spacer for centering -->
+            </div>
+            
+            <!-- Price Cards Grid -->
+            <div class="grid gap-4 md:grid-cols-3 mb-4">
+                <!-- BTC Price Card -->
+                <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                    <h2 class="text-sm font-semibold mb-3 text-gray-300">CURRENT BITCOIN PRICE</h2>
+                    <div class="flex items-center gap-3">
+                        <img src="bitcoin-910307_1280.webp" alt="BTC" class="w-10 h-10">
+                        <select id="bitcoin-price-dropdown" onchange="updateBTCPrice();" 
+                                class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="10000">10,000 $</option>
+                            <option value="20000">20,000 $</option>
+                            <option value="30000">30,000 $</option>    
+                            <option value="40000">40,000 $</option>
+                            <option value="50000">50,000 $</option>
+                            <option value="60000">60,000 $</option>   
+                            <option value="70000">70,000 $</option>
+                            <option value="80000">80,000 $</option>
+                            <option value="90000">90,000 $</option>
+                            <option id="currentp" value="0">current price</option>
+                            <option value="100000">100,000 $</option>
+                            <option value="110000">110,000 $</option>
+                            <option value="120000">120,000 $</option>
+                            <option value="130000">130,000 $</option>
+                            <option value="140000">140,000 $</option>
+                            <option value="150000">150,000 $</option>
+                            <option value="160000">160,000 $</option>
+                            <option value="200000">200,000 $</option>
+                            <option value="250000">250,000 $</option>
+                            <option value="300000">300,000 $</option>
+                            <option value="400000">400,000 $</option>   
+                        </select>
+                    </div>
+                </div>
+
+                <!-- GMT Price Card -->
+                <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                    <h2 class="text-sm font-semibold mb-3 text-gray-300">CURRENT GMT PRICE</h2>
+                    <div class="flex items-center gap-3">
+                        <img src="GoMining_Logo.webp" alt="GMT" class="w-10 h-10">
+                        <input type="number" id="gmt-token-price" placeholder="0.4269" step="0.0001" value="0.4269"
+                               class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                </div>
+
+                <!-- SAT per TH Card -->
+                <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                    <h2 class="text-sm font-semibold mb-3 text-gray-300">SAT PER TH</h2>
+                    <div class="flex items-center gap-3">
+                        <img src="sats-ordinals-sats-logo.png" alt="⚡" class="w-10 h-10">
+                        <input type="number" id="sat-TH" value="42" min="0" step="1"
+                               class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar fixed left-0 top-0 w-64 h-full bg-gray-800 z-40 shadow-xl" id="sidebar">
+        <div class="p-4">
+            <h2 class="text-xl font-bold mb-6 text-purple-400">HashSense</h2>
+            <nav class="space-y-2">
+                <!-- Home Button -->
+                <a href="index.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons">home</span>
+                    <span>Home</span>
+                </a>
+
+                <!-- Mining Calculator -->
+                <a href="HashSense.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons">calculate</span>
+                    <span>Mining Calculator</span>
+                </a>
+
+                <!-- Reinvestment Calculator (Active) -->
+                <a href="reinvest-calculator.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg transition-colors duration-200 bg-purple-600 text-left">
+                    <span class="material-icons">trending_up</span>
+                    <span>Reinvestment Calculator</span>
+                </a>
+
+                <!-- Support -->
+                <a href="support.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons">support</span>
+                    <span>Support</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto p-4 space-y-6">
+<section class="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+    <button onclick="toggleSeoContent()" class="w-full p-4 flex items-center justify-between hover:bg-gray-750 transition-colors">
+        <h1 class="text-2xl font-bold text-purple-400">About This GoMining Calculator</h1>
+        <span id="seo-toggle-icon" class="material-icons text-purple-400">expand_more</span>
+    </button>
+    
+    <div id="seo-content" class="hidden p-6 pt-0 border-t border-gray-700">
+        <div class="prose prose-invert max-w-none text-gray-300">
+            <p class="mb-4">
+                This calculator helps you plan and compare different <strong>GoMining reward strategies</strong>. GoMining offers four ways to receive your mining rewards, each with different advantages:
+            </p>
+            
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div class="bg-gray-700 p-3 rounded-lg">
+                    <h3 class="text-lg font-semibold text-blue-400 mb-2">1. BTC Rewards Only</h3>
+                    <p class="text-sm">Receive rewards in BTC and pay maintenance in BTC. Simple and straightforward.</p>
+                </div>
+                
+                <div class="bg-gray-700 p-3 rounded-lg">
+                    <h3 class="text-lg font-semibold text-orange-400 mb-2">2. BTC Accumulation</h3>
+                    <p class="text-sm">Get full rewards as BTC, pay maintenance from GMT wallet. Requires GMT balance from saving phases.</p>
+                </div>
+                
+                <div class="bg-gray-700 p-3 rounded-lg">
+                    <h3 class="text-lg font-semibold text-purple-400 mb-2">3. GMT Reinvest</h3>
+                    <p class="text-sm">Receive rewards as GMT and use it to pay maintenance. Build up your GMT buffer.</p>
+                </div>
+                
+                <div class="bg-gray-700 p-3 rounded-lg">
+                    <h3 class="text-lg font-semibold text-green-400 mb-2">4. Auto TH Reinvest</h3>
+                    <p class="text-sm">Reinvest rewards into TH with <strong>5% bonus</strong>. Pay maintenance from GMT wallet for maximum growth.</p>
+                </div>
+            </div>
+            
+            <p class="text-sm mb-4">
+                Our calculator lets you simulate combinations of these strategies over time. Compare automatic reinvestment with the 5% bonus against manual approaches, or create custom cycles that alternate between TH growth, BTC accumulation, and GMT saving phases.
+            </p>
+            
+            <div class="bg-yellow-900/20 border border-yellow-600/30 rounded-lg p-3 text-sm">
+                <strong class="text-yellow-400">⚠️ Important:</strong> This is a planning tool only. Results depend on Bitcoin price, network difficulty, and GoMining parameters. Always do your own research (DYOR) and make informed decisions based on your individual situation.
+            </div>
+        </div>
+    </div>
+</section>
+        <!-- Input Parameters Section -->
+        <section class="bg-gray-800 rounded-xl p-6 shadow-lg">
+            <h2 class="text-2xl font-bold mb-6 text-purple-400">Starting Parameters</h2>
+            
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+                <!-- GMT Wallet Balance -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-300">GMT Wallet Balance</label>
+                    <input type="number" id="gmt-wallet-balance" value="0" min="0" step="0.01" 
+                           class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <div class="text-xs text-gray-400">Free GMT on wallet</div>
+                </div>
+
+                <!-- Locked GMT -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-300">Locked GMT</label>
+                    <input type="number" id="locked-gmt" value="0" min="0" step="1" 
+                           class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <div class="text-xs text-gray-400">Locked for extra discount</div>
+                </div>
+
+                <!-- Daily Additional Income GMT -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-300">Daily Additional Income (GMT)</label>
+                    <input type="number" id="daily-additional-income" value="0" min="0" step="0.01" 
+                           class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <div class="text-xs text-gray-400">💰 Extra GMT added daily to wallet</div>
+                </div>
+
+                <!-- Farm Total TH -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-300">Total Farm TH</label>
+                    <input type="number" id="farm-total-th" value="10" min="0.1" step="0.1" 
+                           class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+
+                <!-- Farm Average Efficiency -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-300">Farm Avg. Efficiency (W/TH)</label>
+                    <input type="number" id="farm-efficiency" value="20.00" min="15" max="50" step="0.01" 
+                           class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+
+                <!-- Target Miner TH -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-300">Target Miner TH</label>
+                    <input type="number" id="miner-th" value="1" min="0.1" step="0.1" 
+                           class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+
+                <!-- Target Miner Efficiency -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-300">Target Miner Efficiency (W/TH)</label>
+                    <select id="miner-efficiency" 
+                            class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <option value="15" selected>15 W/TH</option>
+                        <option value="16">16 W/TH</option>
+                        <option value="17">17 W/TH</option>
+                        <option value="18">18 W/TH</option>
+                        <option value="19">19 W/TH</option>
+                        <option value="20">20 W/TH</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Base Discount Breakdown Section -->
+            <div class="mt-6 p-4 bg-gradient-to-r from-yellow-900/20 to-orange-900/20 rounded-lg border border-yellow-600/30">
+                <h3 class="text-lg font-bold mb-4 text-yellow-400">Base Discount Components</h3>
+                <div class="grid gap-6 md:grid-cols-3">
+                    <!-- VIP Level Discount -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">VIP Level Discount</label>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span id="vip-level-name" class="text-xs font-bold text-purple-400">Bronze I</span>
+                            <span id="vip-discount-display" class="text-lg font-bold text-yellow-400">0%</span>
+                        </div>
+                        <input type="range" id="vip-level-slider" min="0" max="20" step="1" value="0" 
+                               list="vip-levels" 
+                               oninput="updateVIPLevel(this.value)"
+                               class="w-full accent-yellow-500">
+                        <datalist id="vip-levels">
+                            <option value="0" label="Bronze I"></option>
+                            <option value="1" label="Bronze II"></option>
+                            <option value="2" label="Silver I"></option>
+                            <option value="3" label="Silver II"></option>
+                            <option value="4" label="Silver III"></option>
+                            <option value="5" label="Gold I"></option>
+                            <option value="6" label="Gold II"></option>
+                            <option value="7" label="Plat I"></option>
+                            <option value="8" label="Plat II"></option>
+                            <option value="9" label="Plat III"></option>
+                            <option value="10" label="Diamond I"></option>
+                            <option value="11" label="Diamond II"></option>
+                            <option value="12" label="Diamond III"></option>
+                            <option value="13" label="Diamond IV"></option>
+                            <option value="14" label="Diamond V"></option>
+                            <option value="15" label="Legend I"></option>
+                            <option value="16" label="Legend II"></option>
+                            <option value="17" label="Legend III"></option>
+                            <option value="18" label="Legend IV"></option>
+                            <option value="19" label="Legend V"></option>
+                            <option value="20" label="Elite"></option>
+                        </datalist>
+                        <div class="text-xs text-gray-400">Based on NFT holdings or TH</div>
+                    </div>
+
+                    <!-- ServiceButton Discount -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">ServiceButton Discount</label>
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="service-button-enabled" 
+                                   onchange="updateBaseDiscount()"
+                                   class="w-5 h-5 rounded bg-gray-600 border-gray-500 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800">
+                            <span class="text-lg font-bold text-blue-400">3%</span>
+                        </div>
+                        <div class="text-xs text-gray-400">Enable ServiceButton for 3% discount</div>
+                    </div>
+
+                    <!-- Solo Mining Discount -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">Solo Mining Extra Discount (%)</label>
+                        <input type="number" id="solo-mining-discount" value="0" min="0" max="5" step="0.1" 
+                               oninput="updateBaseDiscount()"
+                               class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:ring-2 focus:ring-green-500">
+                        <div class="text-xs text-gray-400">Up to 5% for solo mining</div>
+                    </div>
+                </div>
+
+                <!-- Total Base Discount Display -->
+                <div class="mt-4 p-3 bg-gray-800 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-300">Total Base Discount:</span>
+                        <span id="total-base-discount" class="text-2xl font-bold text-yellow-400">0%</span>
+                    </div>
+                    <div class="text-xs text-gray-400 mt-1">
+                        VIP: <span id="base-breakdown-vip">0%</span> + 
+                        ServiceButton: <span id="base-breakdown-service">0%</span> + 
+                        Solo: <span id="base-breakdown-solo">0%</span>
+                    </div>
+                </div>
+                
+                <!-- Starting Total Discount (Base + Token from Locked GMT) -->
+                <div class="mt-4 p-4 bg-gradient-to-r from-green-900/30 to-blue-900/30 rounded-lg border border-green-500/30">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-green-300">Starting Total Discount:</span>
+                        <span id="starting-total-discount" class="text-3xl font-bold text-green-400">0%</span>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        Base: <span id="starting-base-discount">0%</span> + 
+                        Token (Wallet + Locked): <span id="starting-token-discount">0%</span>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">
+                        💡 This is your discount at day 1 (from wallet + locked GMT)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Discount Feature Toggle -->
+            <div class="mt-6 p-4 bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-lg border border-purple-500/30">
+                <div class="flex items-start gap-3">
+                    <div class="flex items-center h-6">
+                        <input type="checkbox" id="dynamic-discount-enabled" checked
+                               class="w-5 h-5 rounded bg-gray-600 border-gray-500 text-purple-600 focus:ring-purple-500 focus:ring-offset-gray-800">
+                    </div>
+                    <div class="flex-1">
+                        <label for="dynamic-discount-enabled" class="text-sm font-medium text-purple-300 cursor-pointer">
+                            🎯 Dynamic Discount Calculation
+                        </label>
+                        <div class="text-xs text-gray-400 mt-1">
+                            Calculate daily discount based on changing GMT wallet + locked GMT balance. When disabled, uses static base discount only.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-2">
+                <!-- Calculation Period -->
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-300">Calculation Period</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="calculation-period" value="365" min="1" step="1"
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+                        <select id="chart-period" onchange="updatePeriodLabel()" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white">
+                            <option value="daily">Days</option>
+                            <option value="weekly">Weeks</option>
+                            <option value="monthly">Months</option>
+                            <option value="yearly">Years</option>
+                        </select>
+                    </div>
+                    <div class="text-xs text-gray-400">Enter number of periods to calculate</div>
+                </div>
+            </div>
+        <!-- NEU: Erweiterte Greedy Miner Checkbox Section -->
+        <div class="mt-6 p-4 bg-gray-700 rounded-lg" >   <!-- style="display: none; -->
+            <div class="flex items-start gap-3">
+                <div class="flex items-center h-6">
+                    <input type="checkbox" id="greedy-miner-enabled" onchange="toggleGreedyOptions()"
+                        class="w-4 h-4 text-green-600 bg-gray-600 border-gray-500 rounded focus:ring-green-500 focus:ring-2">
+                </div>
+                <div class="flex-1">
+                    <label for="greedy-miner-enabled" class="text-sm font-medium text-gray-300 cursor-pointer">
+                        I am greedy and I have a greedy! 🤑
+                    </label>
+                    <div class="text-xs text-gray-400 mt-1">
+                        Enable automatic 0.12% TH growth every Tuesday
+                    </div>
+                </div>
+            </div>
+             
+            <!-- Greedy Options (hidden by default) -->
+            <div id="greedy-options" class="mt-4 space-y-4" style="display: none;">
+                <!-- Greedy Target Switch -->
+                <div class="p-3 bg-gray-800 rounded-lg">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">Greedy Miner Configuration</label>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm text-gray-400">Target Miner is NOT the Greedy</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="target-is-greedy-toggle" onchange="updateGreedyConfig()">
+                                <span class="toggle-slider" style="background-color: #059669;"></span>
+                            </label>
+                            <span class="text-sm text-gray-400">Target Miner IS the Greedy</span>
+                        </div>
+                        <div class="text-xs text-gray-400" id="greedy-config-description">
+                            Target miner and greedy miner are separate miners
+                        </div>
+                               <!-- NEU: Greedy Growth Rate Input -->
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-300">Predicted Greedy Growth (% per Tuesday)</label>
+                            <input type="number" id="greedy-growth-rate" value="0.12" min="0" max="5" step="0.01" 
+                                class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                                oninput="updateGreedyConfig()">
+                            <div class="text-xs text-gray-400">
+                                Weekly growth percentage based on recent GoMining performance
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Separate Greedy TH Input (shown when target is NOT greedy) -->
+                <div id="separate-greedy-section" class="p-3 bg-gray-800 rounded-lg">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">The Total TH of all my Greedys -- yes there are some really greedy miners out there</label>
+                        <input type="number" id="greedy-miner-th" value="10.00000000" min="1" step="0.00000001" 
+                            class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                       <input type="number" id="greedy-miner-efficiency" value="20.00" min="15.00" step="0.01" 
+                            class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <div class="text-xs text-gray-400">
+                            TH and W/TH amount of your separate greedy miner (grows by 0.12% every Tuesday)
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Greedy Summary -->
+                <div class="p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                    <div class="text-sm text-green-400 font-medium" id="greedy-summary">
+                        Configuration: Target Miner (1.0 TH) + Separate Greedy (1.0 TH) = 2.0 TH total with greedy growth
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Reinvestment Strategy Selection -->
+        <section class="bg-gray-800 rounded-xl p-6 shadow-lg">
+            <h2 class="text-2xl font-bold mb-6 text-purple-400">Reinvestment Strategy</h2>
+
+            <div class="grid gap-4 md:grid-cols-4 lg:grid-cols-4">
+                <!-- Automatic Reinvestment -->
+                <div class="strategy-card bg-gray-700 rounded-lg p-4 border-2 border-transparent" 
+                     onclick="selectStrategy('auto')">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="material-icons text-green-400">autorenew</span>
+                        <h3 class="font-bold">Automatic Reinvest</h3>
+                    </div>
+                    <p class="text-sm text-gray-300 mb-3">100% daily reward reinvested with 5% bonus, maintenance costs deducted from GMT Wallet</p>
+                    <div class="text-green-400 font-bold">+5% Bonus</div>
+                </div>
+
+                <!-- Manual Reinvestment -->
+                <div class="strategy-card bg-gray-700 rounded-lg p-4 border-2 border-transparent" 
+                     onclick="selectStrategy('manual')">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="material-icons text-blue-400">build</span>
+                        <h3 class="font-bold">Manual Reinvest</h3>
+                    </div>
+                    <p class="text-sm text-gray-300 mb-3">Manual reinvestment of daily profits</p>
+                    <div class="text-blue-400 font-bold">No Bonus</div>
+                </div>
+
+                <!-- Controlled Auto Reinvestment -->
+                <div class="strategy-card bg-gray-700 rounded-lg p-4 border-2 border-transparent selected" 
+                     onclick="selectStrategy('controlled')">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="material-icons text-purple-400">tune</span>
+                        <h3 class="font-bold">Controlled Auto</h3>
+                    </div>
+                    <p class="text-sm text-gray-300 mb-3">Mix of auto reinvest(with 5% TH bonus) and saving for maintenance</p>
+                    <div class="text-purple-400 font-bold">Customizable</div>
+                </div>
+            
+                        <!-- Controlled Auto v2 Reinvestment -->
+                <div class="strategy-card bg-gray-700 rounded-lg p-4 border-2 border-transparent" 
+                    onclick="selectStrategy('controlledv2')">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="material-icons text-orange-400">schedule</span>
+                        <h3 class="font-bold">Controlled Auto + BTC</h3>
+                    </div>
+                    <p class="text-sm text-gray-300 mb-3">Advanced strategy with TH reinvest, BTC accumulation, and GMT saving phases</p>
+                    <div class="text-orange-400 font-bold">3-Phase Cycle</div>
+                </div>
+            </div>
+            
+
+            <!-- Controlled Strategy Settings -->
+            <div id="controlled-settings" class="mt-6 p-4 bg-gray-700 rounded-lg">
+                <h4 class="font-bold mb-4 text-purple-400">Controlled Auto Settings</h4>
+                <div class="grid gap-4 md:grid-cols-2">
+                    <!-- Auto Reinvest Days -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">Auto Reinvest Days (with 5% bonus)</label>
+                        <input type="range" id="auto-days" min="0" max="30" value="15" step="1" oninput="updateControlledSettings()"
+                               class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-sm text-gray-400">
+                            <span>0</span>
+                            <span id="auto-days-value" class="font-bold text-purple-400">15 days</span>
+                            <span>30</span>
+                        </div>
+                    </div>
+                    <!-- Improved Cycle Mode Toggle -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">Cycle Mode</label>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm text-gray-400">Auto First</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="save-first-toggle" onchange="updateCycleMode()">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="text-sm text-gray-400">Save First</span>
+                        </div>
+                        <div class="text-xs text-gray-400" id="cycle-description">
+                            Start with auto-reinvest days, then save for maintenance
+                        </div>
+                    </div>
+                    <!-- Saving Days -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">Saving Days (accumulate GMT for electricity)</label>
+                        <div class="text-sm text-gray-400 mt-2">
+                            Saving Days: <span id="saving-days-value" class="font-bold text-blue-400">10 days</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controlled Reinvest v2 Settings -->
+            <div id="controlledv2-settings" class="mt-6 p-4 bg-gray-700 rounded-lg" style="display: none;">
+                <h4 class="font-bold mb-4 text-orange-400">Controlled Auto v2 Settings</h4>
+                
+                <div class="grid gap-4 md:grid-cols-3">
+                    <!-- Reinvest in TH Days -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">Reinvest in TH Days (with +5% bonus)</label>
+                        <input type="number" id="controlled-reinvest-days-v2" 
+                            class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-blue-500" 
+                            value="6" min="0" max="30" oninput="updateControlledV2Settings()">
+                        <div class="text-xs text-gray-400">Reward → TH with 5% bonus<br>Maintenance from GMT wallet</div>
+                    </div>
+
+                    <!-- Reward in BTC Days -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">Reward in BTC Days</label>
+                        <input type="number" id="btc-reward-days-v2" 
+                            class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-orange-500" 
+                            value="4" min="0" max="30" oninput="updateControlledV2Settings()">
+                        <div class="text-xs text-gray-400">Reward → BTC wallet<br>Maintenance from GMT wallet</div>
+                    </div>
+
+                    <!-- Saving Days -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">Saving Days (Reinvest in GMT)</label>
+                        <input type="number" id="controlled-saving-days-v2" 
+                            class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-green-500" 
+                            value="20" min="0" max="30" oninput="updateControlledV2Settings()">
+                        <div class="text-xs text-gray-400">Reward → GMT wallet<br>Maintenance from GMT wallet</div>
+                    </div>
+                </div>
+                <!-- Improved V2 Cycle Mode Toggle -->
+                <div class="mt-4 space-y-2">
+                    <label class="text-sm font-medium text-gray-300">Cycle Mode</label>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-gray-400">TH First</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="save-first-toggle-v2" onchange="updateCycleModeV2()">
+                            <span class="toggle-slider orange"></span>
+                        </label>
+                        <span class="text-sm text-gray-400">Save First</span>
+                    </div>
+                    <div class="text-xs text-gray-400" id="cycle-description-v2">
+                        Start with TH reinvest, then BTC accumulation, then GMT saving
+                    </div>
+                </div>
+                <!-- Total Days Display -->
+                <div class="mt-4 p-3 bg-gray-800 rounded-lg">
+                    <div class="text-sm text-gray-400">
+                        Total Cycle Duration: <span id="controlled-total-days-v2" class="font-bold text-orange-400">30 days</span>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1" id="cycle-order-v2">
+                        Phase 1: <span id="phase1-summary" class="text-blue-400">6d TH reinvest</span> → 
+                        Phase 2: <span id="phase2-summary" class="text-orange-400">4d BTC accumulation</span> → 
+                        Phase 3: <span id="phase3-summary" class="text-green-400">20d GMT saving</span>
+                    </div>
+                </div>
+            </div>
+
+            
+        </section>
+
+        <!-- Calculate Button -->
+        <section class="text-center">
+            <button onclick="calculateReinvestment()" 
+                    class="bg-purple-600 hover:bg-purple-700 px-8 py-3 rounded-lg font-bold text-lg transition-colors duration-200">
+                Calculate Reinvestment Strategy
+            </button>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results-section" class="bg-gray-800 rounded-xl p-6 shadow-lg hidden">
+            <h2 class="text-2xl font-bold mb-6 text-purple-400">Results</h2>
+            
+            <!-- Growth Chart -->
+            <div class="mb-8">
+                <h3 class="text-lg font-bold mb-4 text-gray-300">Growth Over Time</h3>
+                <div class="chart-container bg-gray-700 rounded-lg p-4">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-5 mb-8">
+                <div class="bg-gray-700 rounded-lg p-4">
+                    <h4 class="text-sm font-medium text-gray-300 mb-2">Final TH Amount</h4>
+                    <div id="final-th" class="text-2xl font-bold text-green-400">-</div>
+                </div>
+                <div class="bg-gray-700 rounded-lg p-4">
+                    <h4 class="text-sm font-medium text-gray-300 mb-2">Final Farm TH</h4>
+                    <div id="final-farm-th" class="text-2xl font-bold text-yellow-400">-</div>
+                </div>
+                <div class="bg-gray-700 rounded-lg p-4">
+                    <h4 class="text-sm font-medium text-gray-300 mb-2">Final Farm W/TH</h4>
+                    <div id="final-farm-efficiency" class="text-2xl font-bold text-orange-400">-</div>
+                </div>
+                <div class="bg-gray-700 rounded-lg p-4">
+                    <h4 class="text-sm font-medium text-gray-300 mb-2">Total Investment</h4>
+                    <div id="total-investment" class="text-2xl font-bold text-blue-400">-</div>
+                </div>
+                <div class="bg-gray-700 rounded-lg p-4">
+                    <h4 class="text-sm font-medium text-gray-300 mb-2">Final GMT Balance</h4>
+                    <div id="final-gmt-balance" class="text-2xl font-bold text-purple-400">-</div>
+                </div>
+                    <!-- NEU: Avg Total Discount Card -->
+                <div class="bg-gradient-to-br from-yellow-900/40 to-orange-900/40 rounded-lg p-4 border border-yellow-600/30">
+                    <h4 class="text-sm font-medium text-gray-300 mb-2">Avg. Total Discount</h4>
+                    <div id="avg-total-discount" class="text-2xl font-bold text-yellow-400">-</div>
+                    <div class="text-xs text-gray-400 mt-1">
+                        Base: <span id="avg-base-discount">0%</span> + 
+                        Token: <span id="avg-token-discount">0%</span>
+                    </div>
+                </div>
+                    <!-- NEU: Hold Days Card -->
+                <div class="bg-gray-700 rounded-lg p-4">
+                    <h4 class="text-sm font-medium text-gray-300 mb-2">Hold Days</h4>
+                    <div id="hold-days" class="text-2xl font-bold text-red-400">-</div>
+                    <div class="text-xs text-gray-400 mt-1">Insufficient GMT</div>
+                </div>
+                    <!-- NEU: Final BTC Card -->
+                <div class="bg-gray-700 rounded-lg p-4">
+                    <div class="text-sm text-gray-400">Final BTC Balance</div>
+                    <div id="final-btc" class="text-2xl font-bold text-orange-400">-</div>
+                </div>
+   
+                <div class="bg-gray-800 rounded-lg p-6 border border-gray-700" id="greedy-final-card" style="display: none;">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-500 bg-opacity-20">
+                                <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-400 truncate">Final Greedy TH</dt>
+                                    <dd class="text-lg font-bold text-yellow-400" id="greedy-final-th">0.00 TH</dd>
+                                    <dd class="text-xs text-gray-500 mt-1" id="greedy-growth-info">Growth info</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+
+            <!-- Detailed Results Table -->
+            <div class="overflow-x-auto">
+                <h3 class="text-lg font-bold mb-4 text-gray-300">Detailed Timeline</h3>
+                <table class="results-table w-full bg-gray-700 rounded-lg overflow-hidden">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Date</th>
+                            <th>Target TH</th>
+                            <th>Farm TH</th>
+                            <th>Daily Profit</th>
+                            <th>Reinvestment</th>
+                            <th>GMT Balance</th>
+                            <th>Discount %</th>
+                            <th>Strategy</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-table-body">
+                        <!-- Results will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Overlay for Sidebar -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden" id="sidebar-overlay" onclick="closeSidebar()"></div>
+<div id="footer-container"></div>
+    <script>
+        // Global variables for calculation
+        let currentStrategy = 'controlled';
+        let growthChart = null;
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+           // setupEventListeners();
+            updateControlledV2Settings();
+        });
+        function updatePeriodLabel() {
+            const period = document.getElementById('chart-period').value;
+            console.log('Chart period changed to:', period);
+            // Keine Einschränkungen - der Benutzer soll frei wählen können
+            // 25 Jahre, 50 Jahre oder mehr sind völlig in Ordnung
+        }
+        function initializePage() {
+            // Load current BTC price
+            loadCurrentBTCPrice();
+            
+            // Update controlled settings display
+            updateControlledSettings();
+        }
+
+        function updateControlledSettings() {
+            const autoDays = parseInt(document.getElementById('auto-days').value);
+            const savingDays = 30 - autoDays;
+            
+            document.getElementById('auto-days-value').textContent = `${autoDays} days`;
+            document.getElementById('saving-days-value').textContent = `${savingDays} days`;
+        }
+        function selectStrategy(strategy) {
+            currentStrategy = strategy;
+            
+            // Update visual selection
+            document.querySelectorAll('.strategy-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.strategy-card').classList.add('selected');
+            
+            // Show/hide controlled settings
+            const controlledSettings = document.getElementById('controlled-settings');
+            const controlledV2Settings = document.getElementById('controlledv2-settings');
+            const greedySettings = document.getElementById('greedy-settings');
+            
+            if (strategy === 'controlled') {
+                controlledSettings.style.display = 'block';
+                controlledV2Settings.style.display = 'none';
+                greedySettings.style.display = 'none';
+            } else if (strategy === 'controlledv2') {
+                controlledSettings.style.display = 'none';
+                controlledV2Settings.style.display = 'block';
+                greedySettings.style.display = 'none';
+            } else if (strategy === 'greedy') {
+                controlledSettings.style.display = 'none';
+                controlledV2Settings.style.display = 'none';
+                greedySettings.style.display = 'block';
+                updateGreedyPreview();
+            } else {
+                controlledSettings.style.display = 'none';
+                controlledV2Settings.style.display = 'none';
+                greedySettings.style.display = 'none';
+            }
+            
+            // Update table header visibility for BTC column
+            updateTableHeader();
+            
+            // Recalculate if results are visible
+            if (!document.getElementById('results-section').classList.contains('hidden')) {
+                calculateReinvestment();
+            }
+        }
+        
+
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            sidebar.classList.remove('open');
+            overlay.classList.add('hidden');
+        }
+
+        function updateBTCPrice() {
+            const btcPrice = document.getElementById('bitcoin-price-dropdown').value;
+            // This function would be connected to price update logic
+            console.log('BTC Price updated to:', btcPrice);
+        }
+
+        async function loadCurrentBTCPrice() {
+            try {
+                // Use the existing price fetch functions from skript.js
+                fetchBTCPrice();
+                fetchGMTPrice();
+            } catch (error) {
+                console.log('Could not load current prices:', error);
+                // Set defaults if price fetch fails
+                document.getElementById('bitcoin-price-dropdown').value = '67000';
+                document.getElementById('gmt-token-price').value = '0.4269';
+            }
+        }
+        function toggleSeoContent() {
+            const content = document.getElementById('seo-content');
+            const icon = document.getElementById('seo-toggle-icon');
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.textContent = 'expand_less';
+            } else {
+                content.classList.add('hidden');
+                icon.textContent = 'expand_more';
+            }
+        }
+
+        // VIP Level Configuration (based on GoMining VIP tiers)
+        window.VIP_LEVELS = [
+            { level: 0, name: 'Bronze I', discount: 0.3 },
+            { level: 1, name: 'Bronze II', discount: 0.6 },
+            { level: 2, name: 'Silver I', discount: 0.9 },
+            { level: 3, name: 'Silver II', discount: 0.9 },
+            { level: 4, name: 'Silver III', discount: 1.2 },
+            { level: 5, name: 'Gold I', discount: 1.5 },
+            { level: 6, name: 'Gold II', discount: 1.8 },
+            { level: 7, name: 'Platinum I', discount: 2.1 },
+            { level: 8, name: 'Platinum II', discount: 2.4 },
+            { level: 9, name: 'Platinum III', discount: 2.7 },
+            { level: 10, name: 'Diamond I', discount: 3.0 },
+            { level: 11, name: 'Diamond II', discount: 3.3 },
+            { level: 12, name: 'Diamond III', discount: 3.6 },
+            { level: 13, name: 'Diamond IV', discount: 3.9 },
+            { level: 14, name: 'Diamond V', discount: 4.2 },
+            { level: 15, name: 'Legend I', discount: 4.5 },
+            { level: 16, name: 'Legend II', discount: 4.8 },
+            { level: 17, name: 'Legend III', discount: 5.1 },
+            { level: 18, name: 'Legend IV', discount: 5.4 },
+            { level: 19, name: 'Legend V', discount: 5.7 },
+            { level: 20, name: 'Elite', discount: 6.0 }
+        ];
+
+        // Update VIP Level display and base discount
+        function updateVIPLevel(sliderValue) {
+            const level = parseInt(sliderValue);
+            const vipData = window.VIP_LEVELS[level];
+            
+            document.getElementById('vip-level-name').textContent = vipData.name;
+            document.getElementById('vip-discount-display').textContent = vipData.discount.toFixed(1) + '%';
+            
+            updateBaseDiscount();
+        }
+
+        // Calculate and update total base discount
+        function updateBaseDiscount() {
+            const vipLevel = parseInt(document.getElementById('vip-level-slider').value) || 0;
+            const vipDiscount = window.VIP_LEVELS[vipLevel].discount;
+            
+            const serviceButtonEnabled = document.getElementById('service-button-enabled').checked;
+            const serviceDiscount = serviceButtonEnabled ? 3 : 0;
+            
+            const soloDiscount = parseFloat(document.getElementById('solo-mining-discount').value) || 0;
+            
+            const totalBase = vipDiscount + serviceDiscount + soloDiscount;
+            
+            // Update base discount display
+            document.getElementById('total-base-discount').textContent = totalBase.toFixed(2) + '%';
+            document.getElementById('base-breakdown-vip').textContent = vipDiscount.toFixed(1) + '%';
+            document.getElementById('base-breakdown-service').textContent = serviceDiscount.toFixed(0) + '%';
+            document.getElementById('base-breakdown-solo').textContent = soloDiscount.toFixed(1) + '%';
+            
+            // Calculate starting total discount (base + token from locked GMT)
+            updateStartingDiscount(totalBase);
+            
+            return totalBase;
+        }
+        
+        // Calculate and display starting total discount (includes locked GMT)
+        function updateStartingDiscount(baseDiscount) {
+            const walletGMT = parseFloat(document.getElementById('gmt-wallet-balance').value) || 0;
+            const lockedGMT = parseFloat(document.getElementById('locked-gmt').value) || 0;
+            const totalGMT = walletGMT + lockedGMT;
+            const gmtPrice = parseFloat(document.getElementById('gmt-token-price').value) || 0.4269;
+            const farmTH = parseFloat(document.getElementById('farm-total-th').value) || 10;
+            const efficiency = parseFloat(document.getElementById('farm-efficiency').value) || 20;
+            
+            // Calculate raw maintenance costs
+            const rawElectricity = (efficiency * farmTH * 0.05 * 24) / 1000; // ELECTRICITY_COST_PER_KWH = 0.05
+            const rawService = 0.0089 * farmTH; // SERVICE_COST_PER_TH = 0.0089
+            const rawMaintenance = rawElectricity + rawService;
+            
+            // Calculate coverage days with base discount
+            const actualDailyCost = rawMaintenance * (1 - baseDiscount / 100);
+            const totalGMTValue = totalGMT * gmtPrice;
+            const coverageDays = actualDailyCost > 0 ? totalGMTValue / actualDailyCost : 0;
+            
+            // Calculate token discount from total GMT (wallet + locked)
+            let tokenDiscount = 0;
+            if (coverageDays >= 378) {
+                tokenDiscount = 20;
+            } else if (coverageDays >= 36) {
+                tokenDiscount = Math.floor((coverageDays - 18) / 18);
+            }
+            
+            const startingTotal = baseDiscount + tokenDiscount;
+            
+            // Update display
+            document.getElementById('starting-total-discount').textContent = startingTotal.toFixed(2) + '%';
+            document.getElementById('starting-base-discount').textContent = baseDiscount.toFixed(2) + '%';
+            document.getElementById('starting-token-discount').textContent = tokenDiscount.toFixed(2) + '%';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateVIPLevel(0);
+            updateBaseDiscount();
+            
+            // Add event listeners for starting discount updates
+            document.getElementById('gmt-wallet-balance')?.addEventListener('input', function() {
+                const baseDiscount = parseFloat(document.getElementById('total-base-discount').textContent) || 0;
+                updateStartingDiscount(baseDiscount);
+            });
+            
+            document.getElementById('locked-gmt')?.addEventListener('input', function() {
+                const baseDiscount = parseFloat(document.getElementById('total-base-discount').textContent) || 0;
+                updateStartingDiscount(baseDiscount);
+            });
+            
+            document.getElementById('farm-total-th')?.addEventListener('input', function() {
+                const baseDiscount = parseFloat(document.getElementById('total-base-discount').textContent) || 0;
+                updateStartingDiscount(baseDiscount);
+            });
+            
+            document.getElementById('farm-efficiency')?.addEventListener('input', function() {
+                const baseDiscount = parseFloat(document.getElementById('total-base-discount').textContent) || 0;
+                updateStartingDiscount(baseDiscount);
+            });
+        });
+ 
+        // Main calculation is handled in reinvest-calculator.js
+    </script>
+</body>
+</html>
