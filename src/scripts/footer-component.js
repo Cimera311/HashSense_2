@@ -86,7 +86,7 @@ function renderFooter() {
                     <div class="mt-4 pt-4 border-t border-gray-700">
                         <p class="text-xs text-gray-500 flex items-center gap-2">
                             <span class="material-icons text-sm">schedule</span>
-                            Price date::
+                            Price date: 06.02.2026:
                         </p>
                         <p class="text-sm text-gray-300 font-mono mt-1">${updateTimeString}</p>
                     </div>
