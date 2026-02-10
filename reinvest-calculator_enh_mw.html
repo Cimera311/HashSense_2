@@ -8,7 +8,7 @@
     <script src="priceMatrix.js"></script>
     <script src="src/scripts/skript.js"></script>
     <script src="src/scripts/greedy-scripts.js"></script>
-    <script src="src/scripts/reinvest-calculator_enh.js"></script>
+    <script src="src/scripts/reinvest-calculator_enh_mw.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <!-- Footer Script -->
@@ -402,7 +402,7 @@
                     <h2 class="text-sm font-semibold mb-3 text-gray-300">SAT PER TH</h2>
                     <div class="flex items-center gap-3">
                         <img src="sats-ordinals-sats-logo.png" alt="⚡" class="w-10 h-10">
-                        <input type="number" id="sat-TH" value="42" min="0" step="1"
+                        <input type="number" id="sat-TH" value="50" min="0" step="1"
                                class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
                     </div>
                 </div>
@@ -541,7 +541,7 @@
                     <!-- Farm Total TH -->
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-gray-300">Total Farm TH</label>
-                        <input type="number" id="farm-total-th" value="10" min="0.1" step="0.1" 
+                        <input type="number" id="farm-total-th" value="1000" min="0.1" step="0.1" 
                                class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <div class="text-xs text-gray-400">Total hashrate of your farm</div>
                     </div>
@@ -549,7 +549,7 @@
                     <!-- Farm Average Efficiency -->
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-gray-300">Farm Avg. Efficiency (W/TH)</label>
-                        <input type="number" id="farm-efficiency" value="20.00" min="15" max="50" step="0.01" 
+                        <input type="number" id="farm-efficiency" value="15.00" min="15" max="50" step="0.01" 
                                class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <div class="text-xs text-gray-400">Average power consumption</div>
                     </div>
@@ -589,12 +589,12 @@
             <div class="mt-6 p-4 bg-gray-700 rounded-lg">
                 <div class="flex items-start gap-3">
                     <div class="flex items-center h-6">
-                        <input type="checkbox" id="greedy-miner-enabled" onchange="toggleGreedyOptions()"
+                        <input type="checkbox" id="greedy-miner-enabled" onchange="toggleGreedyOptions()" class="hidden"
                             class="w-4 h-4 text-green-600 bg-gray-600 border-gray-500 rounded focus:ring-green-500 focus:ring-2">
                     </div>
                     <div class="flex-1">
                         <label for="greedy-miner-enabled" class="text-sm font-medium text-gray-300 cursor-pointer">
-                            I am greedy and I have a greedy! 🤑
+                           (BUGGY in MW Sorry ) I am greedy and I have a greedy! 🤑
                         </label>
                         <div class="text-xs text-gray-400 mt-1">
                             Enable automatic 0.12% TH growth every Tuesday
@@ -914,7 +914,7 @@
                             <option value="yearly">Years</option>
                         </select>
                     </div>
-                    <div class="text-xs text-gray-400">Enter number of periods to calculate</div>
+                    <div id="period-description" class="text-xs text-gray-400">Enter number of periods to calculate</div>
                 </div>
             </div>
         </section>
@@ -925,7 +925,7 @@
 
             <div class="grid gap-4 md:grid-cols-4 lg:grid-cols-4">
                 <!-- Automatic Reinvestment -->
-                <div class="strategy-card bg-gray-700 rounded-lg p-4 border-2 border-transparent" 
+                <div id="strategy-auto" class="strategy-card bg-gray-700 rounded-lg p-4 border-2 border-transparent" 
                      onclick="selectStrategy('auto')">
                     <div class="flex items-center gap-3 mb-3">
                         <span class="material-icons text-green-400">autorenew</span>
@@ -936,7 +936,7 @@
                 </div>
 
                 <!-- Manual Reinvestment -->
-                <div class="strategy-card bg-gray-700 rounded-lg p-4 border-2 border-transparent" 
+                <div id="strategy-manual" class="strategy-card bg-gray-700 rounded-lg p-4 border-2 border-transparent" 
                      onclick="selectStrategy('manual')">
                     <div class="flex items-center gap-3 mb-3">
                         <span class="material-icons text-blue-400">build</span>
@@ -970,7 +970,7 @@
                 
                 <!-- Only Saving Strategy (Miner Wars only) -->
                 <div id="strategy-saving" class="strategy-card bg-gray-700 rounded-lg p-4 border-2 border-transparent" 
-                    onclick="selectStrategy('saving')" style="display: none;">
+                    onclick="selectStrategy('saving')" >
                     <div class="flex items-center gap-3 mb-3">
                         <span class="material-icons text-cyan-400">savings</span>
                         <h3 class="font-bold">Only Saving</h3>
@@ -1002,17 +1002,6 @@
                     <div class="text-blue-400 font-bold">No Auto</div>
                 </div>
                 
-                <!-- Controlled Auto MW -->
-                <div id="strategy-controlled-mw" class="strategy-card bg-gray-700 rounded-lg p-4 border-2 border-transparent" 
-                    onclick="selectStrategy('controlled-mw')" style="display: none;">
-                    <div class="flex items-center gap-3 mb-3">
-                        <span class="material-icons text-purple-400">tune</span>
-                        <h3 class="font-bold">Controlled Auto MW</h3>
-                    </div>
-                    <p class="text-sm text-gray-300 mb-3">Cycle-based auto/saving strategy (Miner Wars)</p>
-                    <div class="text-purple-400 font-bold">Cycle-Based</div>
-                </div>
-                
                 <!-- Controlled Auto V2 MW -->
                 <div id="strategy-controlledv2-mw" class="strategy-card bg-gray-700 rounded-lg p-4 border-2 border-transparent" 
                     onclick="selectStrategy('controlledv2-mw')" style="display: none;">
@@ -1022,6 +1011,17 @@
                     </div>
                     <p class="text-sm text-gray-300 mb-3">Advanced cycle-based strategy with BTC accumulation (Miner Wars)</p>
                     <div class="text-orange-400 font-bold">3-Phase Cycles</div>
+                </div>
+                
+                <!-- Only Saving MW -->
+                <div id="strategy-saving-mw" class="strategy-card bg-gray-700 rounded-lg p-4 border-2 border-transparent" 
+                    onclick="selectStrategy('saving-mw')" style="display: none;">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="material-icons text-cyan-400">savings</span>
+                        <h3 class="font-bold">Only Saving MW</h3>
+                    </div>
+                    <p class="text-sm text-gray-300 mb-3">Accumulate all weekly profits in GMT wallet, no reinvestment (Miner Wars)</p>
+                    <div class="text-cyan-400 font-bold">Pure Accumulation</div>
                 </div>
             </div>
             
@@ -1126,45 +1126,7 @@
                 </div>
             </div>
 
-            <!-- MW Controlled Settings (Cycle-based) -->
-            <div id="controlled-settings-mw" class="mt-6 p-4 bg-gray-700 rounded-lg" style="display: none;">
-                <h4 class="font-bold mb-4 text-purple-400">Controlled Auto MW Settings (Cycle-Based)</h4>
-                <div class="grid gap-4 md:grid-cols-2">
-                    <!-- Auto Reinvest Cycles -->
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-300">Auto Reinvest Cycles (with 5% bonus)</label>
-                        <input type="number" id="auto-cycles-mw" min="0" max="10" value="2" step="1" oninput="updateControlledMWSettings()"
-                               class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-purple-500">
-                        <div class="text-xs text-gray-400">Number of cycles to auto-reinvest</div>
-                    </div>
-                    
-                    <!-- Cycle Mode Toggle -->
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-300">Cycle Mode</label>
-                        <div class="flex items-center gap-3">
-                            <span class="text-sm text-gray-400">Auto First</span>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="save-first-toggle-mw" onchange="updateCycleModeMW()">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <span class="text-sm text-gray-400">Save First</span>
-                        </div>
-                        <div class="text-xs text-gray-400" id="cycle-description-mw">
-                            Start with auto-reinvest cycles, then save for maintenance
-                        </div>
-                    </div>
-                    
-                    <!-- Saving Cycles -->
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-300">Saving Cycles</label>
-                        <div class="text-sm text-gray-400 mt-2">
-                            Saving Cycles: <span id="saving-cycles-value-mw" class="font-bold text-blue-400">3 cycles</span>
-                        </div>
-                        <div class="text-xs text-gray-400">Accumulate GMT for maintenance</div>
-                    </div>
-                </div>
-            </div>
-
+        
             <!-- MW Controlled V2 Settings (3-Phase Cycles) -->
             <div id="controlledv2-settings-mw" class="mt-6 p-4 bg-gray-700 rounded-lg" style="display: none;">
                 <h4 class="font-bold mb-4 text-orange-400">Controlled Auto + BTC + Saving MW Settings</h4>
@@ -1177,16 +1139,6 @@
                             value="2" min="0" max="10" oninput="updateControlledV2MWSettings()">
                         <div class="text-xs text-gray-400">Reward → TH with 5% bonus<br>Maintenance from GMT wallet</div>
                     </div>
-
-                    <!-- BTC Cycles -->
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-300">BTC Accumulation Cycles</label>
-                        <input type="number" id="btc-cycles-mw" 
-                            class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-orange-500" 
-                            value="1" min="0" max="10" oninput="updateControlledV2MWSettings()">
-                        <div class="text-xs text-gray-400">Reward → BTC wallet<br>Maintenance from GMT wallet</div>
-                    </div>
-
                     <!-- Saving Cycles -->
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-gray-300">Saving Cycles (GMT)</label>
@@ -1195,6 +1147,15 @@
                             value="2" min="0" max="10" oninput="updateControlledV2MWSettings()">
                         <div class="text-xs text-gray-400">Reward → GMT wallet<br>Maintenance from GMT wallet</div>
                     </div>
+                    <!-- BTC Cycles -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300">BTC Accumulation Cycles</label>
+                        <input type="number" id="btc-cycles-mw" 
+                            class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-orange-500" 
+                            value="0" min="0" max="10" oninput="updateControlledV2MWSettings()">
+                        <div class="text-xs text-gray-400">Reward → BTC wallet<br>Maintenance from GMT wallet</div>
+                    </div>
+
                 </div>
                 
                 <!-- Cycle Mode Toggle -->
@@ -1429,7 +1390,9 @@
             }
             
             // Update table header visibility for BTC column
-            updateTableHeader();
+            if (typeof updateTableHeader === 'function') {
+                updateTableHeader();
+            }
             
             // Recalculate if results are visible
             if (!document.getElementById('results-section').classList.contains('hidden')) {
@@ -1658,12 +1621,24 @@
         function toggleMinerWars() {
             const isEnabled = document.getElementById('miner-wars-toggle').checked;
             const settings = document.getElementById('miner-wars-settings');
+            const periodInput = document.getElementById('calculation-period');
+            const periodSelect = document.getElementById('chart-period');
+            const periodDescription = document.getElementById('period-description');
             
             // Show/hide MW settings
             if (isEnabled) {
                 settings.style.display = 'block';
                 
+                // Change to Cycles mode
+                periodInput.value = '12';
+                periodSelect.innerHTML = '<option value="cycles">Cycles</option>';
+                periodSelect.value = 'cycles';
+                periodDescription.textContent = 'Enter number of cycles (1 cycle = Tuesday to Monday)';
+                periodDescription.className = 'text-xs text-red-400';
+                
                 // Hide Mining Mode strategies
+                document.getElementById('strategy-auto').style.display = 'none';
+                document.getElementById('strategy-manual').style.display = 'none';
                 document.getElementById('strategy-controlled').style.display = 'none';
                 document.getElementById('strategy-controlledv2').style.display = 'none';
                 document.getElementById('strategy-saving').style.display = 'none';
@@ -1675,8 +1650,8 @@
                 // Show MW strategies
                 document.getElementById('strategy-auto-mw').style.display = 'block';
                 document.getElementById('strategy-manual-mw').style.display = 'block';
-                document.getElementById('strategy-controlled-mw').style.display = 'block';
                 document.getElementById('strategy-controlledv2-mw').style.display = 'block';
+                document.getElementById('strategy-saving-mw').style.display = 'block';
                 
                 // If Mining Mode strategy is selected, switch to auto-mw
                 const currentStrategy = document.querySelector('.strategy-card.selected');
@@ -1686,17 +1661,30 @@
             } else {
                 settings.style.display = 'none';
                 
+                // Restore normal period options
+                periodInput.value = '365';
+                periodSelect.innerHTML = `
+                    <option value="daily">Days</option>
+                    <option value="weekly">Weeks</option>
+                    <option value="monthly">Months</option>
+                    <option value="yearly">Years</option>
+                `;
+                periodSelect.value = 'daily';
+                periodDescription.textContent = 'Enter number of periods to calculate';
+                periodDescription.className = 'text-xs text-gray-400';
+                
                 // Hide MW strategies
                 document.getElementById('strategy-auto-mw').style.display = 'none';
                 document.getElementById('strategy-manual-mw').style.display = 'none';
-                document.getElementById('strategy-controlled-mw').style.display = 'none';
                 document.getElementById('strategy-controlledv2-mw').style.display = 'none';
+                document.getElementById('strategy-saving-mw').style.display = 'none';
                 
                 // Hide MW settings
-                document.getElementById('controlled-settings-mw').style.display = 'none';
                 document.getElementById('controlledv2-settings-mw').style.display = 'none';
                 
                 // Show Mining Mode strategies
+                document.getElementById('strategy-auto').style.display = 'block';
+                document.getElementById('strategy-manual').style.display = 'block';
                 document.getElementById('strategy-controlled').style.display = 'block';
                 document.getElementById('strategy-controlledv2').style.display = 'block';
                 document.getElementById('strategy-saving').style.display = 'block';

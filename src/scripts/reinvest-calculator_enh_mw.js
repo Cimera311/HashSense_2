@@ -371,13 +371,59 @@ function calculateReinvestmentStrategy() {
         case 'yearly': 
             chartInterval = 365; 
             break;
+        case 'cycles':
+            chartInterval = 7; // Same as weekly - Di-Mo period
+            break;
     }
     
     // Tracking für average discount
     let totalDiscountSum = 0;
     let discountDayCount = 0;
     
+    // Miner Wars weekly tracking
+    let weeklyMiningRevenue = 0;
+    let weeklyMaintenanceCost = 0;
+    const isMinerWars = inputs.minerWarsEnabled;
+    const minerWarsFactor = inputs.minerWarsFactor / 100; // Convert to decimal
+    
+    // Track cycles for Miner Wars (Tuesday to Monday periods)
+    let currentCycleNumber = 1;
+    let daysUntilNextTuesday = 0;
+    let isFirstCycle = true; // Track if this is the first payout
+    
+    // Calculate days until next Tuesday from today
+    if (isMinerWars) {
+        const todayDayOfWeek = currentDate.getDay(); // 0=Sunday, 1=Monday, 2=Tuesday, etc.
+        // Days until next Tuesday: (2 - today + 7) % 7, but if today is Tuesday, it's 0
+        daysUntilNextTuesday = todayDayOfWeek === 2 ? 0 : (2 - todayDayOfWeek + 7) % 7;
+        
+        // If we start mid-cycle (not on Tuesday), pre-accumulate for the full cycle
+        // Example: Start on Monday (day 6 of cycle) → need to count full 7 days for first payout
+        const daysAlreadyInCycle = todayDayOfWeek === 2 ? 0 : (todayDayOfWeek === 0 ? 5 : (todayDayOfWeek + 5) % 7);
+        
+        // 🔍 DEBUG: Initial Cycle Setup
+        console.log('\n🔍 === MINER WARS CYCLE SETUP ===');
+        console.log('  Today (Start Date):', currentDate.toISOString().split('T')[0]);
+        console.log('  Today Day of Week:', todayDayOfWeek, ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][todayDayOfWeek]);
+        console.log('  Days until next Tuesday:', daysUntilNextTuesday);
+        console.log('  Days already in current cycle:', daysAlreadyInCycle);
+        console.log('  Starting Cycle Number:', currentCycleNumber);
+        console.log('  First payout will include FULL 7-day cycle');
+    }
+    
     for (let day = 0; day < inputs.calculationPeriod; day++) {
+        // Calculate actual date for this iteration
+        const thisDate = new Date(currentDate.getTime() + day * 24 * 60 * 60 * 1000);
+        const actualDayOfWeek = thisDate.getDay(); // 0=Sunday, 1=Monday, 2=Tuesday, etc.
+        const isTuesday = actualDayOfWeek === 2;
+        
+        // 🔍 DEBUG: Daily Date Check (nur erste 14 Tage oder Dienstage/Montage)
+        if (isMinerWars && (day < 14 || isTuesday || actualDayOfWeek === 1)) {
+            console.log(`\n🔍 Day ${day} (${thisDate.toISOString().split('T')[0]}):`, 
+                ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][actualDayOfWeek],
+                isTuesday ? '✅ TUESDAY' : actualDayOfWeek === 1 ? '🔄 MONDAY' : '');
+            console.log('  Current Cycle Number:', currentCycleNumber);
+        }
         // ===== DYNAMIC DISCOUNT CALCULATION =====
         let currentDiscount = inputs.baseDiscount; // Default: nur Base Discount
         let currentDiscountPercent = inputs.baseDiscountPercent;
@@ -422,23 +468,195 @@ function calculateReinvestmentStrategy() {
         // Calculate daily profit for display purposes
         const dailyProfitGMT = dailyRevenue.gmt - dailyElectricity.gmt - dailyService.gmt;
         const dailyProfitUSD = dailyRevenue.usd - dailyElectricity.usd - dailyService.usd;
+        // For the FIRST payout, always use 7 full days (full cycle)
+        // For subsequent payouts, use accumulated days (should also be 7)
+        //const daysToCalculate = isFirstCycle ? 7 : Math.max(1, Math.round(weeklyMiningRevenue / (dailyRevenue.gmt * minerWarsFactor)));
+        const daysToCalculate = 7;
+        // Calculate weekly metrics (ensure full 7-day cycle)
+       /* const weeklyRevenueGMT = isFirstCycle ? (dailyRevenue.gmt * minerWarsFactor * 7) : weeklyMiningRevenue;
+        const weeklyMaintenanceGMT = isFirstCycle ? ((dailyElectricity.gmt + dailyService.gmt) * minerWarsFactor * 7) : weeklyMaintenanceCost;
+        const weeklyNetProfitGMT = weeklyRevenueGMT - weeklyMaintenanceGMT; */
+        const weeklyRevenueGMT = (dailyRevenue.gmt * minerWarsFactor * 7) 
+        const weeklyMaintenanceGMT = ((dailyElectricity.gmt + dailyService.gmt) * minerWarsFactor * 7) 
+        const weeklyNetProfitGMT = weeklyRevenueGMT - weeklyMaintenanceGMT;
+
 
         let reinvestmentUSD = 0;
         let strategyText = 'Hold';
         let todayMinerTH = yesterdayMinerTH;
         let todayGreedyTH = yesterdayGreedyTH; // ✅ Separate Today Variable
-        // ===== STRATEGY EXECUTION =====
         
+        // ===== MINER WARS MODE: Weekly Accumulation =====
+        /* if (isMinerWars) {
+            // Accumulate revenue and costs for the week
+            weeklyMiningRevenue += dailyRevenue.gmt * minerWarsFactor;
+            weeklyMaintenanceCost += (dailyElectricity.gmt + dailyService.gmt) * minerWarsFactor;
+            
+            // Only process on Tuesday
+            if (!isTuesday) {
+                strategyText = 'Accumulating (Miner Wars)';
+            }
+        } */
+        
+        // ===== STRATEGY EXECUTION =====
+        if (isMinerWars && isTuesday) {
+            // ===== MINER WARS TUESDAY PAYOUT =====
+                // Diese Berechnung EINMALIG am Dienstag:
+        /*    const weeklyRevenueGMT = dailyRevenue.gmt * minerWarsFactor * daysToCalculate; // ✅ × 7
+            const weeklyMaintenanceGMT = (dailyElectricity.gmt + dailyService.gmt) * minerWarsFactor * daysToCalculate; // ✅ × 7
+            const weeklyNetProfitGMT = weeklyRevenueGMT - weeklyMaintenanceGMT;*/
+
+            
+            console.log(`💰 PAYOUT Day ${day}: ${isFirstCycle ? 'FIRST CYCLE (7 days)' : `Accumulated ${daysToCalculate} days`}`);
+            console.log(`   Revenue: ${weeklyRevenueGMT.toFixed(2)} GMT, Maintenance: ${weeklyMaintenanceGMT.toFixed(2)} GMT, Net: ${weeklyNetProfitGMT.toFixed(2)} GMT`);
+            
+            // Add bonuses to GMT Wallet (always, independent of strategy)
+            currentGMTBalance += inputs.soloBlockRewards;
+            currentGMTBalance += inputs.weeklyAdditionalIncome;
+            currentGMTBalance += (inputs.dailyAdditionalIncome * 7);
+            
+            // Mark first cycle as complete
+            if (isFirstCycle) isFirstCycle = false;
+            
+            // NOW recalculate discount with new wallet balance
+            if (inputs.dynamicDiscountEnabled) {
+                const rawElectricityCost = (yesterdayFarmEfficiency * yesterdayFarmTH * ELECTRICITY_COST_PER_KWH * 24) / 1000;
+                const rawServiceCost = SERVICE_COST_PER_TH * yesterdayFarmTH;
+                const rawMaintenanceCost = rawElectricityCost + rawServiceCost;
+                
+                const newDiscountInfo = calculateDynamicDiscount(
+                    currentGMTBalance,
+                    inputs.lockedGMT,
+                    rawMaintenanceCost,
+                    inputs.gmtPrice,
+                    inputs.baseDiscountPercent
+                );
+                
+                currentDiscount = newDiscountInfo.totalDiscountDecimal;
+                currentDiscountPercent = newDiscountInfo.totalDiscountPercent;
+                discountBreakdown = newDiscountInfo.breakdown;
+            }
+            
+            // MW STRATEGY EXECUTION
+            if (currentStrategy === 'auto-mw') {
+                // AUTO MW: Deduct costs, reinvest entire revenue + 5%
+                const weeklyRevenueUSD = weeklyRevenueGMT * inputs.gmtPrice;
+                
+                if (currentGMTBalance >= weeklyMaintenanceGMT) {
+                    reinvestmentUSD = weeklyRevenueUSD * 1.05; // +5% bonus from system
+                    const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
+                    todayMinerTH = yesterdayMinerTH + additionalTH;
+                    totalInvestment += reinvestmentUSD;
+                    currentGMTBalance -= weeklyMaintenanceGMT; // Only deduct maintenance cost, not bonus
+                    strategyText = 'MW Auto +5%';
+                } else {
+                    strategyText = 'MW Hold (Insufficient GMT)';
+                    currentGMTBalance += weeklyNetProfitGMT; // Net profit bleibt im Wallet
+                    holdDaysCount += 7;
+                }
+                
+            } else if (currentStrategy === 'manual-mw') {
+                // MANUAL MW: Reinvest net profit manually (no 5% bonus)
+                if (weeklyNetProfitGMT > 0) {
+                    const weeklyNetProfitUSD = weeklyNetProfitGMT * inputs.gmtPrice;
+                    reinvestmentUSD = weeklyNetProfitUSD; // Net profit, no bonus
+                    const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
+                    todayMinerTH = yesterdayMinerTH + additionalTH;
+                    totalInvestment += reinvestmentUSD;
+                    strategyText = 'MW Manual';
+                } else {
+                    strategyText = 'MW Manual (No Profit/Reward Protection)';
+                }
+                
+            } else if (currentStrategy === 'saving-mw') {
+                // SAVING MW: Accumulate all weekly profits, no reinvestment
+                // Net profit already in GMT balance (bonuses added earlier)
+                // Just accumulate, don't reinvest
+                strategyText = 'MW Saving';
+                currentGMTBalance += weeklyNetProfitGMT; // Net profit bleibt im Wallet
+                
+            } else if (currentStrategy === 'controlledv2-mw') {
+                // CONTROLLED V2 MW: 3-phase cycle (TH Reinvest / BTC / Saving)
+                const reinvestCyclesMW = parseInt(document.getElementById('reinvest-cycles-mw').value) || 2;
+                const btcCyclesMW = parseInt(document.getElementById('btc-cycles-mw').value) || 1;
+                const savingCyclesMW = parseInt(document.getElementById('saving-cycles-mw').value) || 2;
+                const saveFirstV2MW = document.getElementById('save-first-toggle-v2-mw').checked;
+                const totalCyclesV2MW = reinvestCyclesMW + btcCyclesMW + savingCyclesMW;
+                const currentCycle = Math.floor(day / 7);
+                const cyclePosition = currentCycle % totalCyclesV2MW;
+                
+                let isReinvestPhaseMW, isBTCPhaseMW, isSavingPhaseMW;
+                
+                if (saveFirstV2MW) {
+                    // Save First: GMT Saving → BTC → TH Reinvest
+                    isSavingPhaseMW = cyclePosition < savingCyclesMW;
+                    isBTCPhaseMW = cyclePosition >= savingCyclesMW && cyclePosition < savingCyclesMW + btcCyclesMW;
+                    isReinvestPhaseMW = cyclePosition >= savingCyclesMW + btcCyclesMW;
+                } else {
+                    // TH First: TH Reinvest → BTC → GMT Saving
+                    isReinvestPhaseMW = cyclePosition < reinvestCyclesMW;
+                    isBTCPhaseMW = cyclePosition >= reinvestCyclesMW && cyclePosition < reinvestCyclesMW + btcCyclesMW;
+                    isSavingPhaseMW = cyclePosition >= reinvestCyclesMW + btcCyclesMW;
+                }
+                
+                if (isReinvestPhaseMW) {
+                    const weeklyRevenueUSD = weeklyRevenueGMT * inputs.gmtPrice;
+                    
+                    if (currentGMTBalance >= weeklyMaintenanceGMT) {
+                        reinvestmentUSD = weeklyRevenueUSD * 1.05; // +5% bonus from system
+                        const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
+                        todayMinerTH = yesterdayMinerTH + additionalTH;
+                        totalInvestment += reinvestmentUSD;
+                        currentGMTBalance -= weeklyMaintenanceGMT; // Only deduct maintenance cost
+                        strategyText = `MW Reinvest +5% (${(cyclePosition % reinvestCyclesMW) + 1}/${reinvestCyclesMW})`;
+                    } else {
+                    strategyText = 'MW Hold (Insufficient GMT)';
+                    currentGMTBalance += weeklyNetProfitGMT; // Net profit bleibt im Wallet
+                    holdDaysCount += 7;
+                    }
+                    
+                } else if (isBTCPhaseMW) {
+
+                    if (currentGMTBalance >= weeklyMaintenanceGMT) {
+                        // BTC Accumulation: Revenue goes to BTC, maintenance from GMT wallet
+                        const dailySats = inputs.satPerTH; // sats per TH per day
+                        const weeklyBTC = (dailySats * yesterdayFarmTH * 7 * minerWarsFactor) / 100_000_000;
+                        currentBTCBalance += weeklyBTC;
+                        
+                        // Deduct revenue (went to BTC) and maintenance from GMT wallet
+                        currentGMTBalance -= weeklyMaintenanceGMT; // Maintenance from wallet
+                        
+                        const btcPhaseIndex = saveFirstV2MW ? (cyclePosition - savingCyclesMW) : (cyclePosition - reinvestCyclesMW);
+                        strategyText = `MW BTC Accumulation (${btcPhaseIndex + 1}/${btcCyclesMW})`;
+                    } else {
+                    strategyText = 'MW Hold (Insufficient GMT)';
+                    currentGMTBalance += weeklyNetProfitGMT; // Net profit bleibt im Wallet
+                    holdDaysCount += 7;
+                    }
+                } else if (isSavingPhaseMW) {
+                    const savingPhaseIndex = saveFirstV2MW ? cyclePosition : (cyclePosition - reinvestCyclesMW - btcCyclesMW);
+                    currentGMTBalance += weeklyNetProfitGMT; // Net profit bleibt im Wallet
+                    strategyText = `MW Saving (${savingPhaseIndex + 1}/${savingCyclesMW})`;
+                }
+            }
+            
+            // Reset weekly counters
+            weeklyMiningRevenue = 0;
+            weeklyMaintenanceCost = 0;
+            
+        } else if (!isMinerWars) {
+            // ===== MINING MODE: Daily Processing =====
+        const dailymaintenanceGMT = dailyElectricity.gmt + dailyService.gmt;
         if (currentStrategy === 'auto') {
             // AUTOMATIC REINVEST: Deduct costs from wallet, reinvest ENTIRE revenue + 5%
-            currentGMTBalance -= dailyElectricity.gmt;
-            currentGMTBalance -= dailyService.gmt;
-            
-            if (currentGMTBalance >= 0) {
+
+
+            if (currentGMTBalance >= dailymaintenanceGMT) {
                 reinvestmentUSD = dailyRevenue.usd * 1.05; // ENTIRE revenue + 5% bonus
                 const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
                 todayMinerTH = yesterdayMinerTH + additionalTH;
                 totalInvestment += reinvestmentUSD;
+                currentGMTBalance -= dailymaintenanceGMT; // Maintenance costs deducted, bonus reinvested
                 strategyText = 'Auto +5%';
             } else {
                 // Not enough GMT for costs - revert and hold
@@ -449,17 +667,13 @@ function calculateReinvestmentStrategy() {
             
         } else if (currentStrategy === 'manual') {
             // MANUAL REINVEST: Revenue to wallet, deduct costs, reinvest profit
-            currentGMTBalance += dailyRevenue.gmt;
-            currentGMTBalance -= dailyElectricity.gmt;
-            currentGMTBalance -= dailyService.gmt;
-            
-            const profitGMT = dailyProfitGMT;
-            if (profitGMT > 0 && currentGMTBalance >= profitGMT) {
+            //const currentGMTwalletinUSD = currentGMTBalance * inputs.gmtPrice;
+           // const additionalTH = calculateTHFromUSD(currentGMTwalletinUSD, inputs.minerEfficiency, yesterdayMinerTH);
+            if (dailyProfitGMT > 0 ) {
                 reinvestmentUSD = dailyProfitUSD; // Only profit, no bonus
-                currentGMTBalance -= profitGMT; // Remove profit from wallet for reinvestment
-                const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
+                const additionalTH = calculateTHFromUSD(dailyProfitUSD, inputs.minerEfficiency, yesterdayMinerTH);
                 todayMinerTH = yesterdayMinerTH + additionalTH;
-                totalInvestment += reinvestmentUSD;
+                totalInvestment += dailyProfitUSD;
                 strategyText = 'Manual';
             } else {
                 strategyText = 'Hold (No Profit/Insufficient GMT)';
@@ -473,10 +687,9 @@ function calculateReinvestmentStrategy() {
                 (dayInCycle < autoDays);
             
             if (shouldAutoInvest) {
-                currentGMTBalance -= dailyElectricity.gmt;
-                currentGMTBalance -= dailyService.gmt;
+
                 
-                if (currentGMTBalance >= 0) {
+                if (currentGMTBalance >= dailymaintenanceGMT) {
                     reinvestmentUSD = dailyRevenue.usd * 1.05;
                     const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
                     todayMinerTH = yesterdayMinerTH + additionalTH;
@@ -490,8 +703,6 @@ function calculateReinvestmentStrategy() {
                 }
             } else {
                 currentGMTBalance += dailyRevenue.gmt;
-                currentGMTBalance -= dailyElectricity.gmt;
-                currentGMTBalance -= dailyService.gmt;
                 strategyText = 'Saving';
             }
             
@@ -521,14 +732,13 @@ function calculateReinvestmentStrategy() {
             
             if (isReinvestPhase) {
                 // PHASE: Reinvest in TH mit +5%
-                currentGMTBalance -= dailyElectricity.gmt;
-                currentGMTBalance -= dailyService.gmt;
                 
-                if (currentGMTBalance >= 0) {
+                if (currentGMTBalance >= dailymaintenanceGMT) {
+                    currentGMTBalance -= dailymaintenanceGMT; // Maintenance costs deducted, bonus reinvested
                     reinvestmentUSD = dailyRevenue.usd * 1.05;
                     const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
                     todayMinerTH = yesterdayMinerTH + additionalTH;
-                    totalInvestment += reinvestmentUSD;
+                    totalInvestment += dailyProfitUSD;
                     strategyText = 'TH Reinvest +5%';
                 } else {
                     currentGMTBalance += dailyRevenue.gmt;
@@ -538,29 +748,32 @@ function calculateReinvestmentStrategy() {
                 
             } else if (isBTCPhase) {
                 // PHASE: Reward in BTC, Maintenance in GMT
-                currentGMTBalance -= dailyElectricity.gmt;
-                currentGMTBalance -= dailyService.gmt;
-                
-                if (currentGMTBalance < 0) {                                                     
-                    currentGMTBalance += dailyRevenue.gmt;
-                    strategyText = 'Hold (Insufficient GMT)';
-                    holdDaysCount++; // NEU: Increment Hold Days counter
-                } else {
+               
+                if (currentGMTBalance > dailymaintenanceGMT) {                                                     
+                    currentGMTBalance -= dailymaintenanceGMT; // Maintenance from wallet
                     currentBTCBalance += dailyRevenue.btc;
                     strategyText = 'BTC Accumulation';
+                } else {
+                    currentGMTBalance += dailyRevenue.gmt; // Net profit bleibt im Wallet
+                    strategyText = 'Hold (Insufficient GMT)';
+                    holdDaysCount++; // NEU: Increment Hold Days counter
                 }
                 
             } else if (isSavingPhase) {
                 // PHASE: Saving (Reinvest in GMT)
-                currentGMTBalance += dailyRevenue.gmt;
-                currentGMTBalance -= dailyElectricity.gmt;
-                currentGMTBalance -= dailyService.gmt;
+                currentGMTBalance += dailyRevenue.gmt; // Net profit bleibt im Wallet
                 strategyText = 'GMT Saving';
             }
             
             dayInCycleV2++;
             
-        } 
+        } else if (currentStrategy === 'saving') {
+            // ONLY SAVING: Accumulate all profits, no reinvestment
+            currentGMTBalance += dailyRevenue.gmt; // Net profit bleibt im Wallet
+            strategyText = 'GMT Saving';
+        }
+        
+        } // End of Mining Mode (!isMinerWars) block
         
         // ===== GREEDY MINER LOGIC (independent of strategy) =====
             // ✅ IMMER: Wenn Target IS Greedy → Synchronisiere Greedy TH
@@ -632,11 +845,23 @@ function calculateReinvestmentStrategy() {
             console.log('  Strategy:', strategyText);
         } */
         // Store data for chart based on selected interval
-        const shouldStore = day % chartInterval === 0 || day === inputs.calculationPeriod - 1;
+        // In Miner Wars mode, only store on Tuesdays (one entry per cycle)
+        let shouldStore;
+        if (isMinerWars) {
+            shouldStore = isTuesday; // Only on payout days (Tuesdays), not last day
+        } else {
+            shouldStore = day % chartInterval === 0 || day === inputs.calculationPeriod - 1;
+        }
         
         if (shouldStore) {
-            const dateStr = new Date(currentDate.getTime() + day * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            const dateStr = thisDate.toISOString().split('T')[0];
 
+            // In Miner Wars, show weekly profit instead of daily
+            const displayProfitUSD = isMinerWars ? weeklyNetProfitGMT * inputs.gmtPrice : dailyProfitUSD;
+            
+            // Calculate reinvestment in GMT for display
+            const reinvestmentGMT = reinvestmentUSD / inputs.gmtPrice;
+            
             results.push({
                 day: day + 1,
                 date: dateStr,
@@ -644,23 +869,31 @@ function calculateReinvestmentStrategy() {
                 farmTH: todayFarmTH,
                 farmEfficiency: todayFarmEfficiency,
                 greedyTH: inputs.greedy ? todayGreedyTH : 0, // ✅ NEU: Separate Greedy TH
-                dailyProfitUSD: dailyProfitUSD,
+                dailyProfitUSD: displayProfitUSD,
                 reinvestmentUSD: reinvestmentUSD,
+                reinvestmentGMT: reinvestmentGMT, // ✅ NEU: GMT Wert
                 gmtBalance: currentGMTBalance,
                 btcBalance: currentBTCBalance,
                 discountPercent: currentDiscountPercent, // ✅ NEU: Current Discount %
                 discountBreakdown: discountBreakdown, // ✅ NEU: Discount Breakdown
-                strategy: strategyText
+                strategy: strategyText,
+                cycleNumber: isMinerWars ? currentCycleNumber : 0 // ✅ NEU: Actual cycle number
             });
             
             // Chart labels
             let label;
-            switch(chartPeriod) {
-                case 'daily': label = `Day ${day + 1}`; break;
-                case 'weekly': label = `Week ${Math.ceil((day + 1) / 7)}`; break;
-                case 'monthly': label = `Month ${Math.ceil((day + 1) / 30)}`; break;
-                case 'yearly': label = `Year ${Math.ceil((day + 1) / 365)}`; break;
-                default: label = `Day ${day + 1}`;
+            if (isMinerWars) {
+                // In Miner Wars, always show as cycles (Di-Mo)
+                label = `Cycle ${currentCycleNumber}`;
+            } else {
+                switch(chartPeriod) {
+                    case 'daily': label = `Day ${day + 1}`; break;
+                    case 'weekly': label = `Week ${Math.ceil((day + 1) / 7)}`; break;
+                    case 'monthly': label = `Month ${Math.ceil((day + 1) / 30)}`; break;
+                    case 'yearly': label = `Year ${Math.ceil((day + 1) / 365)}`; break;
+                    case 'cycles': label = `Cycle ${Math.ceil((day + 1) / 7)}`; break;
+                    default: label = `Day ${day + 1}`;
+                }
             }
 
             chartData.labels.push(label);
@@ -670,11 +903,31 @@ function calculateReinvestmentStrategy() {
             chartData.gmtData.push(Number(currentGMTBalance.toFixed(4)));
             chartData.btcData.push(Number(currentBTCBalance.toFixed(8)));
             chartData.discountData.push(Number(currentDiscountPercent.toFixed(2))); // ✅ NEU: Discount %
-            chartData.profitData.push(dailyProfitUSD);
+            chartData.profitData.push(displayProfitUSD); // Use displayProfitUSD instead of dailyProfitUSD
         }
         
-        // Add daily additional income to GMT wallet at end of day
-        currentGMTBalance += inputs.dailyAdditionalIncome;
+        // Add daily/weekly additional income to GMT wallet at end of day
+        if (!isMinerWars) {
+            // Mining Mode: Daily additional income
+            currentGMTBalance += inputs.dailyAdditionalIncome;
+            // Add weekly income on Tuesdays also in Mining Mode
+            if (isTuesday) {
+                currentGMTBalance += inputs.weeklyAdditionalIncome;
+            }
+        }
+        // Note: In Miner Wars, both daily and weekly income are already added on Tuesday
+        
+        // In Miner Wars, increment cycle on Tuesday (start of new cycle)
+        if (isMinerWars && isTuesday && day > 0) {
+            // Tuesday = start of new cycle
+            // Increment if we've reached the day that equals or exceeds the first Tuesday
+            if (day >= daysUntilNextTuesday) {
+                console.log(`🔄 CYCLE INCREMENT on Day ${day} (Tuesday):`, currentCycleNumber, '→', currentCycleNumber + 1);
+                currentCycleNumber++;
+            } else {
+                console.log(`⏸️ FIRST TUESDAY Day ${day}: Staying in Cycle ${currentCycleNumber}`);
+            }
+        }
         
         // TODAY becomes YESTERDAY
         yesterdayFarmTH = todayFarmTH;
@@ -744,8 +997,9 @@ function getInputValues() {
         const vipData = window.VIP_LEVELS ? window.VIP_LEVELS[vipLevel] : { discount: 0 };
         const vipDiscount = vipData.discount || 0;
         
-        const serviceButtonEnabled = document.getElementById('service-button-enabled').checked;
-        const serviceDiscount = serviceButtonEnabled ? 3 : 0;
+        const serviceStreakDay = parseInt(document.getElementById('service-button-slider').value) || 0;
+        const serviceStreakData = window.SERVICE_STREAK_LEVELS ? window.SERVICE_STREAK_LEVELS[serviceStreakDay] : { discount: 0 };
+        const serviceDiscount = serviceStreakData.discount || 0;
         
         const soloDiscount = parseFloat(document.getElementById('solo-mining-discount').value) || 0;
         
@@ -761,6 +1015,7 @@ function getInputValues() {
             case 'weekly': calculationPeriod = periodCount * 7; break;
             case 'monthly': calculationPeriod = periodCount * 30; break;
             case 'yearly': calculationPeriod = periodCount * 365; break;
+            case 'cycles': calculationPeriod = periodCount * 7; break; // Miner Wars: 1 Cycle = 7 days (Di-Mo)
             default: calculationPeriod = periodCount;
         }
         
@@ -778,6 +1033,7 @@ function getInputValues() {
             gmtWalletBalance,
             lockedGMT,
             dailyAdditionalIncome,
+            weeklyAdditionalIncome: parseFloat(document.getElementById('weekly-additional-income').value) || 0,
             farmTotalTH,
             farmEfficiency,
             minerTH,
@@ -788,7 +1044,10 @@ function getInputValues() {
             satPerTH,
             baseDiscount,
             baseDiscountPercent,
-            dynamicDiscountEnabled
+            dynamicDiscountEnabled,
+            minerWarsEnabled: document.getElementById('miner-wars-toggle')?.checked ?? false,
+            minerWarsFactor: parseFloat(document.getElementById('miner-wars-factor').value) || 80,
+            soloBlockRewards: parseFloat(document.getElementById('solo-block-rewards').value) || 0
         };
     } catch (error) {
         console.error('Error getting input values:', error);
@@ -875,9 +1134,9 @@ function updateResultsDisplay(calculationResult) {
         greedyFinalCard.style.display = 'none';
     }
 
-    // NEU: BTC Balance Card (nur bei controlledv2 anzeigen)
+    // NEU: BTC Balance Card (nur bei controlledv2 oder controlledv2-mw anzeigen)
     const btcBalanceCard = document.getElementById('final-btc').parentElement;
-    if (currentStrategy === 'controlledv2') {
+    if (currentStrategy === 'controlledv2' || currentStrategy === 'controlledv2-mw') {
         btcBalanceCard.style.display = 'block';
         document.getElementById('final-btc').textContent = calculationResult.summary.finalBTCBalance.toFixed(8) + ' BTC';
     } else {
@@ -891,25 +1150,37 @@ function updateResultsDisplay(calculationResult) {
     const tableBody = document.getElementById('results-table-body');
     tableBody.innerHTML = '';
     
+    // Prüfe MW Mode einmal außerhalb der Schleife
+    const isMWMode = document.getElementById('miner-wars-toggle')?.checked ?? false;
+    
     calculationResult.results.forEach(result => {
         const row = document.createElement('tr');
         
-        // 1. Period label ✅
+        // 1. Period label ✅ (MW immer als Cycles)
         const periodCell = document.createElement('td');
-        const chartPeriod = document.getElementById('chart-period').value;
-        switch(chartPeriod) {
-            case 'daily':
-                periodCell.textContent = `Day ${result.day}`;
-                break;
-            case 'weekly':
-                periodCell.textContent = `Week ${Math.ceil(result.day / 7)}`;
-                break;
-            case 'monthly':
-                periodCell.textContent = `Month ${Math.ceil(result.day / 30)}`;
-                break;
-            case 'yearly':
-                periodCell.textContent = `Year ${Math.ceil(result.day / 365)}`;
-                break;
+        
+        if (isMWMode) {
+            // Miner Wars: Immer Cycles anzeigen (basierend auf echten Di-Mo Perioden)
+            const cycleNum = result.cycleNumber || Math.ceil(result.day / 7);
+            periodCell.textContent = `Cycle ${cycleNum}`;
+            periodCell.className = 'text-red-400 font-semibold';
+        } else {
+            // Mining Mode: Normal
+            const chartPeriod = document.getElementById('chart-period').value;
+            switch(chartPeriod) {
+                case 'daily':
+                    periodCell.textContent = `Day ${result.day}`;
+                    break;
+                case 'weekly':
+                    periodCell.textContent = `Week ${Math.ceil(result.day / 7)}`;
+                    break;
+                case 'monthly':
+                    periodCell.textContent = `Month ${Math.ceil(result.day / 30)}`;
+                    break;
+                case 'yearly':
+                    periodCell.textContent = `Year ${Math.ceil(result.day / 365)}`;
+                    break;
+            }
         }
         row.appendChild(periodCell);
         
@@ -948,15 +1219,23 @@ function updateResultsDisplay(calculationResult) {
     farmCell.className = 'text-amber-600';
     row.appendChild(farmCell);
     
-    // 6. Daily Profit ✅
+    // 6. Profit (Daily/Weekly je nach Mode) ✅
     const profitCell = document.createElement('td');
     profitCell.textContent = '$' + result.dailyProfitUSD.toFixed(2);
     profitCell.className = result.dailyProfitUSD >= 0 ? 'text-green-400' : 'text-red-400';
+    // MW Mode: Zeige Hinweis dass es wöchentlicher Profit ist
+    if (isMWMode && result.dailyProfitUSD !== 0) {
+        profitCell.title = 'Weekly Net Profit (Revenue - Maintenance)';
+    }
     row.appendChild(profitCell);
     
     // 7. Reinvestment ✅
     const reinvestCell = document.createElement('td');
-    reinvestCell.textContent = result.reinvestmentUSD > 0 ? '$' + result.reinvestmentUSD.toFixed(2) : '-';
+    if (result.reinvestmentUSD > 0) {
+        reinvestCell.innerHTML = `$${result.reinvestmentUSD.toFixed(2)}<br><span class="text-xs text-gray-400">${result.reinvestmentGMT.toFixed(2)} GMT</span>`;
+    } else {
+        reinvestCell.textContent = '-';
+    }
     row.appendChild(reinvestCell);
     
     // 8. GMT Balance ✅
@@ -964,7 +1243,13 @@ function updateResultsDisplay(calculationResult) {
     gmtCell.textContent = result.gmtBalance.toFixed(4) + ' GMT';
     gmtCell.className = result.gmtBalance >= 0 ? 'text-purple-400' : 'text-red-400';
     row.appendChild(gmtCell);
-    
+        // 10. BTC Balance (nur bei controlledv2) ✅
+    if (currentStrategy === 'controlledv2') {
+        const btcCell = document.createElement('td');
+        btcCell.textContent = result.btcBalance.toFixed(8) + ' BTC';
+        btcCell.className = 'text-orange-400';
+        row.appendChild(btcCell);
+    }
     // ✅ NEU: 9. Discount % Column
     const discountCell = document.createElement('td');
     if (result.discountPercent !== undefined) {
@@ -977,13 +1262,6 @@ function updateResultsDisplay(calculationResult) {
     }
     row.appendChild(discountCell);
     
-    // 10. BTC Balance (nur bei controlledv2) ✅
-    if (currentStrategy === 'controlledv2') {
-        const btcCell = document.createElement('td');
-        btcCell.textContent = result.btcBalance.toFixed(8) + ' BTC';
-        btcCell.className = 'text-orange-400';
-        row.appendChild(btcCell);
-    }
         
     // 11. Strategy ✅
     const strategyCell = document.createElement('td');
@@ -1022,7 +1300,7 @@ function updateResultsDisplay(calculationResult) {
 /**
  * Update table header based on strategy and greedy settings
  */
-function updateTableHeader() {
+window.updateTableHeader = function updateTableHeader() {
     const table = document.querySelector('.results-table');
     if (!table) return;
     
@@ -1040,8 +1318,12 @@ function updateTableHeader() {
     // ✅ KORREKTE Header-Reihenfolge entsprechend den Spalten
     const headers = [];
 
-    // 1. Day
-    headers.push({ text: 'Day', class: 'text-gray-300 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider' });
+    // 1. Day/Cycle (je nach Mode)
+    const isMWMode = document.getElementById('miner-wars-toggle')?.checked ?? false;
+    headers.push({ 
+        text: isMWMode ? 'Cycle' : 'Day', 
+        class: isMWMode ? 'text-red-400 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider' : 'text-gray-300 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider' 
+    });
     
     // 2. Date
     headers.push({ text: 'Date', class: 'text-gray-300 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider' });
@@ -1061,8 +1343,11 @@ function updateTableHeader() {
     // 5. Farm TH
     headers.push({ text: 'Farm TH', class: 'text-amber-600' });
     
-    // 6. Daily Profit
-    headers.push({ text: 'Daily Profit', class: 'text-gray-300' });
+    // 6. Profit (Daily/Weekly je nach Mode - uses isMWMode from line 1289)
+    headers.push({ 
+        text: isMWMode ? 'Weekly Profit' : 'Daily Profit', 
+        class: isMWMode ? 'text-red-400' : 'text-gray-300' 
+    });
     
     // 7. Reinvestment
     headers.push({ text: 'Reinvestment', class: 'text-gray-300' });
@@ -1375,7 +1660,8 @@ function getStrategyBadgeClass(strategy) {
         case 'Manual':
             return 'bg-blue-600 text-white';
         case 'Saving':
-            return 'bg-purple-600 text-white';
+        case 'MW Saving':
+            return 'bg-cyan-600 text-white';
         default:
             return 'bg-gray-600 text-white';
     }
@@ -1384,7 +1670,7 @@ function getStrategyBadgeClass(strategy) {
 /**
  * Main calculation function called from HTML
  */
-function calculateReinvestment() {
+window.calculateReinvestment = function calculateReinvestment() {
     console.log('Starting reinvestment calculation...');
     
     try {
@@ -1401,7 +1687,7 @@ function calculateReinvestment() {
 // Global variable for cycle mode
 let saveFirst = false;
 
-function updateCycleMode() {
+window.updateCycleMode = function updateCycleMode() {
     saveFirst = document.getElementById('save-first-toggle').checked;
     const description = document.getElementById('cycle-description');
     
@@ -1496,7 +1782,7 @@ function calculateControlledReinvestV2() {
 // Global variable for cycle mode v2
 let saveFirstV2 = false;
 
-function updateCycleModeV2() {
+window.updateCycleModeV2 = function updateCycleModeV2() {
     saveFirstV2 = document.getElementById('save-first-toggle-v2').checked;
     const description = document.getElementById('cycle-description-v2');
     const cycleOrder = document.getElementById('cycle-order-v2');
@@ -1586,6 +1872,7 @@ function updateTableHeader() {
                 case 'weekly': totalDays = calculationPeriod * 7; break;
                 case 'monthly': totalDays = calculationPeriod * 30; break;
                 case 'yearly': totalDays = calculationPeriod * 365; break;
+                case 'cycles': totalDays = calculationPeriod * 7; break; // Miner Wars cycles
                 default: totalDays = calculationPeriod;
             }
             
@@ -1603,7 +1890,7 @@ function updateTableHeader() {
             document.getElementById('tuesday-count').textContent = `${tuesdayCount}`;
         }
 
-        function toggleGreedyOptions() {
+        window.toggleGreedyOptions = function toggleGreedyOptions() {
             const isEnabled = document.getElementById('greedy-miner-enabled').checked;
             const greedyOptions = document.getElementById('greedy-options');
             
@@ -1615,7 +1902,7 @@ function updateTableHeader() {
             }
         }
 
-        function updateGreedyConfig() {
+        window.updateGreedyConfig = function updateGreedyConfig() {
             const targetIsGreedy = document.getElementById('target-is-greedy-toggle').checked;
             const separateGreedySection = document.getElementById('separate-greedy-section');
             const greedyConfigDescription = document.getElementById('greedy-config-description');
@@ -1647,4 +1934,3 @@ function updateTableHeader() {
                 `;
             }
         }
-        
