@@ -58,17 +58,17 @@
             transform: scale(0.95);
         }
         
-        .pulse-animation {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        .info-card {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
         }
         
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
+        .screenshot {
+            max-width: 100%;
+            border: 2px solid #4b5563;
+            border-radius: 0.5rem;
         }
     </style>
 </head>
@@ -93,187 +93,186 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="max-w-4xl mx-auto px-4 py-16 text-center">
-        <div class="mb-8">
-            <span class="material-icons text-6xl text-purple-400 pulse-animation">favorite</span>
+    <section class="max-w-4xl mx-auto px-4 py-12 text-center">
+        <div class="mb-6">
+            <span class="material-icons text-5xl text-purple-400">favorite</span>
         </div>
-        <h1 class="text-5xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+        <h1 class="text-4xl font-bold mb-4 text-white">
             Support HashSense
         </h1>
-        <p class="text-xl text-gray-300 mb-4 max-w-2xl mx-auto">
-            Help us keep building <span class="text-purple-400 font-semibold">free tools</span> for the GoMining community!
+        <p class="text-lg text-gray-300 mb-3 max-w-2xl mx-auto">
+            Help us provide free tools for the GoMining community.
         </p>
         <p class="text-gray-400 max-w-2xl mx-auto">
-            All our calculators and tools are completely free to use. Your support helps us cover hosting costs, maintain the website, and keep developing new features.
+            All our calculators and tools are completely free. Your support helps us cover hosting costs and develop new features.
         </p>
     </section>
 
-    <!-- Support Methods -->
-    <section class="max-w-6xl mx-auto px-4 pb-16">
-        <div class="grid md:grid-cols-2 gap-6">
+    <!-- Support Us With Referral Code -->
+    <section class="max-w-6xl mx-auto px-4 pb-12">
+        <div class="bg-gray-800 border border-gray-700 rounded-lg p-8">
+            <div class="flex items-center justify-center gap-3 mb-6">
+                <span class="material-icons text-4xl text-purple-400">stars</span>
+                <h2 class="text-3xl font-bold">Support Us With Our Referral Code</h2>
+            </div>
+            <p class="text-gray-300 text-center mb-8 max-w-3xl mx-auto">
+                If HashSense helped you, support us by using our referral code <span class="bg-gray-900 text-purple-400 px-2 py-1 rounded font-mono">ICjK3</span> - whether you're signing up or already a member!
+            </p>
             
-            <!-- Referral Link -->
-            <div class="gradient-border hover-lift">
-                <div class="gradient-border-content">
-                    <div class="flex items-center justify-center w-16 h-16 bg-purple-600 rounded-full mb-4 mx-auto">
-                        <span class="material-icons text-3xl">link</span>
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- New Users: Sign Up -->
+                <div class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <div class="flex items-center justify-center w-14 h-14 bg-purple-600 rounded-full mb-4 mx-auto">
+                        <span class="material-icons text-2xl">person_add</span>
                     </div>
-                    <h3 class="text-2xl font-bold text-center mb-3">Use Our Referral Code</h3>
+                    <h3 class="text-xl font-bold text-center mb-3">New to GoMining?</h3>
                     <p class="text-gray-400 text-center mb-6">
-                        Sign up to GoMining and use our referral code to get <span class="text-green-400 font-semibold">5% extra TH</span> on your first miner purchase! We get a small commission. Win-win! 🎉
+                        Sign up using our referral link and get <span class="text-green-400 font-semibold">5% extra TH</span> on your first miner purchase!
                     </p>
-                    
-                    <!-- Copy Referral Code Button -->
-                    <button onclick="copyReferralCode(event)" 
-                            class="w-full bg-gray-800 border-2 border-purple-600 text-purple-400 font-semibold py-3 px-6 rounded-lg mb-3 hover:bg-gray-700 transition-all flex items-center justify-center gap-2">
-                        <span class="material-icons text-sm">content_copy</span>
-                        <span>Copy Referral Code: <span class="font-mono">ICjK3</span></span>
-                    </button>
-                    
-                    <!-- Sign Up Button -->
                     <a href="https://gomining.com/?ref=ICjK3" target="_blank" rel="noopener"
                        onclick="trackReferralClick()"
-                       class="block w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition-all">
+                       class="block w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition-colors">
                         Sign Up to GoMining →
                     </a>
-                    <p class="text-xs text-gray-500 text-center mt-3">Use Code <span class="text-purple-400 font-mono">ICjK3</span> after signup • New users only</p>
+                    <p class="text-xs text-gray-500 text-center mt-3">Use Code <span class="text-purple-400 font-mono">ICjK3</span> after signup</p>
+                </div>
+
+                <!-- Existing Users: Add to Profile -->
+                <div class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <div class="flex items-center justify-center w-14 h-14 bg-blue-600 rounded-full mb-4 mx-auto">
+                        <span class="material-icons text-2xl">edit</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-3">Already a Member?</h3>
+                    <p class="text-gray-400 text-center mb-4">
+                        Add our code to your GoMining profile to support us:
+                    </p>
+                    <ol class="text-gray-400 space-y-2 text-sm mb-4 pl-4">
+                        <li>1. Go to your GoMining profile</li>
+                        <li>2. Click "Edit Profile"</li>
+                        <li>3. Enter code: <span class="bg-gray-800 text-purple-400 px-2 py-1 rounded font-mono text-xs">ICjK3</span></li>
+                        <li>4. Save your profile</li>
+                    </ol>
+                    <button onclick="copyReferralCodeSimple()" 
+                            class="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
+                        <span class="material-icons text-sm">content_copy</span>
+                        <span id="copy-btn-text">Copy Code: ICjK3</span>
+                    </button>
+                    <div class="mt-4 text-center">
+                        <img src="src/pics/referralProfileinsert.png" alt="Add referral code to your profile" class="screenshot mx-auto max-w-xs rounded border border-gray-700">
+                    </div>
                 </div>
             </div>
-
-            <!-- GMT Donation -->
-            <div class="gradient-border hover-lift">
-                <div class="gradient-border-content">
-                    <div class="flex items-center justify-center w-16 h-16 bg-green-600 rounded-full mb-4 mx-auto">
-                        <span class="material-icons text-3xl">account_balance_wallet</span>
-                    </div>
-                    <h3 class="text-2xl font-bold text-center mb-3">Donate GMT</h3>
-                    <p class="text-gray-400 text-center mb-6">
-                        Send GMT tokens directly to our BSC wallet. Every donation helps keep the website online! 💚
-                    </p>
-                    <div class="bg-gray-800 rounded-lg p-4 mb-4">
-                        <p class="text-xs text-gray-500 mb-2">BSC Wallet Address:</p>
-                        <div class="flex items-center gap-2">
-                            <input type="text" readonly value="0x3229E3118F803d8EaCB52D5f598395F5bf888bad" 
-                                   id="gmt-address"
-                                   class="bg-gray-900 text-gray-300 text-xs font-mono px-3 py-2 rounded flex-1 border border-gray-700">
-                            <button onclick="copyToClipboard('gmt-address')" 
-                                    class="copy-button bg-purple-600 text-white px-3 py-2 rounded flex items-center gap-1">
-                                <span class="material-icons text-sm">content_copy</span>
-                            </button>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-500 text-center">⚠️ BSC Network Only (BEP-20)</p>
-                </div>
-            </div>
-
-            <!-- BTC Donation 
-            <div class="gradient-border hover-lift">
-                <div class="gradient-border-content">
-                    <div class="flex items-center justify-center w-16 h-16 bg-orange-600 rounded-full mb-4 mx-auto">
-                        <span class="material-icons text-3xl">currency_bitcoin</span>
-                    </div>
-                    <h3 class="text-2xl font-bold text-center mb-3">Donate BTC</h3>
-                    <p class="text-gray-400 text-center mb-6">
-                        Support us with Bitcoin. Every satoshi counts and helps keep the lights on! 🧡
-                    </p>
-                    <div class="bg-gray-800 rounded-lg p-4 mb-4">
-                        <p class="text-xs text-gray-500 mb-2">BTC Wallet Address:</p>
-                        <div class="flex items-center gap-2">
-                            <input type="text" readonly value="bc1qYourBTCWalletAddressHere" 
-                                   id="btc-address"
-                                   class="bg-gray-900 text-gray-300 text-xs font-mono px-3 py-2 rounded flex-1 border border-gray-700">
-                            <button onclick="copyToClipboard('btc-address')" 
-                                    class="copy-button bg-purple-600 text-white px-3 py-2 rounded flex items-center gap-1">
-                                <span class="material-icons text-sm">content_copy</span>
-                            </button>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-500 text-center">⚠️ Bitcoin Network Only</p>
-                </div>
-            </div>-->
-
         </div>
     </section>
 
-    <!-- Join Our Clan -->
-    <section class="max-w-4xl mx-auto px-4 pb-16">
-        <div class="bg-gradient-to-r from-purple-900 to-pink-900 rounded-2xl p-8 text-center">
-            <span class="material-icons text-5xl text-purple-300 mb-4 inline-block">groups</span>
-            <h2 class="text-3xl font-bold mb-4">Join Wagmington Clan!</h2>
-            <p class="text-gray-200 mb-6 max-w-2xl mx-auto">
-                Join the <span class="text-purple-300 font-semibold">Wagmington Clan</span> on GoMining. 
-                Connect with other miners, share strategies, and grow together as a community!
+    <!-- More Ways to Support -->
+    <section class="max-w-6xl mx-auto px-4 pb-16">
+        <h2 class="text-2xl font-bold text-center mb-8">More Ways to Help</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+
+            <!-- GMT Donation -->
+            <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 hover-lift">
+                <div class="flex items-center justify-center w-14 h-14 bg-green-600 rounded-full mb-4 mx-auto">
+                    <span class="material-icons text-2xl">account_balance_wallet</span>
+                </div>
+                <h3 class="text-xl font-bold text-center mb-3">Donate GMT</h3>
+                <p class="text-gray-400 text-center mb-6">
+                    Send GMT tokens directly to our BSC wallet. Every donation helps!
+                </p>
+                <div class="bg-gray-900 rounded-lg p-4 mb-4">
+                    <p class="text-xs text-gray-500 mb-2">BSC Wallet Address:</p>
+                    <div class="flex items-center gap-2">
+                        <input type="text" readonly value="0x3229E3118F803d8EaCB52D5f598395F5bf888bad" 
+                               id="gmt-address"
+                               class="bg-gray-800 text-gray-300 text-xs font-mono px-3 py-2 rounded flex-1 border border-gray-700">
+                        <button onclick="copyToClipboard('gmt-address')" 
+                                class="copy-button bg-purple-600 text-white px-3 py-2 rounded flex items-center gap-1 hover:bg-purple-700 transition-colors">
+                            <span class="material-icons text-sm">content_copy</span>
+                        </button>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 text-center">⚠️ BSC Network Only (BEP-20)</p>
+            </div>
+
+        
+        <div class="bg-gray-800 border border-gray-700 rounded-lg p-8 text-center">
+            <span class="material-icons text-4xl text-purple-400 mb-4 inline-block">groups</span>
+            <h2 class="text-2xl font-bold mb-4">Join Wagmington Clan!</h2>
+            <p class="text-gray-300 mb-6 max-w-2xl mx-auto">
+                Join the <span class="text-purple-400 font-semibold">Wagmington Clan</span> on GoMining. 
+                Connect with other miners and grow together with the community!
             </p>
             <a href="https://app.gomining.com/miner-wars/mining/select-pool?inviteToClan=2232" target="_blank" rel="noopener"
-               class="inline-block bg-white text-purple-900 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition-all">
+               class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors">
                 Join Wagmington →
             </a>
         </div>
+
+        </div>
     </section>
+
 
     <!-- What You Get -->
     <section class="max-w-4xl mx-auto px-4 pb-16">
-        <h2 class="text-3xl font-bold text-center mb-12">What's Free to Use</h2>
+        <h2 class="text-2xl font-bold text-center mb-8">What's Free to Use</h2>
         <div class="grid md:grid-cols-2 gap-6">
-            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-                <div class="flex items-center gap-3 mb-3">
+            <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <div class="flex items-center gap-3 mb-2">
                     <span class="material-icons text-green-400">check_circle</span>
-                    <h3 class="text-xl font-semibold">All Core Calculators</h3>
+                    <h3 class="text-lg font-semibold">All Calculators</h3>
                 </div>
-                <p class="text-gray-400">Mining Calculator, ROI Calculator, Reinvestment Calculator - all free to use.</p>
+                <p class="text-gray-400 text-sm">Mining Calculator, ROI Calculator, Reinvestment Calculator - completely free.</p>
             </div>
             
-            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-                <div class="flex items-center gap-3 mb-3">
+            <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <div class="flex items-center gap-3 mb-2">
                     <span class="material-icons text-green-400">check_circle</span>
-                    <h3 class="text-xl font-semibold">Daily Price Updates</h3>
+                    <h3 class="text-lg font-semibold">Daily Price Updates</h3>
                 </div>
-                <p class="text-gray-400">Real-time BTC and GMT prices updated automatically from CoinPaprika.</p>
+                <p class="text-gray-400 text-sm">Real-time BTC and GMT prices updated from several sources like CoinPaprika, CoinGecko, and Binance.</p>
             </div>
             
-            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-                <div class="flex items-center gap-3 mb-3">
+            <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <div class="flex items-center gap-3 mb-2">
                     <span class="material-icons text-green-400">check_circle</span>
-                    <h3 class="text-xl font-semibold">No Ads</h3>
+                    <h3 class="text-lg font-semibold">No Ads</h3>
                 </div>
-                <p class="text-gray-400">Clean interface, no annoying ads. Only anonymous Google Analytics for usage stats.</p>
+                <p class="text-gray-400 text-sm">Clean interface without annoying ads.</p>
             </div>
             
-            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
-                <div class="flex items-center gap-3 mb-3">
+            <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <div class="flex items-center gap-3 mb-2">
                     <span class="material-icons text-green-400">check_circle</span>
-                    <h3 class="text-xl font-semibold">Privacy First</h3>
+                    <h3 class="text-lg font-semibold">Privacy First</h3>
                 </div>
-                <p class="text-gray-400">Your data stays secure and anonymous. We only track page views, nothing personal.</p>
+                <p class="text-gray-400 text-sm">Your data stays secure and anonymous.</p>
             </div>
         </div>
     </section>
 
     <!-- FAQ -->
     <section class="max-w-4xl mx-auto px-4 pb-16">
-        <h2 class="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+        <h2 class="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
         <div class="space-y-4">
             
-            <details class="bg-gray-800 rounded-lg p-6 border border-gray-700 cursor-pointer">
-                <summary class="font-semibold text-lg cursor-pointer">Why do you need support?</summary>
-                <p class="text-gray-400 mt-3">
-                    Running a website, maintaining automated price updates via external tools, and developing new features takes time and money. 
-                    Your support helps cover hosting costs and keeps everything running smoothly and free for everyone.
+            <details class="bg-gray-800 rounded-lg p-5 border border-gray-700 cursor-pointer">
+                <summary class="font-semibold cursor-pointer">Why do you need support?</summary>
+                <p class="text-gray-400 mt-3 text-sm">
+                    Running the website, maintaining price updates, and developing new features takes time and money. 
+                    Your support helps cover hosting costs and keeps everything free for everyone.
                 </p>
             </details>
             
-            
-            <details class="bg-gray-800 rounded-lg p-6 border border-gray-700 cursor-pointer">
-                <summary class="font-semibold text-lg cursor-pointer">How is my donation used?</summary>
-                <p class="text-gray-400 mt-3">
-                    Donations help cover hosting costs, domain fees, and keep me motivated to continue developing new features and fixing bugs. 
-                    Think of it as buying me coffee to fuel late-night coding sessions! ☕
+            <details class="bg-gray-800 rounded-lg p-5 border border-gray-700 cursor-pointer">
+                <summary class="font-semibold cursor-pointer">How are donations used?</summary>
+                <p class="text-gray-400 mt-3 text-sm">
+                    Donations cover hosting costs, domain fees, and motivate us to continue developing new features and fixing bugs.
                 </p>
             </details>
             
-            <details class="bg-gray-800 rounded-lg p-6 border border-gray-700 cursor-pointer">
-                <summary class="font-semibold text-lg cursor-pointer">Can I contribute in other ways?</summary>
-                <p class="text-gray-400 mt-3">
+            <details class="bg-gray-800 rounded-lg p-5 border border-gray-700 cursor-pointer">
+                <summary class="font-semibold cursor-pointer">Can I contribute in other ways?</summary>
+                <p class="text-gray-400 mt-3 text-sm">
                     Absolutely! Share the tools with other GoMining miners, report bugs, suggest features, or join our clan. 
                     Community feedback is invaluable!
                 </p>
@@ -284,15 +283,14 @@
 
     <!-- Thank You Section -->
     <section class="max-w-4xl mx-auto px-4 pb-16 text-center">
-        <div class="bg-gray-800 rounded-2xl p-12 border border-gray-700">
-            <span class="material-icons text-6xl text-pink-400 mb-4 inline-block">volunteer_activism</span>
-            <h2 class="text-3xl font-bold mb-4">Thank You! 🙏</h2>
-            <p class="text-gray-300 text-lg max-w-2xl mx-auto mb-6">
-                Your support means a lot and helps keep these tools available for the entire GoMining community. 
-                Together, we're making Bitcoin mining with GoMining more accessible and transparent!
+        <div class="bg-gray-800 rounded-lg p-8 border border-gray-700">
+            <span class="material-icons text-5xl text-purple-400 mb-4 inline-block">volunteer_activism</span>
+            <h2 class="text-2xl font-bold mb-4">Thank You!</h2>
+            <p class="text-gray-300 max-w-2xl mx-auto mb-4">
+                Your support means a lot and helps keep these tools available for the entire GoMining community.
             </p>
-            <p class="text-gray-400 italic">
-                Happy Mining! ⛏️✨
+            <p class="text-gray-400">
+                Happy Mining! ⛏️
             </p>
         </div>
     </section>
@@ -334,26 +332,23 @@
             });
         }
         
-        // Copy referral code to clipboard
-        function copyReferralCode(event) {
+        // Copy referral code to clipboard (simple version for profile section)
+        function copyReferralCodeSimple() {
             const code = 'ICjK3';
             navigator.clipboard.writeText(code).then(() => {
-                // Visual feedback
-                const button = event.target.closest('button');
-                const originalHTML = button.innerHTML;
-                button.innerHTML = '<span class="material-icons text-sm">check</span><span>Copied!</span>';
-                button.classList.add('bg-green-600', 'border-green-600', 'text-white');
+                const btnText = document.getElementById('copy-btn-text');
+                const originalText = btnText.textContent;
+                btnText.textContent = '✓ Copied!';
                 
                 setTimeout(() => {
-                    button.innerHTML = originalHTML;
-                    button.classList.remove('bg-green-600', 'border-green-600', 'text-white');
+                    btnText.textContent = originalText;
                 }, 2000);
                 
                 // Track referral code copy
                 if (typeof gtag !== 'undefined') {
-                    gtag('event', 'copy_referral_code', {
+                    gtag('event', 'copy_referral_code_profile', {
                         'event_category': 'Referral',
-                        'event_label': 'Referral Code Copied',
+                        'event_label': 'Profile Referral Code Copied',
                         'value': 1
                     });
                 }

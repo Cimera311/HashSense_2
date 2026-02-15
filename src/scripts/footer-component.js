@@ -1,7 +1,7 @@
 // filepath: src/scripts/footer-component.js
 function renderFooter() {
     // Festes Datum - wird manuell aktualisiert wenn Preise geändert werden
-    const PRICE_UPDATE_DATE = '2025-12-19'; // Format: YYYY-MM-DD
+    const PRICE_UPDATE_DATE = '2025-02-06'; // Format: YYYY-MM-DD
     
     const updateDate = new Date(PRICE_UPDATE_DATE + 'T00:00:00');
     const updateTimeString = updateDate.toLocaleString('de-DE', {
@@ -86,7 +86,7 @@ function renderFooter() {
                     <div class="mt-4 pt-4 border-t border-gray-700">
                         <p class="text-xs text-gray-500 flex items-center gap-2">
                             <span class="material-icons text-sm">schedule</span>
-                            Price date: 06.02.2026:
+                            Price date:
                         </p>
                         <p class="text-sm text-gray-300 font-mono mt-1">${updateTimeString}</p>
                     </div>
