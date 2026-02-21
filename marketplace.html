@@ -287,6 +287,7 @@
         let currentFilter = 'all';
         let allTransactions = [];
         let lastSeenIds = new Set();
+        let newlyAddedIds = new Set(); // Track truly new transactions
 
         // Get current refresh interval from select
         function getRefreshInterval() {
@@ -366,6 +367,9 @@
             const newIds = new Set(transactions.map(t => t.id));
             const newTransactions = transactions.filter(t => !lastSeenIds.has(t.id));
             
+            // Update newly added IDs (for animation)
+            newlyAddedIds = new Set(newTransactions.map(t => t.id));
+            
             // Update seen IDs
             lastSeenIds = newIds;
             
@@ -373,6 +377,12 @@
             if (newTransactions.length > 0) {
                 allTransactions = [...newTransactions, ...allTransactions].slice(0, 100);
                 renderTransactions();
+                
+                // Clear "new" status after 5 seconds
+                setTimeout(() => {
+                    newlyAddedIds.clear();
+                    renderTransactions();
+                }, 5000);
             } else if (allTransactions.length === 0) {
                 // Initial load
                 allTransactions = transactions.slice(0, 100);
@@ -576,7 +586,7 @@
                 return;
             }
             
-            feed.innerHTML = filtered.map((tx, idx) => createTransactionCard(tx, idx < 3)).join('');
+            feed.innerHTML = filtered.map(tx => createTransactionCard(tx, newlyAddedIds.has(tx.id))).join('');
         }
 
         // Create transaction card HTML
