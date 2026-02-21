@@ -221,12 +221,24 @@
                     </div>
 
                     <!-- Load More & Refresh -->
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="loadToday()" 
+                                id="load-today-btn"
+                                class="px-4 py-2 rounded-lg bg-yellow-600 hover:bg-yellow-700 transition-colors text-sm font-semibold flex items-center gap-2">
+                            <span class="material-icons text-sm">today</span>
+                            Today
+                        </button>
+                        <button onclick="loadAll()" 
+                                id="load-all-btn"
+                                class="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-700 transition-colors text-sm font-semibold flex items-center gap-2">
+                            <span class="material-icons text-sm">all_inclusive</span>
+                            Load All
+                        </button>
                         <button onclick="loadMore()" 
                                 id="load-more-btn"
                                 class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors text-sm font-semibold flex items-center gap-2">
                             <span class="material-icons text-sm">add</span>
-                            Load More
+                            50 More
                         </button>
                         <button onclick="refreshHistory()" 
                                 class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 transition-colors text-sm font-semibold flex items-center gap-2">
@@ -240,9 +252,15 @@
 
         <!-- Transaction Feed -->
         <main class="max-w-7xl mx-auto px-4 py-6">
-            <div class="mb-4">
-                <h2 class="text-2xl font-bold mb-2">Transaction History</h2>
-                <p class="text-gray-400 text-sm">All unique marketplace transactions stored permanently (deduplicated)</p>
+            <div class="mb-4 flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">Transaction History</h2>
+                    <p class="text-gray-400 text-sm">All unique marketplace transactions stored permanently (deduplicated)</p>
+                </div>
+                <div class="bg-gray-700 rounded-lg px-4 py-2 text-sm">
+                    <span class="text-gray-400">Showing:</span>
+                    <span id="limit-display" class="text-white font-bold ml-2">0 / 0</span>
+                </div>
             </div>
 
             <div id="transaction-feed" class="space-y-3">
@@ -251,15 +269,17 @@
                     <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-600 border-t-purple-500"></div>
                     <p class="mt-4 text-gray-400">Loading historical data...</p>
                 </div>
-            </div>
-
-            <!-- Load More Button (bottom) -->
-            <div id="load-more-container" class="text-center mt-6 hidden">
-                <button onclick="loadMore()" 
-                        class="px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors font-semibold flex items-center gap-2 mx-auto">
-                    <span class="material-icons">expand_more</span>
-                    Load More Transactions
-                </button>
+                    
+                <!-- Error State (hidden by default) -->
+                <div id="error-state" class="hidden text-center py-12">
+                    <span class="material-icons text-6xl text-red-400 mb-4">cloud_off</span>
+                    <p class="text-red-400 font-bold text-xl mb-2">Cloudflare Worker Unavailable</p>
+                    <p class="text-gray-400 text-sm mb-4">The worker might be paused or rate-limited. Please try again later.</p>
+                    <button onclick="refreshHistory()" 
+                            class="px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 transition-colors font-semibold">
+                        Retry
+                    </button>
+                </div>
             </div>
         </main>
     </div>
@@ -280,8 +300,8 @@
         // Configuration
         const CONFIG = {
             WORKER_URL: 'https://gomining-marketplace.cimerawow.workers.dev',
-            INITIAL_LIMIT: 50,
-            LOAD_MORE_INCREMENT: 50
+            INITIAL_LIMIT: 500,
+            LOAD_MORE_INCREMENT: 500
         };
 
         let allTransactions = [];
@@ -303,7 +323,7 @@
                 const response = await fetch(`${CONFIG.WORKER_URL}/history?limit=${limit}`);
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    throw new Error(`Cloudflare Worker Error (HTTP ${response.status})`);
                 }
                 
                 const data = await response.json();
@@ -313,31 +333,44 @@
                     updateStatistics();
                     filterByType(currentFilter);
                     updateStatus('loaded');
+                    updateLimitDisplay();
                     
-                    // Show load more if there's potentially more data
-                    if (data.has_more || data.count >= limit) {
-                        document.getElementById('load-more-container').classList.remove('hidden');
-                    }
+                    // Hide loading, show error state if needed
+                    const loadingState = document.getElementById('loading-state');
+                    const errorState = document.getElementById('error-state');
+                    if (loadingState) loadingState.classList.add('hidden');
+                    if (errorState) errorState.classList.add('hidden');
                 } else {
-                    document.getElementById('loading-state').innerHTML = `
-                        <div class="text-center py-12 text-gray-400">
-                            <span class="material-icons text-6xl mb-4">history</span>
-                            <p class="text-xl">No historical data available yet</p>
-                            <p class="text-sm mt-2">Transactions will appear here as they are captured</p>
-                        </div>
-                    `;
+                    const loadingState = document.getElementById('loading-state');
+                    if (loadingState) {
+                        loadingState.innerHTML = `
+                            <div class="text-center py-12 text-gray-400">
+                                <span class="material-icons text-6xl mb-4">history</span>
+                                <p class="text-xl">No historical data available yet</p>
+                                <p class="text-sm mt-2">Transactions will appear here as they are captured</p>
+                            </div>
+                        `;
+                    }
                     updateStatus('empty');
                 }
                 
             } catch (error) {
                 console.error('Error loading history:', error);
-                document.getElementById('loading-state').innerHTML = `
-                    <div class="text-center py-12 text-red-400">
-                        <span class="material-icons text-6xl mb-4">error</span>
-                        <p class="text-xl">Failed to load history</p>
-                        <p class="text-sm mt-2">${error.message}</p>
-                    </div>
-                `;
+                
+                // Show Cloudflare error state
+                const loadingState = document.getElementById('loading-state');
+                const errorState = document.getElementById('error-state');
+                
+                if (loadingState) loadingState.classList.add('hidden');
+                if (errorState) {
+                    errorState.classList.remove('hidden');
+                    // Update error message
+                    const errorMsg = errorState.querySelector('p.text-gray-400');
+                    if (errorMsg && error.message.includes('Cloudflare')) {
+                        errorMsg.textContent = error.message + ' - The worker might be paused or rate-limited.';
+                    }
+                }
+                
                 updateStatus('error');
             }
         }
@@ -451,6 +484,17 @@
             document.getElementById('date-range').textContent = `${oldest} - ${newest}`;
         }
 
+        // Update limit display
+        function updateLimitDisplay() {
+            const limitDisplay = document.getElementById('limit-display');
+            if (limitDisplay && displayedTransactions.length > 0) {
+                const showing = Math.min(currentLimit, displayedTransactions.length);
+                limitDisplay.textContent = `${showing} / ${displayedTransactions.length}`;
+            } else if (limitDisplay) {
+                limitDisplay.textContent = '0 / 0';
+            }
+        }
+
         // Perform search
         function performSearch() {
             const field = document.getElementById('search-field').value;
@@ -498,6 +542,7 @@
             
             resultsCount.textContent = `${searchResults.length} result${searchResults.length !== 1 ? 's' : ''}`;
             renderTransactions();
+            updateLimitDisplay();
         }
         
         // Clear search
@@ -508,6 +553,7 @@
             searchResults = [];
             document.getElementById('search-results-count').textContent = '';
             renderTransactions();
+            updateLimitDisplay();
         }
 
         // Filter transactions by type
@@ -530,6 +576,7 @@
             
             // Re-render with new filter (works with search too)
             renderTransactions();
+            updateLimitDisplay();
         }
 
         // Render transactions
@@ -578,6 +625,8 @@
                     loadMoreContainer.classList.add('hidden');
                 }
             }
+            
+            updateLimitDisplay();
         }
 
         // Create transaction card HTML
@@ -822,12 +871,213 @@
         function loadMore() {
             currentLimit += CONFIG.LOAD_MORE_INCREMENT;
             renderTransactions();
+            updateLimitDisplay();
+        }
+        
+        // Load Today's transactions (FROM SERVER)
+        async function loadToday() {
+            try {
+                updateStatus('loading');
+                const loadingState = document.getElementById('loading-state');
+                const errorState = document.getElementById('error-state');
+                
+                if (loadingState) {
+                    loadingState.classList.remove('hidden');
+                    loadingState.innerHTML = `
+                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-600 border-t-purple-500"></div>
+                        <p class="mt-4 text-gray-400">Loading today's transactions from server...</p>
+                    `;
+                }
+                if (errorState) errorState.classList.add('hidden');
+                
+                // Fetch ALL transactions from server
+                const response = await fetch(`${CONFIG.WORKER_URL}/history`);
+                
+                if (!response.ok) {
+                    throw new Error(`Cloudflare Worker Error (HTTP ${response.status})`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.transactions || data.transactions.length === 0) {
+                    alert('No transactions available from server');
+                    loadHistory();
+                    return;
+                }
+                
+                // Process all transactions
+                const allTx = processTransactions(data.transactions);
+                
+                // Filter for today
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todayTimestamp = today.getTime();
+                
+                const todayTransactions = allTx.filter(tx => {
+                    const txDate = new Date(tx.createdAt);
+                    txDate.setHours(0, 0, 0, 0);
+                    return txDate.getTime() === todayTimestamp;
+                });
+                
+                if (todayTransactions.length === 0) {
+                    alert('No transactions found for today');
+                    loadHistory();
+                    return;
+                }
+                
+                // Update state
+                allTransactions = todayTransactions;
+                displayedTransactions = todayTransactions;
+                currentLimit = CONFIG.INITIAL_LIMIT;  // Respect user's limit setting
+                currentFilter = 'all';
+                searchActive = false;
+                searchResults = [];
+                
+                if (document.getElementById('search-input')) {
+                    document.getElementById('search-input').value = '';
+                }
+                if (document.getElementById('search-results-count')) {
+                    document.getElementById('search-results-count').textContent = '';
+                }
+                
+                // Update filter buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active', 'bg-purple-600');
+                    btn.classList.add('bg-gray-700');
+                });
+                const allBtn = document.querySelector('.filter-btn[onclick*=\"all\"]');
+                if (allBtn) {
+                    allBtn.classList.add('active', 'bg-purple-600');
+                    allBtn.classList.remove('bg-gray-700');
+                }
+                
+                if (loadingState) loadingState.classList.add('hidden');
+                
+                updateStatistics();
+                renderTransactions();
+                updateLimitDisplay();
+                updateStatus('loaded');
+                
+            } catch (error) {
+                console.error('Error loading today:', error);
+                
+                const loadingState = document.getElementById('loading-state');
+                const errorState = document.getElementById('error-state');
+                
+                if (loadingState) loadingState.classList.add('hidden');
+                if (errorState) {
+                    errorState.classList.remove('hidden');
+                    const errorMsg = errorState.querySelector('p.text-gray-400');
+                    if (errorMsg) {
+                        errorMsg.textContent = `Failed to load today's transactions: ${error.message}`;
+                    }
+                }
+                
+                updateStatus('error');
+            }
+        }
+        
+        // Load All transactions (FROM SERVER)
+        async function loadAll() {
+            try {
+                updateStatus('loading');
+                const loadingState = document.getElementById('loading-state');
+                const errorState = document.getElementById('error-state');
+                
+                if (loadingState) {
+                    loadingState.classList.remove('hidden');
+                    loadingState.innerHTML = `
+                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-600 border-t-purple-500"></div>
+                        <p class="mt-4 text-gray-400">Loading ALL transactions from server...</p>
+                    `;
+                }
+                if (errorState) errorState.classList.add('hidden');
+                
+                // Fetch ALL transactions from server
+                const response = await fetch(`${CONFIG.WORKER_URL}/history`);
+                
+                if (!response.ok) {
+                    throw new Error(`Cloudflare Worker Error (HTTP ${response.status})`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.transactions || data.transactions.length === 0) {
+                    alert('No transactions available from server');
+                    loadHistory();
+                    return;
+                }
+                
+                // Process all transactions
+                allTransactions = processTransactions(data.transactions);
+                
+                // Confirm if large dataset
+                if (allTransactions.length > 500) {
+                    const confirmed = confirm(`This will display all ${allTransactions.length} transactions. This might be slow. Continue?`);
+                    if (!confirmed) {
+                        loadHistory();
+                        return;
+                    }
+                }
+                
+                currentLimit = allTransactions.length;
+                currentFilter = 'all';
+                searchActive = false;
+                searchResults = [];
+                
+                if (document.getElementById('search-input')) {
+                    document.getElementById('search-input').value = '';
+                }
+                if (document.getElementById('search-results-count')) {
+                    document.getElementById('search-results-count').textContent = '';
+                }
+                
+                // Update filter buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active', 'bg-purple-600');
+                    btn.classList.add('bg-gray-700');
+                });
+                const allBtn = document.querySelector('.filter-btn[onclick*=\"all\"]');
+                if (allBtn) {
+                    allBtn.classList.add('active', 'bg-purple-600');
+                    allBtn.classList.remove('bg-gray-700');
+                }
+                
+                if (loadingState) loadingState.classList.add('hidden');
+                
+                updateStatistics();
+                renderTransactions();
+                updateLimitDisplay();
+                updateStatus('loaded');
+                
+            } catch (error) {
+                console.error('Error loading all:', error);
+                
+                const loadingState = document.getElementById('loading-state');
+                const errorState = document.getElementById('error-state');
+                
+                if (loadingState) loadingState.classList.add('hidden');
+                if (errorState) {
+                    errorState.classList.remove('hidden');
+                    const errorMsg = errorState.querySelector('p.text-gray-400');
+                    if (errorMsg) {
+                        errorMsg.textContent = `Failed to load all transactions: ${error.message}`;
+                    }
+                }
+                
+                updateStatus('error');
+            }
         }
 
         // Refresh history
         function refreshHistory() {
             currentLimit = CONFIG.INITIAL_LIMIT;
-            loadHistory(currentLimit);
+            currentFilter = 'all';
+            searchActive = false;
+            searchResults = [];
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-results-count').textContent = '';
+            loadHistory();
         }
 
         // Initialize on page load
