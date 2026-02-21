@@ -503,6 +503,10 @@
                         fromWalletType: details.fromWalletType || '-',
                         toWalletAddress: details.toWalletAddress || '-',
                         
+                        // P2P Transaction Users (Marketplace)
+                        fromUserId: details.fromUserId || '-',
+                        toUserId: details.toUserId || tx.userId,
+                        
                         // Additional metadata
                         rawDetails: details // Store full details for debugging
                     };
@@ -634,6 +638,28 @@
                 upgradeDetails = `<div class="bg-gray-800 rounded px-2 py-1"><span class="text-gray-400">Power Upgrade:</span> <span class="text-green-400 font-semibold">${tx.fromPower} TH/s → ${tx.toPower} TH/s</span></div>`;
             } else if (tx.type === 'efficiency-upgrade' && tx.fromEfficiency !== '-' && tx.toEfficiency !== '-') {
                 upgradeDetails = `<div class="bg-gray-800 rounded px-2 py-1"><span class="text-gray-400">Efficiency Upgrade:</span> <span class="text-green-400 font-semibold">${tx.fromEfficiency}W → ${tx.toEfficiency}W</span></div>`;
+            } else if ((tx.type === 'marketplace' || tx.type === 'secondary') && tx.fromWalletType !== '-') {
+                // Marketplace P2P transaction - show USER + WALLET flow (FULL transparency)
+                const fromUser = tx.fromUserId !== '-' ? `User ${tx.fromUserId}` : 'Unknown Seller';
+                const fromWallet = tx.fromWalletType;
+                const toUser = tx.toUserId !== '-' ? `User ${tx.toUserId}` : tx.user;
+                const toWallet = tx.toWalletAddress !== '-' ? tx.toWalletAddress : tx.walletAddress;
+                upgradeDetails = `<div class="bg-blue-900 rounded px-3 py-2 border border-blue-500">
+                    <div class="text-blue-300 font-semibold mb-2">P2P Transfer:</div>
+                    <div class="flex flex-col md:flex-row items-start md:items-center gap-2">
+                        <div class="flex-1">
+                            <div class="text-blue-200 text-xs mb-1">Seller:</div>
+                            <div class="text-white font-bold">${fromUser}</div>
+                            <div class="text-gray-300 font-mono text-xs break-all">${fromWallet}</div>
+                        </div>
+                        <div class="text-blue-400 text-2xl px-2">→</div>
+                        <div class="flex-1">
+                            <div class="text-blue-200 text-xs mb-1">Buyer:</div>
+                            <div class="text-white font-bold">${toUser}</div>
+                            <div class="text-gray-300 font-mono text-xs break-all">${toWallet}</div>
+                        </div>
+                    </div>
+                </div>`;
             }
             
             return `
@@ -686,19 +712,19 @@
                                 <!-- Transaction Details -->
                                 <div class="bg-gray-800 rounded p-2 mb-2 text-xs">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                        <div>
+                                        <div class="break-all">
                                             <span class="text-gray-400">TX ID:</span>
-                                            <span class="text-white font-mono">${tx.id && tx.id.length > 20 ? tx.id.substring(0, 20) + '...' : tx.id}</span>
+                                            <span class="text-white font-mono">${tx.id}</span>
                                         </div>
                                         ${tx.sourceId !== '-' ? `
-                                        <div>
+                                        <div class="break-all">
                                             <span class="text-gray-400">Source ID:</span>
-                                            <span class="text-white font-mono">${tx.sourceId.length > 20 ? tx.sourceId.substring(0, 20) + '...' : tx.sourceId}</span>
+                                            <span class="text-white font-mono">${tx.sourceId}</span>
                                         </div>` : ''}
                                         ${tx.walletAddress !== '-' ? `
-                                        <div>
+                                        <div class="break-all">
                                             <span class="text-gray-400">Wallet:</span>
-                                            <span class="text-white font-mono">${tx.walletAddress.length > 20 ? tx.walletAddress.substring(0, 20) + '...' : tx.walletAddress}</span>
+                                            <span class="text-white font-mono">${tx.walletAddress}</span>
                                         </div>` : ''}
                                         ${tx.detailType !== '-' ? `
                                         <div>
@@ -710,19 +736,19 @@
                                 
                                 <!-- Wallet Flow (if applicable) -->
                                 ${tx.fromWalletType !== '-' || tx.toWalletAddress !== '-' ? `
-                                <div class="bg-gray-800 rounded p-2 text-xs">
-                                    <div class="flex items-center gap-2 flex-wrap">
+                                <div class="bg-gray-800 rounded p-2 text-xs mb-2">
+                                    <div class="flex items-start gap-2 flex-wrap">
                                         ${tx.fromWalletType !== '-' ? `
-                                        <div class="flex items-center gap-1">
+                                        <div class="flex items-start gap-1">
                                             <span class="material-icons text-xs text-gray-400">arrow_forward</span>
                                             <span class="text-gray-400">From:</span>
-                                            <span class="text-white font-semibold">${tx.fromWalletType}</span>
+                                            <span class="text-white font-semibold break-all">${tx.fromWalletType}</span>
                                         </div>` : ''}
                                         ${tx.toWalletAddress !== '-' ? `
-                                        <div class="flex items-center gap-1">
+                                        <div class="flex items-start gap-1">
                                             <span class="material-icons text-xs text-gray-400">arrow_forward</span>
                                             <span class="text-gray-400">To:</span>
-                                            <span class="text-white font-mono text-xs">${tx.toWalletAddress.length > 15 ? tx.toWalletAddress.substring(0, 15) + '...' : tx.toWalletAddress}</span>
+                                            <span class="text-white font-mono text-xs break-all">${tx.toWalletAddress}</span>
                                         </div>` : ''}
                                     </div>
                                 </div>` : ''}
