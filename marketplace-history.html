@@ -377,6 +377,7 @@
                     amountUSD: tx.usdValue || null,
                     currency: tx.currency || 'GMT',
                     nftId: details.nftId || '-',
+                    nftExternalUrlId: details.nftExternalUrlId || '-',
                     minerName: details.nftName || 'Unknown Miner',
                     minerImage: details.nftSmallImageUrl || '',
                     ths: ths,
@@ -557,7 +558,7 @@
                                 
                                 <!-- Miner Name & NFT ID -->
                                 <div class="mb-2">
-                                    <span class="text-purple-400 font-semibold">${tx.minerName}</span>
+                                    <a href="${getMinerLink(tx)}" target="_blank" class="text-purple-400 font-semibold hover:text-purple-300 hover:underline">${tx.minerName}</a>
                                     ${tx.nftId !== '-' ? `<span class="text-gray-500 text-xs ml-2">NFT #${tx.nftId}</span>` : ''}
                                 </div>
                                 
@@ -644,6 +645,19 @@
                     </div>
                 </div>
             `;
+        }
+
+        // Get miner link (use nftExternalUrlId - the actual UUID)
+        function getMinerLink(tx) {
+            const baseUrl = 'https://app.gomining.com/nft/view/';
+            
+            // Use nftExternalUrlId if available (this is the correct UUID)
+            if (tx.nftExternalUrlId && tx.nftExternalUrlId !== '-') {
+                return baseUrl + tx.nftExternalUrlId;
+            }
+            
+            // Fallback: use nftId if available
+            return tx.nftId !== '-' ? baseUrl + tx.nftId : '#';
         }
 
         // Format currency
