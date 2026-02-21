@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HashFarm - Marketplace History</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta property="og:title" content="HashFarm - GoMining Marketplace History">
+    <meta property="og:description" content="Complete historical archive of all GoMining Marketplace transactions. Track all miner purchases, upgrades and marketplace activities.">
+    <meta property="og:image" content="https://hashfarm.me/assets/preview.png">
+    <meta property="og:url" content="https://hashfarm.me/marketplace-history.html">
+    <meta property="og:type" content="website">
+    <meta name="description" content="Historical archive of GoMining Marketplace. View all past transactions, purchases, and upgrades.">
+    <meta name="keywords" content="GoMining history, marketplace archive, Bitcoin mining history, miner purchase history, BTC mining statistics">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+        .sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        .filter-btn.active {
+            background-color: rgb(147, 51, 234);
+        }
+    </style>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VQ2RT4JL4L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-VQ2RT4JL4L');
+    </script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+
+    <!-- Sidebar Navigation -->
+    <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 h-full bg-gray-800 shadow-xl z-50 overflow-y-auto">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold">Navigation</h2>
+                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <nav class="space-y-2">
+                <a href="index.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                    <span class="material-icons">home</span>
+                    <span>Home</span>
+                </a>
+                <a href="HashSense.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                    <span class="material-icons">calculate</span>
+                    <span>HashSense Dashboard</span>
+                </a>
+                <a href="farm2.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                    <span class="material-icons">storage</span>
+                    <span>Farm Manager</span>
+                </a>
+                <a href="marketplace.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                    <span class="material-icons">store</span>
+                    <span>Marketplace Live</span>
+                </a>
+                <a href="marketplace-history.html" class="flex items-center gap-3 p-3 rounded-lg bg-purple-600 transition-colors">
+                    <span class="material-icons">history</span>
+                    <span>Marketplace History</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-gray-800 p-4 sticky top-0 z-40 shadow-lg">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <button onclick="toggleSidebar()" 
+                            class="bg-gray-700 hover:bg-gray-600 p-2 rounded-lg transition-colors duration-200">
+                        <span class="material-icons text-white">menu</span>
+                    </button>
+                    <h1 class="text-xl font-bold text-white">GoMining Marketplace History</h1>
+                    <div class="flex items-center gap-2">
+                        <span id="status-indicator" class="w-3 h-3 rounded-full bg-blue-500"></span>
+                        <span id="status-text" class="text-sm text-gray-300">Archive</span>
+                    </div>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <!-- Total Transactions -->
+                    <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                        <h2 class="text-xs font-semibold mb-2 text-gray-300">TOTAL TRANSACTIONS</h2>
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons text-blue-400">receipt_long</span>
+                            <p id="total-count" class="text-2xl font-bold text-white">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Total Volume -->
+                    <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                        <h2 class="text-xs font-semibold mb-2 text-gray-300">TOTAL VOLUME</h2>
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons text-green-400">trending_up</span>
+                            <p id="total-volume" class="text-2xl font-bold text-white">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Date Range -->
+                    <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                        <h2 class="text-xs font-semibold mb-2 text-gray-300">DATE RANGE</h2>
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons text-purple-400">date_range</span>
+                            <p id="date-range" class="text-sm font-bold text-white">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Data Source -->
+                    <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                        <h2 class="text-xs font-semibold mb-2 text-gray-300">DATA SOURCE</h2>
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons text-yellow-400">cloud</span>
+                            <p class="text-sm font-bold text-white">Cloudflare KV</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="flex flex-wrap gap-2 items-center justify-between">
+                    <!-- Filter Buttons -->
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterByType('all')" 
+                                class="filter-btn px-3 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 transition-colors text-xs font-semibold active">
+                            all
+                        </button>
+                        <button onclick="filterByType('direct-purchase')" 
+                                class="filter-btn px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors text-xs font-semibold">
+                            direct-purchase
+                        </button>
+                        <button onclick="filterByType('marketplace')" 
+                                class="filter-btn px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors text-xs font-semibold">
+                            marketplace
+                        </button>
+                        <button onclick="filterByType('secondary')" 
+                                class="filter-btn px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors text-xs font-semibold">
+                            secondary
+                        </button>
+                        <button onclick="filterByType('power-upgrade')" 
+                                class="filter-btn px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors text-xs font-semibold">
+                            power-upgrade
+                        </button>
+                        <button onclick="filterByType('efficiency-upgrade')" 
+                                class="filter-btn px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors text-xs font-semibold">
+                            efficiency-upgrade
+                        </button>
+                    </div>
+
+                    <!-- Load More & Refresh -->
+                    <div class="flex gap-2">
+                        <button onclick="loadMore()" 
+                                id="load-more-btn"
+                                class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors text-sm font-semibold flex items-center gap-2">
+                            <span class="material-icons text-sm">add</span>
+                            Load More
+                        </button>
+                        <button onclick="refreshHistory()" 
+                                class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 transition-colors text-sm font-semibold flex items-center gap-2">
+                            <span class="material-icons text-sm">refresh</span>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Transaction Feed -->
+        <main class="max-w-7xl mx-auto px-4 py-6">
+            <div class="mb-4">
+                <h2 class="text-2xl font-bold mb-2">Transaction History</h2>
+                <p class="text-gray-400 text-sm">All unique marketplace transactions stored permanently (deduplicated)</p>
+            </div>
+
+            <div id="transaction-feed" class="space-y-3">
+                <!-- Loading State -->
+                <div id="loading-state" class="text-center py-12">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-600 border-t-purple-500"></div>
+                    <p class="mt-4 text-gray-400">Loading historical data...</p>
+                </div>
+            </div>
+
+            <!-- Load More Button (bottom) -->
+            <div id="load-more-container" class="text-center mt-6 hidden">
+                <button onclick="loadMore()" 
+                        class="px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors font-semibold flex items-center gap-2 mx-auto">
+                    <span class="material-icons">expand_more</span>
+                    Load More Transactions
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-400 text-sm">
+            <p>&copy; 2026 HashFarm. All rights reserved.</p>
+            <div class="mt-2 space-x-4">
+                <a href="imprint.html" class="hover:text-white transition-colors">Imprint</a>
+                <a href="privacy-policy.html" class="hover:text-white transition-colors">Privacy</a>
+                <a href="terms-of-service.html" class="hover:text-white transition-colors">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            WORKER_URL: 'https://gomining-marketplace.cimerawow.workers.dev',
+            INITIAL_LIMIT: 50,
+            LOAD_MORE_INCREMENT: 50
+        };
+
+        let allTransactions = [];
+        let displayedTransactions = [];
+        let currentFilter = 'all';
+        let currentLimit = CONFIG.INITIAL_LIMIT;
+
+        // Toggle sidebar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // Load history from Worker
+        async function loadHistory(limit = CONFIG.INITIAL_LIMIT) {
+            try {
+                updateStatus('loading');
+                const response = await fetch(`${CONFIG.WORKER_URL}/history?limit=${limit}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.transactions && data.transactions.length > 0) {
+                    allTransactions = processTransactions(data.transactions);
+                    updateStatistics();
+                    filterByType(currentFilter);
+                    updateStatus('loaded');
+                    
+                    // Show load more if there's potentially more data
+                    if (data.has_more || data.count >= limit) {
+                        document.getElementById('load-more-container').classList.remove('hidden');
+                    }
+                } else {
+                    document.getElementById('loading-state').innerHTML = `
+                        <div class="text-center py-12 text-gray-400">
+                            <span class="material-icons text-6xl mb-4">history</span>
+                            <p class="text-xl">No historical data available yet</p>
+                            <p class="text-sm mt-2">Transactions will appear here as they are captured</p>
+                        </div>
+                    `;
+                    updateStatus('empty');
+                }
+                
+            } catch (error) {
+                console.error('Error loading history:', error);
+                document.getElementById('loading-state').innerHTML = `
+                    <div class="text-center py-12 text-red-400">
+                        <span class="material-icons text-6xl mb-4">error</span>
+                        <p class="text-xl">Failed to load history</p>
+                        <p class="text-sm mt-2">${error.message}</p>
+                    </div>
+                `;
+                updateStatus('error');
+            }
+        }
+
+        // Process transactions from KV storage
+        function processTransactions(transactions) {
+            return transactions.map(tx => {
+                const details = tx.data && tx.data[0] ? tx.data[0] : {};
+                
+                // Determine transaction type
+                let type = 'purchase';
+                let typeLabel = 'Purchase';
+                let extraInfo = '';
+                
+                if (details.type === 'nftPowerUpgrade') {
+                    type = 'power-upgrade';
+                    typeLabel = 'TH/s Upgrade';
+                } else if (details.type === 'nftEnergyEfficiencyUpgrade') {
+                    type = 'efficiency-upgrade';
+                    typeLabel = 'Efficiency Upgrade';
+                    extraInfo = `${details.fromEnergyEfficiency}W → ${details.toEnergyEfficiency}W`;
+                } else if (tx.type === 'nft-payment') {
+                    type = 'direct-purchase';
+                    typeLabel = 'Primary Market';
+                } else if (tx.type === 'nft-marketplace-payment') {
+                    // Determine currency/chain
+                    const currency = details.fromWalletType || tx.walletType || 'Unknown';
+                    
+                    if (details.fromWalletType && details.fromWalletType !== 'VIRTUAL_GMT') {
+                        type = 'secondary';
+                        typeLabel = `Secondary Market (${currency})`;
+                    } else {
+                        type = 'marketplace';
+                        typeLabel = `Marketplace (${currency})`;
+                    }
+                }
+                
+                // Calculate TH/s
+                let ths = 0;
+                let displayThs = '';
+                if (type === 'power-upgrade') {
+                    const fromPower = parseFloat(details.fromPower || 0);
+                    const toPower = parseFloat(details.toPower || 0);
+                    ths = toPower - fromPower;
+                    displayThs = `+${ths.toFixed(2)} TH/s (${fromPower.toFixed(2)} → ${toPower.toFixed(2)})`;
+                } else if (type === 'efficiency-upgrade') {
+                    ths = parseFloat(details.nftPower || 0);
+                    displayThs = ths > 0 ? `${ths.toFixed(2)} TH/s` : '-';
+                } else {
+                    ths = parseFloat(details.nftPower || 0);
+                    displayThs = `${ths.toFixed(2)} TH/s`;
+                }
+                
+                // Determine efficiency
+                let efficiency = '-';
+                if (type === 'efficiency-upgrade') {
+                    efficiency = extraInfo;
+                } else if (details.nftEnergyEfficiency) {
+                    efficiency = `${details.nftEnergyEfficiency}W/TH`;
+                } else if (details.toEnergyEfficiency) {
+                    efficiency = `${details.toEnergyEfficiency}W/TH`;
+                }
+                
+                return {
+                    id: tx.id,
+                    sourceId: tx.sourceId || '-',
+                    timestamp: new Date(tx.createdAt).getTime(),
+                    createdAt: tx.createdAt,
+                    storedAt: tx.stored_at,
+                    type: type,
+                    typeLabel: typeLabel,
+                    typeRaw: tx.type,
+                    detailType: details.type || '-',
+                    amount: tx.value || 0,
+                    amountUSD: tx.usdValue || null,
+                    currency: tx.currency || 'GMT',
+                    nftId: details.nftId || '-',
+                    minerName: details.nftName || 'Unknown Miner',
+                    minerImage: details.nftSmallImageUrl || '',
+                    ths: ths,
+                    displayThs: displayThs,
+                    efficiency: efficiency,
+                    fromPower: details.fromPower || '-',
+                    toPower: details.toPower || '-',
+                    fromEfficiency: details.fromEnergyEfficiency || '-',
+                    toEfficiency: details.toEnergyEfficiency || '-',
+                    userId: tx.userId,
+                    walletAddress: tx.walletAddress || '-',
+                    walletType: tx.walletType || '-',
+                    fromWalletType: details.fromWalletType || '-',
+                    toWalletAddress: details.toWalletAddress || '-'
+                };
+            });
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const totalCount = allTransactions.length;
+            const totalVolume = allTransactions.reduce((sum, tx) => sum + (tx.amountUSD || tx.amount), 0);
+            
+            // Date range
+            const timestamps = allTransactions.map(tx => tx.timestamp).sort((a, b) => a - b);
+            const oldest = timestamps[0] ? new Date(timestamps[0]).toLocaleDateString() : '-';
+            const newest = timestamps[timestamps.length - 1] ? new Date(timestamps[timestamps.length - 1]).toLocaleDateString() : '-';
+            
+            document.getElementById('total-count').textContent = totalCount.toLocaleString();
+            document.getElementById('total-volume').textContent = `$${totalVolume.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('date-range').textContent = `${oldest} - ${newest}`;
+        }
+
+        // Filter transactions by type
+        function filterByType(type) {
+            currentFilter = type;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-purple-600');
+                btn.classList.add('bg-gray-700');
+            });
+            
+            // Find and activate the clicked button by checking onclick attribute
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.getAttribute('onclick').includes(`'${type}'`)) {
+                    btn.classList.add('active', 'bg-purple-600');
+                    btn.classList.remove('bg-gray-700');
+                }
+            });
+            
+            // Filter transactions
+            if (type === 'all') {
+                displayedTransactions = [...allTransactions];
+            } else {
+                displayedTransactions = allTransactions.filter(tx => tx.type === type);
+            }
+            
+            renderTransactions();
+        }
+
+        // Render transactions
+        function renderTransactions() {
+            const feed = document.getElementById('transaction-feed');
+            
+            if (displayedTransactions.length === 0) {
+                feed.innerHTML = `
+                    <div class="text-center py-12 text-gray-400">
+                        <span class="material-icons text-6xl mb-4">inbox</span>
+                        <p>No transactions found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            feed.innerHTML = displayedTransactions.map(tx => createTransactionCard(tx)).join('');
+        }
+
+        // Create transaction card HTML
+        function createTransactionCard(tx) {
+            // Icon and color based on type
+            let typeIcon = 'shopping_cart';
+            let typeColor = 'text-blue-400';
+            
+            switch(tx.type) {
+                case 'power-upgrade':
+                    typeIcon = 'upgrade';
+                    typeColor = 'text-green-400';
+                    break;
+                case 'efficiency-upgrade':
+                    typeIcon = 'bolt';
+                    typeColor = 'text-yellow-400';
+                    break;
+                case 'direct-purchase':
+                    typeIcon = 'store';
+                    typeColor = 'text-purple-400';
+                    break;
+                case 'marketplace':
+                    typeIcon = 'shopping_cart';
+                    typeColor = 'text-blue-400';
+                    break;
+                case 'secondary':
+                    typeIcon = 'swap_horiz';
+                    typeColor = 'text-orange-400';
+                    break;
+                default:
+                    typeIcon = 'help_outline';
+                    typeColor = 'text-gray-400';
+            }
+            
+            const timestamp = new Date(tx.timestamp).toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            // Format amount
+            let amountDisplay = '';
+            if (tx.amountUSD && tx.amountUSD > 0) {
+                amountDisplay = `${formatCurrency(tx.amountUSD)} (${tx.amount.toFixed(2)} ${tx.currency})`;
+            } else {
+                amountDisplay = `${tx.amount.toFixed(2)} ${tx.currency}`;
+            }
+            
+            // Miner image
+            const minerImageHTML = tx.minerImage 
+                ? `<img src="${tx.minerImage}" alt="${tx.minerName}" class="w-16 h-16 rounded-lg object-cover" onerror="this.style.display='none'">` 
+                : '';
+            
+            // Build upgrade details
+            let upgradeDetails = '';
+            if (tx.type === 'power-upgrade' && tx.fromPower !== '-' && tx.toPower !== '-') {
+                upgradeDetails = `<div class="bg-gray-800 rounded px-2 py-1"><span class="text-gray-400">Power Upgrade:</span> <span class="text-green-400 font-semibold">${tx.fromPower} TH/s → ${tx.toPower} TH/s</span></div>`;
+            } else if (tx.type === 'efficiency-upgrade' && tx.fromEfficiency !== '-' && tx.toEfficiency !== '-') {
+                upgradeDetails = `<div class="bg-gray-800 rounded px-2 py-1"><span class="text-gray-400">Efficiency Upgrade:</span> <span class="text-green-400 font-semibold">${tx.fromEfficiency}W → ${tx.toEfficiency}W</span></div>`;
+            }
+            
+            return `
+                <div class="bg-gray-700 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        ${minerImageHTML}
+                        <div class="flex items-start gap-3 flex-1">
+                            <span class="material-icons ${typeColor} text-3xl">${typeIcon}</span>
+                            <div class="flex-1">
+                                <!-- Header -->
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="font-bold text-lg">${tx.typeLabel}</span>
+                                    <span class="text-gray-500 text-xs">(${tx.typeRaw})</span>
+                                </div>
+                                
+                                <!-- Miner Name & NFT ID -->
+                                <div class="mb-2">
+                                    <span class="text-purple-400 font-semibold">${tx.minerName}</span>
+                                    ${tx.nftId !== '-' ? `<span class="text-gray-500 text-xs ml-2">NFT #${tx.nftId}</span>` : ''}
+                                </div>
+                                
+                                <!-- Upgrade Details (if applicable) -->
+                                ${upgradeDetails ? `<div class="mb-2">${upgradeDetails}</div>` : ''}
+                                
+                                <!-- Main Stats Grid -->
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm mb-2">
+                                    <div>
+                                        <span class="text-gray-400">Amount:</span>
+                                        <span class="text-white font-semibold ml-1 block md:inline">${amountDisplay}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Power:</span>
+                                        <span class="text-white font-semibold ml-1 block md:inline">${tx.displayThs}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Efficiency:</span>
+                                        <span class="text-white font-semibold ml-1">${tx.efficiency}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">User ID:</span>
+                                        <span class="text-white font-semibold ml-1">${tx.userId}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Wallet Type:</span>
+                                        <span class="text-white font-semibold ml-1 text-xs">${tx.walletType}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Transaction Details -->
+                                <div class="bg-gray-800 rounded p-2 mb-2 text-xs">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                        <div>
+                                            <span class="text-gray-400">TX ID:</span>
+                                            <span class="text-white font-mono">${tx.id && tx.id.length > 20 ? tx.id.substring(0, 20) + '...' : tx.id}</span>
+                                        </div>
+                                        ${tx.sourceId !== '-' ? `
+                                        <div>
+                                            <span class="text-gray-400">Source ID:</span>
+                                            <span class="text-white font-mono">${tx.sourceId.length > 20 ? tx.sourceId.substring(0, 20) + '...' : tx.sourceId}</span>
+                                        </div>` : ''}
+                                        ${tx.walletAddress !== '-' ? `
+                                        <div>
+                                            <span class="text-gray-400">Wallet:</span>
+                                            <span class="text-white font-mono">${tx.walletAddress.length > 20 ? tx.walletAddress.substring(0, 20) + '...' : tx.walletAddress}</span>
+                                        </div>` : ''}
+                                        ${tx.detailType !== '-' ? `
+                                        <div>
+                                            <span class="text-gray-400">Detail Type:</span>
+                                            <span class="text-white">${tx.detailType}</span>
+                                        </div>` : ''}
+                                    </div>
+                                </div>
+                                
+                                <!-- Wallet Flow (if applicable) -->
+                                ${tx.fromWalletType !== '-' || tx.toWalletAddress !== '-' ? `
+                                <div class="bg-gray-800 rounded p-2 text-xs mb-2">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        ${tx.fromWalletType !== '-' ? `
+                                        <div class="flex items-center gap-1">
+                                            <span class="material-icons text-xs text-gray-400">arrow_forward</span>
+                                            <span class="text-gray-400">From:</span>
+                                            <span class="text-white font-semibold">${tx.fromWalletType}</span>
+                                        </div>` : ''}
+                                        ${tx.toWalletAddress !== '-' ? `
+                                        <div class="flex items-center gap-1">
+                                            <span class="material-icons text-xs text-gray-400">arrow_forward</span>
+                                            <span class="text-gray-400">To:</span>
+                                            <span class="text-white font-mono text-xs">${tx.toWalletAddress.length > 15 ? tx.toWalletAddress.substring(0, 15) + '...' : tx.toWalletAddress}</span>
+                                        </div>` : ''}
+                                    </div>
+                                </div>` : ''}
+                                
+                                <!-- Stored timestamp -->
+                                <div class="text-xs text-gray-500">
+                                    <span class="text-gray-400">Stored:</span> ${new Date(tx.storedAt).toLocaleString('en-US')}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right text-xs text-gray-400 ml-4 whitespace-nowrap">
+                            ${timestamp}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Format currency
+        function formatCurrency(value) {
+            if (value === '-' || value === null || value === undefined) return '-';
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        }
+
+        // Update status indicator
+        function updateStatus(status) {
+            const indicator = document.getElementById('status-indicator');
+            const text = document.getElementById('status-text');
+            
+            switch(status) {
+                case 'loading':
+                    indicator.className = 'w-3 h-3 rounded-full bg-yellow-500 pulse';
+                    text.textContent = 'Loading...';
+                    break;
+                case 'loaded':
+                    indicator.className = 'w-3 h-3 rounded-full bg-green-500';
+                    text.textContent = 'Loaded';
+                    break;
+                case 'empty':
+                    indicator.className = 'w-3 h-3 rounded-full bg-gray-500';
+                    text.textContent = 'Empty';
+                    break;
+                case 'error':
+                    indicator.className = 'w-3 h-3 rounded-full bg-red-500';
+                    text.textContent = 'Error';
+                    break;
+            }
+        }
+
+        // Load more transactions
+        function loadMore() {
+            currentLimit += CONFIG.LOAD_MORE_INCREMENT;
+            loadHistory(currentLimit);
+        }
+
+        // Refresh history
+        function refreshHistory() {
+            currentLimit = CONFIG.INITIAL_LIMIT;
+            loadHistory(currentLimit);
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadHistory();
+        });
+    </script>
+
+</body>
+</html>
