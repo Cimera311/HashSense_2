@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HashFarm - GoMining Marketplace Live</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Plausible Analytics -->
+    <script defer data-domain="hashfarm.me" src="https://plausible.io/js/script.js"></script>
+
+    <!-- Open Graph Meta -->
+    <meta property="og:title" content="HashFarm – GoMining Marketplace Live">
+    <meta property="og:description" content="Real-time monitoring of GoMining Marketplace: Track miner purchases, upgrades and transactions live.">
+    <meta property="og:image" content="https://hashfarm.me/assets/preview.png">
+    <meta property="og:url" content="https://hashfarm.me/marketplace.html">
+    <meta property="og:type" content="website">
+    <meta name="description" content="Live monitoring of GoMining Marketplace. Track miner purchases, upgrades and all marketplace activities in real-time.">
+    <meta name="keywords" content="GoMining marketplace, Bitcoin mining marketplace, buy miners, mining marketplace live, BTC mining statistics">
+    <meta name="author" content="HashSense">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://hashfarm.me/marketplace.html">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    <link rel="manifest" href="assets/site.webmanifest">
+
+    <!-- Google Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    <style>
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .new-entry {
+            animation: highlightNew 3s ease-out;
+            background: linear-gradient(90deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0) 100%);
+        }
+        
+        @keyframes highlightNew {
+            0% {
+                background: linear-gradient(90deg, rgba(139, 92, 246, 0.4) 0%, rgba(139, 92, 246, 0.1) 100%);
+            }
+            100% {
+                background: transparent;
+            }
+        }
+
+        .sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+    </style>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VQ2RT4JL4L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-VQ2RT4JL4L');
+    </script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+
+    <!-- Sidebar Navigation -->
+    <div id="sidebar" class="sidebar fixed top-0 left-0 w-64 h-full bg-gray-800 shadow-xl z-50 overflow-y-auto">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold">Navigation</h2>
+                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <nav class="space-y-2">
+                <a href="index.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                    <span class="material-icons">home</span>
+                    <span>Home</span>
+                </a>
+                <a href="HashSense.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                    <span class="material-icons">calculate</span>
+                    <span>HashSense Dashboard</span>
+                </a>
+                <a href="farm2.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors">
+                    <span class="material-icons">storage</span>
+                    <span>Farm Manager</span>
+                </a>
+                <a href="marketplace.html" class="flex items-center gap-3 p-3 rounded-lg bg-purple-600 transition-colors">
+                    <span class="material-icons">store</span>
+                    <span>Marketplace Live</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-gray-800 p-4 sticky top-0 z-40 shadow-lg">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex items-center justify-between mb-4">
+                    <button onclick="toggleSidebar()" 
+                            class="bg-gray-700 hover:bg-gray-600 p-2 rounded-lg transition-colors duration-200">
+                        <span class="material-icons text-white">menu</span>
+                    </button>
+                    <h1 class="text-xl font-bold text-white">GoMining Marketplace Live</h1>
+                    <div class="flex items-center gap-2">
+                        <span id="status-indicator" class="w-3 h-3 rounded-full bg-green-500 pulse"></span>
+                        <span id="status-text" class="text-sm text-gray-300">Live</span>
+                    </div>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="grid gap-4 md:grid-cols-4">
+                    <!-- Total Volume Card -->
+                    <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                        <h2 class="text-xs font-semibold mb-2 text-gray-300">TOTAL VOLUME (24H)</h2>
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons text-purple-400">payments</span>
+                            <p id="total-volume" class="text-2xl font-bold text-white">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Transactions Count -->
+                    <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                        <h2 class="text-xs font-semibold mb-2 text-gray-300">TRANSACTIONS (24H)</h2>
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons text-blue-400">receipt_long</span>
+                            <p id="tx-count" class="text-2xl font-bold text-white">0</p>
+                        </div>
+                    </div>
+
+                    <!-- Average TH/s -->
+                    <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                        <h2 class="text-xs font-semibold mb-2 text-gray-300">AVG TH/S PER BUY</h2>
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons text-yellow-400">speed</span>
+                            <p id="avg-ths" class="text-2xl font-bold text-white">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Last Update -->
+                    <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                        <h2 class="text-xs font-semibold mb-2 text-gray-300">LAST UPDATE</h2>
+                        <div class="flex items-center gap-2">
+                            <span class="material-icons text-green-400">update</span>
+                            <p id="last-update" class="text-sm font-bold text-white">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Filter & Controls -->
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="bg-gray-800 rounded-xl p-4 mb-4">
+                <div class="flex flex-wrap gap-4 items-center justify-between">
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="filterByType('all')" 
+                                class="filter-btn px-3 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 transition-colors text-xs font-semibold active">
+                            All
+                        </button>
+                        <button onclick="filterByType('direct-purchase')" 
+                                class="filter-btn px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors text-xs font-semibold">
+                            Direct Buy
+                        </button>
+                        <button onclick="filterByType('marketplace')" 
+                                class="filter-btn px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors text-xs font-semibold">
+                            Marketplace P2P
+                        </button>
+                        <button onclick="filterByType('secondary')" 
+                                class="filter-btn px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors text-xs font-semibold">
+                            Secondary Market
+                        </button>
+                        <button onclick="filterByType('power-upgrade')" 
+                                class="filter-btn px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors text-xs font-semibold">
+                            TH/s Upgrade
+                        </button>
+                        <button onclick="filterByType('efficiency-upgrade')" 
+                                class="filter-btn px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors text-xs font-semibold">
+                            Efficiency Upgrade
+                        </button>
+                    </div>
+                    
+                    <div class="flex gap-3 items-center flex-wrap">
+                        <label class="text-sm text-gray-300">Auto-Refresh:</label>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="auto-refresh-toggle" class="sr-only peer" checked onchange="toggleAutoRefresh()">
+                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                        </label>
+                        <select id="refresh-interval" onchange="changeRefreshInterval()" 
+                                class="bg-gray-700 border border-gray-600 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="1000">1s</option>
+                            <option value="2000">2s</option>
+                            <option value="5000">5s</option>
+                            <option value="10000">10s</option>
+                            <option value="20000">20s</option>
+                            <option value="30000" selected>30s</option>
+                        </select>
+                        <span id="refresh-countdown" class="text-xs text-gray-400">(30s)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marketplace Feed -->
+            <div class="bg-gray-800 rounded-xl p-6 shadow-xl">
+                <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                    <span class="material-icons text-purple-400">store</span>
+                    Live Marketplace Feed
+                </h2>
+                
+                <div id="marketplace-feed" class="space-y-3">
+                    <!-- Loading State -->
+                    <div id="loading-state" class="text-center py-12">
+                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-600 border-t-purple-500"></div>
+                        <p class="mt-4 text-gray-400">Loading marketplace data...</p>
+                    </div>
+                    
+                    <!-- Entries will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-400 text-sm">
+            <p>&copy; 2026 HashFarm. All rights reserved.</p>
+            <div class="mt-2 space-x-4">
+                <a href="imprint.html" class="hover:text-white transition-colors">Imprint</a>
+                <a href="privacy-policy.html" class="hover:text-white transition-colors">Privacy</a>
+                <a href="terms-of-service.html" class="hover:text-white transition-colors">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            // Cloudflare Worker URL
+            WORKER_URL: 'https://gomining-marketplace.cimerawow.workers.dev',
+            // Fallback: Direct to GoMining API (testing only, CORS may cause issues)
+            DIRECT_API: 'https://gomining.com/api/payment-marketplace-statistics',
+            REFRESH_INTERVAL: 30000, // 30 seconds
+            USE_WORKER: true // Worker is deployed and active
+        };
+
+        let autoRefresh = true;
+        let refreshTimer = null;
+        let countdownTimer = null;
+        let currentFilter = 'all';
+        let allTransactions = [];
+        let lastSeenIds = new Set();
+
+        // Get current refresh interval from select
+        function getRefreshInterval() {
+            const select = document.getElementById('refresh-interval');
+            return parseInt(select.value) || CONFIG.REFRESH_INTERVAL;
+        }
+
+        // Toggle Sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const burgerButton = event.target.closest('button[onclick="toggleSidebar()"]');
+            
+            if (!sidebar.contains(event.target) && !burgerButton && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        // Fetch marketplace data
+        async function fetchMarketplaceData() {
+            try {
+                const url = CONFIG.USE_WORKER ? CONFIG.WORKER_URL : CONFIG.DIRECT_API;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching marketplace data:', error);
+                updateStatus('error');
+                return null;
+            }
+        }
+
+        // Update status indicator
+        function updateStatus(status) {
+            const indicator = document.getElementById('status-indicator');
+            const text = document.getElementById('status-text');
+            
+            indicator.className = 'w-3 h-3 rounded-full';
+            
+            switch(status) {
+                case 'live':
+                    indicator.classList.add('bg-green-500', 'pulse');
+                    text.textContent = 'Live';
+                    break;
+                case 'loading':
+                    indicator.classList.add('bg-yellow-500', 'pulse');
+                    text.textContent = 'Lädt...';
+                    break;
+                case 'error':
+                    indicator.classList.add('bg-red-500');
+                    text.textContent = 'Fehler';
+                    break;
+            }
+        }
+
+        // Process and display data
+        function processMarketplaceData(data) {
+            if (!data) return;
+
+            // Update statistics
+            updateStatistics(data);
+            
+            // Extract transactions
+            const transactions = extractTransactions(data);
+            
+            // Identify new transactions
+            const newIds = new Set(transactions.map(t => t.id));
+            const newTransactions = transactions.filter(t => !lastSeenIds.has(t.id));
+            
+            // Update seen IDs
+            lastSeenIds = newIds;
+            
+            // Merge with existing (keep max 100 entries)
+            if (newTransactions.length > 0) {
+                allTransactions = [...newTransactions, ...allTransactions].slice(0, 100);
+                renderTransactions();
+            } else if (allTransactions.length === 0) {
+                // Initial load
+                allTransactions = transactions.slice(0, 100);
+                renderTransactions();
+            }
+            
+            updateStatus('live');
+        }
+
+        // Extract transactions from API response
+        function extractTransactions(data) {
+            const transactions = [];
+            
+            // GoMining API Struktur: data.data.array[]
+            if (data.data && data.data.array && Array.isArray(data.data.array)) {
+                return data.data.array.map(tx => {
+                    // Extrahiere Details aus dem verschachtelten data Array
+                    const details = tx.data && tx.data[0] ? tx.data[0] : {};
+                    
+                    // Bestimme Transaktionstyp
+                    let type = 'purchase';
+                    let typeLabel = 'Purchase';
+                    let extraInfo = '';
+                    
+                    // 1. Check for Power Upgrade
+                    if (details.type === 'nftPowerUpgrade') {
+                        type = 'power-upgrade';
+                        typeLabel = 'TH/s Upgrade';
+                    } 
+                    // 2. Check for Efficiency Upgrade
+                    else if (details.type === 'nftEnergyEfficiencyUpgrade') {
+                        type = 'efficiency-upgrade';
+                        typeLabel = 'Efficiency Upgrade';
+                        extraInfo = `${details.fromEnergyEfficiency}W → ${details.toEnergyEfficiency}W`;
+                    }
+                    // 3. Check for Direct Purchase (nft-payment)
+                    else if (tx.type === 'nft-payment') {
+                        type = 'direct-purchase';
+                        typeLabel = 'Direct Purchase';
+                    }
+                    // 4. Check for Marketplace Purchases
+                    else if (tx.type === 'nft-marketplace-payment') {
+                        // Check if Secondary Market (from external wallet)
+                        if (details.fromWalletType && details.fromWalletType !== 'VIRTUAL_GMT') {
+                            type = 'secondary';
+                            typeLabel = 'Secondary Market';
+                        } else {
+                            type = 'marketplace';
+                            typeLabel = 'Marketplace (P2P)';
+                        }
+                    }
+                    
+                    // Calculate TH/s
+                    let ths = 0;
+                    let displayThs = '';
+                    if (type === 'power-upgrade') {
+                        const fromPower = parseFloat(details.fromPower || 0);
+                        const toPower = parseFloat(details.toPower || 0);
+                        ths = toPower - fromPower;
+                        displayThs = `+${ths.toFixed(2)} TH/s (${fromPower.toFixed(2)} → ${toPower.toFixed(2)})`;
+                    } else if (type === 'efficiency-upgrade') {
+                        // For efficiency upgrade no TH/s change, use existing power
+                        ths = parseFloat(details.nftPower || 0);
+                        displayThs = ths > 0 ? `${ths.toFixed(2)} TH/s` : '-';
+                    } else {
+                        ths = parseFloat(details.nftPower || 0);
+                        displayThs = `${ths.toFixed(2)} TH/s`;
+                    }
+                    
+                    // Determine efficiency
+                    let efficiency = '-';
+                    if (type === 'efficiency-upgrade') {
+                        efficiency = extraInfo; // Shows upgrade path
+                    } else if (details.nftEnergyEfficiency) {
+                        efficiency = `${details.nftEnergyEfficiency}W/TH`;
+                    } else if (details.toEnergyEfficiency) {
+                        efficiency = `${details.toEnergyEfficiency}W/TH`;
+                    }
+                    
+                    return {
+                        // Transaction Core
+                        id: tx.id,
+                        sourceId: tx.sourceId || '-',
+                        timestamp: new Date(tx.createdAt).getTime(),
+                        createdAt: tx.createdAt,
+                        timestampRaw: tx.timestamp || tx.createdAt,
+                        
+                        // Type Classification
+                        type: type,
+                        typeLabel: typeLabel,
+                        typeRaw: tx.type,
+                        detailType: details.type || '-',
+                        
+                        // Financial Details
+                        amount: tx.value || 0,
+                        amountUSD: tx.usdValue || null,
+                        currency: tx.currency || 'GMT',
+                        
+                        // NFT Details
+                        nftId: details.nftId || '-',
+                        minerName: details.nftName || 'Unknown Miner',
+                        minerImage: details.nftSmallImageUrl || '',
+                        nftPowerRaw: details.nftPower || 0,
+                        
+                        // Power/Efficiency Display
+                        ths: ths,
+                        displayThs: displayThs,
+                        efficiency: efficiency,
+                        extraInfo: extraInfo,
+                        
+                        // Upgrade Specific (Power)
+                        fromPower: details.fromPower || '-',
+                        toPower: details.toPower || '-',
+                        
+                        // Upgrade Specific (Efficiency)
+                        fromEfficiency: details.fromEnergyEfficiency || '-',
+                        toEfficiency: details.toEnergyEfficiency || '-',
+                        nftEfficiency: details.nftEnergyEfficiency || '-',
+                        
+                        // User & Wallet Info
+                        userId: tx.userId,
+                        user: `User ${tx.userId}`,
+                        walletAddress: tx.walletAddress || '-',
+                        walletType: tx.walletType || '-',
+                        fromWalletType: details.fromWalletType || '-',
+                        toWalletAddress: details.toWalletAddress || '-',
+                        
+                        // Additional metadata
+                        rawDetails: details // Store full details for debugging
+                    };
+                });
+            }
+            
+            return transactions;
+        }
+
+        // Update statistics
+        function updateStatistics(data) {
+            // Calculate from actual transactions
+            const txArray = data.data?.array || [];
+            
+            // Total volume in GMT
+            const totalGMT = txArray.reduce((sum, tx) => sum + (tx.value || 0), 0);
+            
+            // Total volume in USD (where available)
+            const totalUSD = txArray.reduce((sum, tx) => sum + (tx.usdValue || 0), 0);
+            
+            const stats = {
+                volume: totalUSD > 0 ? totalUSD : totalGMT,
+                currency: totalUSD > 0 ? 'USD' : 'GMT',
+                count: data.data?.count || txArray.length,
+                avgThs: calculateAvgThs(),
+                lastUpdate: new Date().toLocaleTimeString('de-DE')
+            };
+
+            document.getElementById('total-volume').textContent = 
+                stats.currency === 'USD' 
+                    ? formatCurrency(stats.volume) 
+                    : `${stats.volume.toFixed(2)} GMT`;
+            document.getElementById('tx-count').textContent = stats.count.toLocaleString('de-DE');
+            document.getElementById('avg-ths').textContent = stats.avgThs;
+            document.getElementById('last-update').textContent = stats.lastUpdate;
+        }
+
+        // Calculate average TH/s
+        function calculateAvgThs() {
+            if (allTransactions.length === 0) return '-';
+            const total = allTransactions.reduce((sum, tx) => sum + (tx.ths || 0), 0);
+            return (total / allTransactions.length).toFixed(2) + ' TH/s';
+        }
+
+        // Render transactions
+        function renderTransactions() {
+            const feed = document.getElementById('marketplace-feed');
+            const loadingState = document.getElementById('loading-state');
+            
+            if (loadingState) {
+                loadingState.remove();
+            }
+            
+            // Filter transactions
+            const filtered = currentFilter === 'all' 
+                ? allTransactions 
+                : allTransactions.filter(tx => tx.type === currentFilter);
+            
+            if (filtered.length === 0) {
+                feed.innerHTML = `
+                    <div class="text-center py-12 text-gray-400">
+                        <span class="material-icons text-6xl mb-4">inbox</span>
+                        <p>No transactions found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            feed.innerHTML = filtered.map((tx, idx) => createTransactionCard(tx, idx < 3)).join('');
+        }
+
+        // Create transaction card HTML
+        function createTransactionCard(tx, isNew) {
+            // Icon and color based on type
+            let typeIcon = 'shopping_cart';
+            let typeColor = 'text-green-400';
+            
+            switch(tx.type) {
+                case 'power-upgrade':
+                    typeIcon = 'upgrade';
+                    typeColor = 'text-blue-400';
+                    break;
+                case 'efficiency-upgrade':
+                    typeIcon = 'bolt';
+                    typeColor = 'text-yellow-400';
+                    break;
+                case 'direct-purchase':
+                    typeIcon = 'store';
+                    typeColor = 'text-green-400';
+                    break;
+                case 'marketplace':
+                    typeIcon = 'shopping_cart';
+                    typeColor = 'text-purple-400';
+                    break;
+                case 'secondary':
+                    typeIcon = 'swap_horiz';
+                    typeColor = 'text-orange-400';
+                    break;
+                default:
+                    typeIcon = 'help_outline';
+                    typeColor = 'text-gray-400';
+            }
+            
+            const timestamp = new Date(tx.timestamp).toLocaleString('en-US', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            // Format amount
+            let amountDisplay = '';
+            if (tx.amountUSD && tx.amountUSD > 0) {
+                amountDisplay = `${formatCurrency(tx.amountUSD)} (${tx.amount.toFixed(2)} ${tx.currency})`;
+            } else {
+                amountDisplay = `${tx.amount.toFixed(2)} ${tx.currency}`;
+            }
+            
+            // Miner image
+            const minerImageHTML = tx.minerImage 
+                ? `<img src="${tx.minerImage}" alt="${tx.minerName}" class="w-16 h-16 rounded-lg object-cover" onerror="this.style.display='none'">` 
+                : '';
+            
+            // Build upgrade details
+            let upgradeDetails = '';
+            if (tx.type === 'power-upgrade' && tx.fromPower !== '-' && tx.toPower !== '-') {
+                upgradeDetails = `<div class="bg-gray-800 rounded px-2 py-1"><span class="text-gray-400">Power Upgrade:</span> <span class="text-green-400 font-semibold">${tx.fromPower} TH/s → ${tx.toPower} TH/s</span></div>`;
+            } else if (tx.type === 'efficiency-upgrade' && tx.fromEfficiency !== '-' && tx.toEfficiency !== '-') {
+                upgradeDetails = `<div class="bg-gray-800 rounded px-2 py-1"><span class="text-gray-400">Efficiency Upgrade:</span> <span class="text-green-400 font-semibold">${tx.fromEfficiency}W → ${tx.toEfficiency}W</span></div>`;
+            }
+            
+            return `
+                <div class="bg-gray-700 rounded-lg p-4 ${isNew ? 'new-entry slide-in' : ''}">
+                    <div class="flex items-start gap-3">
+                        ${minerImageHTML}
+                        <div class="flex items-start gap-3 flex-1">
+                            <span class="material-icons ${typeColor} text-3xl">${typeIcon}</span>
+                            <div class="flex-1">
+                                <!-- Header -->
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="font-bold text-lg">${tx.typeLabel}</span>
+                                    ${isNew ? '<span class="bg-purple-600 text-xs px-2 py-1 rounded-full">NEW</span>' : ''}
+                                    <span class="text-gray-500 text-xs">(${tx.typeRaw})</span>
+                                </div>
+                                
+                                <!-- Miner Name & NFT ID -->
+                                <div class="mb-2">
+                                    <span class="text-purple-400 font-semibold">${tx.minerName}</span>
+                                    ${tx.nftId !== '-' ? `<span class="text-gray-500 text-xs ml-2">NFT #${tx.nftId}</span>` : ''}
+                                </div>
+                                
+                                <!-- Upgrade Details (if applicable) -->
+                                ${upgradeDetails ? `<div class="mb-2">${upgradeDetails}</div>` : ''}
+                                
+                                <!-- Main Stats Grid -->
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm mb-2">
+                                    <div>
+                                        <span class="text-gray-400">Amount:</span>
+                                        <span class="text-white font-semibold ml-1 block md:inline">${amountDisplay}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Power:</span>
+                                        <span class="text-white font-semibold ml-1 block md:inline">${tx.displayThs}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Efficiency:</span>
+                                        <span class="text-white font-semibold ml-1">${tx.efficiency}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">User ID:</span>
+                                        <span class="text-white font-semibold ml-1">${tx.userId}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400">Wallet Type:</span>
+                                        <span class="text-white font-semibold ml-1 text-xs">${tx.walletType}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Transaction Details -->
+                                <div class="bg-gray-800 rounded p-2 mb-2 text-xs">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                        <div>
+                                            <span class="text-gray-400">TX ID:</span>
+                                            <span class="text-white font-mono">${tx.id && tx.id.length > 20 ? tx.id.substring(0, 20) + '...' : tx.id}</span>
+                                        </div>
+                                        ${tx.sourceId !== '-' ? `
+                                        <div>
+                                            <span class="text-gray-400">Source ID:</span>
+                                            <span class="text-white font-mono">${tx.sourceId.length > 20 ? tx.sourceId.substring(0, 20) + '...' : tx.sourceId}</span>
+                                        </div>` : ''}
+                                        ${tx.walletAddress !== '-' ? `
+                                        <div>
+                                            <span class="text-gray-400">Wallet:</span>
+                                            <span class="text-white font-mono">${tx.walletAddress.length > 20 ? tx.walletAddress.substring(0, 20) + '...' : tx.walletAddress}</span>
+                                        </div>` : ''}
+                                        ${tx.detailType !== '-' ? `
+                                        <div>
+                                            <span class="text-gray-400">Detail Type:</span>
+                                            <span class="text-white">${tx.detailType}</span>
+                                        </div>` : ''}
+                                    </div>
+                                </div>
+                                
+                                <!-- Wallet Flow (if applicable) -->
+                                ${tx.fromWalletType !== '-' || tx.toWalletAddress !== '-' ? `
+                                <div class="bg-gray-800 rounded p-2 text-xs">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        ${tx.fromWalletType !== '-' ? `
+                                        <div class="flex items-center gap-1">
+                                            <span class="material-icons text-xs text-gray-400">arrow_forward</span>
+                                            <span class="text-gray-400">From:</span>
+                                            <span class="text-white font-semibold">${tx.fromWalletType}</span>
+                                        </div>` : ''}
+                                        ${tx.toWalletAddress !== '-' ? `
+                                        <div class="flex items-center gap-1">
+                                            <span class="material-icons text-xs text-gray-400">arrow_forward</span>
+                                            <span class="text-gray-400">To:</span>
+                                            <span class="text-white font-mono text-xs">${tx.toWalletAddress.length > 15 ? tx.toWalletAddress.substring(0, 15) + '...' : tx.toWalletAddress}</span>
+                                        </div>` : ''}
+                                    </div>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                        <div class="text-right text-xs text-gray-400 ml-4 whitespace-nowrap">
+                            ${timestamp}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Format currency
+        function formatCurrency(value) {
+            if (value === '-' || value === null || value === undefined) return '-';
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(value);
+        }
+
+        // Filter transactions
+        function filterByType(type) {
+            currentFilter = type;
+            
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-purple-600', 'active');
+                btn.classList.add('bg-gray-700');
+            });
+            event.target.classList.remove('bg-gray-700');
+            event.target.classList.add('bg-purple-600', 'active');
+            
+            renderTransactions();
+        }
+
+        // Toggle auto refresh
+        function toggleAutoRefresh() {
+            autoRefresh = document.getElementById('auto-refresh-toggle').checked;
+            
+            if (autoRefresh) {
+                startAutoRefresh();
+            } else {
+                stopAutoRefresh();
+            }
+        }
+
+        // Change refresh interval
+        function changeRefreshInterval() {
+            // Restart refresh with new interval if active
+            if (autoRefresh) {
+                startAutoRefresh();
+            }
+        }
+
+        // Start auto refresh
+        function startAutoRefresh() {
+            stopAutoRefresh(); // Clear existing timers
+            
+            const interval = getRefreshInterval();
+            
+            refreshTimer = setInterval(async () => {
+                const data = await fetchMarketplaceData();
+                processMarketplaceData(data);
+            }, interval);
+            
+            startCountdown();
+        }
+
+        // Stop auto refresh
+        function stopAutoRefresh() {
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+            }
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+        }
+
+        // Countdown display
+        function startCountdown() {
+            const interval = getRefreshInterval();
+            let seconds = interval / 1000;
+            const countdownEl = document.getElementById('refresh-countdown');
+            
+            countdownTimer = setInterval(() => {
+                seconds--;
+                countdownEl.textContent = `(${seconds}s)`;
+                
+                if (seconds <= 0) {
+                    seconds = interval / 1000;
+                }
+            }, 1000);
+        }
+
+        // Initialize
+        async function init() {
+            updateStatus('loading');
+            
+            // Initial fetch
+            const data = await fetchMarketplaceData();
+            processMarketplaceData(data);
+            
+            // Start auto refresh if enabled
+            if (autoRefresh) {
+                startAutoRefresh();
+            }
+        }
+
+        // Start when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
