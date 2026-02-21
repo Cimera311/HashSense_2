@@ -519,9 +519,10 @@
                 upgradeDetails = `<div class="bg-gray-800 rounded px-2 py-1"><span class="text-gray-400">Efficiency Upgrade:</span> <span class="text-green-400 font-semibold">${tx.fromEfficiency}W → ${tx.toEfficiency}W</span></div>`;
             } else if ((tx.type === 'marketplace' || tx.type === 'secondary') && tx.fromWalletType !== '-') {
                 // Marketplace P2P transaction - show USER + WALLET flow (FULL transparency)
-                const fromUser = tx.fromUserId !== '-' ? `User ${tx.fromUserId}` : 'Unknown Seller';
+                // Source ID = Seller User ID!
+                const fromUser = tx.sourceId !== '-' ? `User ${tx.sourceId}` : 'Unknown Seller';
                 const fromWallet = tx.fromWalletType;
-                const toUser = tx.toUserId !== '-' ? `User ${tx.toUserId}` : `User ${tx.userId}`;
+                const toUser = `User ${tx.userId}`;
                 const toWallet = tx.toWalletAddress !== '-' ? tx.toWalletAddress : tx.walletAddress;
                 upgradeDetails = `<div class="bg-blue-900 rounded px-3 py-2 border border-blue-500">
                     <div class="text-blue-300 font-semibold mb-2">P2P Transfer:</div>
