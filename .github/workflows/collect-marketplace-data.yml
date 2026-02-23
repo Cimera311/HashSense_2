@@ -1,0 +1,57 @@
+name: Collect GoMining Marketplace Data
+
+# This workflow pings the Cloudflare Worker every 10 seconds to ensure continuous data collection
+# It runs every minute and makes 6 requests (one every 10 seconds)
+# This ensures we capture ALL marketplace transactions without gaps
+
+on:
+  schedule:
+    # Runs every minute (GitHub Actions minimum interval is 1 minute)
+    - cron: '* * * * *'
+  
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+
+jobs:
+  collect-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2  # Safety timeout (each run should take ~60 seconds)
+    
+    steps:
+      - name: Collect marketplace data (6x every 10 seconds)
+        run: |
+          echo "🚀 Starting marketplace data collection..."
+          echo "⏰ Time: $(date)"
+          
+          WORKER_URL="https://gomining-marketplace.cimerawow.workers.dev/marketplace"
+          
+          # Make 6 requests, one every 10 seconds
+          for i in {1..6}; do
+            echo ""
+            echo "📡 Request $i/6 at $(date +%H:%M:%S)"
+            
+            # Ping the worker (with timeout and error handling)
+            RESPONSE=$(curl -s -w "\nHTTP_CODE:%{http_code}" --max-time 8 "$WORKER_URL")
+            HTTP_CODE=$(echo "$RESPONSE" | grep "HTTP_CODE:" | cut -d: -f2)
+            
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "✅ Success - Data collected and stored in KV"
+            else
+              echo "❌ Failed with HTTP code: $HTTP_CODE"
+            fi
+            
+            # Sleep 10 seconds (except after last request)
+            if [ $i -lt 6 ]; then
+              echo "⏳ Sleeping 10 seconds..."
+              sleep 10
+            fi
+          done
+          
+          echo ""
+          echo "✨ Collection cycle complete at $(date +%H:%M:%S)"
+
+      - name: Report statistics
+        if: always()
+        run: |
+          echo ""
+          echo "📊 Fetching storage statistics..."
+          curl -s "https://gomining-marketplace.cimerawow.workers.dev/stats" | jq '.' || echo "Stats endpoint unavailable"
