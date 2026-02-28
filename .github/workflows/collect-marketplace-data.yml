@@ -7,7 +7,7 @@ name: Collect GoMining Marketplace Data
 on:
   schedule:
     # Runs every minute (GitHub Actions minimum interval is 1 minute)
-    - cron: '*/5 * * * *'
+    - cron: '60 * * * *'
   
   workflow_dispatch:  # Allows manual trigger from GitHub UI
 
