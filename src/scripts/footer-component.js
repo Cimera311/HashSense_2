@@ -1,7 +1,7 @@
 // filepath: src/scripts/footer-component.js
 function renderFooter() {
     // Festes Datum - wird manuell aktualisiert wenn Preise geändert werden
-    const PRICE_UPDATE_DATE = '2025-02-06'; // Format: YYYY-MM-DD
+    const PRICE_UPDATE_DATE = '2026-03-03'; // Format: YYYY-MM-DD
     
     const updateDate = new Date(PRICE_UPDATE_DATE + 'T00:00:00');
     const updateTimeString = updateDate.toLocaleString('de-DE', {
