@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-03-12T02:54:04.600Z
+// Auto-generiert am 2026-03-13T02:52:22.599Z
 const btcPriceData = {
   "2024-01-01": {
     "date_iso": "2024-01-01",
@@ -5613,6 +5613,13 @@ const btcPriceData = {
     "symbol": "BTC",
     "price_eur": "61029,00000000",
     "price_usd": "70477,00000000"
+  },
+  "2026-03-13": {
+    "date_iso": "2026-03-13",
+    "time_berlin": "00:14",
+    "symbol": "BTC",
+    "price_eur": "61125,00000000",
+    "price_usd": "70419,00000000"
   }
 };
 
