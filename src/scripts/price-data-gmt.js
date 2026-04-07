@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-04-06T02:58:49.847Z
+// Auto-generiert am 2026-04-07T02:58:26.298Z
 const gmtPriceData = {
   "2024-01-02": {
     "date_iso": "2024-01-02",
