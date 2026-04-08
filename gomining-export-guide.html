@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoMining Transaction Export - HashFarm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    
+    <!-- Prism.js für Code-Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
+    <style>
+        .code-block {
+            position: relative;
+        }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .code-block:hover .copy-button {
+            opacity: 1;
+        }
+        .step-number {
+            width: 2.5rem;
+            height: 2.5rem;
+            flex-shrink: 0;
+        }
+        .lang-switch {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .lang-switch:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Language Toggle (Fixed Position) -->
+    <div class="fixed top-4 right-4 z-50">
+        <button onclick="toggleLanguage()" class="lang-switch bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 flex items-center gap-2 shadow-lg">
+            <span class="material-icons text-xl">language</span>
+            <span id="current-lang" class="font-bold">DE</span>
+            <span class="text-gray-400">|</span>
+            <span id="other-lang" class="text-gray-400">EN</span>
+        </button>
+    </div>
+
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        
+        <!-- Hero Section -->
+        <div class="mb-12 text-center">
+            <div class="inline-block p-4 bg-purple-600 rounded-full mb-4">
+                <span class="material-icons text-6xl">cloud_download</span>
+            </div>
+            <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                GoMining Transaction Export
+            </h1>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto" data-i18n="hero.subtitle">
+                Exportiere alle deine GoMining Transaktionen in Sekunden als CSV-Datei. 
+                Schnell, einfach und direkt über die Browser-Console.
+            </p>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="grid md:grid-cols-3 gap-6 mb-12">
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-colors">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="material-icons text-3xl text-green-400">speed</span>
+                    <h3 class="text-xl font-bold" data-i18n="feature.fast.title">Blitzschnell</h3>
+                </div>
+                <p class="text-gray-400" data-i18n="feature.fast.desc">10-100x schneller als manuelles Scraping. Nutzt direkt die API.</p>
+            </div>
+            
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-colors">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="material-icons text-3xl text-blue-400">calendar_today</span>
+                    <h3 class="text-xl font-bold" data-i18n="feature.flexible.title">Flexible Filter</h3>
+                </div>
+                <p class="text-gray-400" data-i18n="feature.flexible.desc">Exportiere nach Jahr, Monat oder benutzerdefiniertem Zeitraum.</p>
+            </div>
+            
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-colors">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="material-icons text-3xl text-yellow-400">lock_open</span>
+                    <h3 class="text-xl font-bold" data-i18n="feature.secure.title">Sicher</h3>
+                </div>
+                <p class="text-gray-400" data-i18n="feature.secure.desc">Deine Daten bleiben lokal. Kein Upload, keine externe Verarbeitung.</p>
+            </div>
+        </div>
+
+        <!-- Step-by-Step Guide -->
+        <div class="bg-gray-800 rounded-xl p-8 mb-12 border border-gray-700">
+            <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                <span class="material-icons text-4xl text-purple-400">list_alt</span>
+                <span data-i18n="steps.title">Schritt-für-Schritt Anleitung</span>
+            </h2>
+
+            <!-- Step 1 -->
+            <div class="flex gap-6 mb-8">
+                <div class="step-number bg-purple-600 rounded-full flex items-center justify-center text-2xl font-bold">
+                    1
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold mb-3" data-i18n="step1.title">GoMining.com öffnen</h3>
+                    <p class="text-gray-400 mb-4" data-i18n="step1.desc">
+                        Gehe zu <a href="https://app.gomining.com" target="_blank" class="text-purple-400 hover:text-purple-300 underline">app.gomining.com</a> 
+                        und logge dich ein.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="flex gap-6 mb-8">
+                <div class="step-number bg-purple-600 rounded-full flex items-center justify-center text-2xl font-bold">
+                    2
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold mb-3" data-i18n="step2.title">Browser-Console öffnen</h3>
+                    <p class="text-gray-400 mb-3">Drücke <kbd class="px-2 py-1 bg-gray-700 rounded">F12</kbd> <span data-i18n="step2.desc1">oder</span> <kbd class="px-2 py-1 bg-gray-700 rounded">Strg + Shift + J</kbd></p>
+                    <p class="text-gray-400 mb-4" data-i18n="step2.desc2">Wechsle zum <strong>"Console"</strong> Tab.</p>
+                    <div class="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                        <p class="text-sm text-gray-500 mb-2" data-i18n="step2.tip">💡 Tipp: Klicke einmal in die Console, damit sie fokussiert ist.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="flex gap-6 mb-8">
+                <div class="step-number bg-purple-600 rounded-full flex items-center justify-center text-2xl font-bold">
+                    3
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold mb-3" data-i18n="step3.title">Skript laden</h3>
+                    <p class="text-gray-400 mb-4" data-i18n="step3.desc">
+                        Kopiere das komplette Skript und füge es in die Console ein:
+                    </p>
+                    <div class="code-block">
+                        <button onclick="copySkript()" class="copy-button bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                            <span class="material-icons text-sm">content_copy</span>
+                            <span data-i18n="step3.button.copy">Kopieren</span>
+                        </button>
+                        <a href="src/scripts/console scripts/gomining-export-final.js" target="_blank" 
+                           class="absolute top-0.5rem left-0.5rem bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors text-sm">
+                            <span class="material-icons text-sm">code</span>
+                            <span data-i18n="step3.button.open">Skript öffnen</span>
+                        </a>
+                        <div class="bg-gray-900 rounded-lg overflow-hidden border border-gray-700 mt-2">
+                            <pre class="language-javascript p-4 text-sm overflow-x-auto"><code>// Das komplette Skript findest du hier:
+// src/scripts/console scripts/gomining-export-final.js
+
+// Oder direkt laden:
+fetch('src/scripts/console scripts/gomining-export-final.js')
+  .then(r => r.text())
+  .then(code => eval(code));</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="flex gap-6">
+                <div class="step-number bg-purple-600 rounded-full flex items-center justify-center text-2xl font-bold">
+                    4
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold mb-3" data-i18n="step4.title">Export starten</h3>
+                    <p class="text-gray-400 mb-4" data-i18n="step4.desc">Wähle einen Export-Befehl:</p>
+                    
+                    <div class="space-y-4">
+                        <!-- Test Export -->
+                        <div class="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-lg" data-i18n="step4.test.title">🧪 Test (empfohlen zuerst!)</h4>
+                                <button onclick="copyCode('testExport()')" class="text-sm bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded transition-colors">
+                                    <span data-i18n="btn.copy">Kopieren</span>
+                                </button>
+                            </div>
+                            <pre class="language-javascript"><code>testExport()</code></pre>
+                            <p class="text-sm text-gray-500 mt-2" data-i18n="step4.test.desc">Lädt nur 100 Transaktionen zum Testen</p>
+                        </div>
+
+                        <!-- Year Export -->
+                        <div class="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-lg" data-i18n="step4.year.title">📅 Ganzes Jahr</h4>
+                                <button onclick="copyCode('exportYear(2026)')" class="text-sm bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded transition-colors">
+                                    <span data-i18n="btn.copy">Kopieren</span>
+                                </button>
+                            </div>
+                            <pre class="language-javascript"><code>exportYear(2026)</code></pre>
+                            <p class="text-sm text-gray-500 mt-2" data-i18n="step4.year.desc">Alle Transaktionen von 2026</p>
+                        </div>
+
+                        <!-- Month Export -->
+                        <div class="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-lg" data-i18n="step4.month.title">📆 Einzelner Monat</h4>
+                                <button onclick="copyCode('exportMonth(2026, 4)')" class="text-sm bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded transition-colors">
+                                    <span data-i18n="btn.copy">Kopieren</span>
+                                </button>
+                            </div>
+                            <pre class="language-javascript"><code>exportMonth(2026, 4)  // April 2026</code></pre>
+                            <p class="text-sm text-gray-500 mt-2" data-i18n="step4.month.desc">2. Parameter ist der Monat (1-12)</p>
+                        </div>
+
+                        <!-- Custom Range -->
+                        <div class="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-lg" data-i18n="step4.custom.title">🎯 Benutzerdefiniert</h4>
+                                <button onclick="copyCode('exportFromTo(\"2026-01-01\", \"2026-04-02\")')" class="text-sm bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded transition-colors">
+                                    <span data-i18n="btn.copy">Kopieren</span>
+                                </button>
+                            </div>
+                            <pre class="language-javascript"><code>exportFromTo("2026-01-01", "2026-04-02")</code></pre>
+                            <p class="text-sm text-gray-500 mt-2" data-i18n="step4.custom.desc">Beliebiger Zeitraum (Format: YYYY-MM-DD)</p>
+                        </div>
+
+                        <!-- All Transactions -->
+                        <div class="bg-gray-900 rounded-lg p-4 border border-red-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-lg" data-i18n="step4.all.title">⚠️ Alle Transaktionen</h4>
+                                <button onclick="copyCode('exportAll()')" class="text-sm bg-red-600 hover:bg-red-700 px-3 py-1 rounded transition-colors">
+                                    <span data-i18n="btn.copy">Kopieren</span>
+                                </button>
+                            </div>
+                            <pre class="language-javascript"><code>exportAll()</code></pre>
+                            <p class="text-sm text-gray-500 mt-2" data-i18n="step4.all.desc">❗ Kann lange dauern bei vielen Transaktionen!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Options -->
+        <div class="bg-gray-800 rounded-xl p-8 mb-12 border border-gray-700">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                <span class="material-icons text-4xl text-blue-400">settings</span>
+                <span data-i18n="advanced.title">Erweiterte Optionen</span>
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Manual Date Range -->
+                <div class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold mb-3" data-i18n="advanced.daterange.title">Datumsbereich manuell setzen</h3>
+                    <pre class="language-javascript"><code>setDateRange("2026-01-01", "2026-12-31")
+exportTransactions()</code></pre>
+                </div>
+
+                <!-- Shortcuts -->
+                <div class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold mb-3" data-i18n="advanced.shortcuts.title">Shortcuts</h3>
+                    <pre class="language-javascript"><code>setDateRange("jahr")   // Dieses Jahr
+setDateRange("monat")  // Dieser Monat
+setDateRange("heute")  // Nur heute
+setDateRange(2026)     // Jahr als Zahl</code></pre>
+                </div>
+
+                <!-- Config -->
+                <div class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold mb-3" data-i18n="advanced.config.title">Konfiguration anpassen</h3>
+                    <pre class="language-javascript"><code>exportConfig.batchSize = 200  // Mehr pro Request
+exportConfig.delayMs = 100    // Längere Pausen</code></pre>
+                </div>
+
+                <!-- Manual Token -->
+                <div class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold mb-3" data-i18n="advanced.token.title">Token manuell setzen</h3>
+                    <pre class="language-javascript"><code>globalThis.goMiningToken = "DEIN_TOKEN"
+exportTransactions()</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="bg-gray-800 rounded-xl p-8 mb-12 border border-gray-700">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                <span class="material-icons text-4xl text-yellow-400">help_outline</span>
+                <span data-i18n="faq.title">Häufige Fragen</span>
+            </h2>
+
+            <div class="space-y-6">
+                <details class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <summary class="cursor-pointer font-bold text-lg mb-3" data-i18n="faq.token.q">Wie finde ich meinen Token?</summary>
+                    <p class="text-gray-400" data-i18n="faq.token.a">Das Skript findet den Token automatisch aus Cookies oder localStorage. Falls nicht, öffne DevTools → Network Tab → Suche nach "transaction-history" → Kopiere den "Authorization" Header.</p>
+                </details>
+
+                <details class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <summary class="cursor-pointer font-bold text-lg mb-3" data-i18n="faq.safe.q">Ist das sicher?</summary>
+                    <p class="text-gray-400" data-i18n="faq.safe.a">Ja! Das Skript läuft komplett lokal in deinem Browser. Es sendet keine Daten an externe Server. Du kannst den Code jederzeit einsehen und prüfen.</p>
+                </details>
+
+                <details class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <summary class="cursor-pointer font-bold text-lg mb-3" data-i18n="faq.401.q">Warum bekomme ich einen 401 Fehler?</summary>
+                    <p class="text-gray-400" data-i18n="faq.401.a">Dein Token ist abgelaufen. Lade die Seite neu (F5), warte bis sie vollständig geladen ist, und führe das Skript erneut aus. Bei Bedarf kannst du den Token auch manuell aus DevTools kopieren.</p>
+                </details>
+
+                <details class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <summary class="cursor-pointer font-bold text-lg mb-3" data-i18n="faq.excel.q">Wie öffne ich die CSV in Excel?</summary>
+                    <p class="text-gray-400" data-i18n="faq.excel.a">
+                        In Excel: Datei → Öffnen → Wähle "Alle Dateien" → CSV auswählen → 
+                        Im Import-Dialog: Trennzeichen "Semikolon" und Dezimaltrennzeichen "Komma" wählen.
+                    </p>
+                </details>
+
+                <details class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <summary class="cursor-pointer font-bold text-lg mb-3" data-i18n="faq.duration.q">Wie lange dauert der Export?</summary>
+                    <p class="text-gray-400" data-i18n="faq.duration.a">
+                        Das hängt von der Anzahl der Transaktionen ab:
+                        <br>• ~1.000 Transaktionen: 5-10 Sekunden
+                        <br>• ~10.000 Transaktionen: 30-60 Sekunden
+                        <br>• ~68.000 Transaktionen: 1-2 Minuten
+                    </p>
+                </details>
+            </div>
+        </div>
+
+        <!-- CSV Format Info -->
+        <div class="bg-gray-800 rounded-xl p-8 border border-gray-700">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                <span class="material-icons text-4xl text-green-400">table_chart</span>
+                <span data-i18n="csv.title">CSV-Format</span>
+            </h2>
+            <p class="text-gray-400 mb-4" data-i18n="csv.desc">Die exportierte CSV-Datei enthält folgende Spalten:</p>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="py-3 px-4 font-bold" data-i18n="csv.col">Spalte</th>
+                            <th class="py-3 px-4 font-bold" data-i18n="csv.description">Beschreibung</th>
+                            <th class="py-3 px-4 font-bold" data-i18n="csv.example">Beispiel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-purple-400">Date</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.date">Datum der Transaktion</td>
+                            <td class="py-3 px-4 font-mono text-sm">2026-04-02</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-purple-400">Time</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.time">Uhrzeit</td>
+                            <td class="py-3 px-4 font-mono text-sm">17:12:22</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-purple-400">Type</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.type">Transaktionstyp</td>
+                            <td class="py-3 px-4 font-mono text-sm">deposit, withdraw</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-purple-400">FromType</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.fromtype">Herkunft</td>
+                            <td class="py-3 px-4 font-mono text-sm">mining-reward, ref-bonus</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-purple-400">Amount</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.amount">Betrag (umgerechnet)</td>
+                            <td class="py-3 px-4 font-mono text-sm">0,00001234</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-purple-400">Currency</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.currency">Währung</td>
+                            <td class="py-3 px-4 font-mono text-sm">BTC, GMT, USDT</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-purple-400">Status</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.status">Status</td>
+                            <td class="py-3 px-4 font-mono text-sm">success, pending</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-mono text-purple-400">ID</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.id">Eindeutige ID</td>
+                            <td class="py-3 px-4 font-mono text-sm">213539236</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer-component></footer-component>
+
+    <!-- Scripts -->
+    <script src="header.js"></script>
+    
+    <script>
+        // Translation System
+        const translations = {
+            de: {
+                // Hero
+                'hero.subtitle': 'Exportiere alle deine GoMining Transaktionen in Sekunden als CSV-Datei. Schnell, einfach und direkt über die Browser-Console.',
+                
+                // Features
+                'feature.fast.title': 'Blitzschnell',
+                'feature.fast.desc': '10-100x schneller als manuelles Scraping. Nutzt direkt die API.',
+                'feature.flexible.title': 'Flexible Filter',
+                'feature.flexible.desc': 'Exportiere nach Jahr, Monat oder benutzerdefiniertem Zeitraum.',
+                'feature.secure.title': 'Sicher',
+                'feature.secure.desc': 'Deine Daten bleiben lokal. Kein Upload, keine externe Verarbeitung.',
+                
+                // Steps
+                'steps.title': 'Schritt-für-Schritt Anleitung',
+                'step1.title': 'GoMining.com öffnen',
+                'step1.desc': 'Gehe zu <a href="https://app.gomining.com" target="_blank" class="text-purple-400 hover:text-purple-300 underline">app.gomining.com</a> und logge dich ein.',
+                'step2.title': 'Browser-Console öffnen',
+                'step2.desc1': 'oder',
+                'step2.desc2': 'Wechsle zum <strong>"Console"</strong> Tab.',
+                'step2.tip': '💡 Tipp: Klicke einmal in die Console, damit sie fokussiert ist.',
+                'step3.title': 'Skript laden',
+                'step3.desc': 'Kopiere das komplette Skript und füge es in die Console ein:',
+                'step3.button.copy': 'Kopieren',
+                'step3.button.open': 'Skript öffnen',
+                'step4.title': 'Export starten',
+                'step4.desc': 'Wähle einen Export-Befehl:',
+                'step4.test.title': '🧪 Test (empfohlen zuerst!)',
+                'step4.test.desc': 'Lädt nur 100 Transaktionen zum Testen',
+                'step4.year.title': '📅 Ganzes Jahr',
+                'step4.year.desc': 'Alle Transaktionen von 2026',
+                'step4.month.title': '📆 Einzelner Monat',
+                'step4.month.desc': '2. Parameter ist der Monat (1-12)',
+                'step4.custom.title': '🎯 Benutzerdefiniert',
+                'step4.custom.desc': 'Beliebiger Zeitraum (Format: YYYY-MM-DD)',
+                'step4.all.title': '⚠️ Alle Transaktionen',
+                'step4.all.desc': '❗ Kann lange dauern bei vielen Transaktionen!',
+                
+                // Advanced
+                'advanced.title': 'Erweiterte Optionen',
+                'advanced.daterange.title': 'Datumsbereich manuell setzen',
+                'advanced.shortcuts.title': 'Shortcuts',
+                'advanced.config.title': 'Konfiguration anpassen',
+                'advanced.token.title': 'Token manuell setzen',
+                
+                // FAQ
+                'faq.title': 'Häufige Fragen',
+                'faq.token.q': 'Wie finde ich meinen Token?',
+                'faq.token.a': 'Das Skript findet den Token automatisch aus Cookies oder localStorage. Falls nicht, öffne DevTools → Network Tab → Suche nach "transaction-history" → Kopiere den "Authorization" Header.',
+                'faq.safe.q': 'Ist das sicher?',
+                'faq.safe.a': 'Ja! Das Skript läuft komplett lokal in deinem Browser. Es sendet keine Daten an externe Server. Du kannst den Code jederzeit einsehen und prüfen.',
+                'faq.401.q': 'Warum bekomme ich einen 401 Fehler?',
+                'faq.401.a': 'Dein Token ist abgelaufen. Lade die Seite neu (F5), warte bis sie vollständig geladen ist, und führe das Skript erneut aus. Bei Bedarf kannst du den Token auch manuell aus DevTools kopieren.',
+                'faq.excel.q': 'Wie öffne ich die CSV in Excel?',
+                'faq.excel.a': 'In Excel: Datei → Öffnen → Wähle "Alle Dateien" → CSV auswählen → Im Import-Dialog: Trennzeichen "Semikolon" und Dezimaltrennzeichen "Komma" wählen.',
+                'faq.duration.q': 'Wie lange dauert der Export?',
+                'faq.duration.a': 'Das hängt von der Anzahl der Transaktionen ab:<br>• ~1.000 Transaktionen: 5-10 Sekunden<br>• ~10.000 Transaktionen: 30-60 Sekunden<br>• ~68.000 Transaktionen: 1-2 Minuten',
+                
+                // CSV
+                'csv.title': 'CSV-Format',
+                'csv.desc': 'Die exportierte CSV-Datei enthält folgende Spalten:',
+                'csv.col': 'Spalte',
+                'csv.description': 'Beschreibung',
+                'csv.example': 'Beispiel',
+                'csv.date': 'Datum der Transaktion',
+                'csv.time': 'Uhrzeit',
+                'csv.type': 'Transaktionstyp',
+                'csv.fromtype': 'Herkunft',
+                'csv.amount': 'Betrag (umgerechnet)',
+                'csv.currency': 'Währung',
+                'csv.status': 'Status',
+                'csv.id': 'Eindeutige ID',
+                
+                // Notifications
+                'notify.copied': 'Code kopiert! 📋',
+                'notify.script': 'Komplettes Skript kopiert! 🚀',
+                'btn.copy': 'Kopieren'
+            },
+            en: {
+                // Hero
+                'hero.subtitle': 'Export all your GoMining transactions in seconds as CSV file. Fast, simple and directly via browser console.',
+                
+                // Features
+                'feature.fast.title': 'Lightning Fast',
+                'feature.fast.desc': '10-100x faster than manual scraping. Uses API directly.',
+                'feature.flexible.title': 'Flexible Filters',
+                'feature.flexible.desc': 'Export by year, month or custom date range.',
+                'feature.secure.title': 'Secure',
+                'feature.secure.desc': 'Your data stays local. No upload, no external processing.',
+                
+                // Steps
+                'steps.title': 'Step-by-Step Guide',
+                'step1.title': 'Open GoMining.com',
+                'step1.desc': 'Go to <a href="https://app.gomining.com" target="_blank" class="text-purple-400 hover:text-purple-300 underline">app.gomining.com</a> and log in.',
+                'step2.title': 'Open Browser Console',
+                'step2.desc1': 'or',
+                'step2.desc2': 'Switch to <strong>"Console"</strong> tab.',
+                'step2.tip': '💡 Tip: Click once in the console to focus it.',
+                'step3.title': 'Load Script',
+                'step3.desc': 'Copy the complete script and paste it into the console:',
+                'step3.button.copy': 'Copy',
+                'step3.button.open': 'Open Script',
+                'step4.title': 'Start Export',
+                'step4.desc': 'Choose an export command:',
+                'step4.test.title': '🧪 Test (recommended first!)',
+                'step4.test.desc': 'Loads only 100 transactions for testing',
+                'step4.year.title': '📅 Full Year',
+                'step4.year.desc': 'All transactions from 2026',
+                'step4.month.title': '📆 Single Month',
+                'step4.month.desc': '2nd parameter is the month (1-12)',
+                'step4.custom.title': '🎯 Custom Range',
+                'step4.custom.desc': 'Any date range (Format: YYYY-MM-DD)',
+                'step4.all.title': '⚠️ All Transactions',
+                'step4.all.desc': '❗ May take long with many transactions!',
+                
+                // Advanced
+                'advanced.title': 'Advanced Options',
+                'advanced.daterange.title': 'Set date range manually',
+                'advanced.shortcuts.title': 'Shortcuts',
+                'advanced.config.title': 'Adjust configuration',
+                'advanced.token.title': 'Set token manually',
+                
+                // FAQ
+                'faq.title': 'Frequently Asked Questions',
+                'faq.token.q': 'How do I find my token?',
+                'faq.token.a': 'The script finds the token automatically from cookies or localStorage. If not, open DevTools → Network Tab → Search for "transaction-history" → Copy the "Authorization" header.',
+                'faq.safe.q': 'Is this safe?',
+                'faq.safe.a': 'Yes! The script runs completely locally in your browser. It doesn\'t send data to external servers. You can review and check the code anytime.',
+                'faq.401.q': 'Why do I get a 401 error?',
+                'faq.401.a': 'Your token has expired. Reload the page (F5), wait until it\'s fully loaded, and run the script again. If needed, you can also copy the token manually from DevTools.',
+                'faq.excel.q': 'How do I open the CSV in Excel?',
+                'faq.excel.a': 'In Excel: File → Open → Select "All Files" → Choose CSV → In the import dialog: Delimiter "Semicolon" and decimal separator "Comma".',
+                'faq.duration.q': 'How long does the export take?',
+                'faq.duration.a': 'Depends on the number of transactions:<br>• ~1,000 transactions: 5-10 seconds<br>• ~10,000 transactions: 30-60 seconds<br>• ~68,000 transactions: 1-2 minutes',
+                
+                // CSV
+                'csv.title': 'CSV Format',
+                'csv.desc': 'The exported CSV file contains the following columns:',
+                'csv.col': 'Column',
+                'csv.description': 'Description',
+                'csv.example': 'Example',
+                'csv.date': 'Transaction date',
+                'csv.time': 'Time',
+                'csv.type': 'Transaction type',
+                'csv.fromtype': 'Source',
+                'csv.amount': 'Amount (converted)',
+                'csv.currency': 'Currency',
+                'csv.status': 'Status',
+                'csv.id': 'Unique ID',
+                
+                // Notifications
+                'notify.copied': 'Code copied! 📋',
+                'notify.script': 'Complete script copied! 🚀',
+                'btn.copy': 'Copy'
+            }
+        };
+
+        // Get current language from localStorage or default to 'de'
+        let currentLang = localStorage.getItem('lang') || 'de';
+
+        // Apply translations
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                const translation = translations[currentLang][key];
+                if (translation) {
+                    element.innerHTML = translation;
+                }
+            });
+            
+            // Update language toggle
+            if (currentLang === 'de') {
+                document.getElementById('current-lang').textContent = 'DE';
+                document.getElementById('other-lang').textContent = 'EN';
+            } else {
+                document.getElementById('current-lang').textContent = 'EN';
+                document.getElementById('other-lang').textContent = 'DE';
+            }
+            
+            document.documentElement.lang = currentLang;
+        }
+
+        // Toggle language
+        function toggleLanguage() {
+            currentLang = currentLang === 'de' ? 'en' : 'de';
+            localStorage.setItem('lang', currentLang);
+            applyTranslations();
+        }
+
+        // Copy functions
+        function copyCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                const msg = translations[currentLang]['notify.copied'];
+                showNotification(msg);
+            });
+        }
+
+        function copySkript() {
+            fetch('src/scripts/console scripts/gomining-export-final.js')
+                .then(r => r.text())
+                .then(code => {
+                    navigator.clipboard.writeText(code).then(() => {
+                        const msg = translations[currentLang]['notify.script'];
+                        showNotification(msg);
+                    });
+                });
+        }
+
+        function showNotification(text) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-purple-600 text-white px-6 py-3 rounded-lg shadow-xl z-50 animate-bounce';
+            notification.innerHTML = text;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTranslations();
+        });
+    </script>
+</body>
+</html>
