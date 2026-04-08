@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoMining Miner Dashboard - Complete Analysis</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(103, 61, 236, 0.2) 0%, rgba(0, 255, 127, 0.1) 100%);
+            border-radius: 20px;
+            border: 2px solid rgba(103, 61, 236, 0.4);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #00ff7f;
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(0, 255, 127, 0.6);
+        }
+
+        .subtitle {
+            color: #aaa;
+            font-size: 1.2em;
+        }
+
+        /* Import Section */
+        .import-section {
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .import-section h2 {
+            color: #673dec;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5em;
+        }
+
+        .file-upload-area {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .file-upload-box {
+            background: rgba(103, 61, 236, 0.1);
+            border: 2px dashed #673dec;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload-box:hover {
+            background: rgba(103, 61, 236, 0.2);
+            border-color: #00ff7f;
+            transform: translateY(-5px);
+        }
+
+        .file-upload-box.loaded {
+            background: rgba(0, 255, 127, 0.1);
+            border-color: #00ff7f;
+            border-style: solid;
+        }
+
+        .file-upload-box h3 {
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .file-upload-box .material-icons {
+            font-size: 48px;
+            color: #673dec;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-box.loaded .material-icons {
+            color: #00ff7f;
+        }
+
+        .file-status {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .file-status.loaded {
+            color: #00ff7f;
+            font-weight: bold;
+        }
+
+        /* Stats Dashboard */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(103, 61, 236, 0.2) 0%, rgba(30, 30, 46, 0.8) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(103, 61, 236, 0.3);
+        }
+
+        .stat-card .material-icons {
+            font-size: 36px;
+            color: #673dec;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            color: #00ff7f;
+            font-size: 2em;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 255, 127, 0.3);
+        }
+
+        /* Filters and Search */
+        .controls-bar {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 12px;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(103, 61, 236, 0.1);
+            border: 2px solid #673dec;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1em;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #00ff7f;
+            box-shadow: 0 0 10px rgba(0, 255, 127, 0.3);
+        }
+
+        select {
+            padding: 12px 15px;
+            background: rgba(103, 61, 236, 0.1);
+            border: 2px solid #673dec;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        /* Miner Cards */
+        .miners-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .miner-card {
+            background: linear-gradient(135deg, rgba(30, 30, 46, 0.95) 0%, rgba(20, 20, 35, 0.95) 100%);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .miner-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #673dec, #00ff7f);
+        }
+
+        .miner-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(103, 61, 236, 0.4);
+            border-color: #00ff7f;
+        }
+
+        .miner-card.sold {
+            opacity: 0.7;
+            border-color: rgba(255, 99, 71, 0.5);
+        }
+
+        .miner-card.sold::before {
+            background: linear-gradient(90deg, #ff6347, #ff4500);
+        }
+
+        .miner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .miner-title {
+            color: #00ff7f;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .miner-id {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .miner-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(0, 255, 127, 0.2);
+            color: #00ff7f;
+            border: 1px solid #00ff7f;
+        }
+
+        .status-sold {
+            background: rgba(255, 99, 71, 0.2);
+            color: #ff6347;
+            border: 1px solid #ff6347;
+        }
+
+        .miner-specs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(103, 61, 236, 0.1);
+            border-radius: 10px;
+        }
+
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .spec-label {
+            color: #888;
+            font-size: 0.85em;
+            margin-bottom: 3px;
+        }
+
+        .spec-value {
+            color: #fff;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .miner-timeline {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(103, 61, 236, 0.3);
+        }
+
+        .timeline-title {
+            color: #673dec;
+            font-size: 1em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timeline-event {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(103, 61, 236, 0.05);
+            border-left: 3px solid #673dec;
+            border-radius: 5px;
+        }
+
+        .timeline-event.purchase {
+            border-left-color: #00ff7f;
+        }
+
+        .timeline-event.upgrade {
+            border-left-color: #ffa500;
+        }
+
+        .timeline-event.sale {
+            border-left-color: #ff6347;
+        }
+
+        .event-date {
+            color: #888;
+            font-size: 0.85em;
+            margin-bottom: 3px;
+        }
+
+        .event-description {
+            color: #fff;
+            font-size: 0.95em;
+        }
+
+        .event-value {
+            color: #00ff7f;
+            font-weight: bold;
+        }
+
+        /* ROI Section */
+        .roi-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(0, 255, 127, 0.1) 0%, rgba(103, 61, 236, 0.1) 100%);
+            border-radius: 10px;
+            border: 2px solid rgba(0, 255, 127, 0.3);
+        }
+
+        .roi-title {
+            color: #00ff7f;
+            font-size: 1em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .roi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .roi-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        .roi-label {
+            color: #aaa;
+            font-size: 0.9em;
+        }
+
+        .roi-value {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .roi-positive {
+            color: #00ff7f !important;
+        }
+
+        .roi-negative {
+            color: #ff6347 !important;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #673dec 0%, #8b5cf6 100%);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(103, 61, 236, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(103, 61, 236, 0.5);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00ff7f 0%, #00cc66 100%);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(0, 255, 127, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 127, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(103, 61, 236, 0.2);
+            color: #fff;
+            border: 2px solid #673dec;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(103, 61, 236, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        /* Hidden File Inputs */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(103, 61, 236, 0.3);
+            border-top: 3px solid #673dec;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .miners-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #673dec 0%, #8b5cf6 100%);
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #00ff7f 0%, #00cc66 100%);
+            color: #000;
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #ff6347 0%, #ff4500 100%);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+
+        .empty-state .material-icons {
+            font-size: 80px;
+            color: #444;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>⛏️ GoMining Miner Dashboard</h1>
+            <p class="subtitle">Complete analysis, ROI tracking & historical price integration</p>
+        </header>
+
+        <!-- Import Section -->
+        <div class="import-section">
+            <h2>
+                <span class="material-icons">upload_file</span>
+                Import CSV Files
+            </h2>
+            <p style="color: #aaa; margin-bottom: 20px;">
+                📥 Upload the 4 CSV files from the export scripts. Historical prices will be loaded automatically from <code>data/</code> folder.
+            </p>
+
+            <div class="file-upload-area">
+                <!-- Current Miners Upload (NEW - FIRST!) -->
+                <div class="file-upload-box" id="currentBox" onclick="document.getElementById('currentFile').click()">
+                    <span class="material-icons">inventory_2</span>
+                    <h3>Current Miners</h3>
+                    <p class="file-status" id="currentStatus">Click to upload</p>
+                    <input type="file" id="currentFile" accept=".csv" class="hidden" onchange="handleFileUpload(event, 'current')">
+                </div>
+
+                <!-- Purchases Upload -->
+                <div class="file-upload-box" id="purchasesBox" onclick="document.getElementById('purchasesFile').click()">
+                    <span class="material-icons">shopping_cart</span>
+                    <h3>Purchases</h3>
+                    <p class="file-status" id="purchasesStatus">Click to upload</p>
+                    <input type="file" id="purchasesFile" accept=".csv" class="hidden" onchange="handleFileUpload(event, 'purchases')">
+                </div>
+
+                <!-- Upgrades Upload -->
+                <div class="file-upload-box" id="upgradesBox" onclick="document.getElementById('upgradesFile').click()">
+                    <span class="material-icons">upgrade</span>
+                    <h3>Upgrades</h3>
+                    <p class="file-status" id="upgradesStatus">Click to upload</p>
+                    <input type="file" id="upgradesFile" accept=".csv" class="hidden" onchange="handleFileUpload(event, 'upgrades')">
+                </div>
+
+                <!-- Sales Upload -->
+                <div class="file-upload-box" id="salesBox" onclick="document.getElementById('salesFile').click()">
+                    <span class="material-icons">sell</span>
+                    <h3>Sales</h3>
+                    <p class="file-status" id="salesStatus">Click to upload</p>
+                    <input type="file" id="salesFile" accept=".csv" class="hidden" onchange="handleFileUpload(event, 'sales')">
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-success" onclick="processData()" id="processBtn" disabled>
+                    <span class="material-icons">analytics</span>
+                    Process & Analyze Data
+                </button>
+                <button class="btn btn-secondary" onclick="resetData()">
+                    <span class="material-icons">refresh</span>
+                    Reset All
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Dashboard (Initially Hidden) -->
+        <div id="statsSection" class="hidden">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="material-icons">inventory</span>
+                    <div class="stat-label">Total Miners</div>
+                    <div class="stat-value" id="statTotalMiners">0</div>
+                </div>
+                <div class="stat-card">
+                    <span class="material-icons">check_circle</span>
+                    <div class="stat-label">Active</div>
+                    <div class="stat-value" id="statActiveMiners">0</div>
+                </div>
+                <div class="stat-card">
+                    <span class="material-icons">monetization_on</span>
+                    <div class="stat-label">Total Invested</div>
+                    <div class="stat-value" id="statTotalInvested">0 GMT</div>
+                </div>
+                <div class="stat-card">
+                    <span class="material-icons">trending_up</span>
+                    <div class="stat-label">Total Hashrate</div>
+                    <div class="stat-value" id="statTotalHashrate">0 TH</div>
+                </div>
+                <div class="stat-card">
+                    <span class="material-icons">shopping_bag</span>
+                    <div class="stat-label">Sales Revenue</div>
+                    <div class="stat-value" id="statSalesRevenue">0 GMT</div>
+                </div>
+                <div class="stat-card">
+                    <span class="material-icons">assessment</span>
+                    <div class="stat-label">Total ROI</div>
+                    <div class="stat-value" id="statTotalROI">0%</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls-bar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Search miners by name or ID..." onkeyup="filterMiners()">
+                </div>
+                <select id="statusFilter" onchange="filterMiners()">
+                    <option value="all">All Miners</option>
+                    <option value="active">Active Only</option>
+                    <option value="sold">Sold Only</option>
+                </select>
+                <select id="sortBy" onchange="filterMiners()">
+                    <option value="date-desc">Newest First</option>
+                    <option value="date-asc">Oldest First</option>
+                    <option value="hashrate-desc">Highest Hashrate</option>
+                    <option value="roi-desc">Best ROI</option>
+                    <option value="roi-asc">Worst ROI</option>
+                </select>
+                <button class="btn btn-primary" onclick="exportDashboard()">
+                    <span class="material-icons">download</span>
+                    Export Dashboard
+                </button>
+            </div>
+
+            <!-- Miners Grid -->
+            <div id="minersGrid" class="miners-grid"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state">
+            <span class="material-icons">cloud_upload</span>
+            <h3>No data loaded yet</h3>
+            <p>Upload your CSV files to start analyzing your miners</p>
+        </div>
+    </div>
+
+    <script>
+        // Global Data Storage
+        let rawData = {
+            current: [],
+            purchases: [],
+            upgrades: [],
+            sales: []
+        };
+
+        let processedData = {
+            miners: {},
+            stats: {}
+        };
+
+        let priceData = {
+            gmt: {},
+            btc: {}
+        };
+
+        // Load price data from CSV files
+        async function loadPriceData() {
+            try {
+                // Load GMT prices
+                const gmtResponse = await fetch('data/gominingtoken_eur.csv');
+                const gmtText = await gmtResponse.text();
+                parsePriceCSV(gmtText, 'gmt');
+
+                // Load BTC prices
+                const btcResponse = await fetch('data/bitcoin_eur.csv');
+                const btcText = await btcResponse.text();
+                parsePriceCSV(btcText, 'btc');
+
+                console.log('✅ Price data loaded:', {
+                    gmtDays: Object.keys(priceData.gmt).length,
+                    btcDays: Object.keys(priceData.btc).length
+                });
+            } catch (error) {
+                console.error('❌ Error loading price data:', error);
+                showToast('Warning: Could not load historical prices', 'error');
+            }
+        }
+
+        // Parse price CSV
+        function parsePriceCSV(csvText, currency) {
+            const lines = csvText.trim().split('\n');
+            // Skip header
+            for (let i = 1; i < lines.length; i++) {
+                const parts = lines[i].split(';');
+                if (parts.length >= 4) {
+                    const date = parts[0]; // date_iso (YYYY-MM-DD)
+                    const priceEur = parseFloat(parts[3].replace(',', '.')); // price_eur
+                    const priceUsd = parseFloat(parts[4].replace(',', '.')); // price_usd
+                    
+                    priceData[currency][date] = {
+                        eur: priceEur,
+                        usd: priceUsd
+                    };
+                }
+            }
+        }
+
+        // Get historical price for a date
+        function getHistoricalPrice(date, currency = 'gmt') {
+            const prices = priceData[currency.toLowerCase()];
+            if (!prices) return null;
+            
+            // Try exact match
+            if (prices[date]) {
+                return prices[date];
+            }
+            
+            // Try to find closest date
+            const dates = Object.keys(prices).sort();
+            const targetDate = new Date(date);
+            
+            for (const d of dates) {
+                if (new Date(d) >= targetDate) {
+                    return prices[d];
+                }
+            }
+            
+            return prices[dates[dates.length - 1]]; // Return latest if date is in future
+        }
+
+        // Handle file upload
+        function handleFileUpload(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csvText = e.target.result;
+                parseCSV(csvText, type);
+                
+                // Update UI
+                document.getElementById(`${type}Box`).classList.add('loaded');
+                document.getElementById(`${type}Status`).textContent = `✅ ${file.name}`;
+                document.getElementById(`${type}Status`).classList.add('loaded');
+                
+                // Enable process button if all files loaded
+                checkAllFilesLoaded();
+                
+                showToast(`${type} data loaded successfully`, 'success');
+            };
+            reader.readAsText(file);
+        }
+
+        // Parse CSV
+        function parseCSV(csvText, type) {
+            const lines = csvText.trim().split('\n');
+            const headers = lines[0].split(';');
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(';');
+                const row = {};
+                
+                headers.forEach((header, index) => {
+                    let value = values[index] || '';
+                    // Remove quotes
+                    value = value.replace(/^"(.*)"$/, '$1');
+                    // Convert comma to dot for numbers
+                    if (value.match(/^-?\d+,\d+$/)) {
+                        value = parseFloat(value.replace(',', '.'));
+                    }
+                    row[header.trim()] = value;
+                });
+                
+                data.push(row);
+            }
+
+            rawData[type] = data;
+            console.log(`✅ Parsed ${type}:`, data.length, 'rows');
+        }
+
+        // Check if all files are loaded
+        function checkAllFilesLoaded()current.length > 0 &&
+                            rawData. {
+            const allLoaded = rawData.purchases.length > 0 && 
+                            rawData.upgrades.length > 0 && 
+                            rawData.sales.length > 0;
+            
+            document.getElementById('processBtn').disabled = !allLoaded;
+        }
+
+        // Process and analyze data
+        async function processData() {
+            showToast('Processing data...', 'success');
+            
+            // Reset miners object
+            processedData.miners = {};
+            Step 1: Process current miners (creates base entries with REAL current data)
+            const currentMinerIds = new Set();
+            rawData.current.forEach(current => {
+                const minerId = current['Miner ID'];
+                currentMinerIds.add(minerId);
+                
+                processedData.miners[minerId] = {
+                    id: minerId,
+                    name: current['Miner Name'],
+                    collection: current['Collection'],
+                    currentHashrate: parseFloat(current['Hashrate']) || 0,
+                    currentEfficiency: parseFloat(current['Energy Efficiency']) || 0,
+                    status: 'active', // Currently in farm
+                    ownerSince: current['Owner Since'],
+                    purchases: [],
+                    upgrades: [],
+                    sales: [],
+                    totalInvested: 0,
+                    totalUpgradeCost: 0,
+                    salesRevenue: 0
+                };
+            });
+            
+            // Step 2: Process purchases (add financial data)
+            rawData.purchases.forEach(purchase => {
+                const minerId = purchase['Miner ID'];
+                
+                // If miner not in current list, create entry marked as sold/historical
+                if (!processedData.miners[minerId]) {
+                    processedData.miners[minerId] = {
+                        id: minerId,
+                        name: purchase['Miner Name'],
+                        collection: purchase['Collection'],
+                        currentHashrate: parseFloat(purchase['Hashrate']) || 0,
+                        currentEfficiency: 0,
+                        status: 'sold', // Not in current farmparseFloat(purchase['Hashrate']) || 0,
+                        status: 'active',
+                        purchases: [],
+                        upgrades: [],
+                        sales: [],
+                        totalInvested: 0,
+                        totalUpgradeCost: 0,
+                        salesRevenue: 0
+                    };
+                }
+                
+                const miner = processedData.miners[minerId];
+                miner.purchases.push({
+                    date: purchase['Date'],
+                    time: purchase['Time'],
+                    hashrate: parseFloat(purchase['Hashrate']) || 0,
+                    price: parseFloat(purchase['Price']) || 0,
+                    currency: purchase['Currency'],
+                    status: purchase['Status']
+                });
+                
+                miner.totalInvested += parseFloat(purchase['Price']) || 0;
+                miner.purchaseDate = purchase['Date'];
+            });
+
+            // Process upgrades
+            rawData.upgrades.forEach(upgrade => {
+                const minerId = upgrade['Miner ID'];
+                if (processedData.miners[minerId]) {
+                    const miner = processedData.miners[minerId];
+                    miner.upgrades.push({
+                        date: upgrade['Date'],
+                        time: upgrade['Time'],
+                        type: upgrade['Upgrade Type'],
+                        fromValue: parseFloat(upgrade['From Value']) || 0,
+                        toValue: parseFloat(upgrade['To Value']) || 0,
+                        cost: parseFloat(upgrade['Cost (GMT)']) || 0,
+                        costUSDT: parseFloat(upgrade['Cost (USDT)']) || 0,
+                        status: upgrade['Status']
+                    });
+                    
+                    miner.totalUpgradeCost += parseFloat(upgrade['Cost (GMT)']) || 0;
+                    
+                    // Update current hashrate if it's a power upgrade
+                    if (upgrade['Upgrade Type'].includes('Power')) {
+                        miner.currentHashrate = parseFloat(upgrade['To Value']) || miner.currentHashrate;
+                    }
+                }
+            });
+
+            // Process sales
+            rawData.sales.forEach(sale => {
+                const minerId = sale['Miner ID'];
+                if (processedData.miners[minerId]) {
+                    const miner = processedData.miners[minerId];
+                    
+                    // Only count successful sales
+                    if (sale['Status'].toLowerCase() === 'success') {
+                        miner.status = 'sold';
+                        miner.salesRevenue = parseFloat(sale['You Get']) || 0;
+                        miner.saleDate = sale['Date'];
+                    }
+                    
+                    miner.sales.push({
+                        date: sale['Date'],
+                        time: sale['Time'],
+                        hashrate: parseFloat(sale['Hashrate']) || 0,
+                        priceForBuyer: parseFloat(sale['Price For Buyer']) || 0,
+                        youGet: parseFloat(sale['You Get']) || 0,
+                        fee: parseFloat(sale['Fee Amount']) || 0,
+                        status: sale['Status']
+                    });
+                }
+            });
+
+            // Calculate ROI for each miner
+            Object.values(processedData.miners).forEach(miner => {
+                const totalCost = miner.totalInvested + miner.totalUpgradeCost;
+                if (miner.status === 'sold') {
+                    miner.roi = ((miner.salesRevenue - totalCost) / totalCost) * 100;
+                    miner.profit = miner.salesRevenue - totalCost;
+                } else {
+                    // For active miners, we could calculate based on current market value
+                    // For now, just show cost
+                    miner.roi = 0;
+                    miner.profit = -totalCost;
+                }
+            });
+
+            // Calculate overall stats
+            calculateStats();
+
+            // Show dashboard
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('statsSection').classList.remove('hidden');
+
+            // Render miners
+            renderMiners();
+
+            showToast('Data processed successfully!', 'success');
+        }
+
+        // Calculate overall statistics
+        function calculateStats() {
+            const miners = Object.values(processedData.miners);
+            
+            processedData.stats = {
+                totalMiners: miners.length,
+                activeMiners: miners.filter(m => m.status === 'active').length,
+                soldMiners: miners.filter(m => m.status === 'sold').length,
+                totalInvested: miners.reduce((sum, m) => sum + m.totalInvested + m.totalUpgradeCost, 0),
+                totalHashrate: miners.filter(m => m.status === 'active').reduce((sum, m) => sum + m.currentHashrate, 0),
+                salesRevenue: miners.reduce((sum, m) => sum + m.salesRevenue, 0),
+                totalProfit: miners.reduce((sum, m) => sum + (m.profit || 0), 0)
+            };
+
+            // Calculate overall ROI
+            if (processedData.stats.totalInvested > 0) {
+                processedData.stats.totalROI = (processedData.stats.totalProfit / processedData.stats.totalInvested) * 100;
+            } else {
+                processedData.stats.totalROI = 0;
+            }
+
+            // Update stats display
+            document.getElementById('statTotalMiners').textContent = processedData.stats.totalMiners;
+            document.getElementById('statActiveMiners').textContent = processedData.stats.activeMiners;
+            document.getElementById('statTotalInvested').textContent = processedData.stats.totalInvested.toFixed(2) + ' GMT';
+            document.getElementById('statTotalHashrate').textContent = processedData.stats.totalHashrate.toFixed(2) + ' TH';
+            document.getElementById('statSalesRevenue').textContent = processedData.stats.salesRevenue.toFixed(2) + ' GMT';
+            
+            const roiElement = document.getElementById('statTotalROI');
+            roiElement.textContent = processedData.stats.totalROI.toFixed(2) + '%';
+            roiElement.style.color = processedData.stats.totalROI >= 0 ? '#00ff7f' : '#ff6347';
+        }
+
+        // Render miners
+        function renderMiners() {
+            const container = document.getElementById('minersGrid');
+            container.innerHTML = '';
+
+            let miners = Object.values(processedData.miners);
+
+            // Apply filters
+            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+            const sortBy = document.getElementById('sortBy')?.value || 'date-desc';
+
+            // Filter
+            miners = miners.filter(miner => {
+                const matchesSearch = miner.name.toLowerCase().includes(searchTerm) || 
+                                    miner.id.toString().includes(searchTerm);
+                const matchesStatus = statusFilter === 'all' || miner.status === statusFilter;
+                return matchesSearch && matchesStatus;
+            });
+
+            // Sort
+            miners.sort((a, b) => {
+                switch (sortBy) {
+                    case 'date-desc':
+                        return new Date(b.purchaseDate) - new Date(a.purchaseDate);
+                    case 'date-asc':
+                        return new Date(a.purchaseDate) - new Date(b.purchaseDate);
+                    case 'hashrate-desc':
+                        return b.currentHashrate - a.currentHashrate;
+                    case 'roi-desc':
+                        return (b.roi || 0) - (a.roi || 0);
+                    case 'roi-asc':
+                        return (a.roi || 0) - (b.roi || 0);
+                    default:
+                        return 0;
+                }
+            });
+
+            // Render each miner
+            miners.forEach(miner => {
+                container.appendChild(createMinerCard(miner));
+            });
+
+            if (miners.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No miners match your filters</h3></div>';
+            }
+        }
+
+        // Create miner card
+        function createMinerCard(miner) {
+            const card = document.createElement('div');
+            card.className = `miner-card ${miner.status}`;
+
+            const totalCost = miner.totalInvested + miner.totalUpgradeCost;
+            const roiClass = (miner.roi || 0) >= 0 ? 'roi-positive' : 'roi-negative';
+
+            card.innerHTML = `
+                <div class="miner-header">
+                    <div>
+                        <div class="miner-title">${miner.name}</div>
+                        <div class="miner-id">ID: ${miner.id}</div>
+                    </div>
+                    <div class="miner-status status-${miner.status}">
+                        ${miner.status === 'active' ? '✓ Active' : '✗ Sold'}
+                    </div>
+                </div>
+
+                <div class="miner-specs">
+                    <div class="spec-item">
+                        <div class="spec-label">Collection</div>
+                        <div class="spec-value">${miner.collection}</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Hashrate</div>
+                        <div class="spec-value">${miner.currentHashrate.toFixed(4)} TH</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Purchase Date</div>
+                        <div class="spec-value">${miner.purchaseDate}</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Upgrades</div>
+                        <div class="spec-value">${miner.upgrades.length}</div>
+                    </div>
+                </div>
+
+                <div class="roi-section">
+                    <div class="roi-title">
+                        <span class="material-icons">trending_up</span>
+                        Financial Overview
+                    </div>
+                    <div class="roi-grid">
+                        <div class="roi-item">
+                            <span class="roi-label">Initial Cost:</span>
+                            <span class="roi-value">${miner.totalInvested.toFixed(2)} GMT</span>
+                        </div>
+                        <div class="roi-item">
+                            <span class="roi-label">Upgrades:</span>
+                            <span class="roi-value">${miner.totalUpgradeCost.toFixed(2)} GMT</span>
+                        </div>
+                        <div class="roi-item">
+                            <span class="roi-label">Total Cost:</span>
+                            <span class="roi-value">${totalCost.toFixed(2)} GMT</span>
+                        </div>
+                        <div class="roi-item">
+                            <span class="roi-label">Revenue:</span>
+                            <span class="roi-value">${miner.salesRevenue.toFixed(2)} GMT</span>
+                        </div>
+                        <div class="roi-item">
+                            <span class="roi-label">Profit/Loss:</span>
+                            <span class="roi-value ${roiClass}">${(miner.profit || 0).toFixed(2)} GMT</span>
+                        </div>
+                        <div class="roi-item">
+                            <span class="roi-label">ROI:</span>
+                            <span class="roi-value ${roiClass}">${(miner.roi || 0).toFixed(2)}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="miner-timeline">
+                    <div class="timeline-title">
+                        <span class="material-icons">history</span>
+                        Timeline
+                    </div>
+                    ${renderTimeline(miner)}
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Render timeline events
+        function renderTimeline(miner) {
+            let html = '';
+
+            // Purchase
+            miner.purchases.forEach(p => {
+                html += `
+                    <div class="timeline-event purchase">
+                        <div class="event-date">${p.date} ${p.time}</div>
+                        <div class="event-description">
+                            📥 Purchased: <span class="event-value">${p.hashrate.toFixed(4)} TH</span> for 
+                            <span class="event-value">${p.price.toFixed(2)} ${p.currency}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Upgrades
+            miner.upgrades.forEach(u => {
+                const icon = u.type.includes('Power') ? '⚡' : '🔋';
+                html += `
+                    <div class="timeline-event upgrade">
+                        <div class="event-date">${u.date} ${u.time}</div>
+                        <div class="event-description">
+                            ${icon} ${u.type}: <span class="event-value">${u.fromValue} → ${u.toValue}</span> for 
+                            <span class="event-value">${u.cost.toFixed(2)} GMT</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Sales
+            miner.sales.forEach(s => {
+                const icon = s.status.toLowerCase() === 'success' ? '✅' : '📋';
+                html += `
+                    <div class="timeline-event sale">
+                        <div class="event-date">${s.date} ${s.time}</div>
+                        <div class="event-description">
+                            ${icon} ${s.status}: Sold for 
+                            <span class="event-value">${s.youGet.toFixed(2)} GMT</span>
+                            (Buyer paid: ${s.priceForBuyer.toFixed(2)} GMT, Fee: ${s.fee.toFixed(2)} GMT)
+                        </div>
+                    </div>
+                `;
+            });
+
+            return html || '<div style="color: #888; font-size: 0.9em;">No events</div>';
+        }
+
+        // Filter miners
+        function filterMiners() {
+            renderMiners();
+        }
+
+        // Reset all data
+        function resetData() {
+            if (!confirm('Reset all data? This cannot be undone.')) return;
+
+            rawData = { purchases: [], upgrades: [], sales: [] };
+            processedData = { miners: {}, stats: {} };
+
+            document.querySelectorAll('.file-upload-box').forEach(box => {
+                box.classList.remove('loaded');
+            });
+            document.querySelectorAll('.file-status').forEach(status => {
+                status.textContent = 'Click to upload';
+                status.classList.remove('loaded');
+            });
+
+            document.getElementById('processBtn').disabled = true;
+            document.getElementById('statsSection').classList.add('hidden');
+            document.getElementById('emptyState').classList.remove('hidden');
+
+            showToast('Data reset', 'success');
+        }
+
+        // Export dashboard to CSV
+        function exportDashboard() {
+            const miners = Object.values(processedData.miners);
+            if (miners.length === 0) {
+                showToast('No data to export', 'error');
+                return;
+            }
+
+            // Create comprehensive CSV
+            let csv = 'Miner ID;Miner Name;Collection;Status;Purchase Date;Current Hashrate;Initial Cost;Total Upgrades;Upgrade Cost;Total Cost;Sales Revenue;Profit/Loss;ROI (%);Purchase Count;Upgrade Count;Sale Count\n';
+
+            miners.forEach(miner => {
+                const totalCost = miner.totalInvested + miner.totalUpgradeCost;
+                csv += [
+                    miner.id,
+                    `"${miner.name}"`,
+                    miner.collection,
+                    miner.status,
+                    miner.purchaseDate,
+                    miner.currentHashrate.toFixed(4).replace('.', ','),
+                    miner.totalInvested.toFixed(2).replace('.', ','),
+                    miner.upgrades.length,
+                    miner.totalUpgradeCost.toFixed(2).replace('.', ','),
+                    totalCost.toFixed(2).replace('.', ','),
+                    miner.salesRevenue.toFixed(2).replace('.', ','),
+                    (miner.profit || 0).toFixed(2).replace('.', ','),
+                    (miner.roi || 0).toFixed(2).replace('.', ','),
+                    miner.purchases.length,
+                    miner.upgrades.length,
+                    miner.sales.length
+                ].join(';') + '\n';
+            });
+
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `miner-dashboard-${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+
+            showToast('Dashboard exported!', 'success');
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span class="material-icons">${type === 'success' ? 'check_circle' : 'error'}</span>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPriceData();
+        });
+    </script>
+</body>
+</html>
