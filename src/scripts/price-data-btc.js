@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-04-09T02:58:11.425Z
+// Auto-generiert am 2026-04-09T17:01:55.068Z
 const btcPriceData = {
   "2024-01-01": {
     "date_iso": "2024-01-01",
