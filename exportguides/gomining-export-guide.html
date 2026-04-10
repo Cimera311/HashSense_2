@@ -154,17 +154,17 @@
                             <span class="material-icons text-sm">content_copy</span>
                             <span data-i18n="step3.button.copy">Kopieren</span>
                         </button>
-                        <a href="src/scripts/console scripts/gomining-export-final.js" target="_blank" 
+                        <a href="../src/scripts/console_scripts/gomining-export-final.js" target="_blank" 
                            class="absolute top-0.5rem left-0.5rem bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors text-sm">
                             <span class="material-icons text-sm">code</span>
                             <span data-i18n="step3.button.open">Skript öffnen</span>
                         </a>
                         <div class="bg-gray-900 rounded-lg overflow-hidden border border-gray-700 mt-2">
                             <pre class="language-javascript p-4 text-sm overflow-x-auto"><code>// Das komplette Skript findest du hier:
-// src/scripts/console scripts/gomining-export-final.js
+// src/scripts/console_scripts/gomining-export-final.js
 
 // Oder direkt laden:
-fetch('src/scripts/console scripts/gomining-export-final.js')
+fetch('../src/scripts/console_scripts/gomining-export-final.js')
   .then(r => r.text())
   .then(code => eval(code));</code></pre>
                         </div>
@@ -600,13 +600,23 @@ exportTransactions()</code></pre>
         }
 
         function copySkript() {
-            fetch('src/scripts/console scripts/gomining-export-final.js')
-                .then(r => r.text())
+            fetch('../src/scripts/console_scripts/gomining-export-final.js')
+                .then(r => {
+                    if (!r.ok) throw new Error('HTTP error! status: ' + r.status);
+                    return r.text();
+                })
                 .then(code => {
                     navigator.clipboard.writeText(code).then(() => {
                         const msg = translations[currentLang]['notify.script'];
                         showNotification(msg);
                     });
+                })
+                .catch(err => {
+                    console.error('Fetch error:', err);
+                    const errorMsg = currentLang === 'de' 
+                        ? '❌ Fehler beim Laden! Öffne die Seite über einen Webserver (z.B. http://localhost:8000) statt file://' 
+                        : '❌ Loading error! Open the page via webserver (e.g. http://localhost:8000) instead of file://';
+                    showNotification(errorMsg);
                 });
         }
 

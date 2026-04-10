@@ -1,100 +1,100 @@
 // ═══════════════════════════════════════════════════════
-// 🚀 GOMINING TRANSACTION EXPORT - FINALE VERSION
-// Komplett-Lösung mit Datumsauswahl und Fortschrittsanzeige
+// 🚀 GOMINING TRANSACTION EXPORT - FINAL VERSION
+// Complete solution with date selection and progress display
 // ═══════════════════════════════════════════════════════
 
-// 🔐 TOKEN SETZEN (wird beim Laden versucht automatisch zu finden)
+// 🔐 SET TOKEN (automatically searched on load)
 globalThis.goMiningToken = null;
 
-// ⚙️ EXPORT-KONFIGURATION
+// ⚙️ EXPORT CONFIGURATION
 globalThis.exportConfig = {
-  fromDate: null,        // Format: "2026-01-01" oder null für alle
-  toDate: null,          // Format: "2026-12-31" oder null für alle
-  testMode: false,       // true = nur 100 Transaktionen
-  batchSize: 100,        // Transaktionen pro Request
-  delayMs: 50            // Pause zwischen Requests (ms)
+  fromDate: null,        // Format: "2026-01-01" or null for all
+  toDate: null,          // Format: "2026-12-31" or null for all
+  testMode: false,       // true = only 100 transactions
+  batchSize: 100,        // Transactions per request
+  delayMs: 50            // Delay between requests (ms)
 };
 
-// 📅 HILFSFUNKTION: Datumsbereich setzen
+// 📅 HELPER FUNCTION: Set date range
 window.setDateRange = function(from, to = null) {
   if (from === 'heute' || from === 'today') {
     const today = new Date().toISOString().split('T')[0];
     exportConfig.fromDate = today;
     exportConfig.toDate = today;
-    console.log(`📅 Datumsfilter: Heute (${today})`);
+    console.log(`📅 Date filter: Today (${today})`);
   } else if (from === 'monat' || from === 'month') {
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     exportConfig.fromDate = firstDay.toISOString().split('T')[0];
     exportConfig.toDate = lastDay.toISOString().split('T')[0];
-    console.log(`📅 Datumsfilter: Dieser Monat (${exportConfig.fromDate} - ${exportConfig.toDate})`);
+    console.log(`📅 Date filter: This month (${exportConfig.fromDate} - ${exportConfig.toDate})`);
   } else if (from === 'jahr' || from === 'year') {
     const year = new Date().getFullYear();
     exportConfig.fromDate = `${year}-01-01`;
     exportConfig.toDate = `${year}-12-31`;
-    console.log(`📅 Datumsfilter: Dieses Jahr (${exportConfig.fromDate} - ${exportConfig.toDate})`);
+    console.log(`📅 Date filter: This year (${exportConfig.fromDate} - ${exportConfig.toDate})`);
   } else if (typeof from === 'number') {
-    // Jahr als Zahl
+    // Year as number
     exportConfig.fromDate = `${from}-01-01`;
     exportConfig.toDate = `${from}-12-31`;
-    console.log(`📅 Datumsfilter: Jahr ${from}`);
+    console.log(`📅 Date filter: Year ${from}`);
   } else {
     exportConfig.fromDate = from;
     exportConfig.toDate = to || new Date().toISOString().split('T')[0];
-    console.log(`📅 Datumsfilter: ${exportConfig.fromDate} bis ${exportConfig.toDate}`);
+    console.log(`📅 Date filter: ${exportConfig.fromDate} to ${exportConfig.toDate}`);
   }
   return exportConfig;
 };
 
-// 🔑 Token automatisch finden
+// 🔑 Find token automatically
 function findToken() {
-  // Versuche aus Cookies
+  // Try from cookies
   const cookies = document.cookie.split(';');
   for (const cookie of cookies) {
     const [name, value] = cookie.trim().split('=');
     if (name === 'access_token') {
-      console.log('🔑 Token aus Cookie gefunden!');
+      console.log('🔑 Token found in cookies!');
       return decodeURIComponent(value);
     }
   }
   
-  // Versuche aus localStorage
+  // Try from localStorage
   const token = localStorage.getItem('access_token');
   if (token) {
-    console.log('🔑 Token aus localStorage gefunden!');
+    console.log('🔑 Token found in localStorage!');
     return token;
   }
   
   return null;
 }
 
-// 📊 HAUPT-EXPORT-FUNKTION
+// 📊 MAIN EXPORT FUNCTION
 async function exportTransactions() {
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log('🚀 GOMINING TRANSACTION EXPORT');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
   
-  // Token holen
+  // Get token
   const token = (globalThis.goMiningToken || findToken() || '').replace('Bearer ', '').trim();
   if (!token) {
-    console.error('❌ Kein Token gefunden!');
-    console.log('\n💡 Token manuell setzen:');
-    console.log('   globalThis.goMiningToken = "DEIN_TOKEN"');
+    console.error('❌ No token found!');
+    console.log('\n💡 Set token manually:');
+    console.log('   globalThis.goMiningToken = "YOUR_TOKEN"');
     console.log('   exportTransactions()');
     return;
   }
   console.log(`🔑 Token: ${token.substring(0, 20)}...`);
   
-  // Konfiguration anzeigen
+  // Show configuration
   if (exportConfig.fromDate || exportConfig.toDate) {
-    console.log(`📅 Zeitraum: ${exportConfig.fromDate || 'Beginn'} bis ${exportConfig.toDate || 'Heute'}`);
+    console.log(`📅 Period: ${exportConfig.fromDate || 'Start'} to ${exportConfig.toDate || 'Today'}`);
   } else {
-    console.log('📅 Zeitraum: Alle Transaktionen');
+    console.log('📅 Period: All transactions');
   }
   
   if (exportConfig.testMode) {
-    console.log('🧪 TEST-MODUS: Nur erste 100 Transaktionen\n');
+    console.log('🧪 TEST MODE: Only first 100 transactions\n');
   } else {
     console.log('');
   }
@@ -102,26 +102,28 @@ async function exportTransactions() {
   const apiUrl = 'https://api.gomining.com/api/wallet/transaction-history';
   let allTransactions = [];
   let cursor = Date.now();
-  let pageNum = 0;
+  let batchNum = 0;
   let totalCount = 0;
   const startTime = Date.now();
   
   while (true) {
-    pageNum++;
+    batchNum++;
     
-    if (exportConfig.testMode && pageNum > 1) {
-      console.log('🛑 Test-Modus: Stoppe nach 1 Request');
+    if (exportConfig.testMode && batchNum > 1) {
+      console.log('🛑 Test mode: Stopping after 1 request');
       break;
     }
     
-    process.stdout?.write?.(`\r📄 Lade Batch ${pageNum}...`) || console.log(`📄 Lade Batch ${pageNum}...`);
+    process.stdout?.write?.(`\r📄 Loading batch ${batchNum}...`) || console.log(`📄 Loading batch ${batchNum}...`);
     
     try {
+      // Korrektes API-Format (cursor-basierte Pagination)
       const requestBody = {
         filter: {
           fromType: null,
           walletType: ["VIRTUAL_BNB", "VIRTUAL_BTC", "VIRTUAL_ETH", "VIRTUAL_GMT", 
-                       "VIRTUAL_SOL", "VIRTUAL_TON", "VIRTUAL_USDC", "VIRTUAL_USDT"]
+                       "VIRTUAL_SOL", "VIRTUAL_TON", "VIRTUAL_USDC", "VIRTUAL_USDT"],
+          range: null
         },
         pagination: {
           cursor: cursor,
@@ -129,7 +131,7 @@ async function exportTransactions() {
         }
       };
       
-      // Datumsfilter hinzufügen
+      // Add date filter
       if (exportConfig.fromDate || exportConfig.toDate) {
         const from = exportConfig.fromDate ? new Date(exportConfig.fromDate + 'T00:00:00Z') : new Date('2000-01-01');
         const to = exportConfig.toDate ? new Date(exportConfig.toDate + 'T23:59:59Z') : new Date();
@@ -156,9 +158,9 @@ async function exportTransactions() {
       if (!response.ok) {
         console.error(`\n❌ API Error: ${response.status}`);
         if (response.status === 401) {
-          console.error('🔒 Token ungültig oder abgelaufen!');
-          console.log('💡 Neuen Token aus DevTools kopieren und setzen:');
-          console.log('   globalThis.goMiningToken = "NEUER_TOKEN"');
+          console.error('🔒 Token invalid or expired!');
+          console.log('💡 Copy new token from DevTools and set:');
+          console.log('   globalThis.goMiningToken = "NEW_TOKEN"');
         }
         break;
       }
@@ -168,7 +170,7 @@ async function exportTransactions() {
       totalCount = result.data?.count || 0;
       
       if (!transactions.length) {
-        console.log('\n✅ Alle Daten geladen!');
+        console.log('\n✅ All data loaded!');
         break;
       }
       
@@ -176,16 +178,17 @@ async function exportTransactions() {
       
       const progress = totalCount > 0 ? ((allTransactions.length / totalCount) * 100).toFixed(1) : '?';
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-      console.log(`\r✓ ${allTransactions.length}/${totalCount} Transaktionen (${progress}%) | ${elapsed}s`);
+      console.log(`\r✓ ${allTransactions.length}/${totalCount} Transactions (${progress}%) | ${elapsed}s`);
       
-      // Prüfe ob wir weitermachen sollen
+      // Check if we should continue
       if (exportConfig.testMode) break;
       
+      // Next cursor = timestamp of last transaction
       const lastTx = transactions[transactions.length - 1];
       const nextCursor = new Date(lastTx.createdAt).getTime();
       
       if (nextCursor === cursor || allTransactions.length >= totalCount) {
-        console.log('✅ Alle Daten geladen!');
+        console.log('✅ All data loaded!');
         break;
       }
       
@@ -193,19 +196,19 @@ async function exportTransactions() {
       await new Promise(r => setTimeout(r, exportConfig.delayMs));
       
     } catch (error) {
-      console.error('\n❌ Fehler:', error.message);
+      console.error('\n❌ Error:', error.message);
       break;
     }
   }
   
   if (!allTransactions.length) {
-    console.log('\n⚠️ Keine Transaktionen gefunden!');
+    console.log('\n⚠️ No transactions found!');
     return;
   }
   
-  console.log(`\n📊 Erstelle CSV mit ${allTransactions.length} Transaktionen...`);
+  console.log(`\n📊 Creating CSV with ${allTransactions.length} transactions...`);
   
-  // CSV Export mit korrekten Dezimalstellen
+  // CSV Export (cursor-based API)
   let csv = "Date;Time;Type;FromType;Amount;Currency;Status;ID;WalletType\n";
   
   allTransactions.forEach(tx => {
@@ -220,27 +223,32 @@ async function exportTransactions() {
     const id = tx.id || '';
     const walletType = tx.walletType || '';
     
-    // Korrekte Umrechnung basierend auf Währung
+    // Convert value (API returns RAW values in Wei - for ALL currencies incl. BTC!)
     let amount = '0';
     try {
-      const numValue = parseFloat(valueNumeric);
-      if (currency === 'BTC') {
-        amount = (numValue / 1e8).toFixed(8); // Satoshi zu BTC
-      } else if (currency === 'USDT' || currency === 'USDC') {
-        amount = (numValue / 1e18).toFixed(6); // Wei zu USDT/USDC
-      } else {
-        amount = (numValue / 1e18).toFixed(8); // Wei zu Token
+      const rawValue = parseFloat(valueNumeric) || 0;
+      
+      // All currencies: Wei → Token (1 Token = 10^18 Wei)
+      amount = (rawValue / 1e18).toFixed(18);
+      
+      // Remove trailing zeros
+      amount = parseFloat(amount).toString();
+      
+      // ➕/➖ Sign: withdraw = minus, deposit = plus
+      if (type === 'withdraw') {
+        amount = '-' + amount;
       }
+      
+      // Dot to comma (German format)
+      amount = amount.replace('.', ',');
     } catch (e) {
       amount = '0';
     }
     
-    amount = amount.replace('.', ','); // Deutsch: Komma als Dezimaltrennzeichen
-    
     csv += `"${date}";"${time}";"${type}";"${fromType}";"${amount}";"${currency}";"${status}";"${id}";"${walletType}"\n`;
   });
   
-  // Dateiname generieren
+  // Generate filename
   let filename = 'gomining_export';
   if (exportConfig.fromDate && exportConfig.toDate) {
     filename += `_${exportConfig.fromDate}_to_${exportConfig.toDate}`;
@@ -266,20 +274,20 @@ async function exportTransactions() {
   const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
   
   console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('✅ EXPORT ABGESCHLOSSEN!');
+  console.log('✅ EXPORT COMPLETED!');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log(`📁 Datei: ${filename}`);
-  console.log(`📊 Transaktionen: ${allTransactions.length}`);
-  console.log(`⏱️ Dauer: ${totalTime}s`);
-  console.log(`📈 Geschwindigkeit: ${(allTransactions.length / totalTime).toFixed(1)} tx/s\n`);
+  console.log(`📁 File: ${filename}`);
+  console.log(`📊 Transactions: ${allTransactions.length}`);
+  console.log(`⏱️ Duration: ${totalTime}s`);
+  console.log(`📈 Speed: ${(allTransactions.length / totalTime).toFixed(1)} tx/s\n`);
 }
 
-// 🎯 QUICK-START FUNKTIONEN
+// 🎯 QUICK-START FUNCTIONS
 window.exportAll = function() {
   exportConfig.fromDate = null;
   exportConfig.toDate = null;
   exportConfig.testMode = false;
-  console.log('📊 Exportiere ALLE Transaktionen...');
+  console.log('📊 Exporting ALL transactions...');
   exportTransactions();
 };
 
@@ -311,46 +319,46 @@ window.exportFromTo = function(dateFrom, dateTo) {
 
 window.testExport = function() {
   exportConfig.testMode = true;
-  console.log('🧪 Test-Export (100 Transaktionen)...');
+  console.log('🧪 Test export (100 transactions)...');
   exportTransactions();
 };
 
-// 📖 HILFE ANZEIGEN
+// 📖 SHOW HELP
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-console.log('🚀 GOMINING TRANSACTION EXPORT - GELADEN');
+console.log('🚀 GOMINING TRANSACTION EXPORT - LOADED');
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
-console.log('📖 SCHNELLSTART:\n');
-console.log('  testExport()                    → Test (100 Transaktionen)');
-console.log('  exportYear(2026)                → Alle Transaktionen 2026');
+console.log('📖 QUICK START:\n');
+console.log('  testExport()                    → Test (100 transactions)');
+console.log('  exportYear(2026)                → All transactions 2026');
 console.log('  exportMonth(2026, 4)            → April 2026');
-console.log('  exportFromTo("2026-01-01", "2026-04-02") → Von-Bis Zeitraum');
-console.log('  exportCustom("2026-01-01", "2026-04-02") → Benutzerdef. Zeitraum');
-console.log('  exportAll()                     → ALLE Transaktionen\n');
+console.log('  exportFromTo("2026-01-01", "2026-04-02") → From-To period');
+console.log('  exportCustom("2026-01-01", "2026-04-02") → Custom period');
+console.log('  exportAll()                     → ALL transactions\n');
 
-console.log('⚙️ ERWEITERT:\n');
-console.log('  setDateRange("2026-01-01", "2026-12-31")  → Filter setzen');
-console.log('  setDateRange(2026)              → Shortcut für Jahr');
-console.log('  setDateRange("jahr")            → Shortcut für dieses Jahr');
-console.log('  setDateRange("monat")           → Shortcut für diesen Monat');
-console.log('  exportTransactions()            → Mit aktuellen Einstellungen\n');
+console.log('⚙️ ADVANCED:\n');
+console.log('  setDateRange("2026-01-01", "2026-12-31")  → Set filter');
+console.log('  setDateRange(2026)              → Shortcut for year');
+console.log('  setDateRange("jahr")            → Shortcut for this year');
+console.log('  setDateRange("monat")           → Shortcut for this month');
+console.log('  exportTransactions()            → With current settings\n');
 
-console.log('🔧 KONFIGURATION:\n');
-console.log('  exportConfig.testMode = true    → Test-Modus ein/aus');
-console.log('  exportConfig.batchSize = 200    → Mehr pro Request');
-console.log('  exportConfig.delayMs = 100      → Längere Pausen\n');
+console.log('🔧 CONFIGURATION:\n');
+console.log('  exportConfig.testMode = true    → Test mode on/off');
+console.log('  exportConfig.batchSize = 200    → More per request');
+console.log('  exportConfig.delayMs = 100      → Longer pauses\n');
 
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
-// Token automatisch versuchen zu finden
+// Token automatically versuchen zu finden
 const autoToken = findToken();
 if (autoToken) {
   globalThis.goMiningToken = autoToken;
-  console.log('✅ Token automatisch gefunden und gesetzt!\n');
-  console.log('🎯 READY! Führe jetzt einen Export aus, z.B.:');
-  console.log('   testExport()        ← Empfohlen zum Testen!\n');
+  console.log('✅ Token automatically found and set!\n');
+  console.log('🎯 READY! Now run an export, e.g.:');
+  console.log('   testExport()        ← Recommended for testing!\n');
 } else {
-  console.log('⚠️ Token nicht automatisch gefunden.');
-  console.log('💡 Manuell setzen:');
-  console.log('   globalThis.goMiningToken = "DEIN_TOKEN"\n');
+  console.log('⚠️ Token not found automatically.');
+  console.log('💡 Set manually:');
+  console.log('   globalThis.goMiningToken = "YOUR_TOKEN"\n');
 }
