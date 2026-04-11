@@ -16,9 +16,7 @@
 
 // Configuration
 globalThis.currentMinersConfig = {
-    endpoint: 'https://api.gomining.com/api/nft/my-miners',
-    batchSize: 100, // Fetch all at once
-    delayMs: 100,
+    endpoint: 'https://api.gomining.com/api/nft/get-my',
     testMode: false
 };
 
@@ -106,23 +104,14 @@ async function fetchCurrentMiners() {
     console.log('\n📥 Fetching current miners from farm...\n');
     
     try {
-        // API Request - my-miners endpoint
+        // API Request - get-my endpoint
         const response = await fetch(config.endpoint, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                pagination: {
-                    skip: 0,
-                    limit: config.batchSize
-                },
-                filters: {},
-                sort: {
-                    id: "ASC"
-                }
-            })
+            body: JSON.stringify({})
         });
         
         if (!response.ok) {
@@ -138,16 +127,21 @@ async function fetchCurrentMiners() {
         
         const result = await response.json();
         
-        // Handle response structure
+        // Handle response structure - API can return direct array or nested
         let miners = [];
-        let totalCount = 0;
         
-        if (result.data) {
-            miners = result.data.items || result.data.array || result.data.list || result.data || [];
-            totalCount = result.data.total || result.data.count || result.total || result.count || miners.length;
-        } else if (Array.isArray(result)) {
+        if (Array.isArray(result)) {
+            // Direct array (used by /api/nft/get-my)
             miners = result;
-            totalCount = miners.length;
+        } else if (result.data && Array.isArray(result.data.array)) {
+            // Nested in data.array (correct format!)
+            miners = result.data.array;
+        } else if (result.data && Array.isArray(result.data)) {
+            // Array in data
+            miners = result.data;
+        } else {
+            console.warn('⚠️ Unexpected response format:', result);
+            miners = [];
         }
         
         console.log(`✅ Found ${miners.length} miners in your farm`);

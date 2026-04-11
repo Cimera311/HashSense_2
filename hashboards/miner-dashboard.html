@@ -836,9 +836,9 @@
         }
 
         // Check if all files are loaded
-        function checkAllFilesLoaded()current.length > 0 &&
-                            rawData. {
-            const allLoaded = rawData.purchases.length > 0 && 
+        function checkAllFilesLoaded() {
+            const allLoaded = rawData.current.length > 0 &&
+                            rawData.purchases.length > 0 && 
                             rawData.upgrades.length > 0 && 
                             rawData.sales.length > 0;
             
@@ -851,7 +851,8 @@
             
             // Reset miners object
             processedData.miners = {};
-            Step 1: Process current miners (creates base entries with REAL current data)
+            
+            // Step 1: Process current miners (creates base entries with REAL current data)
             const currentMinerIds = new Set();
             rawData.current.forEach(current => {
                 const minerId = current['Miner ID'];
@@ -886,8 +887,7 @@
                         collection: purchase['Collection'],
                         currentHashrate: parseFloat(purchase['Hashrate']) || 0,
                         currentEfficiency: 0,
-                        status: 'sold', // Not in current farmparseFloat(purchase['Hashrate']) || 0,
-                        status: 'active',
+                        status: 'sold', // Not in current farm anymore
                         purchases: [],
                         upgrades: [],
                         sales: [],
