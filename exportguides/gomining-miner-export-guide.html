@@ -75,7 +75,23 @@
                 Direkt über die Browser-Console, ohne Copy & Paste.
             </p>
         </div>
-
+        <!-- Link to Tax Export Tool -->
+        <div class="mb-8 bg-gradient-to-r from-green-900/30 to-purple-900/30 rounded-xl p-6 border-2 border-green-500">
+            <div class="flex items-center gap-4">
+                <span class="material-icons text-5xl text-green-400">receipt_long</span>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold mb-2" data-i18n="taxlink.title">🎯 Weiter zur Steuer-Analyse</h3>
+                    <p class="text-gray-300 mb-3" data-i18n="taxlink.desc">
+                        Nachdem du deine CSVs exportiert hast, analysiere sie im Tax Export Tool. 
+                        Berechne automatisch Gewinne/Verluste in EUR oder USD mit historischen Kursen.
+                    </p>
+                    <a href="../miner-tax-export.html" class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-bold transition-colors">
+                        <span class="material-icons">analytics</span>
+                        <span data-i18n="taxlink.button">Open Tax Export Tool</span>
+                    </a>
+                </div>
+            </div>
+        </div>
         <!-- Features Grid -->
         <div class="grid md:grid-cols-3 gap-6 mb-12">
             <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-blue-500 transition-colors">
@@ -453,6 +469,9 @@ exportMinerHistory()</code></pre>
                 'feature.complete.desc': 'Alle drei Kategorien: Käufe, Upgrades und Verkäufe in separaten CSV-Dateien.',
                 'feature.analysis.title': 'Steuerfreundlich',
                 'feature.analysis.desc': 'Perfekt formatiert für Steuer-Tools und Excel-Analysen.',
+                'taxlink.title': '🎯 Weiter zur Steuer-Analyse',
+                'taxlink.desc': 'Nachdem du deine CSVs exportiert hast, analysiere sie im Tax Export Tool. Berechne automatisch Gewinne/Verluste in EUR oder USD mit historischen Kursen.',
+                'taxlink.button': 'Open Tax Export Tool',
                 'btn.copy': 'Kopieren',
                 // Add more translations as needed
             },
@@ -464,6 +483,9 @@ exportMinerHistory()</code></pre>
                 'feature.complete.desc': 'All three categories: purchases, upgrades, and sales in separate CSV files.',
                 'feature.analysis.title': 'Tax-Friendly',
                 'feature.analysis.desc': 'Perfectly formatted for tax tools and Excel analysis.',
+                'taxlink.title': '🎯 Continue to Tax Analysis',
+                'taxlink.desc': 'After exporting your CSVs, analyze them in the Tax Export Tool. Automatically calculate profit/loss in EUR or USD with historical exchange rates.',
+                'taxlink.button': 'Open Tax Export Tool',
                 'btn.copy': 'Copy',
                 // Add more translations as needed
             }
