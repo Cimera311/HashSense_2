@@ -621,7 +621,7 @@
                     <div class="absolute left-1/2 -translate-x-px top-0 h-3 w-0.5 bg-gray-400 rounded" style="top:-8px;"></div>
                     <input type="range" id="th-price-adjustment-slider"
                            min="-20" max="20" step="0.1" value="0"
-                           oninput="onTHPriceSliderChange(this.value)"
+                           oninput="onTHSliderManualChange(this.value)"
                            class="w-full accent-yellow-400"
                            style="background: linear-gradient(to right, #22c55e 0%, #22c55e 50%, #f97316 50%, #f97316 100%);">
                 </div>
@@ -980,6 +980,9 @@
         // Global variables for calculation
         let currentStrategy = 'controlled';
         let growthChart = null;
+        // Stores the unclamped slider-component percentage set by a direct price button.
+        // null means the slider value itself is authoritative (user moved it manually).
+        let thButtonOverridePct = null;
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
@@ -1113,7 +1116,9 @@
         function getTotalTHPriceAdjustmentPercent(sliderPercent) {
             const avatarEnabled = document.getElementById('avatar-discount-enabled')?.checked;
             const avatarBonus = avatarEnabled ? -5 : 0;
-            return sliderPercent + avatarBonus;
+            // If a direct button set an override, use that (may exceed ±20 slider range).
+            const effectivePct = (thButtonOverridePct !== null) ? thButtonOverridePct : sliderPercent;
+            return effectivePct + avatarBonus;
         }
 
         function updateTHPresetButtons(effectiveBasePrice) {
@@ -1139,10 +1144,20 @@
 
             const desiredTotalPct = ((targetBasePrice / refMinerCost) - 1) * 100;
             const avatarBonus = document.getElementById('avatar-discount-enabled')?.checked ? -5 : 0;
-            const sliderPct = Math.max(-20, Math.min(20, desiredTotalPct - avatarBonus));
+            const unclampedSliderPct = desiredTotalPct - avatarBonus;
 
-            slider.value = sliderPct.toFixed(1);
+            // Store the true (unclamped) value so calculations and badge are exact.
+            thButtonOverridePct = unclampedSliderPct;
+
+            // Move the slider thumb to the nearest edge if out of range (visual only).
+            slider.value = Math.max(-20, Math.min(20, unclampedSliderPct)).toFixed(1);
             onTHPriceSliderChange(slider.value);
+        }
+
+        function onTHSliderManualChange(rawValue) {
+            // User moved the slider manually → cancel any button override.
+            thButtonOverridePct = null;
+            onTHPriceSliderChange(rawValue);
         }
 
         function onTHPriceSliderChange(rawValue) {
