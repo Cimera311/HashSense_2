@@ -611,7 +611,9 @@ function getInputValues() {
 
         // TH Purchase Price Adjustment: slider value in percent (−20…+20), convert to factor offset
         const thPriceAdjSlider = document.getElementById('th-price-adjustment-slider');
-        const thPriceAdjPct    = thPriceAdjSlider ? (parseFloat(thPriceAdjSlider.value) || 0) : 0;
+        const sliderAdjPct     = thPriceAdjSlider ? (parseFloat(thPriceAdjSlider.value) || 0) : 0;
+        const avatarBonusPct   = document.getElementById('avatar-discount-enabled')?.checked ? -5 : 0;
+        const thPriceAdjPct    = sliderAdjPct + avatarBonusPct;
         const thPriceAdjustment = thPriceAdjPct / 100;  // e.g. −0.20 for −20 %
 
         let calculationPeriod;

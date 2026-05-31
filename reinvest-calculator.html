@@ -569,10 +569,10 @@
                 <!-- Discount -->
                 <div>
                     <label for="gomining-discount-reinvest" class="block text-sm font-medium mb-2">GoMining Maintenance Discount (%)</label>
-                    <input type="number" id="gomining-discount-reinvest" value="10.41" min="0" max="30.5" step="0.01" placeholder="10.41" 
+                    <input type="number" id="gomining-discount-reinvest" value="10.4" min="0" max="30.5" step="0.1" placeholder="10.4" 
                         oninput="syncFieldAndSlider(event, 'gomining-discount-reinvest', 'gomining-discount-slider-reinvest');"
                         class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                    <input type="range" id="gomining-discount-slider-reinvest" min="0" max="30.5" step="0.01" value="10.41" tabindex="-1" 
+                    <input type="range" id="gomining-discount-slider-reinvest" min="0" max="30.5" step="0.1" value="10.4" tabindex="-1" 
                         oninput="syncFieldAndSlider(event, 'gomining-discount-reinvest', 'gomining-discount-slider-reinvest');"
                         class="w-full accent-purple-500">
                 </div>
@@ -600,6 +600,19 @@
                 <h3 class="text-sm font-semibold text-gray-200">TH Purchase Price Adjustment</h3>
             </div>
 
+            <div class="flex flex-wrap gap-2 mb-4">
+                <button type="button" data-base-price="14.99" onclick="setTHBasePrice(14.99)" class="th-base-price-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-gray-800 text-gray-200 border border-gray-600 hover:border-yellow-400 hover:text-yellow-300 transition-colors">$14.99</button>
+                <button type="button" data-base-price="16.99" onclick="setTHBasePrice(16.99)" class="th-base-price-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-gray-800 text-gray-200 border border-gray-600 hover:border-yellow-400 hover:text-yellow-300 transition-colors">$16.99</button>
+                <button type="button" data-base-price="18.99" onclick="setTHBasePrice(18.99)" class="th-base-price-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-gray-800 text-gray-200 border border-gray-600 hover:border-yellow-400 hover:text-yellow-300 transition-colors">$18.99</button>
+                <button type="button" data-base-price="21.99" onclick="setTHBasePrice(21.99)" class="th-base-price-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-gray-800 text-gray-200 border border-gray-600 hover:border-yellow-400 hover:text-yellow-300 transition-colors">$21.99</button>
+            </div>
+
+            <div class="flex items-center gap-2 mb-4">
+                <input type="checkbox" id="avatar-discount-enabled" onchange="onTHPriceSliderChange(document.getElementById('th-price-adjustment-slider').value)"
+                    class="w-4 h-4 rounded bg-gray-600 border-gray-500 text-green-600 focus:ring-green-500 focus:ring-2">
+                <label for="avatar-discount-enabled" class="text-sm text-gray-300 cursor-pointer">I have an avatar (extra -5%)</label>
+            </div>
+
             <!-- Slider row -->
             <div class="flex items-center gap-3 mb-4">
                 <span class="text-xs text-green-400 font-bold w-12 text-right">−20 %</span>
@@ -607,7 +620,7 @@
                     <!-- center tick -->
                     <div class="absolute left-1/2 -translate-x-px top-0 h-3 w-0.5 bg-gray-400 rounded" style="top:-8px;"></div>
                     <input type="range" id="th-price-adjustment-slider"
-                           min="-20" max="20" step="0.5" value="0"
+                           min="-20" max="20" step="0.1" value="0"
                            oninput="onTHPriceSliderChange(this.value)"
                            class="w-full accent-yellow-400"
                            style="background: linear-gradient(to right, #22c55e 0%, #22c55e 50%, #f97316 50%, #f97316 100%);">
@@ -620,7 +633,7 @@
             </div>
 
             <!-- Price display card -->
-            <div class="grid grid-cols-3 gap-3 text-center text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center text-xs">
                 <div class="bg-gray-800 rounded-lg p-3">
                     <div class="text-gray-400 mb-1">Base Price (1 TH)</div>
                     <div id="th-base-price-display" class="text-white font-bold text-base">–</div>
@@ -974,7 +987,8 @@
            // setupEventListeners();
             updateControlledV2Settings();
             updateTHPriceDisplay();
-            onTHPriceSliderChange('0'); // initialize gradient track
+            const initialSliderValue = document.getElementById('th-price-adjustment-slider')?.value || '0';
+            onTHPriceSliderChange(initialSliderValue); // initialize gradient track
         });
         function updatePeriodLabel() {
             const period = document.getElementById('chart-period').value;
@@ -1096,16 +1110,55 @@
          * Called whenever the TH price adjustment slider moves.
          * Updates the gradient track, badge colour, and price display cards.
          */
+        function getTotalTHPriceAdjustmentPercent(sliderPercent) {
+            const avatarEnabled = document.getElementById('avatar-discount-enabled')?.checked;
+            const avatarBonus = avatarEnabled ? -5 : 0;
+            return sliderPercent + avatarBonus;
+        }
+
+        function updateTHPresetButtons(effectiveBasePrice) {
+            const buttons = document.querySelectorAll('.th-base-price-btn');
+            buttons.forEach(btn => {
+                const targetPrice = parseFloat(btn.dataset.basePrice);
+                const isActive = Number.isFinite(effectiveBasePrice) && Number.isFinite(targetPrice) && Math.abs(effectiveBasePrice - targetPrice) < 0.05;
+                btn.className = isActive
+                    ? 'th-base-price-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-yellow-500/20 text-yellow-300 border border-yellow-400 transition-colors'
+                    : 'th-base-price-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-gray-800 text-gray-200 border border-gray-600 hover:border-yellow-400 hover:text-yellow-300 transition-colors';
+            });
+        }
+
+        function setTHBasePrice(targetBasePrice) {
+            if (typeof priceMatrixdatei === 'undefined') return;
+            const efficiencyEl = document.getElementById('miner-efficiency');
+            const slider = document.getElementById('th-price-adjustment-slider');
+            if (!efficiencyEl || !slider) return;
+
+            const efficiency = parseInt(efficiencyEl.value) || 15;
+            const matrix = priceMatrixdatei[String(efficiency)];
+            if (!matrix || matrix.length === 0) return;
+
+            const basePricePerTH = matrix[0].pricePerTH;
+            if (!basePricePerTH) return;
+
+            const desiredTotalPct = ((targetBasePrice / basePricePerTH) - 1) * 100;
+            const avatarBonus = document.getElementById('avatar-discount-enabled')?.checked ? -5 : 0;
+            const sliderPct = Math.max(-20, Math.min(20, desiredTotalPct - avatarBonus));
+
+            slider.value = sliderPct.toFixed(1);
+            onTHPriceSliderChange(slider.value);
+        }
+
         function onTHPriceSliderChange(rawValue) {
             const pct = parseFloat(rawValue);          // −20 … +20
+            const totalPct = getTotalTHPriceAdjustmentPercent(pct);
             const slider = document.getElementById('th-price-adjustment-slider');
             const badge  = document.getElementById('th-price-adjustment-badge');
 
             // --- update badge text & colour ---
-            badge.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(1) + ' %';
-            if (pct < 0) {
+            badge.textContent = (totalPct >= 0 ? '+' : '') + totalPct.toFixed(1) + ' %';
+            if (totalPct < 0) {
                 badge.className = 'w-20 text-center text-sm font-bold rounded-full px-2 py-0.5 bg-green-900/60 text-green-300 tabular-nums';
-            } else if (pct > 0) {
+            } else if (totalPct > 0) {
                 badge.className = 'w-20 text-center text-sm font-bold rounded-full px-2 py-0.5 bg-orange-900/60 text-orange-300 tabular-nums';
             } else {
                 badge.className = 'w-20 text-center text-sm font-bold rounded-full px-2 py-0.5 bg-gray-600 text-gray-300 tabular-nums';
@@ -1152,8 +1205,9 @@
 
             const efficiency = parseInt(efficiencyEl.value) || 15;
             const currentTH  = parseFloat(minerTHEl.value) || 1;
-            const adjPct     = parseFloat(sliderEl.value) || 0;   // −20 … +20
-            const factor     = 1 + adjPct / 100;                   // e.g. 0.80 for −20 %
+            const sliderPct  = parseFloat(sliderEl.value) || 0;   // −20 … +20
+            const adjPct     = getTotalTHPriceAdjustmentPercent(sliderPct);
+            const factor     = 1 + adjPct / 100;
 
             const matrix = priceMatrixdatei[String(efficiency)];
             if (!matrix || matrix.length === 0) return;
@@ -1208,6 +1262,8 @@
                 tierPriceEl.className   = 'font-bold text-base ' + (adjPct < 0 ? 'text-green-300' : adjPct > 0 ? 'text-orange-300' : 'text-white');
             }
             if (tierLabelEl) tierLabelEl.textContent = efficiency + ' W/TH · ' + currentTH.toFixed(1) + ' TH';
+
+            updateTHPresetButtons(effBase);
         }
     </script>
 </body>
