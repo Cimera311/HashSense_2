@@ -1129,18 +1129,15 @@
 
         function setTHBasePrice(targetBasePrice) {
             if (typeof priceMatrixdatei === 'undefined') return;
-            const efficiencyEl = document.getElementById('miner-efficiency');
             const slider = document.getElementById('th-price-adjustment-slider');
-            if (!efficiencyEl || !slider) return;
+            if (!slider) return;
 
-            const efficiency = parseInt(efficiencyEl.value) || 15;
-            const matrix = priceMatrixdatei[String(efficiency)];
-            if (!matrix || matrix.length === 0) return;
+            // Reference is always the minerCost of the 1 TH 15 W/TH entry,
+            // regardless of which efficiency the user has currently selected.
+            const refMinerCost = priceMatrixdatei?.["15"]?.[0]?.minerCost;
+            if (!refMinerCost) return;
 
-            const basePricePerTH = matrix[0].pricePerTH;
-            if (!basePricePerTH) return;
-
-            const desiredTotalPct = ((targetBasePrice / basePricePerTH) - 1) * 100;
+            const desiredTotalPct = ((targetBasePrice / refMinerCost) - 1) * 100;
             const avatarBonus = document.getElementById('avatar-discount-enabled')?.checked ? -5 : 0;
             const sliderPct = Math.max(-20, Math.min(20, desiredTotalPct - avatarBonus));
 
@@ -1263,7 +1260,11 @@
             }
             if (tierLabelEl) tierLabelEl.textContent = efficiency + ' W/TH · ' + currentTH.toFixed(1) + ' TH';
 
-            updateTHPresetButtons(effBase);
+            // Button highlighting uses the same reference as setTHBasePrice:
+            // minerCost of 1 TH 15 W/TH entry, adjusted by the current factor.
+            const refMinerCost = priceMatrixdatei?.["15"]?.[0]?.minerCost;
+            const effMinerRef  = refMinerCost ? refMinerCost * factor : effBase;
+            updateTHPresetButtons(effMinerRef);
         }
     </script>
 </body>
