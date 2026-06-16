@@ -197,7 +197,15 @@
     </div>
 
     <footer-component></footer-component>
-    <script src="../header.js"></script>
+    <script>
+        // Load header with correct relative path (header.js hardcodes "header.html" which breaks from subdirectories)
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("../header.html")
+                .then(r => r.ok ? r.text() : Promise.reject())
+                .then(html => { document.getElementById("header-container").innerHTML = html; })
+                .catch(() => { document.getElementById("header-container").remove(); });
+        });
+    </script>
 
     <script>
     // ─── i18n ───────────────────────────────────────────────────────────────
