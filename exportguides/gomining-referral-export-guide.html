@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoMining Referral Export - HashFarm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    
+    <!-- Prism.js für Code-Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
+    <style>
+        .code-block {
+            position: relative;
+        }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .code-block:hover .copy-button {
+            opacity: 1;
+        }
+        .step-number {
+            width: 2.5rem;
+            height: 2.5rem;
+            flex-shrink: 0;
+        }
+        .lang-switch {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .lang-switch:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Language Toggle (Fixed Position) -->
+    <div class="fixed top-4 right-4 z-50">
+        <button onclick="toggleLanguage()" class="lang-switch bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 flex items-center gap-2 shadow-lg">
+            <span class="material-icons text-xl">language</span>
+            <span id="current-lang" class="font-bold">DE</span>
+            <span class="text-gray-400">|</span>
+            <span id="other-lang" class="text-gray-400">EN</span>
+        </button>
+    </div>
+
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        
+        <!-- Hero Section -->
+        <div class="mb-12 text-center">
+            <div class="inline-block p-4 bg-green-600 rounded-full mb-4">
+                <span class="material-icons text-6xl">group_add</span>
+            </div>
+            <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-green-400 to-teal-500 bg-clip-text text-transparent">
+                GoMining Referral Export
+            </h1>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto" data-i18n="hero.subtitle">
+                Exportiere alle deine GoMining Referral-Transaktionen als CSV. Direkt über die Browser-Console – vollautomatisch via API.
+            </p>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="grid md:grid-cols-3 gap-6 mb-12">
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 text-center">
+                <span class="material-icons text-4xl text-green-400 mb-3 block">bolt</span>
+                <h3 class="text-xl font-bold mb-2" data-i18n="feature.fast.title">Vollautomatisch</h3>
+                <p class="text-gray-400 text-sm" data-i18n="feature.fast.desc">Kein manuelles Copy & Paste. Alle Seiten automatisch durchlaufen.</p>
+            </div>
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 text-center">
+                <span class="material-icons text-4xl text-teal-400 mb-3 block">date_range</span>
+                <h3 class="text-xl font-bold mb-2" data-i18n="feature.filter.title">Datumsfilter</h3>
+                <p class="text-gray-400 text-sm" data-i18n="feature.filter.desc">Exportiere nach Jahr, Monat oder benutzerdefiniertem Zeitraum.</p>
+            </div>
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 text-center">
+                <span class="material-icons text-4xl text-blue-400 mb-3 block">lock</span>
+                <h3 class="text-xl font-bold mb-2" data-i18n="feature.secure.title">Sicher & Lokal</h3>
+                <p class="text-gray-400 text-sm" data-i18n="feature.secure.desc">Deine Daten bleiben im Browser. Kein Upload, keine externe Verarbeitung.</p>
+            </div>
+        </div>
+
+        <!-- Step-by-Step Guide -->
+        <div class="bg-gray-800 rounded-xl p-8 mb-12 border border-gray-700">
+            <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                <span class="material-icons text-4xl text-green-400">format_list_numbered</span>
+                <span data-i18n="steps.title">Schritt-für-Schritt Anleitung</span>
+            </h2>
+
+            <!-- Step 1 -->
+            <div class="flex gap-6 mb-8">
+                <div class="step-number bg-green-600 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0">1</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold mb-3" data-i18n="step1.title">GoMining.com öffnen</h3>
+                    <p class="text-gray-400" data-i18n="step1.desc">
+                        Gehe zu <a href="https://app.gomining.com" target="_blank" class="text-green-400 hover:text-green-300 underline">app.gomining.com</a> und logge dich ein.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="flex gap-6 mb-8">
+                <div class="step-number bg-green-600 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0">2</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold mb-3" data-i18n="step2.title">Browser-Console öffnen</h3>
+                    <p class="text-gray-400 mb-3">Drücke <kbd class="px-2 py-1 bg-gray-700 rounded">F12</kbd> <span data-i18n="step2.desc1">oder</span> <kbd class="px-2 py-1 bg-gray-700 rounded">Strg + Shift + J</kbd></p>
+                    <p class="text-gray-400 mb-2" data-i18n="step2.desc2">Wechsle zum <strong>"Console"</strong> Tab.</p>
+                    <p class="text-sm text-green-400" data-i18n="step2.tip">💡 Tipp: Klicke einmal in die Console, damit sie fokussiert ist.</p>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="flex gap-6 mb-8">
+                <div class="step-number bg-green-600 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0">3</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold mb-3" data-i18n="step3.title">Skript laden</h3>
+                    <p class="text-gray-400 mb-4" data-i18n="step3.desc">Kopiere das komplette Skript und füge es in die Console ein:</p>
+                    <div class="code-block">
+                        <button onclick="copySkript()" class="copy-button bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                            <span class="material-icons text-sm">content_copy</span>
+                            <span data-i18n="step3.button.copy">Kopieren</span>
+                        </button>
+                        <a href="../src/scripts/console_scripts/gomining-referral-complete-export_approved.js" target="_blank"
+                           class="absolute top-2 left-2 bg-teal-600 hover:bg-teal-700 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors text-sm">
+                            <span class="material-icons text-sm">code</span>
+                            <span data-i18n="step3.button.open">Skript öffnen</span>
+                        </a>
+                        <div class="bg-gray-900 rounded-lg overflow-hidden border border-gray-700 mt-2">
+                            <pre class="language-javascript p-4 text-sm overflow-x-auto"><code>// Das komplette Skript findest du hier:
+// src/scripts/console_scripts/gomining-referral-complete-export_approved.js
+
+// Oder direkt laden:
+fetch('../src/scripts/console_scripts/gomining-referral-complete-export_approved.js')
+  .then(r => r.text())
+  .then(code => eval(code));</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="flex gap-6">
+                <div class="step-number bg-green-600 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0">4</div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold mb-3" data-i18n="step4.title">Export starten</h3>
+                    <p class="text-gray-400 mb-4" data-i18n="step4.desc">Wähle einen Export-Befehl:</p>
+
+                    <div class="space-y-4">
+                        <!-- All Data -->
+                        <div class="bg-gray-900 rounded-lg p-4 border border-green-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-lg" data-i18n="step4.all.title">📊 Alle Daten (empfohlen)</h4>
+                                <button onclick="copyCode('exportAllReferralData()')" class="text-sm bg-green-600 hover:bg-green-700 px-3 py-1 rounded transition-colors">
+                                    <span data-i18n="btn.copy">Kopieren</span>
+                                </button>
+                            </div>
+                            <pre class="language-javascript"><code>exportAllReferralData()</code></pre>
+                            <p class="text-sm text-gray-500 mt-2" data-i18n="step4.all.desc">Holt alle Referral-Transaktionen seit Beginn</p>
+                        </div>
+
+                        <!-- Year Export -->
+                        <div class="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-lg" data-i18n="step4.year.title">📅 Ganzes Jahr</h4>
+                                <button onclick="copyCode('exportReferralDataRange(\"2026-01-01\", \"2026-12-31\")')" class="text-sm bg-green-600 hover:bg-green-700 px-3 py-1 rounded transition-colors">
+                                    <span data-i18n="btn.copy">Kopieren</span>
+                                </button>
+                            </div>
+                            <pre class="language-javascript"><code>exportReferralDataRange("2026-01-01", "2026-12-31")</code></pre>
+                            <p class="text-sm text-gray-500 mt-2" data-i18n="step4.year.desc">Alle Referral-Transaktionen von 2026</p>
+                        </div>
+
+                        <!-- Month Export -->
+                        <div class="bg-gray-900 rounded-lg p-4 border border-gray-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-lg" data-i18n="step4.month.title">📆 Einzelner Monat</h4>
+                                <button onclick="copyCode('exportReferralDataRange(\"2026-04-01\", \"2026-04-30\")')" class="text-sm bg-green-600 hover:bg-green-700 px-3 py-1 rounded transition-colors">
+                                    <span data-i18n="btn.copy">Kopieren</span>
+                                </button>
+                            </div>
+                            <pre class="language-javascript"><code>exportReferralDataRange("2026-04-01", "2026-04-30")  // April 2026</code></pre>
+                            <p class="text-sm text-gray-500 mt-2" data-i18n="step4.month.desc">Beliebiger Zeitraum (Format: YYYY-MM-DD)</p>
+                        </div>
+
+                        <!-- Export to CSV (2nd step) -->
+                        <div class="bg-gray-900 rounded-lg p-4 border border-teal-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-lg" data-i18n="step4.csv.title">💾 CSV herunterladen</h4>
+                                <button onclick="copyCode('exportTransactionsToCSV()')" class="text-sm bg-teal-600 hover:bg-teal-700 px-3 py-1 rounded transition-colors">
+                                    <span data-i18n="btn.copy">Kopieren</span>
+                                </button>
+                            </div>
+                            <pre class="language-javascript"><code>exportTransactionsToCSV()</code></pre>
+                            <p class="text-sm text-gray-500 mt-2" data-i18n="step4.csv.desc">Nach dem Laden: CSV-Datei herunterladen</p>
+                        </div>
+
+                        <!-- Stop Export -->
+                        <div class="bg-gray-900 rounded-lg p-4 border border-red-700">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-bold text-lg" data-i18n="step4.stop.title">🛑 Export abbrechen</h4>
+                                <button onclick="copyCode('stopExport()')" class="text-sm bg-red-600 hover:bg-red-700 px-3 py-1 rounded transition-colors">
+                                    <span data-i18n="btn.copy">Kopieren</span>
+                                </button>
+                            </div>
+                            <pre class="language-javascript"><code>stopExport()</code></pre>
+                            <p class="text-sm text-gray-500 mt-2" data-i18n="step4.stop.desc">Laufenden Export stoppen (dauert wenige Sekunden)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow Info -->
+        <div class="bg-gradient-to-r from-green-900/30 to-teal-900/30 rounded-xl p-6 mb-12 border-2 border-green-600">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-3">
+                <span class="material-icons text-3xl text-green-400">info</span>
+                <span data-i18n="workflow.title">Wichtig: 2-Schritt-Prozess</span>
+            </h2>
+            <ol class="space-y-3 text-gray-300">
+                <li class="flex items-start gap-3">
+                    <span class="bg-green-600 text-white rounded-full w-7 h-7 flex items-center justify-center font-bold flex-shrink-0 mt-0.5">1</span>
+                    <div>
+                        <strong class="text-white" data-i18n="workflow.step1.title">Daten laden:</strong>
+                        <span class="text-gray-400" data-i18n="workflow.step1.desc"> Führe <code class="bg-gray-800 px-1 rounded">exportAllReferralData()</code> oder <code class="bg-gray-800 px-1 rounded">exportReferralDataRange(...)</code> aus. Die Daten werden heruntergeladen und im Speicher gehalten.</span>
+                    </div>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="bg-teal-600 text-white rounded-full w-7 h-7 flex items-center justify-center font-bold flex-shrink-0 mt-0.5">2</span>
+                    <div>
+                        <strong class="text-white" data-i18n="workflow.step2.title">CSV exportieren:</strong>
+                        <span class="text-gray-400" data-i18n="workflow.step2.desc"> Führe danach <code class="bg-gray-800 px-1 rounded">exportTransactionsToCSV()</code> aus, um die CSV-Datei herunterzuladen.</span>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        <!-- CSV Format -->
+        <div class="bg-gray-800 rounded-xl p-8 mb-12 border border-gray-700">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                <span class="material-icons text-4xl text-green-400">table_chart</span>
+                <span data-i18n="csv.title">CSV-Format</span>
+            </h2>
+            <p class="text-gray-400 mb-4" data-i18n="csv.desc">Die exportierte CSV-Datei <code class="bg-gray-900 px-2 py-0.5 rounded text-green-400">gomining_referral_transactions_YYYY-MM-DD.csv</code> enthält folgende Spalten:</p>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="py-3 px-4 font-bold" data-i18n="csv.col">Spalte</th>
+                            <th class="py-3 px-4 font-bold" data-i18n="csv.description">Beschreibung</th>
+                            <th class="py-3 px-4 font-bold" data-i18n="csv.example">Beispiel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-green-400">Date</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.date">Datum</td>
+                            <td class="py-3 px-4 font-mono text-sm">2026-04-02</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-green-400">Time</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.time">Uhrzeit (UTC)</td>
+                            <td class="py-3 px-4 font-mono text-sm">17:12:22</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-green-400">UserID</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.userid">ID des Referral-Nutzers</td>
+                            <td class="py-3 px-4 font-mono text-sm">abc123</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-green-400">Type</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.type">Transaktionstyp</td>
+                            <td class="py-3 px-4 font-mono text-sm">royalty, purchase-bonus</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-green-400">Currency</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.currency">Währung</td>
+                            <td class="py-3 px-4 font-mono text-sm">GMT, BTC</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-green-400">Reward</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.reward">Betrag in Originalwährung</td>
+                            <td class="py-3 px-4 font-mono text-sm">12,345678</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-green-400">RewardInUSD</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.rewardusd">Betrag in USD</td>
+                            <td class="py-3 px-4 font-mono text-sm">5,23</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-green-400">Status</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.status">Status</td>
+                            <td class="py-3 px-4 font-mono text-sm">success, pending</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="py-3 px-4 font-mono text-green-400">PurchaseValue</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.purchasevalue">Kaufwert des Referrals</td>
+                            <td class="py-3 px-4 font-mono text-sm">199,99</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-mono text-green-400">PurchaseValueInBTC</td>
+                            <td class="py-3 px-4 text-gray-400" data-i18n="csv.purchasebtc">Kaufwert in BTC</td>
+                            <td class="py-3 px-4 font-mono text-sm">0,00019</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Advanced Options -->
+        <div class="bg-gray-800 rounded-xl p-8 mb-12 border border-gray-700">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                <span class="material-icons text-4xl text-teal-400">settings</span>
+                <span data-i18n="advanced.title">Erweiterte Optionen</span>
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold mb-3" data-i18n="advanced.year.title">Jahr exportieren</h3>
+                    <pre class="language-javascript"><code>exportReferralDataRange("2025-01-01", "2025-12-31")
+exportTransactionsToCSV()</code></pre>
+                </div>
+
+                <div class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold mb-3" data-i18n="advanced.month.title">Monat exportieren</h3>
+                    <pre class="language-javascript"><code>exportReferralDataRange("2026-06-01", "2026-06-30")
+exportTransactionsToCSV()</code></pre>
+                </div>
+
+                <div class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold mb-3" data-i18n="advanced.token.title">Token manuell setzen</h3>
+                    <pre class="language-javascript"><code>globalThis.goMiningToken = "DEIN_TOKEN"
+exportAllReferralData()</code></pre>
+                </div>
+
+                <div class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold mb-3" data-i18n="advanced.data.title">Daten ohne CSV inspizieren</h3>
+                    <pre class="language-javascript"><code>await exportAllReferralData()
+console.log(globalThis.referralExportData)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="bg-gray-800 rounded-xl p-8 mb-12 border border-gray-700">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                <span class="material-icons text-4xl text-yellow-400">help_outline</span>
+                <span data-i18n="faq.title">Häufige Fragen</span>
+            </h2>
+
+            <div class="space-y-6">
+                <details class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <summary class="cursor-pointer font-bold text-lg mb-3" data-i18n="faq.token.q">Wie finde ich meinen Token?</summary>
+                    <p class="text-gray-400" data-i18n="faq.token.a">Das Skript sucht den Token automatisch in Cookies und localStorage. Falls es nicht klappt: DevTools → Network Tab → einen API-Request anklicken → "Authorization" Header kopieren. Dann <code class="bg-gray-800 px-1 rounded">globalThis.goMiningToken = "TOKEN"</code> setzen.</p>
+                </details>
+
+                <details class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <summary class="cursor-pointer font-bold text-lg mb-3" data-i18n="faq.safe.q">Ist das sicher?</summary>
+                    <p class="text-gray-400" data-i18n="faq.safe.a">Ja! Das Skript läuft vollständig lokal in deinem Browser. Es sendet keine Daten an externe Server. Du kannst den Quellcode jederzeit einsehen und prüfen.</p>
+                </details>
+
+                <details class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <summary class="cursor-pointer font-bold text-lg mb-3" data-i18n="faq.slow.q">Der Export läuft sehr lange – warum?</summary>
+                    <p class="text-gray-400" data-i18n="faq.slow.a">Die Referral-API liefert nur 20 Einträge pro Anfrage. Bei vielen Transaktionen (z.B. 50.000+) dauert der Export entsprechend länger. Mit Datumsfilter (<code class="bg-gray-800 px-1 rounded">exportReferralDataRange</code>) lässt sich die Datenmenge deutlich reduzieren.</p>
+                </details>
+
+                <details class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <summary class="cursor-pointer font-bold text-lg mb-3" data-i18n="faq.401.q">Warum bekomme ich einen 401 Fehler?</summary>
+                    <p class="text-gray-400" data-i18n="faq.401.a">Dein Token ist abgelaufen. Lade die Seite neu (F5), warte bis sie vollständig geladen ist, und führe das Skript erneut aus.</p>
+                </details>
+
+                <details class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                    <summary class="cursor-pointer font-bold text-lg mb-3" data-i18n="faq.excel.q">Wie öffne ich die CSV in Excel?</summary>
+                    <p class="text-gray-400" data-i18n="faq.excel.a">In Excel: Datei → Öffnen → "Alle Dateien" → CSV auswählen → Im Import-Dialog: Trennzeichen "Semikolon" und Dezimaltrennzeichen "Komma" wählen.</p>
+                </details>
+            </div>
+        </div>
+
+        <!-- Links to other guides -->
+        <div class="bg-gray-800 rounded-xl p-8 border border-gray-700">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3">
+                <span class="material-icons text-4xl text-purple-400">link</span>
+                <span data-i18n="related.title">Weitere Export-Anleitungen</span>
+            </h2>
+            <div class="grid md:grid-cols-2 gap-4">
+                <a href="gomining-export-guide.html" class="bg-gray-900 rounded-lg p-5 border border-purple-700 hover:border-purple-500 transition-colors flex items-center gap-4">
+                    <span class="material-icons text-3xl text-purple-400">receipt_long</span>
+                    <div>
+                        <div class="font-bold" data-i18n="related.transactions">Transaction Export</div>
+                        <div class="text-sm text-gray-400" data-i18n="related.transactions.desc">Wallet-Transaktionen (BTC, GMT, USDT...)</div>
+                    </div>
+                </a>
+                <a href="gomining-miner-export-guide.html" class="bg-gray-900 rounded-lg p-5 border border-blue-700 hover:border-blue-500 transition-colors flex items-center gap-4">
+                    <span class="material-icons text-3xl text-blue-400">inventory_2</span>
+                    <div>
+                        <div class="font-bold" data-i18n="related.miners">Miner History Export</div>
+                        <div class="text-sm text-gray-400" data-i18n="related.miners.desc">Käufe, Upgrades, Verkäufe</div>
+                    </div>
+                </a>
+                <a href="miner-tax-export.html" class="bg-gray-900 rounded-lg p-5 border border-yellow-700 hover:border-yellow-500 transition-colors flex items-center gap-4">
+                    <span class="material-icons text-3xl text-yellow-400">calculate</span>
+                    <div>
+                        <div class="font-bold" data-i18n="related.tax">Tax Export Tool</div>
+                        <div class="text-sm text-gray-400" data-i18n="related.tax.desc">Steueranalyse mit historischen Kursen</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer-component></footer-component>
+
+    <!-- Scripts -->
+    <script src="header.js"></script>
+
+    <script>
+        const translations = {
+            de: {
+                'hero.subtitle': 'Exportiere alle deine GoMining Referral-Transaktionen als CSV. Direkt über die Browser-Console – vollautomatisch via API.',
+                'feature.fast.title': 'Vollautomatisch',
+                'feature.fast.desc': 'Kein manuelles Copy & Paste. Alle Seiten automatisch durchlaufen.',
+                'feature.filter.title': 'Datumsfilter',
+                'feature.filter.desc': 'Exportiere nach Jahr, Monat oder benutzerdefiniertem Zeitraum.',
+                'feature.secure.title': 'Sicher & Lokal',
+                'feature.secure.desc': 'Deine Daten bleiben im Browser. Kein Upload, keine externe Verarbeitung.',
+                'steps.title': 'Schritt-für-Schritt Anleitung',
+                'step1.title': 'GoMining.com öffnen',
+                'step1.desc': 'Gehe zu <a href="https://app.gomining.com" target="_blank" class="text-green-400 hover:text-green-300 underline">app.gomining.com</a> und logge dich ein.',
+                'step2.title': 'Browser-Console öffnen',
+                'step2.desc1': 'oder',
+                'step2.desc2': 'Wechsle zum <strong>"Console"</strong> Tab.',
+                'step2.tip': '💡 Tipp: Klicke einmal in die Console, damit sie fokussiert ist.',
+                'step3.title': 'Skript laden',
+                'step3.desc': 'Kopiere das komplette Skript und füge es in die Console ein:',
+                'step3.button.copy': 'Kopieren',
+                'step3.button.open': 'Skript öffnen',
+                'step4.title': 'Export starten',
+                'step4.desc': 'Wähle einen Export-Befehl:',
+                'step4.all.title': '📊 Alle Daten (empfohlen)',
+                'step4.all.desc': 'Holt alle Referral-Transaktionen seit Beginn',
+                'step4.year.title': '📅 Ganzes Jahr',
+                'step4.year.desc': 'Alle Referral-Transaktionen von 2026',
+                'step4.month.title': '📆 Einzelner Monat',
+                'step4.month.desc': 'Beliebiger Zeitraum (Format: YYYY-MM-DD)',
+                'step4.csv.title': '💾 CSV herunterladen',
+                'step4.csv.desc': 'Nach dem Laden: CSV-Datei herunterladen',
+                'step4.stop.title': '🛑 Export abbrechen',
+                'step4.stop.desc': 'Laufenden Export stoppen (dauert wenige Sekunden)',
+                'workflow.title': 'Wichtig: 2-Schritt-Prozess',
+                'workflow.step1.title': 'Daten laden:',
+                'workflow.step1.desc': ' Führe exportAllReferralData() oder exportReferralDataRange(...) aus. Die Daten werden heruntergeladen und im Speicher gehalten.',
+                'workflow.step2.title': 'CSV exportieren:',
+                'workflow.step2.desc': ' Führe danach exportTransactionsToCSV() aus, um die CSV-Datei herunterzuladen.',
+                'csv.title': 'CSV-Format',
+                'csv.desc': 'Die exportierte CSV-Datei enthält folgende Spalten:',
+                'csv.col': 'Spalte',
+                'csv.description': 'Beschreibung',
+                'csv.example': 'Beispiel',
+                'csv.date': 'Datum',
+                'csv.time': 'Uhrzeit (UTC)',
+                'csv.userid': 'ID des Referral-Nutzers',
+                'csv.type': 'Transaktionstyp',
+                'csv.currency': 'Währung',
+                'csv.reward': 'Betrag in Originalwährung',
+                'csv.rewardusd': 'Betrag in USD',
+                'csv.status': 'Status',
+                'csv.purchasevalue': 'Kaufwert des Referrals',
+                'csv.purchasebtc': 'Kaufwert in BTC',
+                'advanced.title': 'Erweiterte Optionen',
+                'advanced.year.title': 'Jahr exportieren',
+                'advanced.month.title': 'Monat exportieren',
+                'advanced.token.title': 'Token manuell setzen',
+                'advanced.data.title': 'Daten ohne CSV inspizieren',
+                'faq.title': 'Häufige Fragen',
+                'faq.token.q': 'Wie finde ich meinen Token?',
+                'faq.token.a': 'Das Skript sucht den Token automatisch in Cookies und localStorage. Falls es nicht klappt: DevTools → Network Tab → einen API-Request anklicken → "Authorization" Header kopieren. Dann globalThis.goMiningToken = "TOKEN" setzen.',
+                'faq.safe.q': 'Ist das sicher?',
+                'faq.safe.a': 'Ja! Das Skript läuft vollständig lokal in deinem Browser. Es sendet keine Daten an externe Server.',
+                'faq.slow.q': 'Der Export läuft sehr lange – warum?',
+                'faq.slow.a': 'Die Referral-API liefert nur 20 Einträge pro Anfrage. Bei vielen Transaktionen dauert der Export entsprechend länger. Mit Datumsfilter lässt sich die Datenmenge deutlich reduzieren.',
+                'faq.401.q': 'Warum bekomme ich einen 401 Fehler?',
+                'faq.401.a': 'Dein Token ist abgelaufen. Lade die Seite neu (F5) und führe das Skript erneut aus.',
+                'faq.excel.q': 'Wie öffne ich die CSV in Excel?',
+                'faq.excel.a': 'In Excel: Datei → Öffnen → "Alle Dateien" → CSV auswählen → Trennzeichen "Semikolon" und Dezimaltrennzeichen "Komma" wählen.',
+                'related.title': 'Weitere Export-Anleitungen',
+                'related.transactions': 'Transaction Export',
+                'related.transactions.desc': 'Wallet-Transaktionen (BTC, GMT, USDT...)',
+                'related.miners': 'Miner History Export',
+                'related.miners.desc': 'Käufe, Upgrades, Verkäufe',
+                'related.tax': 'Tax Export Tool',
+                'related.tax.desc': 'Steueranalyse mit historischen Kursen',
+                'btn.copy': 'Kopieren'
+            },
+            en: {
+                'hero.subtitle': 'Export all your GoMining referral transactions as CSV. Directly via browser console – fully automatic via API.',
+                'feature.fast.title': 'Fully Automatic',
+                'feature.fast.desc': 'No manual copy & paste. All pages iterated automatically.',
+                'feature.filter.title': 'Date Filters',
+                'feature.filter.desc': 'Export by year, month or custom date range.',
+                'feature.secure.title': 'Secure & Local',
+                'feature.secure.desc': 'Your data stays in the browser. No upload, no external processing.',
+                'steps.title': 'Step-by-Step Guide',
+                'step1.title': 'Open GoMining.com',
+                'step1.desc': 'Go to <a href="https://app.gomining.com" target="_blank" class="text-green-400 hover:text-green-300 underline">app.gomining.com</a> and log in.',
+                'step2.title': 'Open Browser Console',
+                'step2.desc1': 'or',
+                'step2.desc2': 'Switch to <strong>"Console"</strong> tab.',
+                'step2.tip': '💡 Tip: Click once in the console to focus it.',
+                'step3.title': 'Load Script',
+                'step3.desc': 'Copy the complete script and paste it into the console:',
+                'step3.button.copy': 'Copy',
+                'step3.button.open': 'Open Script',
+                'step4.title': 'Start Export',
+                'step4.desc': 'Choose an export command:',
+                'step4.all.title': '📊 All Data (recommended)',
+                'step4.all.desc': 'Fetches all referral transactions since the beginning',
+                'step4.year.title': '📅 Full Year',
+                'step4.year.desc': 'All referral transactions from 2026',
+                'step4.month.title': '📆 Single Month',
+                'step4.month.desc': 'Any date range (Format: YYYY-MM-DD)',
+                'step4.csv.title': '💾 Download CSV',
+                'step4.csv.desc': 'After loading: download the CSV file',
+                'step4.stop.title': '🛑 Stop Export',
+                'step4.stop.desc': 'Stop a running export (may take a few seconds)',
+                'workflow.title': 'Important: 2-Step Process',
+                'workflow.step1.title': 'Load data:',
+                'workflow.step1.desc': ' Run exportAllReferralData() or exportReferralDataRange(...). Data is downloaded and kept in memory.',
+                'workflow.step2.title': 'Export CSV:',
+                'workflow.step2.desc': ' Then run exportTransactionsToCSV() to download the CSV file.',
+                'csv.title': 'CSV Format',
+                'csv.desc': 'The exported CSV file contains the following columns:',
+                'csv.col': 'Column',
+                'csv.description': 'Description',
+                'csv.example': 'Example',
+                'csv.date': 'Date',
+                'csv.time': 'Time (UTC)',
+                'csv.userid': 'Referral user ID',
+                'csv.type': 'Transaction type',
+                'csv.currency': 'Currency',
+                'csv.reward': 'Amount in original currency',
+                'csv.rewardusd': 'Amount in USD',
+                'csv.status': 'Status',
+                'csv.purchasevalue': 'Referral purchase value',
+                'csv.purchasebtc': 'Purchase value in BTC',
+                'advanced.title': 'Advanced Options',
+                'advanced.year.title': 'Export year',
+                'advanced.month.title': 'Export month',
+                'advanced.token.title': 'Set token manually',
+                'advanced.data.title': 'Inspect data without CSV',
+                'faq.title': 'Frequently Asked Questions',
+                'faq.token.q': 'How do I find my token?',
+                'faq.token.a': 'The script searches automatically in cookies and localStorage. If that fails: DevTools → Network Tab → click an API request → copy the "Authorization" header. Then set globalThis.goMiningToken = "TOKEN".',
+                'faq.safe.q': 'Is this safe?',
+                'faq.safe.a': 'Yes! The script runs completely locally in your browser. It does not send any data to external servers.',
+                'faq.slow.q': 'The export takes very long – why?',
+                'faq.slow.a': 'The referral API only delivers 20 entries per request. With many transactions this takes longer. Using a date filter (exportReferralDataRange) significantly reduces the data volume.',
+                'faq.401.q': 'Why do I get a 401 error?',
+                'faq.401.a': 'Your token has expired. Reload the page (F5) and run the script again.',
+                'faq.excel.q': 'How do I open the CSV in Excel?',
+                'faq.excel.a': 'In Excel: File → Open → "All Files" → Select CSV → Delimiter "Semicolon" and decimal separator "Comma".',
+                'related.title': 'More Export Guides',
+                'related.transactions': 'Transaction Export',
+                'related.transactions.desc': 'Wallet transactions (BTC, GMT, USDT...)',
+                'related.miners': 'Miner History Export',
+                'related.miners.desc': 'Purchases, upgrades, sales',
+                'related.tax': 'Tax Export Tool',
+                'related.tax.desc': 'Tax analysis with historical rates',
+                'btn.copy': 'Copy'
+            }
+        };
+
+        let currentLang = localStorage.getItem('lang') || 'de';
+
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                const translation = translations[currentLang][key];
+                if (translation) {
+                    element.innerHTML = translation;
+                }
+            });
+            document.getElementById('current-lang').textContent = currentLang.toUpperCase();
+            document.getElementById('other-lang').textContent = currentLang === 'de' ? 'EN' : 'DE';
+            document.documentElement.lang = currentLang;
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'de' ? 'en' : 'de';
+            localStorage.setItem('lang', currentLang);
+            applyTranslations();
+        }
+
+        function copyCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                showNotification(currentLang === 'de' ? 'Code kopiert! 📋' : 'Code copied! 📋');
+            });
+        }
+
+        function copySkript() {
+            fetch('../src/scripts/console_scripts/gomining-referral-complete-export_approved.js')
+                .then(r => {
+                    if (!r.ok) throw new Error('HTTP error! status: ' + r.status);
+                    return r.text();
+                })
+                .then(code => {
+                    navigator.clipboard.writeText(code).then(() => {
+                        showNotification(currentLang === 'de' ? 'Komplettes Skript kopiert! 🚀' : 'Complete script copied! 🚀');
+                    });
+                })
+                .catch(() => {
+                    const msg = currentLang === 'de'
+                        ? '❌ Fehler! Seite über Webserver öffnen (z.B. http://localhost:8000)'
+                        : '❌ Error! Open page via webserver (e.g. http://localhost:8000)';
+                    showNotification(msg);
+                });
+        }
+
+        function showNotification(text) {
+            const n = document.createElement('div');
+            n.className = 'fixed top-4 right-20 bg-green-600 text-white px-6 py-3 rounded-lg shadow-xl z-50 animate-bounce';
+            n.innerHTML = text;
+            document.body.appendChild(n);
+            setTimeout(() => n.remove(), 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTranslations();
+        });
+    </script>
+</body>
+</html>
