@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-06-20T04:32:37.171365Z
+// Auto-generiert am 2026-06-21T04:35:20.087063Z
 // Quelle: data/price_lists/solana_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
