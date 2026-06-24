@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-06-23T04:26:44.192401Z
+// Auto-generiert am 2026-06-24T04:28:41.534387Z
 // Quelle: data/price_lists/bitcoin_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -47010,6 +47010,58 @@ const btcPriceData = {
     "price_xag": 983.8600687,
     "price_xau": 15.2837752,
     "price_zar": 1041017.82165834
+  },
+  "2026-06-23": {
+    "date_iso": "2026-06-23",
+    "time_berlin": "00:00",
+    "symbol": "BTC",
+    "price_eur": 55975.20968684,
+    "price_usd": 63957.19561384,
+    "price_gbp": 48282.37424121,
+    "price_aed": 234882.80089183,
+    "price_ars": 93473601.28261586,
+    "price_aud": 91436.02096615,
+    "price_bdt": 7860124.38080645,
+    "price_bhd": 24119.4096955,
+    "price_bmd": 63957.19561384,
+    "price_brl": 329891.21497619,
+    "price_cad": 90561.02257296,
+    "price_chf": 51735.93488997,
+    "price_clp": 57973999.96416506,
+    "price_cny": 433303.6045642,
+    "price_czk": 1354076.09870077,
+    "price_dkk": 418395.18226662,
+    "price_gel": 169486.56837668,
+    "price_hkd": 501357.25855711,
+    "price_huf": 19723025.83840396,
+    "price_idr": 1142682172.4442203,
+    "price_ils": 190039.21318718,
+    "price_inr": 6056800.02076055,
+    "price_jpy": 10334043.77429518,
+    "price_krw": 98447382.89893578,
+    "price_kwd": 19741.53965573,
+    "price_lkr": 21393886.40398377,
+    "price_mmk": 134297958.92189682,
+    "price_mxn": 1110875.60056217,
+    "price_myr": 265364.80032138,
+    "price_ngn": 87407740.95761026,
+    "price_nok": 620214.67131391,
+    "price_nzd": 112003.24801726,
+    "price_php": 3908114.92696376,
+    "price_pkr": 17795049.67159304,
+    "price_pln": 239233.23329468,
+    "price_rub": 4748989.91779487,
+    "price_sar": 240082.00923767,
+    "price_sek": 615349.06370039,
+    "price_sgd": 82738.8656778,
+    "price_thb": 2111706.70617995,
+    "price_try": 2972160.91330433,
+    "price_twd": 2027283.08005529,
+    "price_uah": 2877551.6560778,
+    "price_vnd": 1683305611.8276098,
+    "price_xag": 985.43839944,
+    "price_xau": 15.27297831,
+    "price_zar": 1048894.81020719
   }
 };
 
