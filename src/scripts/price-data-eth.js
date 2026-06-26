@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-06-25T04:28:20.148133Z
+// Auto-generiert am 2026-06-26T04:31:42.376187Z
 // Quelle: data/price_lists/ethereum_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -19294,6 +19294,58 @@ const ethPriceData = {
     "price_xag": 27.12418438,
     "price_xau": 0.40651078,
     "price_zar": 27541.16804492
+  },
+  "2026-06-25": {
+    "date_iso": "2026-06-25",
+    "time_berlin": "00:00",
+    "symbol": "ETH",
+    "price_eur": 1424.8537548,
+    "price_usd": 1617.7713733,
+    "price_gbp": 1228.77339327,
+    "price_aed": 5941.26536843,
+    "price_ars": 2393084.15274853,
+    "price_aud": 2345.31066198,
+    "price_bdt": 198974.26008155,
+    "price_bhd": 610.13762012,
+    "price_bmd": 1617.7713733,
+    "price_brl": 8426.80930637,
+    "price_cad": 2303.14021559,
+    "price_chf": 1314.57351583,
+    "price_clp": 1486278.9160756,
+    "price_cny": 11003.59554976,
+    "price_czk": 34525.98969973,
+    "price_dkk": 10651.13008288,
+    "price_gel": 4270.9164255,
+    "price_hkd": 12681.62890671,
+    "price_huf": 507220.303557,
+    "price_idr": 29112057.57582914,
+    "price_ils": 4833.75526399,
+    "price_inr": 152783.84434596,
+    "price_jpy": 261714.15502947,
+    "price_krw": 2496091.41416926,
+    "price_kwd": 500.68568009,
+    "price_lkr": 545740.63710602,
+    "price_mmk": 3397012.50736318,
+    "price_mxn": 28514.01963342,
+    "price_myr": 6693.85261129,
+    "price_ngn": 2222979.64404767,
+    "price_nok": 15939.60690671,
+    "price_nzd": 2866.3058439,
+    "price_php": 99297.18265052,
+    "price_pkr": 449856.33730003,
+    "price_pln": 6108.15951662,
+    "price_rub": 121178.05007235,
+    "price_sar": 6095.27073209,
+    "price_sek": 15785.65492951,
+    "price_sgd": 2098.93378846,
+    "price_thb": 54055.06566745,
+    "price_try": 75252.74014948,
+    "price_twd": 51502.07360542,
+    "price_uah": 72612.94332887,
+    "price_vnd": 42600958.56033821,
+    "price_xag": 28.02272835,
+    "price_xau": 0.40334276,
+    "price_zar": 26812.34254785
   }
 };
 
