@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-06-26T04:31:42.411884Z
+// Auto-generiert am 2026-06-27T04:24:27.669978Z
 // Quelle: data/price_lists/bnb_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -19346,6 +19346,58 @@ const bnbPriceData = {
     "price_xag": 9.75963943,
     "price_xau": 0.14047454,
     "price_zar": 9338.091286
+  },
+  "2026-06-26": {
+    "date_iso": "2026-06-26",
+    "time_berlin": "00:00",
+    "symbol": "BNB",
+    "price_eur": 492.6173301,
+    "price_usd": 559.76570448,
+    "price_gbp": 424.4328294,
+    "price_aed": 2055.7395497,
+    "price_ars": 826902.98886191,
+    "price_aud": 810.97455851,
+    "price_bdt": 68677.91625278,
+    "price_bhd": 210.85814322,
+    "price_bmd": 559.76570448,
+    "price_brl": 2908.31869419,
+    "price_cad": 794.92159763,
+    "price_chf": 453.72816755,
+    "price_clp": 515924.04788108,
+    "price_cny": 3801.14499283,
+    "price_czk": 11951.18251329,
+    "price_dkk": 3682.13880406,
+    "price_gel": 1477.78145982,
+    "price_hkd": 4388.68459227,
+    "price_huf": 174535.04013717,
+    "price_idr": 10076567.05621927,
+    "price_ils": 1669.76150466,
+    "price_inr": 52842.23963326,
+    "price_jpy": 90570.37086742,
+    "price_krw": 865283.95748447,
+    "price_kwd": 173.33089063,
+    "price_lkr": 188175.65432198,
+    "price_mmk": 1175401.62392036,
+    "price_mxn": 9802.63101096,
+    "price_myr": 2305.61896018,
+    "price_ngn": 769773.00382728,
+    "price_nok": 5524.93508328,
+    "price_nzd": 991.8270209,
+    "price_php": 34345.82309299,
+    "price_pkr": 155438.6919043,
+    "price_pln": 2110.32846096,
+    "price_rub": 42092.9048746,
+    "price_sar": 2097.6654412,
+    "price_sek": 5453.49834384,
+    "price_sgd": 725.92823549,
+    "price_thb": 18679.38659633,
+    "price_try": 26077.40408228,
+    "price_twd": 17837.15751971,
+    "price_uah": 25107.09893318,
+    "price_vnd": 14732615.19072743,
+    "price_xag": 9.69694445,
+    "price_xau": 0.13933128,
+    "price_zar": 9234.58917055
   }
 };
 
