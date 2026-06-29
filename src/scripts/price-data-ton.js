@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-06-28T04:34:04.873275Z
+// Auto-generiert am 2026-06-29T04:35:09.857101Z
 // Quelle: data/price_lists/toncoin_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
