@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VQ2RT4JL4L"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-VQ2RT4JL4L');
+        
+        // Track QR Code Scan
+        gtag('event', 'qr_code_scan', {
+            'event_category': 'QR Code',
+            'event_label': 'Sticker Scan',
+            'value': 1
+        });
+        
+        // Redirect immediately
+        window.location.href = 'https://gomining.com/?ref=ICjK3';
+    </script>
+    
+    <style>
+        body {
+            background: #14151a;
+            color: #8a5eff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .loader {
+            text-align: center;
+        }
+        .spinner {
+            border: 4px solid rgba(138, 94, 255, 0.1);
+            border-top: 4px solid #8a5eff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader">
+        <div class="spinner"></div>
+        <p>Redirecting to GoMining...</p>
+    </div>
+</body>
+</html>
