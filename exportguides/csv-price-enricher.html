@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Tagespreise Anreichern - HashSense</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.ico">
+    <style>
+        .drop-active {
+            border-color: #a855f7 !important;
+            background-color: rgba(168, 85, 247, 0.1) !important;
+        }
+        .lang-switch { cursor: pointer; transition: all 0.3s ease; }
+        .lang-switch:hover { transform: scale(1.1); }
+        .table-scroll { overflow-x: auto; max-height: 360px; overflow-y: auto; }
+        .table-scroll th { position: sticky; top: 0; background: #1f2937; z-index: 1; }
+        .new-col { background-color: rgba(168, 85, 247, 0.15); }
+        .new-col-header { color: #c084fc; }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen">
+
+    <!-- Language Toggle -->
+    <div class="fixed top-4 right-4 z-50">
+        <button onclick="toggleLanguage()" class="lang-switch bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 flex items-center gap-2 shadow-lg">
+            <span class="material-icons text-xl">language</span>
+            <span id="current-lang" class="font-bold">DE</span>
+            <span class="text-gray-400">|</span>
+            <span id="other-lang" class="text-gray-400">EN</span>
+        </button>
+    </div>
+
+    <!-- Main -->
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+
+        <!-- Hero -->
+        <div class="mb-10 text-center">
+            <div class="inline-block p-4 bg-green-700 rounded-full mb-4">
+                <span class="material-icons text-6xl">price_check</span>
+            </div>
+            <h1 class="text-4xl font-bold mb-3 bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent" data-i18n="hero.title">
+                CSV Tagespreise Anreichern
+            </h1>
+            <p class="text-lg text-gray-400 max-w-2xl mx-auto" data-i18n="hero.subtitle">
+                Exportierte GoMining-CSV hochladen &rarr; BTC &amp; GMT Tageskurse werden automatisch aus den lokalen Preisdaten ergänzt &rarr; fertige CSV  herunterladen.
+            </p>
+        </div>
+
+        <!-- Price Data Status -->
+        <div id="price-status" class="mb-6 p-4 bg-gray-800 rounded-xl border border-gray-700 flex items-center gap-4">
+            <span class="material-icons text-3xl text-yellow-400 animate-spin" id="status-icon">autorenew</span>
+            <div>
+                <div class="font-semibold" data-i18n="status.loading">Preisdaten werden geladen…</div>
+                <div class="text-sm text-gray-400" id="status-detail"></div>
+            </div>
+        </div>
+
+        <!-- Upload Area -->
+        <div id="upload-section" class="mb-8">
+            <div id="drop-zone"
+                class="border-2 border-dashed border-gray-600 rounded-2xl p-12 text-center cursor-pointer transition-colors hover:border-gray-500"
+                onclick="document.getElementById('file-input').click()"
+                ondragover="onDragOver(event)"
+                ondragleave="onDragLeave(event)"
+                ondrop="onDrop(event)">
+                <span class="material-icons text-6xl text-gray-500 mb-4 block">upload_file</span>
+                <p class="text-xl font-semibold mb-2" data-i18n="upload.title">Export-CSV hier ablegen</p>
+                <p class="text-gray-400 mb-4" data-i18n="upload.subtitle">oder klicken zum Auswählen</p>
+                <p class="text-sm text-gray-500" data-i18n="upload.hint">Unterstützt: Transaktionen, Miner Käufe/Upgrades/Verkäufe, Referrals</p>
+                <input type="file" id="file-input" accept=".csv" class="hidden" onchange="onFileSelected(event)">
+            </div>
+        </div>
+
+        <!-- Options (shown after file selected) -->
+        <div id="options-section" class="hidden mb-8 bg-gray-800 rounded-xl p-6 border border-gray-700">
+            <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="material-icons text-green-400">tune</span>
+                <span data-i18n="options.title">Optionen</span>
+            </h2>
+
+            <!-- File info -->
+            <div id="file-info" class="mb-5 p-3 bg-gray-900 rounded-lg text-sm text-gray-300"></div>
+
+            <!-- Column detection info -->
+            <div id="col-info" class="mb-5 p-3 bg-gray-900 rounded-lg text-sm flex items-center gap-2">
+                <span class="material-icons text-green-400 text-sm">check_circle</span>
+                <span id="col-info-text"></span>
+            </div>
+
+            <!-- Which prices to add -->
+            <div class="mb-5">
+                <p class="text-sm font-semibold text-gray-300 mb-3" data-i18n="options.add">Spalten hinzufügen:</p>
+                <div class="flex flex-wrap gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="add-btc" checked class="w-4 h-4 accent-purple-500">
+                        <span class="font-mono text-sm">BTC_EUR &amp; BTC_USD</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="add-gmt" checked class="w-4 h-4 accent-purple-500">
+                        <span class="font-mono text-sm">GMT_EUR &amp; GMT_USD</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Decimal separator -->
+            <div class="mb-5">
+                <p class="text-sm font-semibold text-gray-300 mb-3" data-i18n="options.decimal">Dezimaltrennzeichen für neue Spalten:</p>
+                <div class="flex gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="decimal" value="dot" checked class="accent-purple-500">
+                        <span class="text-sm" data-i18n="options.dot">Punkt (1234.56)</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="decimal" value="comma" class="accent-purple-500">
+                        <span class="text-sm" data-i18n="options.comma">Komma (1234,56)</span>
+                    </label>
+                </div>
+            </div>
+
+            <button onclick="processCSV()"
+                class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-bold flex items-center gap-2 transition-colors">
+                <span class="material-icons">add_chart</span>
+                <span data-i18n="options.process">Preise ergänzen</span>
+            </button>
+        </div>
+
+        <!-- Preview -->
+        <div id="preview-section" class="hidden mb-8 bg-gray-800 rounded-xl p-6 border border-gray-700">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    <span class="material-icons text-blue-400">table_view</span>
+                    <span data-i18n="preview.title">Vorschau</span>
+                    <span class="text-sm font-normal text-gray-400" id="preview-count"></span>
+                </h2>
+                <div class="flex items-center gap-2 text-sm text-gray-400">
+                    <span class="inline-block w-3 h-3 rounded bg-purple-500/30 border border-purple-500/50"></span>
+                    <span data-i18n="preview.legend">Neu ergänzte Spalten</span>
+                </div>
+            </div>
+
+            <!-- Stats bar -->
+            <div id="stats-bar" class="mb-4 grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+
+            <!-- Table -->
+            <div class="table-scroll rounded-lg border border-gray-700">
+                <table class="w-full text-sm text-left border-collapse" id="preview-table">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Download -->
+        <div id="download-section" class="hidden mb-8">
+            <div class="bg-gradient-to-r from-green-900/30 to-teal-900/30 rounded-xl p-6 border border-green-600/40 flex items-center gap-6">
+                <span class="material-icons text-5xl text-green-400">download_done</span>
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold mb-1" data-i18n="download.ready">CSV bereit zum Herunterladen</h3>
+                    <p class="text-gray-400 text-sm" id="download-info"></p>
+                </div>
+                <button onclick="downloadCSV()"
+                    class="bg-green-600 hover:bg-green-700 px-8 py-4 rounded-xl font-bold text-lg flex items-center gap-3 transition-colors shadow-lg">
+                    <span class="material-icons text-2xl">download</span>
+                    <span data-i18n="download.button">Download CSV</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Info box: data coverage -->
+        <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
+            <h3 class="font-bold mb-3 flex items-center gap-2">
+                <span class="material-icons text-yellow-400">info</span>
+                <span data-i18n="info.title">Datenverfügbarkeit</span>
+            </h3>
+            <div class="grid md:grid-cols-2 gap-4 text-sm text-gray-400">
+                <div class="flex items-center gap-2">
+                    <span class="material-icons text-orange-400 text-base">currency_bitcoin</span>
+                    <span data-i18n="info.btc">BTC/EUR & BTC/USD Preise:</span>
+                    <span id="btc-range" class="font-mono text-white">…</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="material-icons text-green-400 text-base">toll</span>
+                    <span data-i18n="info.gmt">GMT/EUR & GMT/USD Preise:</span>
+                    <span id="gmt-range" class="font-mono text-white">…</span>
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-3" data-i18n="info.note">
+                Transaktionen außerhalb dieses Zeitraums bekommen leere Preiszellen. Die Preisdaten stammen aus den lokalen CSV-Dateien.
+            </p>
+        </div>
+
+    </div>
+
+    <footer-component></footer-component>
+
+    <script>
+    // ─── i18n ───────────────────────────────────────────────────────────────
+    const T = {
+        de: {
+            'hero.title': 'CSV Tagespreise Anreichern',
+            'hero.subtitle': 'Exportierte GoMining-CSV hochladen → BTC & GMT Tageskurse werden automatisch aus den lokalen Preisdaten ergänzt → fertige CSV herunterladen.',
+            'status.loading': 'Preisdaten werden geladen…',
+            'status.ready': 'Preisdaten geladen',
+            'status.error': 'Fehler beim Laden der Preisdaten',
+            'upload.title': 'Export-CSV hier ablegen',
+            'upload.subtitle': 'oder klicken zum Auswählen',
+            'upload.hint': 'Unterstützt: Transaktionen, Miner Käufe/Upgrades/Verkäufe, Referrals',
+            'options.title': 'Optionen',
+            'options.add': 'Spalten hinzufügen:',
+            'options.decimal': 'Dezimaltrennzeichen für neue Spalten:',
+            'options.dot': 'Punkt (1234.56)',
+            'options.comma': 'Komma (1234,56)',
+            'options.process': 'Preise ergänzen',
+            'preview.title': 'Vorschau',
+            'preview.legend': 'Neu ergänzte Spalten',
+            'download.ready': 'CSV bereit zum Herunterladen',
+            'download.button': 'Download CSV',
+            'info.title': 'Datenverfügbarkeit',
+            'info.btc': 'BTC/EUR & BTC/USD Preise:',
+            'info.gmt': 'GMT/EUR & GMT/USD Preise:',
+            'info.note': 'Transaktionen außerhalb dieses Zeitraums bekommen leere Preiszellen. Die Preisdaten stammen aus den lokalen CSV-Dateien.',
+        },
+        en: {
+            'hero.title': 'CSV Daily Price Enrichment',
+            'hero.subtitle': 'Upload exported GoMining CSV → BTC & GMT daily prices are automatically added from local price data → download the enriched CSV.',
+            'status.loading': 'Loading price data…',
+            'status.ready': 'Price data loaded',
+            'status.error': 'Error loading price data',
+            'upload.title': 'Drop Export CSV here',
+            'upload.subtitle': 'or click to select',
+            'upload.hint': 'Supports: transactions, miner purchases/upgrades/sales, referrals',
+            'options.title': 'Options',
+            'options.add': 'Add columns:',
+            'options.decimal': 'Decimal separator for new columns:',
+            'options.dot': 'Dot (1234.56)',
+            'options.comma': 'Comma (1234,56)',
+            'options.process': 'Add Prices',
+            'preview.title': 'Preview',
+            'preview.legend': 'Newly added columns',
+            'download.ready': 'CSV ready to download',
+            'download.button': 'Download CSV',
+            'info.title': 'Data Coverage',
+            'info.btc': 'BTC/EUR & BTC/USD prices:',
+            'info.gmt': 'GMT/EUR & GMT/USD prices:',
+            'info.note': 'Transactions outside this range will have empty price cells. Price data comes from local CSV files.',
+        }
+    };
+
+    let lang = localStorage.getItem('lang') || 'de';
+
+    function t(key) { return T[lang][key] || T['de'][key] || key; }
+
+    function applyTranslations() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            el.innerHTML = t(el.getAttribute('data-i18n'));
+        });
+        document.getElementById('current-lang').textContent = lang.toUpperCase();
+        document.getElementById('other-lang').textContent = lang === 'de' ? 'EN' : 'DE';
+        document.documentElement.lang = lang;
+    }
+
+    function toggleLanguage() {
+        lang = lang === 'de' ? 'en' : 'de';
+        localStorage.setItem('lang', lang);
+        applyTranslations();
+    }
+
+    // ─── Price data ──────────────────────────────────────────────────────────
+    let btcPrices = {};   // { 'YYYY-MM-DD': { eur, usd } }
+    let gmtPrices = {};
+    let pricesOk = false;
+
+    function parsePriceCSV(text) {
+        const lines = text.trim().split(/\r?\n/);
+        const result = {};
+        for (let i = 1; i < lines.length; i++) {
+            const p = lines[i].split(';');
+            if (p.length < 5) continue;
+            const date = p[0].trim();
+            const eur = parseFloat(p[3].replace(',', '.'));
+            const usd = parseFloat(p[4].replace(',', '.'));
+            if (date && !isNaN(eur)) result[date] = { eur, usd };
+        }
+        return result;
+    }
+
+    function dateRange(obj) {
+        const keys = Object.keys(obj).sort();
+        return keys.length ? `${keys[0]} – ${keys[keys.length - 1]}` : '–';
+    }
+
+    // Try multiple base paths to support different server setups
+    async function fetchWithFallback(filename) {
+        const candidates = [
+            '../data/' + filename,          // served from root, page in exportguides/
+            'data/' + filename,             // served from root, page at root
+            './data/' + filename,           // same
+            '../' + filename,               // edge case
+        ];
+        for (const path of candidates) {
+            try {
+                const res = await fetch(path);
+                if (res.ok) return res;
+            } catch (_) {}
+        }
+        throw new Error(`Datei nicht gefunden: ${filename}\nGetestete Pfade:\n${candidates.join('\n')}`);
+    }
+
+    async function loadPriceData() {
+        if (location.protocol === 'file:') {
+            document.getElementById('status-icon').textContent = 'warning';
+            document.getElementById('status-icon').className = 'material-icons text-3xl text-yellow-400';
+            document.querySelector('[data-i18n="status.loading"]').textContent = 'Kein HTTP-Server erkannt';
+            document.getElementById('status-detail').innerHTML =
+                'Seite über einen HTTP-Server öffnen, z.B.:<br>' +
+                '<code class="text-yellow-300">python -m http.server 8000</code><br>' +
+                'dann: <code class="text-yellow-300">http://localhost:8000/exportguides/csv-price-enricher.html</code>';
+            return;
+        }
+        try {
+            const [btcRes, gmtRes] = await Promise.all([
+                fetchWithFallback('bitcoin_eur.csv'),
+                fetchWithFallback('gominingtoken_eur.csv')
+            ]);
+            btcPrices = parsePriceCSV(await btcRes.text());
+            gmtPrices = parsePriceCSV(await gmtRes.text());
+            pricesOk = true;
+
+            document.getElementById('status-icon').textContent = 'check_circle';
+            document.getElementById('status-icon').className = 'material-icons text-3xl text-green-400';
+            document.querySelector('[data-i18n="status.loading"]').textContent = t('status.ready');
+            document.getElementById('status-detail').textContent =
+                `BTC: ${Object.keys(btcPrices).length} Tage · GMT: ${Object.keys(gmtPrices).length} Tage`;
+
+            document.getElementById('btc-range').textContent = dateRange(btcPrices);
+            document.getElementById('gmt-range').textContent = dateRange(gmtPrices);
+        } catch (e) {
+            document.getElementById('status-icon').textContent = 'error';
+            document.getElementById('status-icon').className = 'material-icons text-3xl text-red-400';
+            document.querySelector('[data-i18n="status.loading"]').textContent = t('status.error');
+            document.getElementById('status-detail').innerHTML =
+                `<span class="text-red-400">${e.message.replace(/\n/g, '<br>')}</span>`;
+        }
+    }
+
+    // ─── Upload logic ────────────────────────────────────────────────────────
+    let parsedCSV = null;  // { headers, rows, dateColIdx, rawText }
+    let enrichedCSV = null; // final CSV string
+
+    function onDragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('drop-active'); }
+    function onDragLeave() { document.getElementById('drop-zone').classList.remove('drop-active'); }
+    function onDrop(e) {
+        e.preventDefault();
+        document.getElementById('drop-zone').classList.remove('drop-active');
+        const file = e.dataTransfer.files[0];
+        if (file) readFile(file);
+    }
+    function onFileSelected(e) { if (e.target.files[0]) readFile(e.target.files[0]); }
+
+    function readFile(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const text = e.target.result;
+            parseUploadedCSV(file.name, text);
+        };
+        reader.readAsText(file, 'UTF-8');
+    }
+
+    function detectSeparator(firstLine) {
+        const semis = (firstLine.match(/;/g) || []).length;
+        const commas = (firstLine.match(/,/g) || []).length;
+        return semis >= commas ? ';' : ',';
+    }
+
+    function parseUploadedCSV(filename, text) {
+        const lines = text.trim().split(/\r?\n/);
+        if (lines.length < 2) { alert('CSV-Datei scheint leer zu sein.'); return; }
+
+        const sep = detectSeparator(lines[0]);
+        const headers = lines[0].split(sep).map(h => h.trim());
+        const rows = lines.slice(1).filter(l => l.trim()).map(l => l.split(sep));
+
+        // Find date column
+        const dateNames = ['Date', 'Datum', 'date', 'datum', 'date_iso', 'Date/Time'];
+        let dateColIdx = dateNames.reduce((found, n) => found !== -1 ? found : headers.indexOf(n), -1);
+        if (dateColIdx === -1) dateColIdx = 0; // fallback: first column
+
+        parsedCSV = { headers, rows, dateColIdx, filename, sep };
+
+        // Show options
+        document.getElementById('options-section').classList.remove('hidden');
+        document.getElementById('preview-section').classList.add('hidden');
+        document.getElementById('download-section').classList.add('hidden');
+
+        document.getElementById('file-info').innerHTML =
+            `<span class="material-icons text-sm align-middle text-green-400 mr-1">insert_drive_file</span>` +
+            `<strong>${filename}</strong> &nbsp;·&nbsp; ${rows.length.toLocaleString()} Zeilen &nbsp;·&nbsp; ${headers.length} Spalten`;
+
+        document.getElementById('col-info-text').textContent =
+            `Datumsspalte erkannt: "${headers[dateColIdx]}" (Spalte ${dateColIdx + 1})`;
+    }
+
+    // ─── Processing ──────────────────────────────────────────────────────────
+    function extractDate(str) {
+        if (!str) return null;
+        const iso = str.match(/(\d{4}-\d{2}-\d{2})/);
+        if (iso) return iso[1];
+        const de = str.match(/^(\d{2})\.(\d{2})\.(\d{4})/);
+        if (de) return `${de[3]}-${de[2]}-${de[1]}`;
+        return null;
+    }
+
+    function fmt(num, decimals, useDot) {
+        const s = num.toFixed(decimals);
+        return useDot ? s : s.replace('.', ',');
+    }
+
+    function processCSV() {
+        if (!parsedCSV) return;
+        const addBtc = document.getElementById('add-btc').checked;
+        const addGmt = document.getElementById('add-gmt').checked;
+        if (!addBtc && !addGmt) { alert('Bitte mindestens eine Preis-Option auswählen.'); return; }
+
+        const useDot = document.querySelector('input[name="decimal"]:checked').value === 'dot';
+        const { headers, rows, dateColIdx, filename, sep } = parsedCSV;
+
+        const newHeaders = [...headers];
+        if (addBtc) newHeaders.push('BTC_EUR', 'BTC_USD');
+        if (addGmt) newHeaders.push('GMT_EUR', 'GMT_USD');
+
+        let matchedCount = 0;
+        let missedDates = new Set();
+
+        const newRows = rows.map(row => {
+            const newRow = [...row];
+            const rawDate = (row[dateColIdx] || '').trim();
+            const date = extractDate(rawDate);
+
+            if (addBtc) {
+                const btc = date ? btcPrices[date] : null;
+                if (btc) { matchedCount++; }
+                else if (date) missedDates.add(date);
+                newRow.push(
+                    btc ? fmt(btc.eur, 2, useDot) : '',
+                    btc ? fmt(btc.usd, 2, useDot) : ''
+                );
+            }
+            if (addGmt) {
+                const gmt = date ? gmtPrices[date] : null;
+                if (!addBtc) {
+                    if (gmt) matchedCount++;
+                    else if (date) missedDates.add(date);
+                }
+                newRow.push(
+                    gmt ? fmt(gmt.eur, 6, useDot) : '',
+                    gmt ? fmt(gmt.usd, 6, useDot) : ''
+                );
+            }
+            return newRow;
+        });
+
+        // Build CSV string
+        enrichedCSV = [newHeaders, ...newRows].map(r => r.join(sep)).join('\n');
+
+        // Build preview
+        renderPreview(newHeaders, newRows, headers.length, rows.length, matchedCount, missedDates.size, filename);
+
+        // Show download
+        const addedColsCount = (addBtc ? 2 : 0) + (addGmt ? 2 : 0);
+        const missed = missedDates.size;
+        document.getElementById('download-info').textContent =
+            `${newRows.length.toLocaleString()} Zeilen · ${addedColsCount} neue Spalten ergänzt` +
+            (missed > 0 ? ` · ${missed} Datum${missed > 1 ? 'en' : ''} ohne Preisdaten` : '');
+        document.getElementById('download-section').classList.remove('hidden');
+
+        // Scroll to preview
+        document.getElementById('preview-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function renderPreview(headers, rows, origColCount, totalRows, matchedCount, missedCount, filename) {
+        const PREVIEW_ROWS = 20;
+        const newColCount = headers.length - origColCount;
+
+        // Stats
+        const stats = document.getElementById('stats-bar');
+        const matchPct = totalRows > 0 ? Math.round(matchedCount / totalRows * 100) : 0;
+        stats.innerHTML = `
+            <div class="bg-gray-900 rounded-lg p-3 text-center">
+                <div class="text-2xl font-bold text-white">${totalRows.toLocaleString()}</div>
+                <div class="text-xs text-gray-400">Zeilen gesamt</div>
+            </div>
+            <div class="bg-gray-900 rounded-lg p-3 text-center">
+                <div class="text-2xl font-bold text-green-400">${matchedCount.toLocaleString()}</div>
+                <div class="text-xs text-gray-400">Preise gefunden (${matchPct}%)</div>
+            </div>
+            <div class="bg-gray-900 rounded-lg p-3 text-center">
+                <div class="text-2xl font-bold ${missedCount > 0 ? 'text-yellow-400' : 'text-green-400'}">${missedCount}</div>
+                <div class="text-xs text-gray-400">Daten ohne Preis</div>
+            </div>
+            <div class="bg-gray-900 rounded-lg p-3 text-center">
+                <div class="text-2xl font-bold text-purple-400">${newColCount}</div>
+                <div class="text-xs text-gray-400">Neue Spalten</div>
+            </div>
+        `;
+
+        // Count info
+        document.getElementById('preview-count').textContent =
+            `(erste ${Math.min(PREVIEW_ROWS, rows.length)} von ${totalRows.toLocaleString()} Zeilen)`;
+
+        // Table
+        const thead = document.querySelector('#preview-table thead');
+        const tbody = document.querySelector('#preview-table tbody');
+        thead.innerHTML = '';
+        tbody.innerHTML = '';
+
+        const trh = document.createElement('tr');
+        headers.forEach((h, i) => {
+            const th = document.createElement('th');
+            th.className = 'px-3 py-2 text-xs font-semibold whitespace-nowrap border-b border-gray-700 ' +
+                (i >= origColCount ? 'new-col-header' : 'text-gray-300');
+            th.textContent = h;
+            trh.appendChild(th);
+        });
+        thead.appendChild(trh);
+
+        const previewRows = rows.slice(0, PREVIEW_ROWS);
+        previewRows.forEach((row, ri) => {
+            const tr = document.createElement('tr');
+            tr.className = ri % 2 === 0 ? 'bg-gray-900/50' : '';
+            headers.forEach((_, i) => {
+                const td = document.createElement('td');
+                td.className = 'px-3 py-1.5 text-xs whitespace-nowrap border-b border-gray-800 ' +
+                    (i >= origColCount ? 'new-col font-mono' : 'text-gray-300');
+                td.textContent = row[i] ?? '';
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('preview-section').classList.remove('hidden');
+    }
+
+    // ─── Download ────────────────────────────────────────────────────────────
+    function downloadCSV() {
+        if (!enrichedCSV) return;
+        const base = (parsedCSV.filename || 'export').replace(/\.csv$/i, '');
+        const filename = `${base}_mit_preisen.csv`;
+        const blob = new Blob([enrichedCSV], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // ─── Init ────────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+        applyTranslations();
+        loadPriceData();
+    });
+    </script>
+</body>
+</html>

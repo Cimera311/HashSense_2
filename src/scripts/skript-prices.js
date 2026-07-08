@@ -1,4 +1,7 @@
 const efficiencyMatrix = {
+            13: { to: 12, pricePerW: 2.67 },
+            14: { to: 13, pricePerW: 2.67 },
+            15: { to: 14, pricePerW: 2.67 },
             16: { to: 15, pricePerW: 1.10 },
             17: { to: 16, pricePerW: 1.10 },
             18: { to: 17, pricePerW: 1.10 },
@@ -36,7 +39,45 @@ const efficiencyMatrix = {
             50: { to: 49, pricePerW: 0.10 }
         };
 
-/*const efficiencyMatrix 19.12.2025 = {
+/*
+const efficiencyMatrix 16.06.2026 = {
+            16: { to: 15, pricePerW: 1.10 },
+            17: { to: 16, pricePerW: 1.10 },
+            18: { to: 17, pricePerW: 1.10 },
+            19: { to: 18, pricePerW: 1.10 },
+            20: { to: 19, pricePerW: 1.10 },
+            21: { to: 20, pricePerW: 1.00 },
+            22: { to: 21, pricePerW: 1.00 },
+            23: { to: 22, pricePerW: 1.00 },
+            24: { to: 23, pricePerW: 1.00 },
+            25: { to: 24, pricePerW: 1.00 },
+            26: { to: 25, pricePerW: 1.00 },
+            27: { to: 26, pricePerW: 1.00 },
+            28: { to: 27, pricePerW: 1.00 },
+            29: { to: 28, pricePerW: 0.50 },
+            30: { to: 29, pricePerW: 0.50 },
+            31: { to: 30, pricePerW: 0.50 },
+            32: { to: 31, pricePerW: 0.50 },
+            33: { to: 32, pricePerW: 0.50 },
+            34: { to: 33, pricePerW: 0.50 },
+            35: { to: 34, pricePerW: 0.50 },
+            36: { to: 35, pricePerW: 0.10 },
+            37: { to: 36, pricePerW: 0.10 },
+            38: { to: 37, pricePerW: 0.10 },
+            39: { to: 38, pricePerW: 0.10 },
+            40: { to: 39, pricePerW: 0.10 },
+            41: { to: 40, pricePerW: 0.10 },
+            42: { to: 41, pricePerW: 0.10 },
+            43: { to: 42, pricePerW: 0.10 },
+            44: { to: 43, pricePerW: 0.10 },
+            45: { to: 44, pricePerW: 0.10 },
+            46: { to: 45, pricePerW: 0.10 },
+            47: { to: 46, pricePerW: 0.10 },
+            48: { to: 47, pricePerW: 0.10 },
+            49: { to: 48, pricePerW: 0.10 },
+            50: { to: 49, pricePerW: 0.10 }
+        };
+const efficiencyMatrix 19.12.2025 = {
             16: { to: 15, pricePerW: 0.93 },
             17: { to: 16, pricePerW: 0.93 },
             18: { to: 17, pricePerW: 0.93 },

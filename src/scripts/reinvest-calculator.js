@@ -193,11 +193,11 @@ function calculateNewFarmEfficiency(originalFarmTH, originalFarmEfficiency, curr
 /**
  * Calculate how much TH can be bought with given USD amount
  */
-function calculateTHFromUSD(usdAmount, efficiency, currentTH) {
-    const pricePerTH = getPricePerTH(efficiency, currentTH);
-    if (!pricePerTH) return 0;
-    
-    return usdAmount / pricePerTH;
+function calculateTHFromUSD(usdAmount, efficiency, currentTH, thPriceAdjustment) {
+    const basePricePerTH = getPricePerTH(efficiency, currentTH);
+    if (!basePricePerTH) return 0;
+    const factor = 1 + (thPriceAdjustment || 0);   // e.g. 0.80 for −20 %
+    return usdAmount / (basePricePerTH * factor);
 }
 
 /**
@@ -320,7 +320,7 @@ function calculateReinvestmentStrategy() {
             
             if (currentGMTBalance >= 0) {
                 reinvestmentUSD = dailyRevenue.usd * 1.05; // ENTIRE revenue + 5% bonus
-                const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
+                const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH, inputs.thPriceAdjustment);
                 todayMinerTH = yesterdayMinerTH + additionalTH;
                 totalInvestment += reinvestmentUSD;
                 strategyText = 'Auto +5%';
@@ -341,7 +341,7 @@ function calculateReinvestmentStrategy() {
             if (profitGMT > 0 && currentGMTBalance >= profitGMT) {
                 reinvestmentUSD = dailyProfitUSD; // Only profit, no bonus
                 currentGMTBalance -= profitGMT; // Remove profit from wallet for reinvestment
-                const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
+                const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH, inputs.thPriceAdjustment);
                 todayMinerTH = yesterdayMinerTH + additionalTH;
                 totalInvestment += reinvestmentUSD;
                 strategyText = 'Manual';
@@ -362,7 +362,7 @@ function calculateReinvestmentStrategy() {
                 
                 if (currentGMTBalance >= 0) {
                     reinvestmentUSD = dailyRevenue.usd * 1.05;
-                    const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
+                    const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH, inputs.thPriceAdjustment);
                     todayMinerTH = yesterdayMinerTH + additionalTH;
                     totalInvestment += reinvestmentUSD;
                     strategyText = 'Auto +5%';
@@ -410,7 +410,7 @@ function calculateReinvestmentStrategy() {
                 
                 if (currentGMTBalance >= 0) {
                     reinvestmentUSD = dailyRevenue.usd * 1.05;
-                    const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH);
+                    const additionalTH = calculateTHFromUSD(reinvestmentUSD, inputs.minerEfficiency, yesterdayMinerTH, inputs.thPriceAdjustment);
                     todayMinerTH = yesterdayMinerTH + additionalTH;
                     totalInvestment += reinvestmentUSD;
                     strategyText = 'TH Reinvest +5%';
@@ -609,6 +609,13 @@ function getInputValues() {
         const discountfield = parseFloat(document.getElementById('gomining-discount-reinvest').value) || 0;
         const discount = (discountfield) / 100;
 
+        // TH Purchase Price Adjustment: slider value in percent (−20…+20), convert to factor offset
+        const thPriceAdjSlider = document.getElementById('th-price-adjustment-slider');
+        const sliderAdjPct     = thPriceAdjSlider ? (parseFloat(thPriceAdjSlider.value) || 0) : 0;
+        const avatarBonusPct   = document.getElementById('avatar-discount-enabled')?.checked ? -5 : 0;
+        const thPriceAdjPct    = sliderAdjPct + avatarBonusPct;
+        const thPriceAdjustment = thPriceAdjPct / 100;  // e.g. −0.20 for −20 %
+
         let calculationPeriod;
         switch(periodUnit) {
             case 'daily': calculationPeriod = periodCount; break;
@@ -638,7 +645,8 @@ function getInputValues() {
             btcPrice,
             gmtPrice,
             satPerTH,
-            discount
+            discount,
+            thPriceAdjustment
         };
     } catch (error) {
         console.error('Error getting input values:', error);

@@ -207,6 +207,35 @@
             outline: none !important;
         }
 
+        /* TH Price Adjustment Slider – bidirectional color track */
+        #th-price-adjustment-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+        #th-price-adjustment-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #eab308;
+            border: 2px solid #fff;
+            cursor: pointer;
+            box-shadow: 0 0 4px rgba(0,0,0,0.5);
+        }
+        #th-price-adjustment-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #eab308;
+            border: 2px solid #fff;
+            cursor: pointer;
+        }
+
         /* Chart Container */
         .chart-container {
             position: relative;
@@ -399,7 +428,7 @@
                     <h2 class="text-sm font-semibold mb-3 text-gray-300">SAT PER TH</h2>
                     <div class="flex items-center gap-3">
                         <img src="sats-ordinals-sats-logo.png" alt="⚡" class="w-10 h-10">
-                        <input type="number" id="sat-TH" value="44" min="0" step="1"
+                        <input type="number" id="sat-TH" value="50" min="0" step="1"
                                class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
                     </div>
                 </div>
@@ -511,7 +540,7 @@
                 <!-- Farm Average Efficiency -->
                 <div class="space-y-2">
                     <label class="text-sm font-medium text-gray-300">Farm Avg. Efficiency (W/TH)</label>
-                    <input type="number" id="farm-efficiency" value="20.00" min="15" max="50" step="0.01" 
+                    <input type="number" id="farm-efficiency" value="20.00" min="12" max="50" step="0.01" 
                            class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
                 </div>
 
@@ -519,6 +548,7 @@
                 <div class="space-y-2">
                     <label class="text-sm font-medium text-gray-300">Target Miner TH</label>
                     <input type="number" id="miner-th" value="1" min="0.1" step="0.1" 
+                           oninput="updateTHPriceDisplay()"
                            class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
                 </div>
 
@@ -526,7 +556,11 @@
                 <div class="space-y-2">
                     <label class="text-sm font-medium text-gray-300">Target Miner Efficiency (W/TH)</label>
                     <select id="miner-efficiency" 
+                            onchange="updateTHPriceDisplay()"
                             class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <option value="12">12 W/TH</option>
+                        <option value="13">13 W/TH</option>
+                        <option value="14">14 W/TH</option>
                         <option value="15" selected>15 W/TH</option>
                         <option value="16">16 W/TH</option>
                         <option value="17">17 W/TH</option>
@@ -538,10 +572,10 @@
                 <!-- Discount -->
                 <div>
                     <label for="gomining-discount-reinvest" class="block text-sm font-medium mb-2">GoMining Maintenance Discount (%)</label>
-                    <input type="number" id="gomining-discount-reinvest" value="10.41" min="0" max="30.5" step="0.01" placeholder="10.41" 
+                    <input type="number" id="gomining-discount-reinvest" value="10.4" min="0" max="30.5" step="0.1" placeholder="10.4" 
                         oninput="syncFieldAndSlider(event, 'gomining-discount-reinvest', 'gomining-discount-slider-reinvest');"
                         class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-3 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                    <input type="range" id="gomining-discount-slider-reinvest" min="0" max="30.5" step="0.01" value="10.41" tabindex="-1" 
+                    <input type="range" id="gomining-discount-slider-reinvest" min="0" max="30.5" step="0.1" value="10.4" tabindex="-1" 
                         oninput="syncFieldAndSlider(event, 'gomining-discount-reinvest', 'gomining-discount-slider-reinvest');"
                         class="w-full accent-purple-500">
                 </div>
@@ -561,6 +595,66 @@
                     <div class="text-xs text-gray-400">Enter number of periods to calculate</div>
                 </div>
             </div>
+
+        <!-- TH Purchase Price Adjustment -->
+        <div class="mt-6 p-5 bg-gray-700 rounded-lg">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="material-icons text-yellow-400 text-base">tune</span>
+                <h3 class="text-sm font-semibold text-gray-200">TH Purchase Price Adjustment</h3>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-4">
+                <button type="button" data-base-price="14.99" onclick="setTHBasePrice(14.99)" class="th-base-price-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-gray-800 text-gray-200 border border-gray-600 hover:border-yellow-400 hover:text-yellow-300 transition-colors">$14.99</button>
+                <button type="button" data-base-price="16.99" onclick="setTHBasePrice(16.99)" class="th-base-price-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-gray-800 text-gray-200 border border-gray-600 hover:border-yellow-400 hover:text-yellow-300 transition-colors">$16.99</button>
+                <button type="button" data-base-price="18.99" onclick="setTHBasePrice(18.99)" class="th-base-price-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-gray-800 text-gray-200 border border-gray-600 hover:border-yellow-400 hover:text-yellow-300 transition-colors">$18.99</button>
+                <button type="button" data-base-price="21.99" onclick="setTHBasePrice(21.99)" class="th-base-price-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-gray-800 text-gray-200 border border-gray-600 hover:border-yellow-400 hover:text-yellow-300 transition-colors">$21.99</button>
+            </div>
+
+            <div class="flex items-center gap-2 mb-4">
+                <input type="checkbox" id="avatar-discount-enabled" onchange="onTHPriceSliderChange(document.getElementById('th-price-adjustment-slider').value)"
+                    class="w-4 h-4 rounded bg-gray-600 border-gray-500 text-green-600 focus:ring-green-500 focus:ring-2">
+                <label for="avatar-discount-enabled" class="text-sm text-gray-300 cursor-pointer">I have an avatar (extra -5%)</label>
+            </div>
+
+            <!-- Slider row -->
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-xs text-green-400 font-bold w-12 text-right">−20 %</span>
+                <div class="relative flex-1">
+                    <!-- center tick -->
+                    <div class="absolute left-1/2 -translate-x-px top-0 h-3 w-0.5 bg-gray-400 rounded" style="top:-8px;"></div>
+                    <input type="range" id="th-price-adjustment-slider"
+                           min="-20" max="20" step="0.1" value="0"
+                           oninput="onTHPriceSliderChange(this.value)"
+                           class="w-full accent-yellow-400"
+                           style="background: linear-gradient(to right, #22c55e 0%, #22c55e 50%, #f97316 50%, #f97316 100%);">
+                </div>
+                <span class="text-xs text-orange-400 font-bold w-12">+20 %</span>
+                <span id="th-price-adjustment-badge"
+                      class="w-20 text-center text-sm font-bold rounded-full px-2 py-0.5 bg-gray-600 text-gray-300 tabular-nums">
+                    0.0 %
+                </span>
+            </div>
+
+            <!-- Price display card -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center text-xs">
+                <div class="bg-gray-800 rounded-lg p-3">
+                    <div class="text-gray-400 mb-1">Base Price (1 TH)</div>
+                    <div id="th-base-price-display" class="text-white font-bold text-base">–</div>
+                    <div id="th-base-efficiency-label" class="text-gray-500 mt-0.5">–</div>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-3 border border-yellow-500/40">
+                    <div class="text-gray-400 mb-1">Effective Price (1 TH)</div>
+                    <div id="th-effective-price-display" class="font-bold text-base text-yellow-300">–</div>
+                    <div id="th-savings-display" class="mt-0.5 text-gray-500">–</div>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-3">
+                    <div class="text-gray-400 mb-1">Price Tier (current TH)</div>
+                    <div id="th-tier-price-display" class="text-white font-bold text-base">–</div>
+                    <div id="th-tier-label" class="text-gray-500 mt-0.5">–</div>
+                </div>
+            </div>
+        </div>
+
         <!-- NEU: Erweiterte Greedy Miner Checkbox Section -->
         <div class="mt-6 p-4 bg-gray-700 rounded-lg" >   <!-- style="display: none; -->
             <div class="flex items-start gap-3">
@@ -614,7 +708,7 @@
                         <label class="text-sm font-medium text-gray-300">The Total TH of all my Greedys -- yes there are some really greedy miners out there</label>
                         <input type="number" id="greedy-miner-th" value="10.00000000" min="1" step="0.00000001" 
                             class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500">
-                       <input type="number" id="greedy-miner-efficiency" value="20.00" min="15.00" step="0.01" 
+                       <input type="number" id="greedy-miner-efficiency" value="20.00" min="12.00" step="0.01" 
                             class="w-full bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500">
                         <div class="text-xs text-gray-400">
                             TH and W/TH amount of your separate greedy miner (grows by 0.12% every Tuesday)
@@ -895,6 +989,9 @@
             initializePage();
            // setupEventListeners();
             updateControlledV2Settings();
+            updateTHPriceDisplay();
+            const initialSliderValue = document.getElementById('th-price-adjustment-slider')?.value || '0';
+            onTHPriceSliderChange(initialSliderValue); // initialize gradient track
         });
         function updatePeriodLabel() {
             const period = document.getElementById('chart-period').value;
@@ -1009,6 +1106,168 @@
         }
  
         // Main calculation is handled in reinvest-calculator.js
+
+        // ===== TH PRICE ADJUSTMENT SLIDER =====
+
+        /**
+         * Called whenever the TH price adjustment slider moves.
+         * Updates the gradient track, badge colour, and price display cards.
+         */
+        function getTotalTHPriceAdjustmentPercent(sliderPercent) {
+            const avatarEnabled = document.getElementById('avatar-discount-enabled')?.checked;
+            const avatarBonus = avatarEnabled ? -5 : 0;
+            return sliderPercent + avatarBonus;
+        }
+
+        function updateTHPresetButtons(effectiveBasePrice) {
+            const buttons = document.querySelectorAll('.th-base-price-btn');
+            buttons.forEach(btn => {
+                const targetPrice = parseFloat(btn.dataset.basePrice);
+                const isActive = Number.isFinite(effectiveBasePrice) && Number.isFinite(targetPrice) && Math.abs(effectiveBasePrice - targetPrice) < 0.05;
+                btn.className = isActive
+                    ? 'th-base-price-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-yellow-500/20 text-yellow-300 border border-yellow-400 transition-colors'
+                    : 'th-base-price-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-gray-800 text-gray-200 border border-gray-600 hover:border-yellow-400 hover:text-yellow-300 transition-colors';
+            });
+        }
+
+        function setTHBasePrice(targetBasePrice) {
+            if (typeof priceMatrixdatei === 'undefined') return;
+            const efficiencyEl = document.getElementById('miner-efficiency');
+            const slider = document.getElementById('th-price-adjustment-slider');
+            if (!efficiencyEl || !slider) return;
+
+            const efficiency = parseInt(efficiencyEl.value) || 15;
+            const matrix = priceMatrixdatei[String(efficiency)];
+            if (!matrix || matrix.length === 0) return;
+
+            const basePricePerTH = matrix[0].pricePerTH;
+            if (!basePricePerTH) return;
+
+            const desiredTotalPct = ((targetBasePrice / basePricePerTH) - 1) * 100;
+            const avatarBonus = document.getElementById('avatar-discount-enabled')?.checked ? -5 : 0;
+            const sliderPct = Math.max(-20, Math.min(20, desiredTotalPct - avatarBonus));
+
+            slider.value = sliderPct.toFixed(1);
+            onTHPriceSliderChange(slider.value);
+        }
+
+        function onTHPriceSliderChange(rawValue) {
+            const pct = parseFloat(rawValue);          // −20 … +20
+            const totalPct = getTotalTHPriceAdjustmentPercent(pct);
+            const slider = document.getElementById('th-price-adjustment-slider');
+            const badge  = document.getElementById('th-price-adjustment-badge');
+
+            // --- update badge text & colour ---
+            badge.textContent = (totalPct >= 0 ? '+' : '') + totalPct.toFixed(1) + ' %';
+            if (totalPct < 0) {
+                badge.className = 'w-20 text-center text-sm font-bold rounded-full px-2 py-0.5 bg-green-900/60 text-green-300 tabular-nums';
+            } else if (totalPct > 0) {
+                badge.className = 'w-20 text-center text-sm font-bold rounded-full px-2 py-0.5 bg-orange-900/60 text-orange-300 tabular-nums';
+            } else {
+                badge.className = 'w-20 text-center text-sm font-bold rounded-full px-2 py-0.5 bg-gray-600 text-gray-300 tabular-nums';
+            }
+
+            // --- update gradient track so the filled portion reflects position ---
+            // slider range is −20…+20 → map to 0…100 %
+            const fillPct = ((pct + 20) / 40) * 100;
+            const center  = 50;
+            let grad;
+            if (fillPct < center) {
+                // discount side: green fills from fillPct to center, rest grey
+                grad = `linear-gradient(to right,
+                    #374151 0%, #374151 ${fillPct}%,
+                    #22c55e ${fillPct}%, #22c55e ${center}%,
+                    #374151 ${center}%, #374151 100%)`;
+            } else if (fillPct > center) {
+                // surcharge side: orange fills from center to fillPct, rest grey
+                grad = `linear-gradient(to right,
+                    #374151 0%, #374151 ${center}%,
+                    #f97316 ${center}%, #f97316 ${fillPct}%,
+                    #374151 ${fillPct}%, #374151 100%)`;
+            } else {
+                grad = 'linear-gradient(to right, #374151 0%, #374151 100%)';
+            }
+            slider.style.background = grad;
+
+            updateTHPriceDisplay();
+        }
+
+        /**
+         * Reads the selected efficiency and current TH amount, then shows:
+         *  - base price (1 TH)
+         *  - effective price after adjustment
+         *  - current-TH-tier price after adjustment
+         */
+        function updateTHPriceDisplay() {
+            if (typeof priceMatrixdatei === 'undefined') return;
+
+            const efficiencyEl  = document.getElementById('miner-efficiency');
+            const minerTHEl     = document.getElementById('miner-th');
+            const sliderEl      = document.getElementById('th-price-adjustment-slider');
+            if (!efficiencyEl || !minerTHEl || !sliderEl) return;
+
+            const efficiency = parseInt(efficiencyEl.value) || 15;
+            const currentTH  = parseFloat(minerTHEl.value) || 1;
+            const sliderPct  = parseFloat(sliderEl.value) || 0;   // −20 … +20
+            const adjPct     = getTotalTHPriceAdjustmentPercent(sliderPct);
+            const factor     = 1 + adjPct / 100;
+
+            const matrix = priceMatrixdatei[String(efficiency)];
+            if (!matrix || matrix.length === 0) return;
+
+            // Base price = cheapest entry (1 TH) and its miner cost if available
+            const baseEntry     = matrix[0];
+            const basePricePerTH = baseEntry.pricePerTH;
+            const minerCostRaw  = baseEntry.minerCost;
+
+            // Effective (adjusted) base prices
+            const effBase    = basePricePerTH * factor;
+            const effMiner   = minerCostRaw ? minerCostRaw * factor : null;
+
+            // Tier price for the current TH amount
+            let tierPrice = basePricePerTH;
+            for (let i = matrix.length - 1; i >= 0; i--) {
+                if (currentTH >= matrix[i].minTH) { tierPrice = matrix[i].pricePerTH; break; }
+            }
+            const effTier = tierPrice * factor;
+
+            // --- Update DOM ---
+            const basePriceEl  = document.getElementById('th-base-price-display');
+            const baseEffLabel = document.getElementById('th-base-efficiency-label');
+            const effPriceEl   = document.getElementById('th-effective-price-display');
+            const savingsEl    = document.getElementById('th-savings-display');
+            const tierPriceEl  = document.getElementById('th-tier-price-display');
+            const tierLabelEl  = document.getElementById('th-tier-label');
+
+            if (basePriceEl)  basePriceEl.textContent  = '$' + basePricePerTH.toFixed(2) + ' / TH' + (minerCostRaw ? ' (miner: $' + minerCostRaw.toFixed(2) + ')' : '');
+            if (baseEffLabel) baseEffLabel.textContent  = efficiency + ' W/TH · 1 TH';
+
+            const diff = effBase - basePricePerTH;
+            if (effPriceEl) {
+                effPriceEl.textContent = '$' + effBase.toFixed(2) + ' / TH';
+                effPriceEl.className   = 'font-bold text-base ' + (adjPct < 0 ? 'text-green-300' : adjPct > 0 ? 'text-orange-300' : 'text-yellow-300');
+            }
+            if (savingsEl) {
+                if (Math.abs(diff) < 0.001) {
+                    savingsEl.textContent = 'No adjustment';
+                    savingsEl.className   = 'mt-0.5 text-gray-400 text-xs';
+                } else if (diff < 0) {
+                    savingsEl.textContent = '▼ Save $' + Math.abs(diff).toFixed(2) + ' / TH';
+                    savingsEl.className   = 'mt-0.5 text-green-400 text-xs font-semibold';
+                } else {
+                    savingsEl.textContent = '▲ +$' + diff.toFixed(2) + ' / TH';
+                    savingsEl.className   = 'mt-0.5 text-orange-400 text-xs font-semibold';
+                }
+            }
+
+            if (tierPriceEl) {
+                tierPriceEl.textContent = '$' + effTier.toFixed(2) + ' / TH';
+                tierPriceEl.className   = 'font-bold text-base ' + (adjPct < 0 ? 'text-green-300' : adjPct > 0 ? 'text-orange-300' : 'text-white');
+            }
+            if (tierLabelEl) tierLabelEl.textContent = efficiency + ' W/TH · ' + currentTH.toFixed(1) + ' TH';
+
+            updateTHPresetButtons(effBase);
+        }
     </script>
 </body>
 </html>

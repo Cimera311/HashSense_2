@@ -1,0 +1,2820 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoMining Transaction Dashboard - Jahresübersicht 2024</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Price Data -->
+    <script src="../src/scripts/price-data-gmt.js"></script>
+    <script src="../src/scripts/price-data-btc.js"></script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VQ2RT4JL4L"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-VQ2RT4JL4L');
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(103, 61, 236, 0.2) 0%, rgba(0, 255, 127, 0.1) 100%);
+            border-radius: 20px;
+            border: 2px solid rgba(103, 61, 236, 0.4);
+        }
+
+        h1 {
+            color: #00ff7f;
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(0, 255, 127, 0.6);
+        }
+
+        .subtitle {
+            color: #aaa;
+            font-size: 1.2em;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: rgba(30, 30, 46, 0.8);
+            border: 2px dashed rgba(103, 61, 236, 0.5);
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #00ff7f;
+            background: rgba(30, 30, 46, 0.9);
+        }
+
+        .upload-section h2 {
+            color: #00ff7f;
+            margin-bottom: 20px;
+        }
+
+        .help-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: rgba(103, 61, 236, 0.3);
+            border: 1px solid #673dec;
+            border-radius: 8px;
+            color: #00ff7f;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .help-link:hover {
+            background: rgba(103, 61, 236, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* Currency Selector */
+        .currency-selector {
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+        }
+
+        .currency-options {
+            display: flex;
+            gap: 15px;
+        }
+
+        .currency-btn {
+            padding: 10px 25px;
+            background: rgba(103, 61, 236, 0.2);
+            border: 2px solid rgba(103, 61, 236, 0.4);
+            border-radius: 8px;
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .currency-btn:hover {
+            border-color: #00ff7f;
+            color: #00ff7f;
+        }
+
+        .currency-btn.active {
+            background: rgba(0, 255, 127, 0.2);
+            border-color: #00ff7f;
+            color: #00ff7f;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .upload-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #673dec 0%, #00ff7f 100%);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 255, 127, 0.4);
+        }
+
+        .file-info {
+            margin-top: 20px;
+            color: #00ff7f;
+            font-size: 1.1em;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: none;
+        }
+
+        .dashboard-grid.active {
+            display: block;
+        }
+
+        /* Overview Cards */
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #00ff7f;
+            box-shadow: 0 10px 40px rgba(0, 255, 127, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            font-size: 2em;
+        }
+
+        .card-title {
+            font-size: 1.1em;
+            color: #aaa;
+            font-weight: 600;
+        }
+
+        .card-value {
+            font-size: 2.2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .positive {
+            color: #00ff7f;
+        }
+
+        .negative {
+            color: #ff4444;
+        }
+
+        .neutral {
+            color: #ffa500;
+        }
+
+        .card-detail {
+            color: #888;
+            font-size: 0.95em;
+            margin-top: 10px;
+        }
+
+        /* Category Section */
+        .category-section {
+            margin-bottom: 40px;
+        }
+
+        .category-section h2 {
+            color: #00ff7f;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .category-card {
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #673dec;
+        }
+
+        .category-card.income {
+            border-left-color: #00ff7f;
+        }
+
+        .category-card.expense {
+            border-left-color: #ff4444;
+        }
+
+        .category-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .category-amount {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .category-count {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 2px solid rgba(103, 61, 236, 0.3);
+        }
+
+        .chart-container h2 {
+            color: #00ff7f;
+            margin-bottom: 20px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(103, 61, 236, 0.3);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #aaa;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            color: #00ff7f;
+        }
+
+        .tab.active {
+            color: #00ff7f;
+            border-bottom-color: #00ff7f;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Monthly Breakdown */
+        .monthly-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .month-card {
+            background: rgba(30, 30, 46, 0.6);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(103, 61, 236, 0.3);
+        }
+
+        .month-name {
+            font-weight: bold;
+            color: #00ff7f;
+            margin-bottom: 10px;
+        }
+
+        .month-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        /* Insights Section */
+        .insights-section {
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 2px solid rgba(255, 165, 0, 0.3);
+        }
+
+        .insights-section h2 {
+            color: #ffa500;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .insight-item {
+            background: rgba(255, 165, 0, 0.1);
+            border-left: 4px solid #ffa500;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+
+        .insight-item strong {
+            color: #ffa500;
+        }
+
+        /* Loader */
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #00ff7f;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .overview-cards,
+            .category-grid,
+            .monthly-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 GoMining Transaction Dashboard</h1>
+            <p class="subtitle">Vollständige Analyse deiner Transaktionen | Multi-Currency Support | EUR/USD Preise</p>
+        </header>
+
+        <!-- Upload Section -->
+        <div class="upload-section" id="uploadSection">
+            <h2>📁 CSV-Datei hochladen</h2>
+            <p style="color: #aaa; margin-bottom: 20px;">Lade deinen GoMining Transaction Export hoch (Format: Date;Time;Type;FromType;Amount;Currency;Status;ID;WalletType)</p>
+            <input type="file" id="fileInput" accept=".csv" />
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                <span class="material-icons" style="vertical-align: middle;">upload_file</span>
+                CSV auswählen
+            </button>
+            <div class="file-info" id="fileInfo"></div>
+            <a href="../exportguides/gomining-export-guide.html" target="_blank" class="help-link">
+                <span class="material-icons" style="vertical-align: middle; margin-right: 5px;">help_outline</span>
+                Export-Anleitung öffnen
+            </a>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-grid" id="dashboardContent">
+            <!-- Currency Selector -->
+            <div class="currency-selector">
+                <div>
+                    <h3 style="color: #00ff7f; margin-bottom: 5px;">💱 Währung wählen</h3>
+                    <p style="color: #888; font-size: 0.9em;">Alle Beträge werden in deine gewählte Währung umgerechnet</p>
+                </div>
+                <div class="currency-options">
+                    <button class="currency-btn active" onclick="changeCurrency('EUR')">🇪🇺 EUR</button>
+                    <button class="currency-btn" onclick="changeCurrency('USD')">🇺🇸 USD</button>
+                </div>
+            </div>
+
+            <!-- Tax Year Filter -->
+            <div class="currency-selector" style="margin-top: 20px;">
+                <div>
+                    <h3 style="color: #00ff7f; margin-bottom: 5px;">📅 Steuerjahr wählen</h3>
+                    <p style="color: #888; font-size: 0.9em;">Filtere Transaktionen nach deutschem Steuerjahr (01.01. - 31.12.)</p>
+                </div>
+                <div class="currency-options">
+                    <button class="currency-btn" onclick="changeTaxYear('all')">Alle</button>
+                    <button class="currency-btn" onclick="changeTaxYear('2024')">2024</button>
+                    <button class="currency-btn" onclick="changeTaxYear('2025')">2025</button>
+                    <button class="currency-btn active" onclick="changeTaxYear('2026')">2026</button>
+                </div>
+            </div>
+
+            <!-- Tax Type Selector (Privat vs Gewerblich) -->
+            <div class="currency-selector" style="margin-top: 20px;">
+                <div>
+                    <h3 style="color: #ffa500; margin-bottom: 5px;">⚖️ Besteuerungsart</h3>
+                    <p style="color: #888; font-size: 0.9em;">
+                        <strong>Gewerblich:</strong> Alle Gewinne steuerpflichtig (§15 EStG)<br>
+                        <strong>Privat:</strong> Haltefrist > 1 Jahr = steuerfrei (§23 EStG)
+                    </p>
+                </div>
+                <div class="currency-options">
+                    <button class="currency-btn active" onclick="changeTaxType('business')">🏢 Gewerblich</button>
+                    <button class="currency-btn" onclick="changeTaxType('private')">👤 Privat</button>
+                </div>
+            </div>
+
+            <!-- Overview Cards -->
+            <div class="overview-cards" id="overviewCards"></div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('overview')">
+                    📊 Übersicht
+                </button>
+                <button class="tab" onclick="switchTab('staking')">
+                    💎 Staking & Mining
+                </button>
+                <button class="tab" onclick="switchTab('referrals')">
+                    🎁 Referrals
+                </button>
+                <button class="tab" onclick="switchTab('withdrawals')">
+                    💸 Auszahlungen
+                </button>
+                <button class="tab" onclick="switchTab('monthly')">
+                    📅 Monatlich
+                </button>
+                <button class="tab" onclick="switchTab('insights')">
+                    💡 Insights
+                </button>
+                <button class="tab" onclick="switchTab('tax')">
+                    🧾 Steuer / EÜR
+                </button>
+            </div>
+
+            <!-- Overview Tab -->
+            <div class="tab-content active" id="overview-tab">
+                <div class="category-section">
+                    <h2>✅ Alle Einnahmen (Multi-Currency)</h2>
+                    <div class="category-grid" id="allIncome"></div>
+                </div>
+
+                <div class="category-section">
+                    <h2>💸 Alle Ausgaben (Multi-Currency)</h2>
+                    <div class="category-grid" id="allExpenses"></div>
+                </div>
+
+                <div class="chart-container">
+                    <h2>📈 Transaktionsverlauf</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="overviewChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Staking & Mining Tab -->
+            <div class="tab-content" id="staking-tab">
+                <div class="category-section">
+                    <h2>💎 Staking Rewards (Simple Earn)</h2>
+                    <div class="category-grid" id="stakingRewards"></div>
+                </div>
+
+                <div class="category-section">
+                    <h2>⛏️ Mining Erträge (BTC)</h2>
+                    <div class="category-grid" id="miningIncome"></div>
+                </div>
+
+                <div class="chart-container">
+                    <h2>📊 Staking & Mining Verlauf</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="stakingChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referrals Tab -->
+            <div class="tab-content" id="referrals-tab">
+                <div class="category-section">
+                    <h2>🎁 Referral Performance (45.048 Transaktionen!)</h2>
+                    <div class="category-grid" id="referralStats"></div>
+                </div>
+
+                <div class="chart-container">
+                    <h2>📈 Referral Einnahmen</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="referralChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Withdrawals Tab -->
+            <div class="tab-content" id="withdrawals-tab">
+                <div class="category-section">
+                    <h2>💸 Cashout Historie</h2>
+                    <div class="category-grid" id="withdrawalStats"></div>
+                </div>
+
+                <div class="chart-container">
+                    <h2>📊 Withdrawal Verlauf</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="withdrawalChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Tab -->
+            <div class="tab-content" id="monthly-tab">
+                <div class="chart-container">
+                    <h2>📅 Monatlicher Verlauf</h2>
+                    <div class="chart-wrapper">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="category-section">
+                    <h2>Detaillierte Monatsübersicht</h2>
+                    <div class="monthly-grid" id="monthlyGrid"></div>
+                </div>
+            </div>
+
+            <!-- Insights Tab -->
+            <div class="tab-content" id="insights-tab">
+                <div class="insights-section">
+                    <h2><span class="material-icons">lightbulb</span> Optimierungs-Insights</h2>
+                    <div id="insightsList"></div>
+                </div>
+            </div>
+
+            <!-- Tax / EÜR Tab -->
+            <div class="tab-content" id="tax-tab">
+                <div style="background: rgba(255, 165, 0, 0.1); border-left: 4px solid #ffa500; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+                    <h3 style="color: #ffa500; margin: 0 0 10px 0;">⚠️ Steuerrechtlicher Hinweis</h3>
+                    <p style="color: #ccc; margin: 0; font-size: 0.95em;">
+                        Diese Berechnung ist eine Hilfestellung basierend auf deutschem Steuerrecht (EStG).
+                        Die finale Steuererklärung sollte mit einem Steuerberater abgestimmt werden.
+                        Keine Haftung für Richtigkeit oder Vollständigkeit.
+                    </p>
+                </div>
+
+                <div class="category-section">
+                    <h2>📊 EÜR-Übersicht (Einnahmen-Überschuss-Rechnung)</h2>
+                    <div class="overview-cards" id="taxOverviewCards"></div>
+                </div>
+
+                <div class="category-section">
+                    <h2>✅ Betriebseinnahmen (§15 / §22 EStG)</h2>
+                    <div class="category-grid" id="taxIncome"></div>
+                </div>
+
+                <div class="category-section">
+                    <h2>💸 Betriebsausgaben</h2>
+                    <div class="category-grid" id="taxExpenses"></div>
+                </div>
+
+                <div class="category-section">
+                    <h2>🏗️ Investitionen (Anlagevermögen)</h2>
+                    <div class="category-grid" id="taxInvestments"></div>
+                </div>
+
+                <div class="category-section">
+                    <h2>💰 Privatentnahmen / Wechselkursgewinne</h2>
+                    <div class="category-grid" id="taxWithdrawals"></div>
+                </div>
+
+                <div class="category-section">
+                    <h2>� FIFO-Gewinnermittlung (§23 EStG - Private Veräußerungsgeschäfte)</h2>
+                    <div style="background: rgba(103, 61, 236, 0.1); border-left: 4px solid #673dec; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+                        <h4 style="color: #673dec; margin: 0 0 5px 0;">ℹ️ FIFO-Prinzip</h4>
+                        <p style="color: #ccc; margin: 0; font-size: 0.9em;">
+                            First In, First Out: Die ältesten Anschaffungen werden zuerst veräußert. 
+                            <strong>Haltefrist: > 1 Jahr = steuerfrei</strong> | < 1 Jahr = steuerpflichtig (§23 EStG)
+                        </p>
+                    </div>
+                    <div class="overview-cards" id="fifoOverviewCards"></div>
+                    <h3 style="margin: 30px 0 15px 0;">📊 Veräußerungsgewinne pro Währung</h3>
+                    <div class="category-grid" id="fifoDetails"></div>
+                    
+                    <h3 style="margin: 30px 0 15px 0;">🔍 Detaillierte Transaktionsliste</h3>
+                    <div style="background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+                        <div id="fifoDetailLoadPrompt" style="text-align: center; padding: 40px 20px;">
+                            <button onclick="loadFIFODetailTable()" class="currency-btn" style="padding: 15px 40px; font-size: 1.1em; background: linear-gradient(135deg, #673dec 0%, #512bd4 100%);">
+                                📊 Detaillierte Transaktionsliste laden
+                            </button>
+                            <p style="color: #888; margin-top: 10px; font-size: 0.9em;">Zeigt alle FIFO-Transaktionen mit Filter- und Sortierfunktion</p>
+                        </div>
+                        
+                        <div id="fifoDetailControls" style="display: none;">
+                            <div style="margin-bottom: 15px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                                <select id="fifoDetailCurrency" onchange="fifoCurrentPage=1; renderFIFODetailTable()" style="padding: 8px 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #fff; font-size: 0.9em;">
+                                    <option value="all">💎 Alle Währungen</option>
+                                    <option value="GMT">💰 GMT</option>
+                                    <option value="BTC">₿ BTC</option>
+                                    <option value="USDT">💵 USDT</option>
+                                    <option value="USDC">💵 USDC</option>
+                                    <option value="TON">💎 TON</option>
+                                </select>
+                                <select id="fifoDetailFilter" onchange="fifoCurrentPage=1; renderFIFODetailTable()" style="padding: 8px 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #fff; font-size: 0.9em;">
+                                    <option value="all">📊 Alle Transaktionen</option>
+                                    <option value="gains">✅ Nur Gewinne</option>
+                                    <option value="losses">❌ Nur Verluste</option>
+                                    <option value="taxable">💰 Nur Steuerpflichtig</option>
+                                    <option value="taxfree">🎁 Nur Steuerfrei</option>
+                                </select>
+                                <select id="fifoDetailSort" onchange="fifoCurrentPage=1; renderFIFODetailTable()" style="padding: 8px 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #fff; font-size: 0.9em;">
+                                    <option value="date-desc">📅 Neueste zuerst</option>
+                                    <option value="date-asc">📅 Älteste zuerst</option>
+                                    <option value="gain-desc">💰 Höchster Gewinn zuerst</option>
+                                    <option value="gain-asc">💰 Niedrigster Gewinn zuerst</option>
+                                    <option value="loss-desc">📉 Höchster Verlust zuerst</option>
+                                    <option value="amount-desc">📊 Größte Menge zuerst</option>
+                                    <option value="days-desc">⏱️ Längste Haltefrist zuerst</option>
+                                </select>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;">
+                                    <label for="fifoMinAmount" style="color: #ccc; font-size: 0.85em; white-space: nowrap;">Min. Betrag:</label>
+                                    <input type="number" id="fifoMinAmount" value="0" min="0" step="0.1" onchange="fifoCurrentPage=1; renderFIFODetailTable()" style="width: 80px; padding: 4px 8px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: #fff; font-size: 0.9em;">
+                                    <span style="color: #888; font-size: 0.85em;" id="currSymbolMin">€</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(103, 61, 236, 0.1); border: 1px solid rgba(103, 61, 236, 0.3); border-radius: 6px;">
+                                    <input type="checkbox" id="fifoIgnoreSmall" onchange="handleIgnoreSmallChange()" style="cursor: pointer;">
+                                    <label for="fifoIgnoreSmall" style="color: #ccc; font-size: 0.85em; cursor: pointer; user-select: none;">≤ 0,10 € ignorieren</label>
+                                </div>
+                            </div>
+                            
+                            <div id="fifoDetailTable" style="overflow-x: auto;"></div>
+                            
+                            <div id="fifoPagination" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                                <button onclick="changeFIFOPage(-1)" class="currency-btn" style="padding: 8px 16px; font-size: 0.9em;">« Zurück</button>
+                                <span id="fifoPageInfo" style="color: #ccc; font-size: 0.9em;">Seite 1 von 1</span>
+                                <button onclick="changeFIFOPage(1)" class="currency-btn" style="padding: 8px 16px; font-size: 0.9em;">Weiter »</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-section">
+                    <h2>📄 Export für Steuerberater</h2>
+                    <button class="currency-btn" onclick="exportTaxData()" style="padding: 15px 30px; font-size: 1.1em; margin-right: 15px;">
+                        📥 EÜR-Daten als CSV herunterladen
+                    </button>
+                    <button class="currency-btn" onclick="exportFIFOData()" style="padding: 15px 30px; font-size: 1.1em; background: rgba(103, 61, 236, 0.3);">
+                        📈 FIFO-Analyse als CSV herunterladen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let transactionData = [];
+        let charts = {};
+        let selectedCurrency = 'EUR';
+
+        // Category Definitions - Multi-Currency Support
+        const INCOME_CATEGORIES = {
+            // Investment
+            'top-up': { name: 'Einzahlungen', icon: '💰', description: 'Kapital-Einzahlung', currencies: ['GMT', 'USDT', 'BTC', 'USDC', 'TON'] },
+            'fireblocks-deposit': { name: 'Externe Einzahlungen', icon: '🔗', description: 'Via Fireblocks', currencies: ['TON', 'BTC'] },
+            
+            // Mining & Staking
+            'nft-income': { name: 'NFT Mining', icon: '⛏️', description: 'Täglich, echte NFTs', currencies: ['BTC'] },
+            'nft-game-income': { name: 'Game Mining', icon: '🎮', description: 'Wöchentlich, MinerWars', currencies: ['BTC'] },
+            'nft-reinvestment': { name: 'NFT Reinvestment', icon: '♻️', description: 'NFT Mining reinvestiert', currencies: ['GMT'] },
+            'nft-game-reinvestment': { name: 'Game Reinvestment', icon: '🎮', description: 'MinerWars reinvestiert', currencies: ['GMT'] },
+            'simple-earn-reward': { name: 'Staking Rewards', icon: '💎', description: 'Passive Staking-Erträge', currencies: ['BTC', 'USDT', 'USDC', 'GMT'] },
+            
+            // Referrals & Bonuses
+            'ref-bonus': { name: 'Referral Bonus', icon: '🎁', description: 'Passives Einkommen', currencies: ['GMT', 'USDT', 'USDC'] },
+            'bounty-program': { name: 'Bounty Programm', icon: '🎯', description: 'Referral-Task Belohnungen', currencies: ['GMT', 'USDT'] },
+            'promocompany-bonus': { name: 'Promo Bonus', icon: '🎊', description: 'Marketing-Belohnungen', currencies: ['GMT'] },
+            
+            // Funds & Rewards
+            'gmt-fund': { name: 'GMT Fonds', icon: '🏦', description: 'Fonds-Gutschrift', currencies: ['GMT'] },
+            'gmt-fund-clan-owner': { name: 'Clan Owner Bonus', icon: '👑', description: 'MinerWars Clan-Besitzer', currencies: ['GMT'] },
+            'pool-liquidity-reward': { name: 'Liquidity Rewards', icon: '💧', description: 'Pool Belohnungen', currencies: ['GMT'] },
+            
+            // Marketplace
+            'marketplace-deposit': { name: 'Marketplace Verkäufe', icon: '🏪', description: 'NFTs verkauft', currencies: ['GMT'] },
+            
+            // Conversions (neutral)
+            'asset-conversion': { name: 'Währungstausch (Eingang)', icon: '🔄', description: 'USDT→USDC für Staking', currencies: ['USDC', 'USDT', 'GMT'] }
+        };
+
+        const EXPENSE_CATEGORIES = {
+            // Mining Costs
+            'maintenance': { name: 'NFT Maintenance', icon: '⚙️', description: 'NFT Wartung', currencies: ['GMT'] },
+            'nft-game-maintenance': { name: 'Game Maintenance', icon: '🔧', description: 'MinerWars Wartung', currencies: ['GMT'] },
+            
+            // Upgrades
+            'nft-upgrade-power': { name: 'Power Upgrades', icon: '⚡', description: 'Hashrate erhöht', currencies: ['GMT', 'USDC'] },
+            'nft-upgrade-energy-efficiency': { name: 'Effizienz Upgrades', icon: '💡', description: 'Energy Efficiency', currencies: ['GMT', 'USDC'] },
+            
+            // Marketplace & NFTs
+            'marketplace-withdraw': { name: 'Marketplace Käufe', icon: '🛒', description: 'NFTs gekauft', currencies: ['GMT'] },
+            'nft-payment': { name: 'NFT Direktkäufe', icon: '🖼️', description: 'Direkte Käufe', currencies: ['GMT'] },
+            'nft-game-ability-payment': { name: 'MinerWars Spells', icon: '✨', description: 'Game Abilities', currencies: ['GMT'] },
+            
+            // Withdrawals
+            'nft-income-withdraw': { name: 'BTC Mining Auszahlung', icon: '💸', description: 'Auto-Withdraw NFT Mining', currencies: ['BTC'] },
+            'nft-game-income-withdraw': { name: 'Game Mining Auszahlung', icon: '💸', description: 'Auto-Withdraw Game Mining', currencies: ['BTC'] },
+            'withdraw': { name: 'Externe Auszahlung', icon: '🏧', description: 'Cashout auf externes Wallet', currencies: ['GMT', 'USDT', 'BTC', 'USDC', 'TON'] },
+            'withdraw-order': { name: 'Auszahlungsorder', icon: '📤', description: 'Withdrawal-Anfrage', currencies: ['USDC', 'TON'] },
+            
+            // Transfers & Conversions
+            'external-service-transfer': { name: 'Service Transfer', icon: '↗️', description: 'BTC auf Credit Card Wallet', currencies: ['BTC'] },
+            'asset-conversion': { name: 'Währungstausch (Ausgang)', icon: '🔄', description: 'USDT→USDC Konvertierung', currencies: ['USDT', 'USDC', 'GMT'] },
+            'gmt-bot-conversion': { name: 'Bot Conversion', icon: '🤖', description: 'Automatische Konvertierung', currencies: ['GMT'] }
+        };
+
+        // Tax Categories (German Tax Law - EStG)
+        const TAX_CATEGORIES = {
+            // Betriebseinnahmen (§15 EStG - Gewerblich oder §22 EStG - Sonstige Einkünfte)
+            businessIncome: {
+                'simple-earn-reward': { paragraph: '§22 EStG', type: 'Betriebseinnahme', description: 'Klassische Mining-Einnahme' },
+                'nft-income': { paragraph: '§22 EStG', type: 'Betriebseinnahme', description: 'Spielbasierte Erträge, betrieblich, da auf Miner bezogen' },
+                'nft-game-income': { paragraph: '§22 EStG', type: 'Betriebseinnahme', description: 'Spielbasierte Erträge, betrieblich, da auf Miner bezogen' },
+                'Mining reward': { paragraph: '§22 EStG', type: 'Betriebseinnahme', description: 'Spielbasierte Erträge, betrieblich, da auf Miner bezogen' },
+                'Miner Wars reward': { paragraph: '§22 EStG', type: 'Betriebseinnahme', description: 'Spielbasierte Erträge, betrieblich, da auf Miner bezogen' },
+                'nft-reinvestment': { paragraph: 'Ja, als Aufwand', type: 'Betriebseinnahme', description: 'Wenn aus Einnahmen getätigt, voll abziehbar' },
+                'nft-game-reinvestment': { paragraph: 'Ja, als Aufwand', type: 'Betriebseinnahme', description: 'Reinvestition aus Einnahmen' },
+                'NFT Game reinvestment': { paragraph: 'Ja, als Aufwand', type: 'Betriebseinnahme', description: 'Reinvestition aus Einnahmen' },
+                'NFT Reinvestment': { paragraph: 'Ja, als Aufwand', type: 'Betriebseinnahme', description: 'Wenn aus Einnahmen getätigt' }
+            },
+            
+            // Betriebseinnahmen KwK (Kunden-werben-Kunden)
+            kwkIncome: {
+                'ref-bonus': { paragraph: '§22 EStG analog', type: 'Betriebseinnahme (§22 EStG analog)', description: 'Kunden-werben-Kunden = Einnahme' },
+                'bounty-program': { paragraph: '§15 EStG', type: 'Betriebseinnahme (§15 EStG)', description: 'Einnahme für Aktionen, zählt wie Referral' },
+                'pool-liquidity-reward': { paragraph: '§22 EStG analog', type: 'Betriebseinnahme (§22 EStG analog)', description: 'Kunden-werben-Kunden = Einnahme' },
+                'promocompany-bonus': { paragraph: '§22 EStG analog', type: 'Betriebseinnahme (§22 EStG analog)', description: 'Kunden-werben-Kunden = Einnahme' },
+                'gmt-fund-clan-owner': { paragraph: 'Ja, als Einnahme', type: 'Betriebseinnahme', description: 'Spielbasierte Erträge, betrieblich, da auf Miner bezogen' }
+            },
+            
+            // Betriebsausgaben
+            businessExpenses: {
+                'maintenance': { paragraph: 'Ja, als Aufwand', type: 'Betriebsausgabe', description: 'Laufende Betriebskosten (Strom + Service)' },
+                'nft-game-maintenance': { paragraph: 'Ja, als Aufwand', type: 'Betriebsausgabe', description: 'Laufende Betriebskosten (Strom + Service)' },
+                'nft-game-ability-payment': { paragraph: 'Ja, als Aufwand', type: 'Betriebsausgabe', description: 'Spielbezogene Booster, wirken auf die Einnahmen' },
+                'Spell purchase': { paragraph: 'Ja, als Aufwand', type: 'Betriebsausgabe', description: 'Spielbezogene Booster, wirken auf die Einnahmen' }
+            },
+            
+            // Investitionen (Anlagevermögen)
+            investments: {
+                'marketplace-withdraw': { paragraph: 'Ja, als Investition', type: 'Betriebsausgabe / Investition', description: 'Miner Kauf' },
+                'Miner purchase': { paragraph: 'Ja, als Investition', type: 'Betriebsausgabe / Investition', description: 'Miner Kauf' },
+                'nft-upgrade-energy-efficiency': { paragraph: 'Ja, als Aufwand', type: 'Betriebsausgabe / Investition', description: 'Investition zur Verbesserung d. Einnahmeerzielung' },
+                'Efficiency upgrade': { paragraph: 'Ja, als Aufwand', type: 'Anschaffung', description: 'Investition zur Verbesserung d. Einnahmeerzielung' },
+                'nft-upgrade-power': { paragraph: 'Ja, als Aufwand', type: 'Betriebsausgabe / Investition', description: 'Investition zur Verbesserung d. Einnahmeerzielung' },
+                'Power upgrade': { paragraph: 'Ja, als Aufwand', type: 'Betriebsausgabe / Investition', description: 'Investition zur Verbesserung d. Einnahmeerzielung' }
+            },
+            
+            // Privatentnahmen (keine Einnahme, aber Wechselkursgewinne möglich)
+            privateWithdrawals: {
+                'withdraw': { paragraph: 'Nein, nur Wechselkurs Gewinne', type: 'Privatentnahme', description: 'Nur Bewegungen zwischen Wallets, keine Buchung nötig' },
+                'withdraw-order': { paragraph: 'Nein, nur Wechselkurs Gewinne', type: 'Privatentnahme', description: 'Nur Bewegungen zwischen Wallets, keine Buchung nötig' },
+                'Auto withdrawal': { paragraph: 'Nein, nur Wechselkurs Gewinne', type: 'Privatentnahme', description: 'Nur Bewegungen zwischen Wallets, keine Buchung nötig' },
+                'Withdrawal': { paragraph: 'Nein, nur Wechselkurs Gewinne', type: 'Privatentnahme', description: 'Nur Bewegungen zwischen Wallets, keine Buchung nötig' }
+            },
+            
+            // Privateinlagen (Investiertes Eigenkapital)
+            privateDeposits: {
+                'top-up': { paragraph: 'Nein, ggf als Privatanlage notieren', type: 'Keine Einnahme', description: 'Investiertes Eigenkapital' },
+                'fireblocks-deposit': { paragraph: 'Nein, ggf als Privatanlage notieren', type: 'Keine Einnahme', description: 'Investiertes Eigenkapital' },
+                'Deposit': { paragraph: 'Privatanlage', type: 'Privatanlage', description: 'Investiertes Eigenkapital' }
+            },
+            
+            // Umwandlungen (nur Wechselkurs relevant)
+            conversions: {
+                'asset-conversion': { paragraph: 'Umwandlung', type: 'Umwandlung', description: 'Umwandlung innerhalb der App nur Wechselkurs gewinne erfassen' },
+                'Conversion': { paragraph: 'Umwandlung', type: 'Umwandlung', description: 'Umwandlung innerhalb der App nur Wechselkurs gewinne erfassen' },
+                'external-service-transfer': { paragraph: 'Umwandlung', type: 'Umwandlung', description: 'Umwandlung innerhalb der App nur Wechselkurs gewinne erfassen' }
+            }
+        };
+
+        let selectedTaxYear = '2026'; // Default to current year
+        let selectedTaxType = 'business'; // 'business' or 'private' (§15 vs §23 EStG)
+        let cachedFIFOResults = null; // Cache for FIFO results (for detail table)
+        let fifoCurrentPage = 1; // Current page in FIFO detail table
+        let fifoPageSize = 100; // Transactions per page
+        let fifoTableLoaded = false; // Track if table has been loaded
+
+        // File Upload Handler
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('fileInfo').innerHTML = `
+                    <div class="loader"></div>
+                    <p>Analysiere ${file.name}...</p>
+                `;
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    parseCSV(event.target.result);
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            const headers = lines[0].split(';').map(h => h.replace(/"/g, ''));
+            
+            transactionData = lines.slice(1).map(line => {
+                const values = line.split(';').map(v => v.replace(/"/g, ''));
+                const obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = values[index];
+                });
+                return obj;
+            });
+
+            document.getElementById('fileInfo').innerHTML = `
+                <p>✅ ${transactionData.length} Transaktionen erfolgreich geladen!</p>
+            `;
+
+            setTimeout(() => {
+                document.getElementById('uploadSection').style.display = 'none';
+                document.getElementById('dashboardContent').classList.add('active');
+                analyzeData();
+            }, 1000);
+        }
+
+        function parseAmount(amountStr) {
+            return parseFloat(amountStr.replace(',', '.')) || 0;
+        }
+
+        function getPrice(date, currency, fiatCurrency) {
+            // Normalize date format
+            const dateStr = date.replace(/"/g, '');
+            
+            if (currency === 'GMT') {
+                const priceData = gmtPriceData[dateStr];
+                if (!priceData) return null;
+                
+                const priceStr = fiatCurrency === 'EUR' ? priceData.price_eur : priceData.price_usd;
+                return parseFloat(priceStr.replace(',', '.'));
+            } else if (currency === 'BTC') {
+                const priceData = btcPriceData[dateStr];
+                if (!priceData) return null;
+                
+                const priceStr = fiatCurrency === 'EUR' ? priceData.price_eur : priceData.price_usd;
+                return parseFloat(priceStr.replace(',', '.'));
+            }
+            return null;
+        }
+
+        function calculateFiatValue(amount, date, currency, fiatCurrency) {
+            const price = getPrice(date, currency, fiatCurrency);
+            if (price === null) return 0;
+            return amount * price;
+        }
+
+        function changeCurrency(currency) {
+            selectedCurrency = currency;
+            
+            // Update button states
+            document.querySelectorAll('.currency-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(currency)) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Reanalyze with new currency
+            if (transactionData.length > 0) {
+                analyzeData();
+            }
+        }
+
+        function changeTaxYear(year) {
+            selectedTaxYear = year;
+            
+            // Update button states (only for tax year buttons)
+            const taxYearButtons = document.querySelectorAll('.currency-selector')[1]?.querySelectorAll('.currency-btn');
+            if (taxYearButtons) {
+                taxYearButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.textContent.includes(year) || (year === 'all' && btn.textContent === 'Alle')) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+            
+            // Reanalyze with filtered data
+            if (transactionData.length > 0) {
+                analyzeData();
+            }
+        }
+
+        function changeTaxType(type) {
+            selectedTaxType = type;
+            
+            // Update button states (only for tax type buttons)
+            const taxTypeButtons = document.querySelectorAll('.currency-selector')[2]?.querySelectorAll('.currency-btn');
+            if (taxTypeButtons) {
+                taxTypeButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if ((type === 'business' && btn.textContent.includes('Gewerblich')) ||
+                        (type === 'private' && btn.textContent.includes('Privat'))) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+            
+            // Reanalyze with new tax type
+            if (transactionData.length > 0) {
+                analyzeData();
+            }
+        }
+
+        function getFilteredTransactions() {
+            if (selectedTaxYear === 'all') {
+                return transactionData;
+            }
+            
+            // Filter by German tax year (01.01. - 31.12.)
+            return transactionData.filter(t => {
+                const date = new Date(t.Date.replace(/"/g, ''));
+                const year = date.getFullYear();
+                return year.toString() === selectedTaxYear;
+            });
+        }
+
+        function getDataForFIFO() {
+            // FIFO needs ALL transactions from the beginning up to the end of selected year
+            // Not just transactions FROM that year!
+            if (selectedTaxYear === 'all') {
+                return transactionData;
+            }
+            
+            // Return all transactions up to and including the selected year
+            return transactionData.filter(t => {
+                const date = new Date(t.Date.replace(/"/g, ''));
+                const year = date.getFullYear();
+                return year <= parseInt(selectedTaxYear);
+            });
+        }
+
+        function analyzeData() {
+            // Get filtered transactions based on tax year
+            const filteredData = getFilteredTransactions();
+            
+            // Multi-Currency Analysis
+            const currencies = ['GMT', 'USDT', 'BTC', 'USDC', 'TON'];
+            const allData = {
+                incomeByCategory: {},
+                expensesByCategory: {},
+                byCurrency: {},
+                totalFiatIncome: 0,
+                totalFiatExpenses: 0
+            };
+
+            // Initialize currency trackers
+            currencies.forEach(curr => {
+                allData.byCurrency[curr] = {
+                    income: 0,
+                    expenses: 0,
+                    fiatIncome: 0,
+                    fiatExpenses: 0,
+                    count: 0
+                };
+            });
+
+            // Process all transactions
+            filteredData.forEach(t => {
+                const amount = parseAmount(t.Amount);
+                const fromType = t.FromType;
+                const currency = t.Currency;
+                const absAmount = Math.abs(amount);
+                
+                // Calculate fiat value (for stablecoins, assume ≈1:1)
+                let fiatValue = 0;
+                if (currency === 'GMT' || currency === 'BTC') {
+                    fiatValue = calculateFiatValue(absAmount, t.Date, currency, selectedCurrency);
+                } else if (currency === 'USDT' || currency === 'USDC') {
+                    // Stablecoins: assume 1:1 with USD, convert to EUR if needed
+                    fiatValue = selectedCurrency === 'EUR' ? absAmount * 0.92 : absAmount; // Rough EUR conversion
+                } else if (currency === 'TON') {
+                    // TON: would need price data, for now skip or assume low value
+                    fiatValue = absAmount * 5; // Rough estimate ~$5 per TON
+                }
+
+                const isIncome = amount > 0;
+                const isExpense = amount < 0;
+
+                // Update currency totals
+                if (allData.byCurrency[currency]) {
+                    allData.byCurrency[currency].count++;
+                    if (isIncome) {
+                        allData.byCurrency[currency].income += absAmount;
+                        allData.byCurrency[currency].fiatIncome += fiatValue;
+                        allData.totalFiatIncome += fiatValue;
+                    } else {
+                        allData.byCurrency[currency].expenses += absAmount;
+                        allData.byCurrency[currency].fiatExpenses += fiatValue;
+                        allData.totalFiatExpenses += fiatValue;
+                    }
+                }
+
+                // Categorize by FromType
+                if (isIncome && INCOME_CATEGORIES[fromType]) {
+                    if (!allData.incomeByCategory[fromType]) {
+                        allData.incomeByCategory[fromType] = {
+                            totalAmount: 0,
+                            fiatValue: 0,
+                            byCurrency: {}
+                        };
+                    }
+                    if (!allData.incomeByCategory[fromType].byCurrency[currency]) {
+                        allData.incomeByCategory[fromType].byCurrency[currency] = {
+                            amount: 0,
+                            count: 0,
+                            fiatValue: 0
+                        };
+                    }
+                    
+                    allData.incomeByCategory[fromType].totalAmount += absAmount;
+                    allData.incomeByCategory[fromType].fiatValue += fiatValue;
+                    allData.incomeByCategory[fromType].byCurrency[currency].amount += absAmount;
+                    allData.incomeByCategory[fromType].byCurrency[currency].count++;
+                    allData.incomeByCategory[fromType].byCurrency[currency].fiatValue += fiatValue;
+                }
+
+                if (isExpense && EXPENSE_CATEGORIES[fromType]) {
+                    if (!allData.expensesByCategory[fromType]) {
+                        allData.expensesByCategory[fromType] = {
+                            totalAmount: 0,
+                            fiatValue: 0,
+                            byCurrency: {}
+                        };
+                    }
+                    if (!allData.expensesByCategory[fromType].byCurrency[currency]) {
+                        allData.expensesByCategory[fromType].byCurrency[currency] = {
+                            amount: 0,
+                            count: 0,
+                            fiatValue: 0
+                        };
+                    }
+                    
+                    allData.expensesByCategory[fromType].totalAmount += absAmount;
+                    allData.expensesByCategory[fromType].fiatValue += fiatValue;
+                    allData.expensesByCategory[fromType].byCurrency[currency].amount += absAmount;
+                    allData.expensesByCategory[fromType].byCurrency[currency].count++;
+                    allData.expensesByCategory[fromType].byCurrency[currency].fiatValue += fiatValue;
+                }
+            });
+
+            // Calculate totals
+            const totalTransactions = filteredData.length;
+            const netFiat = allData.totalFiatIncome - allData.totalFiatExpenses;
+
+            // Exchange rate tracking for GMT
+            const gmtTopUps = allData.incomeByCategory['top-up']?.byCurrency['GMT'] || { fiatValue: 0 };
+            const currentGMTBalance = allData.byCurrency['GMT'].income - allData.byCurrency['GMT'].expenses;
+            const currentGMTValue = calculateFiatValue(currentGMTBalance, filteredData[0]?.Date || new Date().toISOString(), 'GMT', selectedCurrency);
+            const exchangeRateLoss = gmtTopUps.fiatValue - currentGMTValue;
+
+            // Render cards and charts
+            renderOverviewCardsMC(allData, netFiat, exchangeRateLoss, totalTransactions);
+            renderCategoryCards(allData);
+            renderChartsMC(allData, filteredData);
+            renderMonthlyBreakdown(filteredData);
+            generateInsightsMC(allData, exchangeRateLoss);
+            
+            // Tax Analysis
+            analyzeTaxData(filteredData, allData);
+        }
+
+        function renderOverviewCardsMC(allData, netFiat, exchangeLoss, totalCount) {
+            const currSymbol = selectedCurrency === 'EUR' ? '€' : '$';
+            
+            let cards = '';
+            
+            // Currency cards
+            ['GMT', 'USDT', 'BTC', 'USDC', 'TON'].forEach(curr => {
+                const data = allData.byCurrency[curr];
+                if (data && data.count > 0) {
+                    const net = data.income - data.expenses;
+                    const netFiat = data.fiatIncome - data.fiatExpenses;
+                    const precision = curr === 'BTC' ? 8 : 2;
+                    
+                    cards += `
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-icon">${curr === 'BTC' ? '₿' : curr === 'GMT' ? '💰' : curr === 'USDT' ? '💵' : curr === 'USDC' ? '💲' : '🎫'}</span>
+                                <span class="card-title">${curr}</span>
+                            </div>
+                            <div class="card-value ${net >= 0 ? 'positive' : 'negative'}">
+                                ${net >= 0 ? '+' : ''}${net.toFixed(precision)} ${curr}
+                            </div>
+                            <div class="card-detail">${data.count} Transaktionen</div>
+                            <div class="card-detail" style="color: ${netFiat >= 0 ? '#00ff7f' : '#ff4444'}; font-size: 1.05em; margin-top: 5px;">
+                                ≈ ${netFiat >= 0 ? '+' : ''}${netFiat.toFixed(2)} ${currSymbol}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            // Total Fiat card
+            cards += `
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">🌐</span>
+                        <span class="card-title">Gesamt (Fiat)</span>
+                    </div>
+                    <div class="card-value ${netFiat >= 0 ? 'positive' : 'negative'}">
+                        ${netFiat >= 0 ? '+' : ''}${netFiat.toFixed(2)} ${currSymbol}
+                    </div>
+                    <div class="card-detail">${totalCount} Total Transaktionen</div>
+                    <div class="card-detail" style="color: #888; font-size: 0.9em; margin-top: 5px;">
+                        713 Tage Historie
+                    </div>
+                </div>
+            `;
+
+            // Exchange rate card
+            if (Math.abs(exchangeLoss) > 10) {
+                cards += `
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-icon">📉</span>
+                            <span class="card-title">Wechselkurs-Effekt</span>
+                        </div>
+                        <div class="card-value ${exchangeLoss <= 0 ? 'positive' : 'negative'}">
+                            ${exchangeLoss <= 0 ? '+' : '-'}${Math.abs(exchangeLoss).toFixed(2)} ${currSymbol}
+                        </div>
+                        <div class="card-detail">GMT Preis-Änderung</div>
+                        <div class="card-detail" style="color: #888; font-size: 0.85em; margin-top: 5px;">
+                            ${exchangeLoss > 0 ? 'Verlust' : 'Gewinn'} seit Top-Up
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('overviewCards').innerHTML = cards;
+        }
+
+        function renderCategoryCards(allData) {
+            const currSymbol = selectedCurrency === 'EUR' ? '€' : '$';
+            
+            // All Income (Overview Tab)
+            let allIncomeHTML = '';
+            Object.entries(allData.incomeByCategory).forEach(([key, data]) => {
+                const cat = INCOME_CATEGORIES[key];
+                if (cat && data.totalAmount > 0) {
+                    // Group by currency
+                    let currencyBreakdown = '';
+                    Object.entries(data.byCurrency).forEach(([curr, details]) => {
+                        if (details.amount > 0) {
+                            currencyBreakdown += `<div style="font-size: 0.85em; color: #888; margin-top: 3px;">
+                                ${curr}: +${details.amount.toFixed(curr === 'BTC' ? 8 : 2)} (${details.count}x)
+                            </div>`;
+                        }
+                    });
+                    
+                    allIncomeHTML += `
+                        <div class="category-card income">
+                            <div class="category-name">${cat.icon} ${cat.name}</div>
+                            <div class="category-count">${cat.description}</div>
+                            ${currencyBreakdown}
+                            <div class="category-count" style="color: #00ff7f; margin-top: 8px; font-size: 1.1em; font-weight: bold;">
+                                ≈ +${data.fiatValue.toFixed(2)} ${currSymbol}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            document.getElementById('allIncome').innerHTML = allIncomeHTML || '<div style="color: #888; padding: 20px;">Keine Einnahmen gefunden</div>';
+
+            // All Expenses (Overview Tab)
+            let allExpensesHTML = '';
+            Object.entries(allData.expensesByCategory).forEach(([key, data]) => {
+                const cat = EXPENSE_CATEGORIES[key];
+                if (cat && data.totalAmount > 0) {
+                    // Group by currency
+                    let currencyBreakdown = '';
+                    Object.entries(data.byCurrency).forEach(([curr, details]) => {
+                        if (details.amount > 0) {
+                            currencyBreakdown += `<div style="font-size: 0.85em; color: #888; margin-top: 3px;">
+                                ${curr}: -${details.amount.toFixed(curr === 'BTC' ? 8 : 2)} (${details.count}x)
+                            </div>`;
+                        }
+                    });
+                    
+                    allExpensesHTML += `
+                        <div class="category-card expense">
+                            <div class="category-name">${cat.icon} ${cat.name}</div>
+                            <div class="category-count">${cat.description}</div>
+                            ${currencyBreakdown}
+                            <div class="category-count" style="color: #ff4444; margin-top: 8px; font-size: 1.1em; font-weight: bold;">
+                                ≈ -${data.fiatValue.toFixed(2)} ${currSymbol}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            document.getElementById('allExpenses').innerHTML = allExpensesHTML || '<div style="color: #888; padding: 20px;">Keine Ausgaben gefunden</div>';
+
+            // Staking Rewards (Staking Tab)
+            const stakingData = allData.incomeByCategory['simple-earn-reward'];
+            let stakingHTML = '';
+            if (stakingData) {
+                Object.entries(stakingData.byCurrency).forEach(([curr, details]) => {
+                    if (details.amount > 0) {
+                        stakingHTML += `
+                            <div class="category-card income">
+                                <div class="category-name">💎 ${curr} Staking</div>
+                                <div class="category-amount positive">+${details.amount.toFixed(curr === 'BTC' ? 8 : 2)} ${curr}</div>
+                                <div class="category-count">${details.count} Staking Rewards</div>
+                                <div class="category-count" style="color: #00ff7f; margin-top: 5px;">
+                                    ≈ ${details.fiatValue.toFixed(2)} ${currSymbol}
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+            document.getElementById('stakingRewards').innerHTML = stakingHTML || '<div style="color: #888; padding: 20px;">Keine Staking Rewards gefunden</div>';
+
+            // Mining Income (Staking Tab)
+            let miningHTML = '';
+            ['nft-income', 'nft-game-income'].forEach(type => {
+                const miningData = allData.incomeByCategory[type];
+                if (miningData) {
+                    const cat = INCOME_CATEGORIES[type];
+                    miningHTML += `
+                        <div class="category-card income">
+                            <div class="category-name">${cat.icon} ${cat.name}</div>
+                            <div class="category-amount neutral">${miningData.byCurrency['BTC']?.amount.toFixed(8) || '0.00000000'} BTC</div>
+                            <div class="category-count">${miningData.byCurrency['BTC']?.count || 0} Transaktionen</div>
+                            <div class="category-count" style="color: #ffa500; margin-top: 5px;">
+                                ≈ ${miningData.byCurrency['BTC']?.fiatValue.toFixed(2) || '0.00'} ${currSymbol}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            document.getElementById('miningIncome').innerHTML = miningHTML || '<div style="color: #888; padding: 20px;">Kein BTC Mining gefunden</div>';
+
+            // Referral Stats (Referrals Tab)
+            let referralHTML = '';
+            ['ref-bonus', 'bounty-program'].forEach(type => {
+                const refData = allData.incomeByCategory[type];
+                if (refData) {
+                    const cat = INCOME_CATEGORIES[type];
+                    let totalFiat = 0;
+                    let totalCount = 0;
+                    let currBreakdown = '';
+                    
+                    Object.entries(refData.byCurrency).forEach(([curr, details]) => {
+                        if (details.amount > 0) {
+                            totalFiat += details.fiatValue;
+                            totalCount += details.count;
+                            currBreakdown += `<div style="font-size: 0.9em; color: #aaa; margin-top: 3px;">
+                                ${curr}: +${details.amount.toFixed(2)} (${details.count}x)
+                            </div>`;
+                        }
+                    });
+                    
+                    referralHTML += `
+                        <div class="category-card income">
+                            <div class="category-name">${cat.icon} ${cat.name}</div>
+                            <div class="category-count">${cat.description}</div>
+                            ${currBreakdown}
+                            <div class="category-count" style="color: #00ff7f; margin-top: 8px; font-size: 1.2em; font-weight: bold;">
+                                ${totalCount} Rewards ≈ ${totalFiat.toFixed(2)} ${currSymbol}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            document.getElementById('referralStats').innerHTML = referralHTML || '<div style="color: #888; padding: 20px;">Keine Referral-Einnahmen gefunden</div>';
+
+            // Withdrawal Stats (Withdrawals Tab)
+            let withdrawalHTML = '';
+            ['withdraw', 'withdraw-order', 'external-service-transfer', 'nft-income-withdraw', 'nft-game-income-withdraw'].forEach(type => {
+                const withData = allData.expensesByCategory[type];
+                if (withData) {
+                    const cat = EXPENSE_CATEGORIES[type];
+                    let totalFiat = 0;
+                    let totalCount = 0;
+                    let currBreakdown = '';
+                    
+                    Object.entries(withData.byCurrency).forEach(([curr, details]) => {
+                        if (details.amount > 0) {
+                            totalFiat += details.fiatValue;
+                            totalCount += details.count;
+                            currBreakdown += `<div style="font-size: 0.9em; color: #aaa; margin-top: 3px;">
+                                ${curr}: -${details.amount.toFixed(curr === 'BTC' ? 8 : 2)} (${details.count}x)
+                            </div>`;
+                        }
+                    });
+                    
+                    withdrawalHTML += `
+                        <div class="category-card expense">
+                            <div class="category-name">${cat.icon} ${cat.name}</div>
+                            <div class="category-count">${cat.description}</div>
+                            ${currBreakdown}
+                            <div class="category-count" style="color: #ff4444; margin-top: 8px; font-size: 1.2em; font-weight: bold;">
+                                ${totalCount} Auszahlungen ≈ -${totalFiat.toFixed(2)} ${currSymbol}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            document.getElementById('withdrawalStats').innerHTML = withdrawalHTML || '<div style="color: #888; padding: 20px;">Keine Auszahlungen gefunden</div>';
+        }
+
+        function renderChartsMC(allData, filteredData) {
+            // Overview Chart - All fiat income/expenses over time
+            const monthlyFiat = {};
+            filteredData.forEach(t => {
+                const date = new Date(t.Date.replace(/"/g, ''));
+                const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                if (!monthlyFiat[month]) monthlyFiat[month] = { income: 0, expenses: 0 };
+                
+                const amount = parseAmount(t.Amount);
+                const currency = t.Currency;
+                let fiatValue = 0;
+                
+                if (currency === 'GMT' || currency === 'BTC') {
+                    fiatValue = calculateFiatValue(Math.abs(amount), t.Date, currency, selectedCurrency);
+                } else if (currency === 'USDT' || currency === 'USDC') {
+                    fiatValue = selectedCurrency === 'EUR' ? Math.abs(amount) * 0.92 : Math.abs(amount);
+                } else if (currency === 'TON') {
+                    fiatValue = Math.abs(amount) * 5;
+                }
+                
+                if (amount > 0) {
+                    monthlyFiat[month].income += fiatValue;
+                } else {
+                    monthlyFiat[month].expenses += fiatValue;
+                }
+            });
+
+            const months = Object.keys(monthlyFiat).sort();
+            const incomeData = months.map(m => monthlyFiat[m].income);
+            const expenseData = months.map(m => monthlyFiat[m].expenses);
+            const netData = months.map(m => monthlyFiat[m].income - monthlyFiat[m].expenses);
+
+            const currSymbol = selectedCurrency === 'EUR' ? '€' : '$';
+
+            // Overview Chart
+            if (charts.overview) charts.overview.destroy();
+            charts.overview = new Chart(document.getElementById('overviewChart'), {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: `Einnahmen (${currSymbol})`,
+                            data: incomeData,
+                            borderColor: '#00ff7f',
+                            backgroundColor: 'rgba(0, 255, 127, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: `Ausgaben (${currSymbol})`,
+                            data: expenseData,
+                            borderColor: '#ff4444',
+                            backgroundColor: 'rgba(255, 68, 68, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: `Netto (${currSymbol})`,
+                            data: netData,
+                            borderColor: '#ffa500',
+                            backgroundColor: 'rgba(255, 165, 0, 0.1)',
+                            tension: 0.4,
+                            borderWidth: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#f0f0f0' } }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#f0f0f0' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#f0f0f0', maxRotation: 45 },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+
+            // Staking Chart - Show staking rewards over time
+            const stakingByMonth = {};
+            filteredData.filter(t => t.FromType === 'simple-earn-reward').forEach(t => {
+                const date = new Date(t.Date.replace(/"/g, ''));
+                const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                if (!stakingByMonth[month]) stakingByMonth[month] = {};
+                
+                const curr = t.Currency;
+                if (!stakingByMonth[month][curr]) stakingByMonth[month][curr] = 0;
+                stakingByMonth[month][curr] += parseAmount(t.Amount);
+            });
+
+            const stakingMonths = Object.keys(stakingByMonth).sort();
+            const currencyColors = { BTC: '#ffa500', GMT: '#673dec', USDT: '#26a69a', USDC: '#2196f3' };
+            const stakingDatasets = [];
+            
+            Object.keys(currencyColors).forEach(curr => {
+                stakingDatasets.push({
+                    label: curr,
+                    data: stakingMonths.map(m => stakingByMonth[m][curr] || 0),
+                    backgroundColor: currencyColors[curr],
+                    borderColor: currencyColors[curr],
+                    borderWidth: 2
+                });
+            });
+
+            if (charts.staking) charts.staking.destroy();
+            charts.staking = new Chart(document.getElementById('stakingChart'), {
+                type: 'bar',
+                data: {
+                    labels: stakingMonths,
+                    datasets: stakingDatasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#f0f0f0' } }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#f0f0f0' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            stacked: false
+                        },
+                        x: {
+                            ticks: { color: '#f0f0f0', maxRotation: 45 },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+
+            // Referral Chart - Monthly referral income
+            const refByMonth = {};
+            filteredData.filter(t => t.FromType === 'ref-bonus' || t.FromType === 'bounty-program').forEach(t => {
+                const date = new Date(t.Date.replace(/"/g, ''));
+                const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                const amount = parseAmount(t.Amount);
+                const currency = t.Currency;
+                
+                let fiatValue = 0;
+                if (currency === 'USDT' || currency === 'USDC') {
+                    fiatValue = selectedCurrency === 'EUR' ? amount * 0.92 : amount;
+                } else if (currency === 'GMT') {
+                    fiatValue = calculateFiatValue(amount, t.Date, 'GMT', selectedCurrency);
+                }
+                
+                if (!refByMonth[month]) refByMonth[month] = 0;
+                refByMonth[month] += fiatValue;
+            });
+
+            const refMonths = Object.keys(refByMonth).sort();
+            const refData = refMonths.map(m => refByMonth[m]);
+
+            if (charts.referral) charts.referral.destroy();
+            charts.referral = new Chart(document.getElementById('referralChart'), {
+                type: 'bar',
+                data: {
+                    labels: refMonths,
+                    datasets: [{
+                        label: `Referral Income (${currSymbol})`,
+                        data: refData,
+                        backgroundColor: '#00ff7f',
+                        borderColor: '#00cc66',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#f0f0f0' } }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#f0f0f0' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#f0f0f0', maxRotation: 45 },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+
+            // Withdrawal Chart
+            const withByMonth = {};
+            filteredData.filter(t => 
+                t.FromType === 'withdraw' || t.FromType === 'withdraw-order' || 
+                t.FromType === 'external-service-transfer'
+            ).forEach(t => {
+                const date = new Date(t.Date.replace(/"/g, ''));
+                const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                const amount = Math.abs(parseAmount(t.Amount));
+                const currency = t.Currency;
+                
+                let fiatValue = 0;
+                if (currency === 'BTC') {
+                    fiatValue = calculateFiatValue(amount, t.Date, 'BTC', selectedCurrency);
+                } else if (currency === 'USDT' || currency === 'USDC') {
+                    fiatValue = selectedCurrency === 'EUR' ? amount * 0.92 : amount;
+                } else if (currency === 'TON') {
+                    fiatValue = amount * 5;
+                }
+                
+                if (!withByMonth[month]) withByMonth[month] = 0;
+                withByMonth[month] += fiatValue;
+            });
+
+            const withMonths = Object.keys(withByMonth).sort();
+            const withData = withMonths.map(m => withByMonth[m]);
+
+            if (charts.withdrawal) charts.withdrawal.destroy();
+            charts.withdrawal = new Chart(document.getElementById('withdrawalChart'), {
+                type: 'bar',
+                data: {
+                    labels: withMonths,
+                    datasets: [{
+                        label: `Withdrawals (${currSymbol})`,
+                        data: withData,
+                        backgroundColor: '#ff4444',
+                        borderColor: '#cc0000',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#f0f0f0' } }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#f0f0f0' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#f0f0f0', maxRotation: 45 },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+
+            // Monthly Chart (keep existing)
+            if (charts.monthly) charts.monthly.destroy();
+            charts.monthly = new Chart(document.getElementById('monthlyChart'), {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: `Einnahmen (${currSymbol})`,
+                            data: incomeData,
+                            backgroundColor: 'rgba(0, 255, 127, 0.7)'
+                        },
+                        {
+                            label: `Ausgaben (${currSymbol})`,
+                            data: expenseData,
+                            backgroundColor: 'rgba(255, 68, 68, 0.7)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#f0f0f0' } }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#f0f0f0' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#f0f0f0', maxRotation: 45 },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderMonthlyBreakdown(allTxs) {
+            const monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+            const currSymbol = selectedCurrency === 'EUR' ? '€' : '$';
+            const byMonth = {};
+            
+            allTxs.forEach(t => {
+                const date = new Date(t.Date.replace(/"/g, ''));
+                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                if (!byMonth[monthKey]) {
+                    byMonth[monthKey] = { income: 0, expenses: 0, count: 0 };
+                }
+                
+                const amount = parseAmount(t.Amount);
+                const currency = t.Currency;
+                
+                // Calculate fiat value
+                let fiatValue = 0;
+                if (currency === 'GMT' || currency === 'BTC') {
+                    fiatValue = calculateFiatValue(Math.abs(amount), t.Date, currency, selectedCurrency);
+                } else if (currency === 'USDT' || currency === 'USDC') {
+                    fiatValue = selectedCurrency === 'EUR' ? Math.abs(amount) * 0.92 : Math.abs(amount);
+                } else if (currency === 'TON') {
+                    fiatValue = Math.abs(amount) * 5;
+                }
+                
+                if (amount > 0) {
+                    byMonth[monthKey].income += fiatValue;
+                } else {
+                    byMonth[monthKey].expenses += fiatValue;
+                }
+                byMonth[monthKey].count++;
+            });
+
+            let html = '';
+            Object.entries(byMonth).sort().forEach(([monthKey, data]) => {
+                const [year, month] = monthKey.split('-');
+                const monthName = monthNames[parseInt(month) - 1];
+                const net = data.income - data.expenses;
+                
+                html += `
+                    <div class="month-card">
+                        <div class="month-name">${monthName} ${year}</div>
+                        <div class="month-stats">
+                            <span style="color: #00ff7f;">+${data.income.toFixed(0)} ${currSymbol}</span>
+                            <span style="color: #ff4444;">-${data.expenses.toFixed(0)} ${currSymbol}</span>
+                        </div>
+                        <div style="margin-top: 10px; font-weight: bold; color: ${net >= 0 ? '#00ff7f' : '#ff4444'};">
+                            ${net >= 0 ? '+' : ''}${net.toFixed(2)} ${currSymbol}
+                        </div>
+                        <div style="color: #888; font-size: 0.85em; margin-top: 5px;">
+                            ${data.count} Transaktionen
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('monthlyGrid').innerHTML = html;
+        }
+
+        function generateInsightsMC(allData, exchangeLoss) {
+            let insights = '';
+            const currSymbol = selectedCurrency === 'EUR' ? '€' : '$';
+
+            // Exchange rate insight
+            if (Math.abs(exchangeLoss) > 10) {
+                if (exchangeLoss > 0) {
+                    insights += `
+                        <div class="insight-item">
+                            <strong>📉 Wechselkurs-Verlust:</strong> Deine verbleibenden GMT haben durch Preis-Änderungen 
+                            ${exchangeLoss.toFixed(2)} ${currSymbol} an Wert verloren. 
+                            Erwäge Auszahlungen bei hohen GMT-Preisen!
+                        </div>
+                    `;
+                } else {
+                    insights += `
+                        <div class="insight-item">
+                            <strong>📈 Wechselkurs-Gewinn:</strong> Deine verbleibenden GMT haben durch Preis-Änderungen 
+                            ${Math.abs(exchangeLoss).toFixed(2)} ${currSymbol} an Wert gewonnen! 💰
+                        </div>
+                    `;
+                }
+            }
+
+            // Referral Performance (45.048 transactions!)
+            const refBonus = allData.incomeByCategory['ref-bonus'];
+            const bounty = allData.incomeByCategory['bounty-program'];
+            if (refBonus || bounty) {
+                const totalRefFiat = (refBonus?.fiatValue || 0) + (bounty?.fiatValue || 0);
+                const refCount = Object.values(refBonus?.byCurrency || {}).reduce((sum, c) => sum + c.count, 0);
+                const bountyCount = Object.values(bounty?.byCurrency || {}).reduce((sum, c) => sum + c.count, 0);
+                
+                insights += `
+                    <div class="insight-item">
+                        <strong>🎁 Referral Erfolg:</strong> ${(refCount + bountyCount).toLocaleString()} Referral-Rewards 
+                        mit einem Wert von ${totalRefFiat.toFixed(2)} ${currSymbol}! 
+                        ${refCount > 40000 ? '🔥 Du bist ein Referral-Champion!' : 'Weiter so!'}
+                    </div>
+                `;
+            }
+
+            // Staking Performance
+            const staking = allData.incomeByCategory['simple-earn-reward'];
+            if (staking && staking.fiatValue > 0) {
+                const stakingCurrencies = Object.keys(staking.byCurrency).length;
+                insights += `
+                    <div class="insight-item">
+                        <strong>💎 Staking Diversifizierung:</strong> Du stakst ${stakingCurrencies} verschiedene Währungen 
+                        und hast ${staking.fiatValue.toFixed(2)} ${currSymbol} an passiven Staking-Rewards verdient! 🎯
+                    </div>
+                `;
+            }
+
+            // BTC Mining Success
+            const btcMining = (allData.incomeByCategory['nft-income']?.fiatValue || 0) + 
+                             (allData.incomeByCategory['nft-game-income']?.fiatValue || 0);
+            if (btcMining > 0) {
+                insights += `
+                    <div class="insight-item">
+                        <strong>⛏️ Bitcoin Mining:</strong> Du hast ${btcMining.toFixed(2)} ${currSymbol} 
+                        durch BTC Mining verdient. ${btcMining > 4000 ? 'Starke Performance! 💪' : ''}
+                    </div>
+                `;
+            }
+
+            // Maintenance Costs
+            const maintenance = (allData.expensesByCategory['maintenance']?.fiatValue || 0) +
+                              (allData.expensesByCategory['nft-game-maintenance']?.fiatValue || 0);
+            if (maintenance > 0) {
+                insights += `
+                    <div class="insight-item">
+                        <strong>⚙️ Wartungskosten:</strong> Insgesamt ${maintenance.toFixed(2)} ${currSymbol} 
+                        für NFT Maintenance ausgegeben. Upgrade deine Energy Efficiency um Kosten zu senken!
+                    </div>
+                `;
+            }
+
+            // Clan Owner Bonuses
+            const clanOwner = allData.incomeByCategory['gmt-fund-clan-owner'];
+            if (clanOwner && clanOwner.fiatValue > 0) {
+                const count = Object.values(clanOwner.byCurrency).reduce((sum, c) => sum + c.count, 0);
+                insights += `
+                    <div class="insight-item">
+                        <strong>👑 Clan Owner Privileg!</strong> Als MinerWars Clan-Besitzer hast du 
+                        ${count} Bonuszahlungen mit einem Wert von ${clanOwner.fiatValue.toFixed(2)} ${currSymbol} erhalten! 
+                    </div>
+                `;
+            }
+
+            // Withdrawal Detection
+            const withdrawals = ['withdraw', 'withdraw-order', 'external-service-transfer'];
+            let totalWithdrawn = 0;
+            withdrawals.forEach(type => {
+                totalWithdrawn += allData.expensesByCategory[type]?.fiatValue || 0;
+            });
+            
+            if (totalWithdrawn > 0) {
+                insights += `
+                    <div class="insight-item">
+                        <strong>💸 Cashout Historie:</strong> Du hast ${totalWithdrawn.toFixed(2)} ${currSymbol} 
+                        ausgecasht. Glückwunsch zu deinen Gewinnen! 🎉
+                    </div>
+                `;
+            } else {
+                const netFiat = allData.totalFiatIncome - allData.totalFiatExpenses;
+                if (netFiat > 1000) {
+                    insights += `
+                        <div class="insight-item">
+                            <strong>🔒 Kapital gebunden:</strong> Keine externen Auszahlungen gefunden. 
+                            Dein kompletter Gewinn von ${netFiat.toFixed(2)} ${currSymbol} ist noch im System investiert.
+                        </div>
+                    `;
+                }
+            }
+
+            // Asset Conversion Tracking
+            const conversion = allData.expensesByCategory['asset-conversion'];
+            if (conversion) {
+                const usdtConverted = conversion.byCurrency['USDT']?.amount || 0;
+                insights += `
+                    <div class="insight-item">
+                        <strong>🔄 Währungstausch:</strong> Du hast ${usdtConverted.toFixed(2)} USDT zu USDC konvertiert 
+                        um Staking-Rewards zu aktivieren. Smart move! 🧠
+                    </div>
+                `;
+            }
+
+            // Time-based insight
+            const days = 713; // From your data analysis
+            const avgDailyFiatIncome = allData.totalFiatIncome / days;
+            insights += `
+                <div class="insight-item">
+                    <strong>📅 Durchschnitt:</strong> Über ${days} Tage hinweg verdienst du durchschnittlich 
+                    ${avgDailyFiatIncome.toFixed(2)} ${currSymbol} pro Tag. Das sind 
+                    ${(avgDailyFiatIncome * 30).toFixed(2)} ${currSymbol}/Monat! 📈
+                </div>
+            `;
+
+            document.getElementById('insightsList').innerHTML = insights || '<div style="color: #888; padding: 20px;">Noch keine Insights verfügbar</div>';
+        }
+
+        // ============================================
+        // TAX ANALYSIS FUNCTIONS (German EStG)
+        // ============================================
+
+        function analyzeTaxData(filteredData, allData) {
+            const currSymbol = selectedCurrency === 'EUR' ? '€' : '$';
+            
+            // Tax categorization
+            let taxData = {
+                businessIncome: {}, // Betriebseinnahmen §15/§22
+                kwkIncome: {},      // KwK Einnahmen
+                businessExpenses: {}, // Betriebsausgaben
+                investments: {},     // Anlagevermögen
+                withdrawals: {},     // Privatentnahmen
+                conversions: {},     // Umwandlungen
+                totalBusinessIncome: 0,
+                totalKwKIncome: 0,
+                totalBusinessExpenses: 0,
+                totalInvestments: 0,
+                totalWithdrawals: 0
+            };
+
+            // Process each transaction
+            filteredData.forEach(t => {
+                const amount = Math.abs(parseAmount(t.Amount));
+                const fromType = t.FromType;
+                const currency = t.Currency;
+                
+                // Calculate fiat value
+                let fiatValue = 0;
+                if (currency === 'GMT' || currency === 'BTC') {
+                    fiatValue = calculateFiatValue(amount, t.Date, currency, selectedCurrency);
+                } else if (currency === 'USDT' || currency === 'USDC') {
+                    fiatValue = selectedCurrency === 'EUR' ? amount * 0.92 : amount;
+                } else if (currency === 'TON') {
+                    fiatValue = amount * 5;
+                }
+
+                // Categorize by tax type
+                if (TAX_CATEGORIES.businessIncome[fromType]) {
+                    if (!taxData.businessIncome[fromType]) {
+                        taxData.businessIncome[fromType] = { amount: 0, fiatValue: 0, count: 0, transactions: [] };
+                    }
+                    taxData.businessIncome[fromType].amount += amount;
+                    taxData.businessIncome[fromType].fiatValue += fiatValue;
+                    taxData.businessIncome[fromType].count++;
+                    taxData.businessIncome[fromType].transactions.push(t);
+                    taxData.totalBusinessIncome += fiatValue;
+                }
+
+                if (TAX_CATEGORIES.kwkIncome[fromType]) {
+                    if (!taxData.kwkIncome[fromType]) {
+                        taxData.kwkIncome[fromType] = { amount: 0, fiatValue: 0, count: 0, transactions: [] };
+                    }
+                    taxData.kwkIncome[fromType].amount += amount;
+                    taxData.kwkIncome[fromType].fiatValue += fiatValue;
+                    taxData.kwkIncome[fromType].count++;
+                    taxData.kwkIncome[fromType].transactions.push(t);
+                    taxData.totalKwKIncome += fiatValue;
+                }
+
+                if (TAX_CATEGORIES.businessExpenses[fromType]) {
+                    if (!taxData.businessExpenses[fromType]) {
+                        taxData.businessExpenses[fromType] = { amount: 0, fiatValue: 0, count: 0, transactions: [] };
+                    }
+                    taxData.businessExpenses[fromType].amount += amount;
+                    taxData.businessExpenses[fromType].fiatValue += fiatValue;
+                    taxData.businessExpenses[fromType].count++;
+                    taxData.businessExpenses[fromType].transactions.push(t);
+                    taxData.totalBusinessExpenses += fiatValue;
+                }
+
+                if (TAX_CATEGORIES.investments[fromType]) {
+                    if (!taxData.investments[fromType]) {
+                        taxData.investments[fromType] = { amount: 0, fiatValue: 0, count: 0, transactions: [] };
+                    }
+                    taxData.investments[fromType].amount += amount;
+                    taxData.investments[fromType].fiatValue += fiatValue;
+                    taxData.investments[fromType].count++;
+                    taxData.investments[fromType].transactions.push(t);
+                    taxData.totalInvestments += fiatValue;
+                }
+
+                if (TAX_CATEGORIES.privateWithdrawals[fromType]) {
+                    if (!taxData.withdrawals[fromType]) {
+                        taxData.withdrawals[fromType] = { amount: 0, fiatValue: 0, count: 0, transactions: [] };
+                    }
+                    taxData.withdrawals[fromType].amount += amount;
+                    taxData.withdrawals[fromType].fiatValue += fiatValue;
+                    taxData.withdrawals[fromType].count++;
+                    taxData.withdrawals[fromType].transactions.push(t);
+                    taxData.totalWithdrawals += fiatValue;
+                }
+            });
+
+            // Calculate EÜR
+            const totalIncome = taxData.totalBusinessIncome + taxData.totalKwKIncome;
+            const totalExpenses = taxData.totalBusinessExpenses;
+            const profit = totalIncome - totalExpenses;
+
+            // Render tax sections
+            renderTaxOverview(totalIncome, totalExpenses, profit, taxData, currSymbol);
+            renderTaxCategories(taxData, currSymbol);
+            
+            // FIFO Analysis - needs ALL data from start to end of year
+            const fifoData = getDataForFIFO();
+            const fifoResults = calculateFIFO(fifoData);
+            renderFIFOAnalysis(fifoResults, currSymbol);
+        }
+
+        function renderTaxOverview(totalIncome, totalExpenses, profit, taxData, currSymbol) {
+            const year = selectedTaxYear === 'all' ? 'Alle Jahre' : selectedTaxYear;
+            
+            const cards = `
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">📅</span>
+                        <span class="card-title">Steuerjahr</span>
+                    </div>
+                    <div class="card-value neutral">${year}</div>
+                    <div class="card-detail">EÜR-Zeitraum</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">✅</span>
+                        <span class="card-title">Betriebseinnahmen</span>
+                    </div>
+                    <div class="card-value positive">+${totalIncome.toFixed(2)} ${currSymbol}</div>
+                    <div class="card-detail">§15 / §22 EStG</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">💸</span>
+                        <span class="card-title">Betriebsausgaben</span>
+                    </div>
+                    <div class="card-value negative">-${totalExpenses.toFixed(2)} ${currSymbol}</div>
+                    <div class="card-detail">Abzugsfähige Kosten</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">🏗️</span>
+                        <span class="card-title">Investitionen</span>
+                    </div>
+                    <div class="card-value neutral">${taxData.totalInvestments.toFixed(2)} ${currSymbol}</div>
+                    <div class="card-detail">Anlagevermögen (AfA möglich)</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">📊</span>
+                        <span class="card-title">🎯 Gewinn (EÜR)</span>
+                    </div>
+                    <div class="card-value ${profit >= 0 ? 'positive' : 'negative'}">
+                        ${profit >= 0 ? '+' : ''}${profit.toFixed(2)} ${currSymbol}
+                    </div>
+                    <div class="card-detail">Einnahmen - Ausgaben</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">💰</span>
+                        <span class="card-title">Privatentnahmen</span>
+                    </div>
+                    <div class="card-value neutral">${taxData.totalWithdrawals.toFixed(2)} ${currSymbol}</div>
+                    <div class="card-detail">Wechselkursgewinne separat</div>
+                </div>
+            `;
+            
+            document.getElementById('taxOverviewCards').innerHTML = cards;
+        }
+
+        function renderTaxCategories(taxData, currSymbol) {
+            // Business Income
+            let businessIncomeHTML = '';
+            Object.entries(taxData.businessIncome).forEach(([key, data]) => {
+                const cat = TAX_CATEGORIES.businessIncome[key];
+                if (cat && data.count > 0) {
+                    businessIncomeHTML += `
+                        <div class="category-card income">
+                            <div class="category-name">✅ ${key}</div>
+                            <div class="category-amount positive">+${data.fiatValue.toFixed(2)} ${currSymbol}</div>
+                            <div class="category-count">${data.count} Transaktionen | ${cat.paragraph}</div>
+                            <div class="category-count" style="color: #888; font-size: 0.85em; margin-top: 5px;">
+                                ${cat.description}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            // KwK Income
+            Object.entries(taxData.kwkIncome).forEach(([key, data]) => {
+                const cat = TAX_CATEGORIES.kwkIncome[key];
+                if (cat && data.count > 0) {
+                    businessIncomeHTML += `
+                        <div class="category-card income">
+                            <div class="category-name">🎁 ${key}</div>
+                            <div class="category-amount positive">+${data.fiatValue.toFixed(2)} ${currSymbol}</div>
+                            <div class="category-count">${data.count} Transaktionen | ${cat.paragraph}</div>
+                            <div class="category-count" style="color: #888; font-size: 0.85em; margin-top: 5px;">
+                                ${cat.description}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            document.getElementById('taxIncome').innerHTML = businessIncomeHTML || '<div style="color: #888; padding: 20px;">Keine Betriebseinnahmen</div>';
+
+            // Business Expenses
+            let expensesHTML = '';
+            Object.entries(taxData.businessExpenses).forEach(([key, data]) => {
+                const cat = TAX_CATEGORIES.businessExpenses[key];
+                if (cat && data.count > 0) {
+                    expensesHTML += `
+                        <div class="category-card expense">
+                            <div class="category-name">💸 ${key}</div>
+                            <div class="category-amount negative">-${data.fiatValue.toFixed(2)} ${currSymbol}</div>
+                            <div class="category-count">${data.count} Transaktionen | ${cat.paragraph}</div>
+                            <div class="category-count" style="color: #888; font-size: 0.85em; margin-top: 5px;">
+                                ${cat.description}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            document.getElementById('taxExpenses').innerHTML = expensesHTML || '<div style="color: #888; padding: 20px;">Keine Betriebsausgaben</div>';
+
+            // Investments
+            let investmentsHTML = '';
+            Object.entries(taxData.investments).forEach(([key, data]) => {
+                const cat = TAX_CATEGORIES.investments[key];
+                if (cat && data.count > 0) {
+                    investmentsHTML += `
+                        <div class="category-card">
+                            <div class="category-name">🏗️ ${key}</div>
+                            <div class="category-amount neutral">${data.fiatValue.toFixed(2)} ${currSymbol}</div>
+                            <div class="category-count">${data.count} Transaktionen | ${cat.paragraph}</div>
+                            <div class="category-count" style="color: #888; font-size: 0.85em; margin-top: 5px;">
+                                ${cat.description}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            document.getElementById('taxInvestments').innerHTML = investmentsHTML || '<div style="color: #888; padding: 20px;">Keine Investitionen</div>';
+
+            // Withdrawals
+            let withdrawalsHTML = '';
+            Object.entries(taxData.withdrawals).forEach(([key, data]) => {
+                const cat = TAX_CATEGORIES.privateWithdrawals[key];
+                if (cat && data.count > 0) {
+                    withdrawalsHTML += `
+                        <div class="category-card">
+                            <div class="category-name">💰 ${key}</div>
+                            <div class="category-amount neutral">${data.fiatValue.toFixed(2)} ${currSymbol}</div>
+                            <div class="category-count">${data.count} Transaktionen | ${cat.paragraph}</div>
+                            <div class="category-count" style="color: #888; font-size: 0.85em; margin-top: 5px;">
+                                ${cat.description}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            document.getElementById('taxWithdrawals').innerHTML = withdrawalsHTML || '<div style="color: #888; padding: 20px;">Keine Privatentnahmen</div>';
+        }
+
+        function exportTaxData() {
+            const filteredData = getFilteredTransactions();
+            const currSymbol = selectedCurrency === 'EUR' ? '€' : '$';
+            const year = selectedTaxYear === 'all' ? 'Alle' : selectedTaxYear;
+            
+            // CSV Header
+            let csv = 'Datum;Typ;FromType;Währung;Betrag;Fiat-Wert;Steuer-Kategorie;Paragraph;Beschreibung\n';
+            
+            // Add all transactions with tax categorization
+            filteredData.forEach(t => {
+                const amount = parseAmount(t.Amount);
+                const absAmount = Math.abs(amount);
+                const currency = t.Currency;
+                const fromType = t.FromType;
+                
+                // Calculate fiat value
+                let fiatValue = 0;
+                if (currency === 'GMT' || currency === 'BTC') {
+                    fiatValue = calculateFiatValue(absAmount, t.Date, currency, selectedCurrency);
+                } else if (currency === 'USDT' || currency === 'USDC') {
+                    fiatValue = selectedCurrency === 'EUR' ? absAmount * 0.92 : absAmount;
+                } else if (currency === 'TON') {
+                    fiatValue = absAmount * 5;
+                }
+
+                // Determine tax category
+                let taxCategory = 'Sonstiges';
+                let paragraph = '';
+                let description = '';
+
+                if (TAX_CATEGORIES.businessIncome[fromType]) {
+                    taxCategory = 'Betriebseinnahme';
+                    paragraph = TAX_CATEGORIES.businessIncome[fromType].paragraph;
+                    description = TAX_CATEGORIES.businessIncome[fromType].description;
+                } else if (TAX_CATEGORIES.kwkIncome[fromType]) {
+                    taxCategory = 'KwK-Einnahme';
+                    paragraph = TAX_CATEGORIES.kwkIncome[fromType].paragraph;
+                    description = TAX_CATEGORIES.kwkIncome[fromType].description;
+                } else if (TAX_CATEGORIES.businessExpenses[fromType]) {
+                    taxCategory = 'Betriebsausgabe';
+                    paragraph = TAX_CATEGORIES.businessExpenses[fromType].paragraph;
+                    description = TAX_CATEGORIES.businessExpenses[fromType].description;
+                } else if (TAX_CATEGORIES.investments[fromType]) {
+                    taxCategory = 'Investition';
+                    paragraph = TAX_CATEGORIES.investments[fromType].paragraph;
+                    description = TAX_CATEGORIES.investments[fromType].description;
+                } else if (TAX_CATEGORIES.privateWithdrawals[fromType]) {
+                    taxCategory = 'Privatentnahme';
+                    paragraph = TAX_CATEGORIES.privateWithdrawals[fromType].paragraph;
+                    description = TAX_CATEGORIES.privateWithdrawals[fromType].description;
+                }
+
+                const typ = amount > 0 ? 'Einnahme' : 'Ausgabe';
+                csv += `${t.Date};${typ};${fromType};${currency};${amount};${fiatValue.toFixed(2)} ${currSymbol};${taxCategory};${paragraph};${description}\n`;
+            });
+
+            // Download CSV
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `EÜR_GoMining_${year}_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        // ============================================
+        // FIFO-ENGINE (First In, First Out)
+        // ============================================
+
+        function calculateFIFO(filteredData) {
+            const currencies = ['GMT', 'USDT', 'BTC', 'USDC', 'TON'];
+            const fifoQueues = {};
+            const fifoResults = {
+                byCurrency: {},
+                totalTaxableGains: 0,
+                totalTaxFreeGains: 0,
+                totalLosses: 0,
+                transactions: []
+            };
+
+            // Initialize FIFO queues for each currency
+            currencies.forEach(curr => {
+                fifoQueues[curr] = [];
+                fifoResults.byCurrency[curr] = {
+                    taxableGains: 0,
+                    taxFreeGains: 0,
+                    losses: 0,
+                    transactions: [],
+                    remainingCoins: 0,
+                    remainingValue: 0
+                };
+            });
+
+            // Sort transactions by date
+            const sortedTxs = [...filteredData].sort((a, b) => {
+                const dateA = new Date(a.Date.replace(/"/g, ''));
+                const dateB = new Date(b.Date.replace(/"/g, ''));
+                return dateA - dateB;
+            });
+
+            // Process each transaction
+            sortedTxs.forEach(t => {
+                const amount = parseAmount(t.Amount);
+                const currency = t.Currency;
+                const date = new Date(t.Date.replace(/"/g, ''));
+                const fromType = t.FromType;
+
+                // Calculate fiat value per unit
+                let fiatValue = 0;
+                if (currency === 'GMT' || currency === 'BTC') {
+                    fiatValue = calculateFiatValue(Math.abs(amount), t.Date, currency, selectedCurrency);
+                } else if (currency === 'USDT' || currency === 'USDC') {
+                    fiatValue = selectedCurrency === 'EUR' ? Math.abs(amount) * 0.92 : Math.abs(amount);
+                } else if (currency === 'TON') {
+                    fiatValue = Math.abs(amount) * 5;
+                }
+
+                const pricePerUnit = Math.abs(amount) > 0 ? fiatValue / Math.abs(amount) : 0;
+
+                // ANSCHAFFUNG (Kauf / Zufluss)
+                if (amount > 0) {
+                    // Nur bestimmte Typen sind Anschaffungen (nicht Reinvestments aus Mining!)
+                    const isAcquisition = fromType === 'top-up' || 
+                                        fromType === 'fireblocks-deposit' ||
+                                        fromType === 'simple-earn-reward' ||
+                                        fromType === 'nft-income' ||
+                                        fromType === 'nft-game-income' ||
+                                        fromType === 'ref-bonus' ||
+                                        fromType === 'bounty-program' ||
+                                        fromType === 'pool-liquidity-reward' ||
+                                        fromType === 'gmt-fund-clan-owner' ||
+                                        fromType === 'gmt-fund' ||                         // GMT aus BTC-Conversion
+                                        fromType === 'nft-reinvestment' ||                 // Mining-Rewards in GMT
+                                        fromType === 'nft-game-reinvestment' ||            // Game-Mining-Rewards in GMT
+                                        fromType === 'marketplace-deposit' ||              // Miner-Verkauf (GMT Zufluss)
+                                        fromType === 'promocompany-bonus' ||               // Promo-Bonus
+                                        fromType === 'asset-conversion'; // Conversion = neuer Coin
+
+                    if (isAcquisition) {
+                        fifoQueues[currency].push({
+                            date: date,
+                            amount: Math.abs(amount),
+                            pricePerUnit: pricePerUnit,
+                            fiatValue: fiatValue,
+                            fromType: fromType,
+                            originalTx: t
+                        });
+                    }
+                }
+
+                // VERÄUSSERUNG (Verkauf / Abfluss)
+                if (amount < 0) {
+                    // Veräußerungen = Tausch von Krypto gegen Fiat, andere Krypto oder Sachen/Dienstleistungen (§23 EStG)
+                    const isDisposal = fromType === 'withdraw' ||                        // Auszahlung an Bank
+                                      fromType === 'withdraw-order' ||                   // Auszahlungsauftrag
+                                      fromType === 'Auto withdrawal' ||                  // Auto-Auszahlung
+                                      fromType === 'external-service-transfer' ||        // Transfer an ext. Wallet
+                                      fromType === 'asset-conversion' ||                 // Tausch in andere Krypto
+                                      fromType === 'gmt-bot-conversion' ||               // Bot-Conversion
+                                      fromType === 'nft-payment' ||                      // Kauf von Miner mit GMT
+                                      fromType === 'marketplace-withdraw' ||             // Miner-Kauf vom Markt
+                                      fromType === 'nft-upgrade-power' ||                // Upgrade mit GMT
+                                      fromType === 'nft-upgrade-energy-efficiency' ||    // Effizienz-Upgrade mit GMT
+                                      fromType === 'nft-game-ability-payment' ||         // Spells/Abilities im Game
+                                      fromType === 'nft-game-maintenance' ||             // Game-Wartungskosten
+                                      fromType === 'nft-income-withdraw' ||              // Automatische BTC-Auszahlung
+                                      fromType === 'nft-game-income-withdraw' ||         // Automatische BTC-Auszahlung (Game)
+                                      fromType === 'maintenance';                        // Reguläre Wartungskosten
+
+                    if (isDisposal && fifoQueues[currency].length > 0) {
+                        let remaining = Math.abs(amount);
+                        const disposalPricePerUnit = pricePerUnit;
+                        const disposalDate = date;
+
+                        while (remaining > 0 && fifoQueues[currency].length > 0) {
+                            const oldest = fifoQueues[currency][0];
+                            const usedAmount = Math.min(remaining, oldest.amount);
+                            
+                            // Gewinn/Verlust berechnen
+                            const purchaseCost = usedAmount * oldest.pricePerUnit;
+                            const saleProceeds = usedAmount * disposalPricePerUnit;
+                            const gainLoss = saleProceeds - purchaseCost;
+
+                            // Haltefrist prüfen (1 Jahr = 365 Tage)
+                            const holdingPeriodDays = Math.floor((disposalDate - oldest.date) / (1000 * 60 * 60 * 24));
+                            // Bei gewerblich (§15 EStG): immer steuerpflichtig
+                            // Bei privat (§23 EStG): steuerfrei nach 1 Jahr Haltefrist
+                            const isTaxFree = selectedTaxType === 'private' && holdingPeriodDays >= 365;
+
+                            // Prüfe ob Veräußerung im gewählten Steuerjahr liegt
+                            const disposalYear = disposalDate.getFullYear().toString();
+                            const isInSelectedYear = selectedTaxYear === 'all' || disposalYear === selectedTaxYear;
+
+                            // Kategorisieren - nur wenn im gewählten Jahr
+                            if (isInSelectedYear) {
+                                if (gainLoss > 0) {
+                                    if (isTaxFree) {
+                                        fifoResults.byCurrency[currency].taxFreeGains += gainLoss;
+                                        fifoResults.totalTaxFreeGains += gainLoss;
+                                    } else {
+                                        fifoResults.byCurrency[currency].taxableGains += gainLoss;
+                                        fifoResults.totalTaxableGains += gainLoss;
+                                    }
+                                } else {
+                                    fifoResults.byCurrency[currency].losses += Math.abs(gainLoss);
+                                    fifoResults.totalLosses += Math.abs(gainLoss);
+                                }
+
+                                // Transaction Details speichern - nur für gewähltes Jahr
+                                const fifoTx = {
+                                    currency: currency,
+                                    disposalDate: disposalDate,
+                                    acquisitionDate: oldest.date,
+                                    amount: usedAmount,
+                                    purchasePrice: oldest.pricePerUnit,
+                                    salePrice: disposalPricePerUnit,
+                                    purchaseCost: purchaseCost,
+                                    saleProceeds: saleProceeds,
+                                    gainLoss: gainLoss,
+                                    holdingPeriodDays: holdingPeriodDays,
+                                    isTaxFree: isTaxFree,
+                                    fromType: fromType,
+                                    acquisitionType: oldest.fromType
+                                };
+
+                                fifoResults.byCurrency[currency].transactions.push(fifoTx);
+                                fifoResults.transactions.push(fifoTx);
+                            }
+
+                            // Queue aktualisieren
+                            oldest.amount -= usedAmount;
+                            if (oldest.amount <= 0.00000001) { // Floating point tolerance
+                                fifoQueues[currency].shift();
+                            }
+                            remaining -= usedAmount;
+                        }
+                    }
+                }
+            });
+
+            // Verbleibende Coins zählen
+            currencies.forEach(curr => {
+                let totalRemaining = 0;
+                let totalValue = 0;
+                fifoQueues[curr].forEach(entry => {
+                    totalRemaining += entry.amount;
+                    totalValue += entry.fiatValue;
+                });
+                fifoResults.byCurrency[curr].remainingCoins = totalRemaining;
+                fifoResults.byCurrency[curr].remainingValue = totalValue;
+            });
+
+            return fifoResults;
+        }
+
+        function renderFIFOAnalysis(fifoResults, currSymbol) {
+            // Update Section Title und Info-Box based on tax type
+            const taxTab = document.getElementById('tax-tab');
+            if (taxTab) {
+                // Find the FIFO section (it's the third category-section in tax tab)
+                const fifoSection = taxTab.querySelectorAll('.category-section')[5]; // 0-based: 0=EÜR, 1=Income, 2=Expenses, 3=Investments, 4=Withdrawals, 5=FIFO
+                if (fifoSection) {
+                    const h2 = fifoSection.querySelector('h2');
+                    const infoBox = fifoSection.querySelector('div[style*="rgba(103, 61, 236"]');
+                    
+                    if (selectedTaxType === 'business') {
+                        if (h2) h2.innerHTML = '📊 FIFO-Gewinnermittlung (§15 EStG - Gewerbliche Einkünfte)';
+                        if (infoBox) infoBox.innerHTML = `
+                            <h4 style="color: #673dec; margin: 0 0 5px 0;">⚠️ Gewerbliche Besteuerung</h4>
+                            <p style="color: #ccc; margin: 0; font-size: 0.9em;">
+                                Bei gewerblichen Einkünften (§15 EStG): <strong>Alle Gewinne sind steuerpflichtig</strong>, unabhängig von der Haltefrist.
+                                Die Spekulationsfrist (1 Jahr) gilt nur bei privaten Veräußerungsgeschäften (§23 EStG).
+                            </p>
+                        `;
+                    } else {
+                        if (h2) h2.innerHTML = '📊 FIFO-Gewinnermittlung (§23 EStG - Private Veräußerungsgeschäfte)';
+                        if (infoBox) infoBox.innerHTML = `
+                            <h4 style="color: #673dec; margin: 0 0 5px 0;">ℹ️ FIFO-Prinzip</h4>
+                            <p style="color: #ccc; margin: 0; font-size: 0.9em;">
+                                First In, First Out: Die ältesten Anschaffungen werden zuerst veräußert. 
+                                <strong>Haltefrist: > 1 Jahr = steuerfrei</strong> | < 1 Jahr = steuerpflichtig (§23 EStG)
+                            </p>
+                        `;
+                    }
+                }
+            }
+            
+            // Overview Cards
+            const netGain = fifoResults.totalTaxableGains + fifoResults.totalTaxFreeGains - fifoResults.totalLosses;
+            const taxableAfterLoss = Math.max(0, fifoResults.totalTaxableGains - fifoResults.totalLosses);
+            
+            // Beschreibungen basierend auf Steuermodus
+            const taxableDesc = selectedTaxType === 'business' 
+                ? 'Gewerblich (§15 EStG - immer steuerpflichtig)'
+                : '< 1 Jahr Haltefrist (§23 EStG)';
+            const taxFreeDesc = selectedTaxType === 'business'
+                ? 'Bei Gewerbebetrieb: n/a'
+                : '> 1 Jahr Haltefrist (steuerfrei!)';
+            
+            const overviewCards = `
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">💰</span>
+                        <span class="card-title">Steuerpflichtige Gewinne</span>
+                    </div>
+                    <div class="card-value ${fifoResults.totalTaxableGains > 0 ? 'negative' : 'neutral'}">
+                        +${fifoResults.totalTaxableGains.toFixed(2)} ${currSymbol}
+                    </div>
+                    <div class="card-detail">${taxableDesc}</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">🎁</span>
+                        <span class="card-title">Steuerfreie Gewinne</span>
+                    </div>
+                    <div class="card-value positive">
+                        +${fifoResults.totalTaxFreeGains.toFixed(2)} ${currSymbol}
+                    </div>
+                    <div class="card-detail">${taxFreeDesc}</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">📉</span>
+                        <span class="card-title">Verluste</span>
+                    </div>
+                    <div class="card-value neutral">
+                        -${fifoResults.totalLosses.toFixed(2)} ${currSymbol}
+                    </div>
+                    <div class="card-detail">Verrechenbar mit Gewinnen</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">🧮</span>
+                        <span class="card-title">Zu versteuern</span>
+                    </div>
+                    <div class="card-value ${taxableAfterLoss > 0 ? 'negative' : 'positive'}">
+                        ${taxableAfterLoss.toFixed(2)} ${currSymbol}
+                    </div>
+                    <div class="card-detail">Gewinne - Verluste</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">📊</span>
+                        <span class="card-title">Gesamt-Netto</span>
+                    </div>
+                    <div class="card-value ${netGain >= 0 ? 'positive' : 'negative'}">
+                        ${netGain >= 0 ? '+' : ''}${netGain.toFixed(2)} ${currSymbol}
+                    </div>
+                    <div class="card-detail">Alle Gewinne - Verluste</div>
+                </div>
+            `;
+
+            document.getElementById('fifoOverviewCards').innerHTML = overviewCards;
+
+            // Details per Currency
+            let detailsHTML = '';
+            Object.entries(fifoResults.byCurrency).forEach(([curr, data]) => {
+                if (data.transactions.length > 0 || data.remainingCoins > 0.00000001) {
+                    const currNetGain = data.taxableGains + data.taxFreeGains - data.losses;
+                    const precision = curr === 'BTC' ? 8 : 2;
+                    
+                    detailsHTML += `
+                        <div class="category-card">
+                            <div class="category-name">${curr === 'BTC' ? '₿' : curr === 'GMT' ? '💰' : '💵'} ${curr}</div>
+                            <div style="display: grid; gap: 8px; margin-top: 10px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #888;">Steuerpflichtig:</span>
+                                    <span style="color: #ff4444;">+${data.taxableGains.toFixed(2)} ${currSymbol}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #888;">Steuerfrei:</span>
+                                    <span style="color: #00ff7f;">+${data.taxFreeGains.toFixed(2)} ${currSymbol}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #888;">Verluste:</span>
+                                    <span style="color: #ffa500;">-${data.losses.toFixed(2)} ${currSymbol}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1);">
+                                    <span style="color: #fff; font-weight: bold;">Netto:</span>
+                                    <span style="color: ${currNetGain >= 0 ? '#00ff7f' : '#ff4444'}; font-weight: bold;">
+                                        ${currNetGain >= 0 ? '+' : ''}${currNetGain.toFixed(2)} ${currSymbol}
+                                    </span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-top: 8px; color: #888; font-size: 0.85em;">
+                                    <span>Verbleibend:</span>
+                                    <span>${data.remainingCoins.toFixed(precision)} ${curr}</span>
+                                </div>
+                            </div>
+                            <div class="category-count">${data.transactions.length} Veräußerungen</div>
+                        </div>
+                    `;
+                }
+            });
+
+            document.getElementById('fifoDetails').innerHTML = detailsHTML || '<div style="color: #888; padding: 20px;">Keine Veräußerungen im gewählten Zeitraum</div>';
+            
+            // Cache results (table loads on demand)
+            cachedFIFOResults = { results: fifoResults, currSymbol: currSymbol };
+            
+            // Re-render detail table if it was already loaded
+            if (fifoTableLoaded) {
+                fifoCurrentPage = 1; // Reset to page 1 when data changes
+                renderFIFODetailTable();
+            }
+        }
+
+        function exportFIFOData() {
+            const fifoData = getDataForFIFO();
+            const fifoResults = calculateFIFO(fifoData);
+            const currSymbol = selectedCurrency === 'EUR' ? '€' : '$';
+            const year = selectedTaxYear === 'all' ? 'Alle' : selectedTaxYear;
+            
+            // CSV Header
+            let csv = 'Veräußerungsdatum;Anschaffungsdatum;Währung;Menge;Kaufpreis/Einheit;Verkaufspreis/Einheit;';
+            csv += 'Anschaffungskosten;Verkaufserlös;Gewinn/Verlust;Haltefrist (Tage);Steuerstatus;Veräußerungsart;Anschaffungsart\n';
+            
+            // Sort by disposal date (newest first)
+            const sorted = [...fifoResults.transactions].sort((a, b) => b.disposalDate - a.disposalDate);
+            
+            sorted.forEach(tx => {
+                const disposalDate = tx.disposalDate.toISOString().split('T')[0];
+                const acquisitionDate = tx.acquisitionDate.toISOString().split('T')[0];
+                const status = tx.isTaxFree ? 'Steuerfrei (>1 Jahr)' : 'Steuerpflichtig (<1 Jahr)';
+                
+                csv += `${disposalDate};${acquisitionDate};${tx.currency};${tx.amount.toFixed(8)};`;
+                csv += `${tx.purchasePrice.toFixed(6)};${tx.salePrice.toFixed(6)};`;
+                csv += `${tx.purchaseCost.toFixed(2)} ${currSymbol};${tx.saleProceeds.toFixed(2)} ${currSymbol};`;
+                csv += `${tx.gainLoss.toFixed(2)} ${currSymbol};${tx.holdingPeriodDays};${status};`;
+                csv += `${tx.fromType};${tx.acquisitionType}\n`;
+            });
+            
+            // Download CSV
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `FIFO_Analyse_GoMining_${year}_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+
+        function renderFIFODetailTable() {
+            if (!cachedFIFOResults) {
+                document.getElementById('fifoDetailTable').innerHTML = '<div style="color: #888; padding: 20px;">Keine Daten verfügbar</div>';
+                return;
+            }
+
+            const { results, currSymbol } = cachedFIFOResults;
+            const currencyFilter = document.getElementById('fifoDetailCurrency')?.value || 'all';
+            const typeFilter = document.getElementById('fifoDetailFilter')?.value || 'all';
+            const sortBy = document.getElementById('fifoDetailSort')?.value || 'date-desc';
+            const minAmount = parseFloat(document.getElementById('fifoMinAmount')?.value || 0);
+
+            // Update currency symbol in min amount label
+            const currSymbolMinEl = document.getElementById('currSymbolMin');
+            if (currSymbolMinEl) currSymbolMinEl.textContent = currSymbol;
+
+            // Filter transactions
+            let transactions = results.transactions.filter(tx => {
+                // Currency filter
+                if (currencyFilter !== 'all' && tx.currency !== currencyFilter) return false;
+                
+                // Type filter
+                if (typeFilter === 'gains' && tx.gainLoss <= 0) return false;
+                if (typeFilter === 'losses' && tx.gainLoss >= 0) return false;
+                if (typeFilter === 'taxable' && tx.isTaxFree) return false;
+                if (typeFilter === 'taxfree' && !tx.isTaxFree) return false;
+                
+                // Minimum amount filter (absolute value)
+                if (Math.abs(tx.gainLoss) < minAmount) return false;
+                
+                return true;
+            });
+
+            // Sort transactions
+            transactions.sort((a, b) => {
+                switch(sortBy) {
+                    case 'date-desc': return b.disposalDate - a.disposalDate;
+                    case 'date-asc': return a.disposalDate - b.disposalDate;
+                    case 'gain-desc': return b.gainLoss - a.gainLoss;
+                    case 'gain-asc': return a.gainLoss - b.gainLoss;
+                    case 'loss-desc': return a.gainLoss - b.gainLoss; // Most negative first
+                    case 'amount-desc': return b.amount - a.amount;
+                    case 'days-desc': return b.holdingPeriodDays - a.holdingPeriodDays;
+                    default: return b.disposalDate - a.disposalDate;
+                }
+            });
+
+            if (transactions.length === 0) {
+                document.getElementById('fifoDetailTable').innerHTML = '<div style="color: #888; padding: 20px; text-align: center;">Keine Transaktionen gefunden</div>';
+                document.getElementById('fifoPagination').style.display = 'none';
+                return;
+            }
+
+            // Pagination
+            const totalPages = Math.ceil(transactions.length / fifoPageSize);
+            const startIdx = (fifoCurrentPage - 1) * fifoPageSize;
+            const endIdx = Math.min(startIdx + fifoPageSize, transactions.length);
+            const paginatedTransactions = transactions.slice(startIdx, endIdx);
+
+            // Update pagination info
+            document.getElementById('fifoPageInfo').textContent = `Seite ${fifoCurrentPage} von ${totalPages} (${transactions.length} Transaktionen gesamt, zeige ${startIdx + 1}-${endIdx})`;
+            document.getElementById('fifoPagination').style.display = 'flex';
+
+            // Format translation map
+            const typeLabels = {
+                'withdraw': '💸 Auszahlung',
+                'withdraw-order': '💸 Auszahlungsauftrag',
+                'Auto withdrawal': '🤖 Auto-Auszahlung',
+                'external-service-transfer': '↗️ Ext. Transfer',
+                'asset-conversion': '🔄 Coin-Tausch',
+                'gmt-bot-conversion': '🤖 Bot-Conversion',
+                'nft-payment': '🛒 Miner-Kauf',
+                'marketplace-withdraw': '🏪 Marktplatz-Kauf',
+                'nft-upgrade-power': '⚡ Hashrate-Upgrade',
+                'nft-upgrade-energy-efficiency': '⚙️ Effizienz-Upgrade',
+                'nft-game-ability-payment': '🎮 Game Ability',
+                'nft-game-maintenance': '🔧 Game-Wartung',
+                'maintenance': '🔧 Wartung'
+            };
+
+            // Render table
+            let tableHTML = `
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9em;">
+                    <thead>
+                        <tr style="background: rgba(255,255,255,0.05); border-bottom: 2px solid rgba(255,255,255,0.1);">
+                            <th style="padding: 12px; text-align: left;">📅 Verkauf</th>
+                            <th style="padding: 12px; text-align: left;">Art</th>
+                            <th style="padding: 12px; text-align: left;">💎 Währung</th>
+                            <th style="padding: 12px; text-align: right;">Menge</th>
+                            <th style="padding: 12px; text-align: left;">📅 Kauf</th>
+                            <th style="padding: 12px; text-align: right;">⏱️ Tage</th>
+                            <th style="padding: 12px; text-align: right;">Kaufpreis</th>
+                            <th style="padding: 12px; text-align: right;">Verkaufspreis</th>
+                            <th style="padding: 12px; text-align: right;">💰 G/V</th>
+                            <th style="padding: 12px; text-align: center;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            paginatedTransactions.forEach((tx, idx) => {
+                const disposalDate = tx.disposalDate.toISOString().split('T')[0];
+                const acquisitionDate = tx.acquisitionDate.toISOString().split('T')[0];
+                const gainLossColor = tx.gainLoss >= 0 ? '#00ff7f' : '#ff4444';
+                const gainLossSign = tx.gainLoss >= 0 ? '+' : '';
+                const rowBg = idx % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent';
+                const statusIcon = tx.isTaxFree ? '🎁' : '💰';
+                const statusText = tx.isTaxFree ? 'Steuerfrei' : 'Steuerpfl.';
+                const statusColor = tx.isTaxFree ? '#00ff7f' : '#ff9800';
+
+                tableHTML += `
+                    <tr style="background: ${rowBg}; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 10px;">${disposalDate}</td>
+                        <td style="padding: 10px; white-space: nowrap;">${typeLabels[tx.fromType] || tx.fromType}</td>
+                        <td style="padding: 10px;">${tx.currency}</td>
+                        <td style="padding: 10px; text-align: right; font-family: monospace;">${tx.amount.toFixed(tx.currency === 'BTC' ? 8 : 2)}</td>
+                        <td style="padding: 10px;">${acquisitionDate}</td>
+                        <td style="padding: 10px; text-align: right;">${tx.holdingPeriodDays}</td>
+                        <td style="padding: 10px; text-align: right; font-family: monospace; color: #888;">${tx.purchasePrice.toFixed(4)} ${currSymbol}</td>
+                        <td style="padding: 10px; text-align: right; font-family: monospace; color: #888;">${tx.salePrice.toFixed(4)} ${currSymbol}</td>
+                        <td style="padding: 10px; text-align: right; font-family: monospace; font-weight: bold; color: ${gainLossColor};">${gainLossSign}${tx.gainLoss.toFixed(2)} ${currSymbol}</td>
+                        <td style="padding: 10px; text-align: center;">
+                            <span style="background: ${statusColor}22; color: ${statusColor}; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; white-space: nowrap;">
+                                ${statusIcon} ${statusText}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('fifoDetailTable').innerHTML = tableHTML;
+        }
+
+        function handleIgnoreSmallChange() {
+            const checkbox = document.getElementById('fifoIgnoreSmall');
+            const minAmountInput = document.getElementById('fifoMinAmount');
+            
+            if (checkbox.checked) {
+                minAmountInput.value = '0.10';
+            } else {
+                minAmountInput.value = '0';
+            }
+            
+            fifoCurrentPage = 1; // Reset to page 1 when filter changes
+            renderFIFODetailTable();
+        }
+
+        function loadFIFODetailTable() {
+            fifoTableLoaded = true;
+            fifoCurrentPage = 1;
+            
+            // Hide load prompt, show controls
+            document.getElementById('fifoDetailLoadPrompt').style.display = 'none';
+            document.getElementById('fifoDetailControls').style.display = 'block';
+            
+            // Render table
+            renderFIFODetailTable();
+        }
+
+        function changeFIFOPage(direction) {
+            if (!cachedFIFOResults) return;
+            
+            // Get filtered transaction count
+            const currencyFilter = document.getElementById('fifoDetailCurrency')?.value || 'all';
+            const typeFilter = document.getElementById('fifoDetailFilter')?.value || 'all';
+            const minAmount = parseFloat(document.getElementById('fifoMinAmount')?.value || 0);
+            
+            let filteredCount = cachedFIFOResults.results.transactions.filter(tx => {
+                if (currencyFilter !== 'all' && tx.currency !== currencyFilter) return false;
+                if (typeFilter === 'gains' && tx.gainLoss <= 0) return false;
+                if (typeFilter === 'losses' && tx.gainLoss >= 0) return false;
+                if (typeFilter === 'taxable' && tx.isTaxFree) return false;
+                if (typeFilter === 'taxfree' && !tx.isTaxFree) return false;
+                if (Math.abs(tx.gainLoss) < minAmount) return false;
+                return true;
+            }).length;
+            
+            const totalPages = Math.ceil(filteredCount / fifoPageSize);
+            
+            // Update page
+            fifoCurrentPage += direction;
+            if (fifoCurrentPage < 1) fifoCurrentPage = 1;
+            if (fifoCurrentPage > totalPages) fifoCurrentPage = totalPages;
+            
+            // Re-render
+            renderFIFODetailTable();
+            
+            // Scroll to top of table
+            document.getElementById('fifoDetailTable').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+    </script>
+</body>
+</html>
