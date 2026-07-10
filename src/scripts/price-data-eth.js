@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-07-09T04:22:11.988290Z
+// Auto-generiert am 2026-07-10T04:23:44.131546Z
 // Quelle: data/price_lists/ethereum_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -20022,6 +20022,58 @@ const ethPriceData = {
     "price_xag": 29.64401322,
     "price_xau": 0.43195022,
     "price_zar": 28887.58699764
+  },
+  "2026-07-09": {
+    "date_iso": "2026-07-09",
+    "time_berlin": "00:00",
+    "symbol": "ETH",
+    "price_eur": 1525.81652225,
+    "price_usd": 1742.52772534,
+    "price_gbp": 1301.14893757,
+    "price_aed": 6399.43307131,
+    "price_ars": 2591951.09400521,
+    "price_aud": 2512.53155936,
+    "price_bdt": 214758.45333438,
+    "price_bhd": 657.01310873,
+    "price_bmd": 1742.52772534,
+    "price_brl": 8999.11018474,
+    "price_cad": 2469.20535,
+    "price_chf": 1408.38757884,
+    "price_clp": 1629542.22762837,
+    "price_cny": 11854.9388738,
+    "price_czk": 37021.22129424,
+    "price_dkk": 11405.81455029,
+    "price_gel": 4600.2731949,
+    "price_hkd": 13660.11047087,
+    "price_huf": 548887.74040177,
+    "price_idr": 31584008.01285493,
+    "price_ils": 5301.97168461,
+    "price_inr": 167042.19280648,
+    "price_jpy": 283252.96413226,
+    "price_krw": 2619278.21884179,
+    "price_kwd": 540.09995352,
+    "price_lkr": 583955.92268123,
+    "price_mmk": 3658977.14294488,
+    "price_mxn": 30617.95466194,
+    "price_myr": 7103.93703066,
+    "price_ngn": 2397003.7136996,
+    "price_nok": 17011.72314834,
+    "price_nzd": 3050.35577168,
+    "price_php": 107383.26584646,
+    "price_pkr": 484532.62977832,
+    "price_pln": 6574.77492367,
+    "price_rub": 133823.80825913,
+    "price_sar": 6565.70855192,
+    "price_sek": 16894.4179244,
+    "price_sgd": 2254.27152519,
+    "price_thb": 58331.9868696,
+    "price_try": 81678.53887383,
+    "price_twd": 55973.99660914,
+    "price_uah": 77528.29437433,
+    "price_vnd": 45819819.23009489,
+    "price_xag": 29.8208005,
+    "price_xau": 0.42752918,
+    "price_zar": 28586.28408355
   }
 };
 
