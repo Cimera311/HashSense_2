@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-07-10T04:23:44.131546Z
+// Auto-generiert am 2026-07-11T04:04:22.976553Z
 // Quelle: data/price_lists/ethereum_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -20074,6 +20074,58 @@ const ethPriceData = {
     "price_xag": 29.8208005,
     "price_xau": 0.42752918,
     "price_zar": 28586.28408355
+  },
+  "2026-07-10": {
+    "date_iso": "2026-07-10",
+    "time_berlin": "00:00",
+    "symbol": "ETH",
+    "price_eur": 1526.75428174,
+    "price_usd": 1745.53830769,
+    "price_gbp": 1301.57285789,
+    "price_aed": 6410.48943498,
+    "price_ars": 2596498.35680465,
+    "price_aud": 2514.33447223,
+    "price_bdt": 215073.96456879,
+    "price_bhd": 658.34897367,
+    "price_bmd": 1745.53830769,
+    "price_brl": 8964.03742529,
+    "price_cad": 2473.15722355,
+    "price_chf": 1407.95992667,
+    "price_clp": 1618916.95884617,
+    "price_cny": 11857.26717028,
+    "price_czk": 37024.52576741,
+    "price_dkk": 11412.57383101,
+    "price_gel": 4608.22113229,
+    "price_hkd": 13677.7501652,
+    "price_huf": 545515.63191793,
+    "price_idr": 31650422.34828771,
+    "price_ils": 5263.31293147,
+    "price_inr": 166507.68291684,
+    "price_jpy": 283414.03639852,
+    "price_krw": 2628862.96034063,
+    "price_kwd": 540.37676714,
+    "price_lkr": 585247.33050211,
+    "price_mmk": 3665298.7938615,
+    "price_mxn": 30617.52740905,
+    "price_myr": 7116.73423427,
+    "price_ngn": 2404740.8495832,
+    "price_nok": 16962.81485843,
+    "price_nzd": 3030.78165471,
+    "price_php": 107385.52192544,
+    "price_pkr": 485276.11345394,
+    "price_pln": 6612.36094026,
+    "price_rub": 133095.56089596,
+    "price_sar": 6548.69417603,
+    "price_sek": 16866.81374258,
+    "price_sgd": 2255.75915502,
+    "price_thb": 58229.14359319,
+    "price_try": 81968.55534571,
+    "price_twd": 56053.77345939,
+    "price_uah": 77686.1686127,
+    "price_vnd": 45898985.75731685,
+    "price_xag": 29.07143431,
+    "price_xau": 0.42324067,
+    "price_zar": 28491.5490272
   }
 };
 
