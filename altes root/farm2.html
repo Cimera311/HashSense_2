@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HashFarm - Mining Farm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="priceMatrix.js"></script>
+    <script src="src/scripts/skript.js"></script>
+    <script src="src/scripts/skript-prices.js"></script>
+    <script src="src/scripts/skript-tables.js"></script>
+    <script src="src/scripts/skriptfarm.js"></script>
+    <script src="src/scripts/skript-ui.js"></script>
+    <script src="src/scripts/skriptreferral.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+        <!-- Footer Script -->
+    <script src="src/scripts/footer-component.js"></script>
+    
+    <!-- Plausible Analytics -->
+    <script defer data-domain="hashfarm.me" src="https://plausible.io/js/script.js"></script>
+
+    <!-- Open Graph Meta -->
+    <meta property="og:title" content="HashFarm – Bitcoin Mining Tools">
+    <meta property="og:description" content="Track, calculate and optimize your Bitcoin mining ROI with HashFarm.">
+    <meta property="og:image" content="https://hashfarm.me/assets/preview.png">
+    <meta property="og:url" content="https://hashfarm.me/">
+    <meta property="og:type" content="website">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+
+    <!-- Android/Chrome -->
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/android-chrome-512x512.png">
+
+    <!-- Apple iOS -->
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="assets/site.webmanifest">
+
+    <!-- Google Material Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <style>
+        /* Sidebar animations */
+        .sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+    </style>
+
+    <script>
+        // Global variables for prices
+        window.btcPrice = 100000; // Default BTC price
+        window.gmtPrice = 0.4269; // Default GMT price
+        
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("Checking priceMatrixlocal:", window.priceMatrixlocal);
+        });
+    </script>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-VQ2RT4JL4L"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-VQ2RT4JL4L');
+</script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Sidebar -->
+    <aside class="sidebar fixed left-0 top-0 w-64 h-full bg-gray-800 z-40 shadow-xl" id="sidebar">
+        <div class="p-4">
+            <h2 class="text-xl font-bold mb-6 text-purple-400">HashFarm</h2>
+            <nav class="space-y-2">
+                <!-- Home Button -->
+                <a href="index.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-blue-400">home</span>
+                    <span class="text-white">Main Dashboard</span>
+                </a>
+                
+                <!-- HashSense Button -->
+                <a href="HashSense.html" 
+                   class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-purple-400">calculate</span>
+                    <span class="text-white">HashSense Calculator</span>
+                </a>
+                
+                <!-- Divider -->
+                <div class="border-t border-gray-600 my-4"></div>
+                
+                <!-- Price Refresh Button -->
+                <button onclick="fetchBTCPrice(); fetchGMTPrice(); aktualisiereFarmWerte();" 
+                        class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-blue-400">refresh</span>
+                    <div class="flex-1">
+                        <span class="block text-white font-medium">Refresh Prices</span>
+                        <span class="block text-xs text-gray-400">Update BTC & GMT prices</span>
+                    </div>
+                </button>
+                
+                <!-- Divider -->
+                <div class="border-t border-gray-600 my-4"></div>
+                
+                <!-- Navigation Tools -->
+                <button onclick="openImportModal()" 
+                        class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-orange-400">upload</span>
+                    <span class="text-white">Imports</span>
+                </button>
+                
+                <button onclick="window.location.href='linkview.html'" 
+                        class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-indigo-400">link</span>
+                    <span class="text-white">LinkView</span>
+                </button>
+                
+                <button onclick="window.location.href='HelpingSkripts.html'" 
+                        class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-teal-400">code</span>
+                    <span class="text-white">Scripts</span>
+                </button>
+                
+                <button onclick="window.location.href='checkminer.html'" 
+                        class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
+                    <span class="material-icons text-cyan-400">check_circle</span>
+                    <span class="text-white">Check Miner</span>
+                </button>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden" 
+         onclick="toggleSidebar()"></div>
+
+    <!-- Header with Price Cards -->
+    <header class="bg-gray-800 p-4">
+        <div class="max-w-7xl mx-auto">
+            <!-- Price Cards Grid -->
+            <div class="grid gap-4 md:grid-cols-3 mb-4">
+                <!-- BTC Price Card -->
+                <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                    <h2 class="text-sm font-semibold mb-3 text-gray-300">CURRENT BITCOIN PRICE</h2>
+                    <div class="flex items-center gap-3">
+                        <img src="bitcoin-910307_1280.webp" alt="BTC" class="w-10 h-10">
+                        <select id="bitcoin-price-dropdown" onchange="updateBTCPrice();" 
+                                class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="10000">10,000 $</option>
+                            <option value="20000">20,000 $</option>
+                            <option value="30000">30,000 $</option>    
+                            <option value="40000">40,000 $</option>
+                            <option value="50000">50,000 $</option>
+                            <option value="60000">60,000 $</option>   
+                            <option value="70000">70,000 $</option>
+                            <option value="80000">80,000 $</option>
+                            <option value="90000">90,000 $</option>
+                            <option id="currentp" value="0">current price</option>
+                            <option value="100000">100,000 $</option>
+                            <option value="110000">110,000 $</option>
+                            <option value="120000">120,000 $</option>
+                            <option value="130000">130,000 $</option>
+                            <option value="140000">140,000 $</option>
+                            <option value="150000">150,000 $</option>
+                            <option value="160000">160,000 $</option>
+                            <option value="200000">200,000 $</option>
+                            <option value="250000">250,000 $</option>
+                            <option value="300000">300,000 $</option>
+                            <option value="400000">400,000 $</option>   
+                        </select>
+                    </div>
+                </div>
+
+                <!-- GMT Price Card -->
+                <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                    <h2 class="text-sm font-semibold mb-3 text-gray-300">CURRENT GMT PRICE</h2>
+                    <div class="flex items-center gap-3">
+                        <img src="GoMining_Logo.webp" alt="GMT" class="w-10 h-10">
+                        <input type="number" id="gmt-token-price" placeholder="0.4269" step="0.0001"
+                               class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                </div>
+
+                <!-- SAT per TH Card -->
+                <div class="bg-gray-700 rounded-xl p-4 shadow-lg">
+                    <h2 class="text-sm font-semibold mb-3 text-gray-300">SAT PER TH</h2>
+                    <div class="flex items-center gap-3">
+                        <img src="sats-ordinals-sats-logo.png" alt="⚡" class="w-10 h-10">
+                        <input type="number" id="sat-TH" value="44" min="0" step="1"
+                               class="flex-1 bg-gray-600 border border-gray-500 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons Row -->
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <!-- Left side - Sidebar Toggle, Refresh and Mode Toggle -->
+                <div class="flex gap-2">
+                    <button onclick="toggleSidebar()" 
+                            class="bg-purple-600 hover:bg-purple-700 p-2 rounded-lg transition-colors duration-200" 
+                            title="Open Menu">
+                        <span class="material-icons text-white">menu</span>
+                    </button>
+                    <button class="bg-blue-600 hover:bg-blue-700 p-2 rounded-lg transition-colors duration-200" 
+                            onclick="fetchBTCPrice(); fetchGMTPrice();aktualisiereFarmWerte();" title="Refresh Prices">
+                        <span class="material-icons text-white">refresh</span>
+                    </button>
+                    <button class="bg-gray-600 hover:bg-gray-700 p-2 rounded-lg transition-colors duration-200" 
+                            id="toggleMode" title="Toggle Mode">
+                        <span class="material-icons text-white">lens</span>
+                    </button>
+                </div>
+
+                <!-- Center - Main Action Buttons -->
+                <div class="flex gap-2 flex-wrap">
+                    <button class="bg-green-600 hover:bg-green-700 p-2 rounded-lg transition-colors duration-200" 
+                            id="addMinerBtn" title="Add Miner" 
+                            onclick="hinzufuegenCard(get_highest_card(document.querySelector('.content')), '1', '20', '-');">
+                        <span class="material-icons text-white">add</span>
+                    </button>
+                    
+                    <button class="bg-purple-600 hover:bg-purple-700 p-2 rounded-lg transition-colors duration-200" 
+                            title="Save to Cloud" onclick="speichernMinerSupabase()">
+                        <span class="material-icons text-white">save</span>
+                    </button>
+                    
+                    <button class="bg-blue-600 hover:bg-blue-700 p-2 rounded-lg transition-colors duration-200" 
+                            title="Load from Cloud" onclick="ladenMinerSupabase()">
+                        <span class="material-icons text-white">cloud</span>
+                    </button>
+                    
+                    <button class="bg-red-600 hover:bg-red-700 p-2 rounded-lg transition-colors duration-200" 
+                            id="deleteAllBtn" title="Delete from Cloud" onclick="openConfirmDeleteModal()">
+                        <span class="material-icons text-white">delete</span>
+                    </button>
+                    
+                    <button class="bg-pink-600 hover:bg-pink-700 px-3 py-2 rounded-lg text-sm font-semibold transition-colors duration-200" 
+                            onclick="openViewConfigModal()">View Config</button>
+                </div>
+
+                <!-- Right side - View and Currency Toggles -->
+                <div class="flex gap-4">
+                    <!-- View Toggle -->
+                    <div class="flex bg-gray-700 rounded-lg p-1">
+                        <button class="px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 bg-purple-600 text-white" 
+                                id="grid-btn" onclick="wechselAnsicht('grid')">Grid</button>
+                        <button class="px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 text-gray-300 hover:text-white" 
+                                id="list-btn" onclick="wechselAnsicht('list')">List</button>
+                    </div>
+                    
+                    <!-- Currency Toggle -->
+                    <div class="flex bg-gray-700 rounded-lg p-1">
+                        <button class="px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 text-gray-300 hover:text-white" 
+                                id="btc-btn" onclick="wechselWaehrung('btc')">BTC</button>
+                        <button class="px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 bg-purple-600 text-white" 
+                                id="usd-btn" onclick="wechselWaehrung('usd')">USD</button>
+                        <button class="px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 text-gray-300 hover:text-white" 
+                                id="gmt-btn" onclick="wechselWaehrung('gmt')">GMT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden elements -->
+        <span id="currencyMode" style="display: none;">usd</span>
+        <span id="viewMode" style="display: none;">grid</span>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <!-- Farm Content Wrapper (außerhalb des Grids) -->
+        <div class="farm-wrapper mb-6">
+            <div class="content" id="farm-content">
+                <!-- Farm overview will be dynamically added here -->
+            </div>
+        </div>
+        
+        <!-- Miner Details Content (im Grid) -->
+        <div class="content grid-view" id="content">
+            <!-- Miner details table will be dynamically added here -->
+        </div>
+    </main>
+
+    <!-- Modals -->
+    
+    <!-- Import Modal -->
+    <div id="importModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto mx-4">
+            <!-- Tab Buttons -->
+            <div class="flex gap-2 mb-6">
+                <button class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg font-semibold transition-colors duration-200" 
+                        onclick="showTab('import-tab')">Import your miners</button>
+                <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg font-semibold transition-colors duration-200" 
+                        onclick="showTab('transactions-tab')">Transactions (beta)</button>
+                <button class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-semibold transition-colors duration-200" 
+                        onclick="showTab('referral-tab')">Referral (beta)</button>
+            </div>
+
+            <!-- Import Tab -->
+            <div class="tab-page" id="import-tab" style="display:none;">
+                <button class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl" 
+                        onclick="closeImportModal('import-tab')">&times;</button>
+                <button class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg mb-4" 
+                        onclick="openHowToImportModal('howToImportModal')">How to Import</button>
+                <h2 class="text-xl font-bold mb-4">Miner-Data import</h2>
+                <textarea id="minerInput" rows="10" cols="50" placeholder="Paste miner Data here..."
+                          class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white"></textarea>
+                <div class="mt-4">
+                    <button class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-semibold" 
+                            onclick="importMinerData()">check the import</button>
+                </div>
+            </div>
+
+            <!-- Transactions Tab -->
+            <div class="tab-page" id="transactions-tab">
+                <button class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl" 
+                        onclick="closeImportModal('transactions-tab')">&times;</button>
+                <button class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg mb-4" 
+                        onclick="openHowToImportModal('howToImportModal2')">How to Import</button>
+                <h2 class="text-xl font-bold mb-4">Transactions Export</h2>
+                <textarea id="transactionInput" rows="15" placeholder="Paste your transaction history here..."
+                          class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white"></textarea>
+                <div class="flex gap-2 mt-4">
+                    <button class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-semibold" 
+                            onclick="convertTransactionsToXLSX()">Download XLSX</button>
+                    <button class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-semibold" 
+                            onclick="clearTransactionInput()">Clear</button>
+                </div>
+                <div id="messageBox" class="mt-4 p-4 bg-gray-900 text-green-400 rounded-lg hidden">
+                    <!-- Messages will appear here -->
+                </div>
+            </div>
+
+            <!-- Referral Tab -->
+            <div class="tab-page" id="referral-tab" style="display:none;">
+                <button class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl" 
+                        onclick="closeImportModal('referral-tab')">&times;</button>
+                <h2 class="text-xl font-bold mb-4">Referral Export</h2>
+                <textarea id="referralInput" rows="15" placeholder="Paste your referral data here..."
+                          class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white"></textarea>
+                <div class="mt-4">
+                    <button class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-semibold" 
+                            onclick="convertReferralToCSV()">Download Referral CSV</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How to Import Modal 1 -->
+    <div id="howToImportModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl" 
+                    onclick="closeHowToImportModal('howToImportModal')">&times;</button>
+            <h2 class="text-xl font-bold mb-4">How to Import Miners</h2>
+            <div class="space-y-4">
+                <div>
+                    <p class="mb-2">Step 1: Go to "My Farm" in Gomining.</p>
+                    <img src="ClickonUpgrade.jpg" alt="Step 1" class="w-full rounded-lg border border-gray-600">
+                </div>
+                <div>
+                    <p class="mb-2">Step 2: Mark all your miners or those you wanna import.</p>
+                    <img src="markallyourminers.jpg" alt="Step 2" class="w-full rounded-lg border border-gray-600">
+                </div>
+                <div>
+                    <p class="mb-2">Step 3: and copy paste them into the import box.</p>
+                    <img src="andpastethem.jpg" alt="Step 3" class="w-full rounded-lg border border-gray-600">
+                </div>
+                <p class="text-gray-300">after the click on import there will be a windows where you can check them all</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- How to Import Modal 2 -->
+    <div id="howToImportModal2" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl" 
+                    onclick="closeHowToImportModal('howToImportModal2')">&times;</button>
+            <h2 class="text-xl font-bold mb-4">How to Import Transactions</h2>
+            <div class="space-y-4">
+                <p>Step 1: Go to my wallet and make the window as narrow as possible and scroll down.</p>
+                <div>
+                    <p class="mb-2">Step 2: Mark all your miners or those you wanna import.</p>
+                    <img src="markyourtransactions.jpg" alt="Step 2" class="w-full rounded-lg border border-gray-600">
+                </div>
+                <div>
+                    <p class="mb-2">Step 3: and copy paste them into the import box.</p>
+                    <img src="andpastethem2.jpg" alt="Step 3" class="w-full rounded-lg border border-gray-600">
+                </div>
+                <p class="text-gray-300">after the click on import there will be a windows where you can check them all</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto mx-4">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl" 
+                    onclick="closePreviewModal()">&times;</button>
+            <h2 class="text-xl font-bold mb-4">check imported miners</h2>
+            <div class="overflow-x-auto">
+                <table id="preview-table" class="w-full bg-gray-700 rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-600">
+                            <th class="px-4 py-2 text-left">ID</th>
+                            <th class="px-4 py-2 text-left">Miner Name</th>
+                            <th class="px-4 py-2 text-left">TH</th>
+                            <th class="px-4 py-2 text-left">W/TH</th>
+                        </tr>
+                    </thead>
+                    <tbody id="preview-tbody"></tbody>
+                </table>
+            </div>
+            <div class="flex gap-2 mt-4">
+                <button class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-semibold" 
+                        onclick="finalizeImport(true)">Import & replace</button>
+                <button class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-semibold" 
+                        onclick="finalizeImport(false)">Add miners</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirmDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl" 
+                    onclick="closeConfirmDeleteModal()">&times;</button>
+            <h2 class="text-xl font-bold mb-4 text-red-400">Delete all miners?</h2>
+            <p class="text-gray-300 mb-6">Are you sure you want to delete <strong>all your miners</strong>? This cannot be undone.</p>
+            <div class="flex gap-2">
+                <button class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-semibold" 
+                        onclick="confirmDeleteMiners()">Yes, delete</button>
+                <button class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-semibold" 
+                        onclick="closeConfirmDeleteModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Config Modal -->
+    <div id="viewConfigModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-xl p-6 w-full max-w-lg mx-4">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl" 
+                    onclick="closeViewConfigModal()">&times;</button>
+            <h2 class="text-xl font-bold mb-4 text-pink-400">Change table view</h2>
+            
+            <!-- Column checkboxes will be added here dynamically -->
+            <div id="viewConfigOptions" class="mb-4 max-h-60 overflow-y-auto">
+                <!-- Checkboxes werden hier dynamisch eingefügt -->
+            </div>
+            
+            <!-- Preset buttons -->
+            <div class="flex gap-2 mb-4">
+                <button class="bg-gray-600 hover:bg-gray-700 px-3 py-1 rounded-lg text-sm font-semibold transition-colors duration-200" 
+                        onclick="setViewPreset('minimal')">Minimal</button>
+                <button class="bg-gray-600 hover:bg-gray-700 px-3 py-1 rounded-lg text-sm font-semibold transition-colors duration-200" 
+                        onclick="setViewPreset('standard')">Standard</button>
+                <button class="bg-gray-600 hover:bg-gray-700 px-3 py-1 rounded-lg text-sm font-semibold transition-colors duration-200" 
+                        onclick="setViewPreset('all')">Alle</button>
+            </div>
+            
+            <!-- Apply/Close button -->
+            <div class="flex gap-2">
+                <button class="bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200" 
+                        onclick="applyViewConfig()">Anwenden</button>
+                <button class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-semibold text-white transition-colors duration-200" 
+                        onclick="closeViewConfigModal()">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+     <div id="footer-container"></div>
+
+    <!-- Tailwind Custom Classes for existing functionality -->
+    <style>
+        /* Custom styles for modern miner cards and tables */
+        .card {
+            background: linear-gradient(135deg, rgb(55 65 81) 0%, rgb(75 85 99) 100%);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            position: relative;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgb(75 85 99);
+            transition: all 0.3s ease-in-out;
+            backdrop-filter: blur(10px);
+            max-width: 280px;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-color: rgb(147 51 234);
+        }
+        .farm-card {
+            background: linear-gradient(135deg, rgb(126 34 206) 0%, rgb(147 51 234) 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(126, 34, 206, 0.3);
+            border: 1px solid rgb(147 51 234);
+            transition: all 0.3s ease-in-out;
+        }
+        .farm-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px -12px rgba(126, 34, 206, 0.4);
+        }
+        .card-label {
+            position: absolute;
+            top: 0.2rem;
+            left: 0.2rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, rgb(147 51 234) 0%, rgb(168 85 247) 100%);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+            letter-spacing: 0.025em;
+        }
+        .delete-btn, .copy-btn {
+            position: absolute;
+            top: 0.1rem;
+            right: 0.5rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            background: linear-gradient(135deg, rgb(239 68 68) 0%, rgb(220 38 38) 100%);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            border: 0;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+        }
+        .delete-btn:hover, .copy-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+        .copy-btn {
+            right: 2.25rem;
+            background: linear-gradient(135deg, rgb(59 130 246) 0%, rgb(37 99 235) 100%);
+        }
+        .copy-btn:hover {
+            background: linear-gradient(135deg, rgb(37 99 235) 0%, rgb(29 78 216) 100%);
+        }
+        .input-container, .input-container-farm {
+            margin-bottom: 1rem;
+        }
+        .input-container label, .input-container-farm label {
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: rgb(209 213 219);
+            margin-bottom: 0.5rem;
+        }
+        .input-container input, .input-container-farm input {
+            width: 100%;
+            background-color: rgb(75 85 99);
+            border: 1px solid rgb(107 114 128);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem;
+        }
+        .input-container input:focus, .input-container-farm input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgb(147 51 234), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-color: rgb(147 51 234);
+            background-color: rgb(55 65 81);
+        }
+        .input-container input:hover, .input-container-farm input:hover {
+            border-color: rgb(156 163 175);
+            background-color: rgb(55 65 81);
+        }
+        .table-container {
+            overflow-x: auto;
+            background-color: rgb(31 41 55);
+            border-radius: 0.5rem;
+            border: 1px solid rgb(55 65 81);
+        }
+        .table-container table {
+            width: 100%;
+            font-size: 0.875rem;
+            text-align: left;
+        }
+        .table-container th {
+            padding: 0.75rem 1rem;
+            background-color: rgb(55 65 81);
+            color: rgb(209 213 219);
+            font-weight: 500;
+        }
+        .table-container td {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid rgb(55 65 81);
+            color: white;
+        }
+        .editable-field {
+            background-color: transparent;
+            border: 0;
+            color: white;
+            width: 100%;
+            padding: 0.25rem;
+        }
+        .editable-field:focus {
+            outline: none;
+            background-color: rgb(75 85 99);
+            border-radius: 0.25rem;
+        }
+        /* Auto-responsive grid - Cards verteilen sich automatisch */
+        .grid-view.content {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+        
+        /* Farm Wrapper bleibt außerhalb des Grids */
+        .farm-wrapper {
+            width: 100%;
+        }
+        
+        .list-view.content {
+            display: block;
+        }
+        .toast {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            z-index: 50;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .toast.success {
+            background-color: rgb(34 197 94);
+        }
+        .toast.error {
+            background-color: rgb(239 68 68);
+        }
+        
+        /* Hidden column styles for ViewConfig */
+        .hidden-column {
+            display: none !important;
+        }
+    </style>
+
+    <!-- JavaScript -->
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/+esm';
+
+        const supabaseUrl = "https://umlgbacgghrvzwfvirro.supabase.co";
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtbGdiYWNnZ2hydnp3ZnZpcnJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY1MTAzMjQsImV4cCI6MjA1MjA4NjMyNH0.Hv0X4Wy4PtbSJ4yEN-CFszdX4zEoW4CMEHrbRBbX1Ug";
+
+        // Supabase-Client erstellen und global verfügbar machen
+        window.supabase = createClient(supabaseUrl, supabaseKey);
+
+        // Session abrufen
+        const session = JSON.parse(sessionStorage.getItem("supabaseSession"));
+
+        if (session) {
+            window.supabase.auth.setSession(session);
+            console.log("Supabase-Session in farm2.html geladen:", session);
+        } else {
+            console.error("Keine Supabase-Session gefunden. Weiterleitung zur Login-Seite...");
+            window.location.href = "login.html";
+        } 
+    </script>
+
+    <script>
+     
+        // Global variables
+        // ansicht variable is declared in skriptfarm.js
+        //let ansicht = 'grid';
+        // Initialize page
+        window.onload = function() {
+            ladenDaten();
+            aktualisiereFarmWerte();
+            updateViewClasses();
+        };
+
+// Auto-render footer on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const footerContainer = document.getElementById('footer-container');
+    if (footerContainer) {
+        footerContainer.innerHTML = renderFooter();
+    }
+});
+
+
+    </script>
+</body>
+</html>
