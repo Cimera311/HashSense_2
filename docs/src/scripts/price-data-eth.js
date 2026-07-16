@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-07-15T04:02:43.153892Z
+// Auto-generiert am 2026-07-16T04:03:24.698769Z
 // Quelle: data/price_lists/ethereum_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -20334,6 +20334,58 @@ const ethPriceData = {
     "price_xag": 30.80690975,
     "price_xau": 0.44350925,
     "price_zar": 29218.63227494
+  },
+  "2026-07-15": {
+    "date_iso": "2026-07-15",
+    "time_berlin": "00:00",
+    "symbol": "ETH",
+    "price_eur": 1654.8011204,
+    "price_usd": 1890.533652,
+    "price_gbp": 1411.19451613,
+    "price_aed": 6942.98483696,
+    "price_ars": 2779993.34248867,
+    "price_aud": 2710.03461733,
+    "price_bdt": 233016.72707511,
+    "price_bhd": 712.84839989,
+    "price_bmd": 1890.533652,
+    "price_brl": 9621.68196847,
+    "price_cad": 2656.97868092,
+    "price_chf": 1529.58351449,
+    "price_clp": 1749783.42160575,
+    "price_cny": 12802.50483796,
+    "price_czk": 40119.37004935,
+    "price_dkk": 12370.57461449,
+    "price_gel": 4953.19816823,
+    "price_hkd": 14817.43182319,
+    "price_huf": 593361.40983737,
+    "price_idr": 34328980.71599205,
+    "price_ils": 5669.0959989,
+    "price_inr": 182295.56758661,
+    "price_jpy": 306611.47401499,
+    "price_krw": 2811187.421874,
+    "price_kwd": 585.22036358,
+    "price_lkr": 635313.48022377,
+    "price_mmk": 3969761.46779965,
+    "price_mxn": 32936.50295943,
+    "price_myr": 7709.40717948,
+    "price_ngn": 2610373.24533127,
+    "price_nok": 18308.58390112,
+    "price_nzd": 3252.93160404,
+    "price_php": 116460.67104512,
+    "price_pkr": 525510.62970061,
+    "price_pln": 7160.41511227,
+    "price_rub": 146512.56940032,
+    "price_sar": 7107.11340649,
+    "price_sek": 18260.04255907,
+    "price_sgd": 2440.300838,
+    "price_thb": 63278.42241058,
+    "price_try": 88910.28711703,
+    "price_twd": 60778.57732468,
+    "price_uah": 84956.41369404,
+    "price_vnd": 49652887.31748047,
+    "price_xag": 32.17162707,
+    "price_xau": 0.46645137,
+    "price_zar": 30941.13543536
   }
 };
 
