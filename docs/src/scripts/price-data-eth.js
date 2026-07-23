@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-07-22T04:06:10.150259Z
+// Auto-generiert am 2026-07-23T04:05:19.095782Z
 // Quelle: data/price_lists/ethereum_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -20698,6 +20698,58 @@ const ethPriceData = {
     "price_xag": 33.7859984,
     "price_xau": 0.47475768,
     "price_zar": 31410.25969538
+  },
+  "2026-07-22": {
+    "date_iso": "2026-07-22",
+    "time_berlin": "00:00",
+    "symbol": "ETH",
+    "price_eur": 1689.40662185,
+    "price_usd": 1925.98279214,
+    "price_gbp": 1439.77228823,
+    "price_aed": 7073.17180413,
+    "price_ars": 2846000.697159,
+    "price_aud": 2751.93088263,
+    "price_bdt": 237472.94061934,
+    "price_bhd": 726.36515023,
+    "price_bmd": 1925.98279214,
+    "price_brl": 9800.74863436,
+    "price_cad": 2717.41341903,
+    "price_chf": 1565.68341327,
+    "price_clp": 1800158.33632862,
+    "price_cny": 13031.39216989,
+    "price_czk": 40868.97157862,
+    "price_dkk": 12629.43956117,
+    "price_gel": 5046.0749154,
+    "price_hkd": 15102.80977463,
+    "price_huf": 611560.3513368,
+    "price_idr": 34509759.66954784,
+    "price_ils": 5872.89932807,
+    "price_inr": 185551.40285284,
+    "price_jpy": 314356.02235875,
+    "price_krw": 2852420.38877971,
+    "price_kwd": 597.51882742,
+    "price_lkr": 647759.65822494,
+    "price_mmk": 4043928.28917064,
+    "price_mxn": 33530.89817527,
+    "price_myr": 7875.72883362,
+    "price_ngn": 2656758.4429604,
+    "price_nok": 18557.79756374,
+    "price_nzd": 3306.85274864,
+    "price_php": 118996.8487383,
+    "price_pkr": 535223.68824936,
+    "price_pln": 7311.20786938,
+    "price_rub": 150791.19801091,
+    "price_sar": 7232.82999965,
+    "price_sek": 18701.92848599,
+    "price_sgd": 2488.67214674,
+    "price_thb": 64957.89319405,
+    "price_try": 90911.7786148,
+    "price_twd": 62286.28542376,
+    "price_uah": 86207.63690636,
+    "price_vnd": 50682237.17513963,
+    "price_xag": 32.72169651,
+    "price_xau": 0.47192356,
+    "price_zar": 31712.31203559
   }
 };
 
