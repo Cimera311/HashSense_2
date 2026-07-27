@@ -26,7 +26,7 @@ globalThis.minersExportConfig = {
         currentMiners: 'https://api.gomining.com/api/nft/get-my',
         purchases: 'https://api.gomining.com/api/user-payments-history/index',
         upgrades: 'https://api.gomining.com/api/internal-payment/get-my',
-        sales: 'https://api.gomining.com/api/nft-marketplace-order/find-by-user'
+        sales: 'https://api.gomining.com/api/nft-marketplace-order/find-by-user-v2'
     },
     
     // Request settings

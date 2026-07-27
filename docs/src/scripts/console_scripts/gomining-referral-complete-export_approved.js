@@ -7,12 +7,33 @@
 //   2. Open Console (F12)
 //   3. Paste this script and press Enter
 //   4. Run: exportAllReferralData()
+//
+// Type-specific exports:
+//   exportRoyalties()          - income-kw-consumed-royalty
+//   exportNftPayments()        - nft-payment
+//   exportRegistrations()      - registration
+//   exportInternalPayments()   - internal-payment
+//   exportSimpleEarnRewards()  - simple-earn-reward
+//   exportCardTransactions()   - card-transaction + card-issued
+//   exportByTypes([...])       - custom type array
 // ============================================================
 
 (function() {
     'use strict';
 
     const REFERRAL_API_BASE = 'https://referral-api.bounty.gomining.com/api';
+
+    // All known transaction types (from API payload inspection)
+    const ALL_TYPES = [
+        'registration',
+        'nft-payment',
+        'internal-payment',
+        'nft-game-ability-payment',
+        'card-issued',
+        'card-transaction',
+        'simple-earn-reward',
+        'income-kw-consumed-royalty'
+    ];
 
     // Token detection
     function findToken() {
@@ -90,67 +111,54 @@
     }
 
     // Get referrals list with pagination
-    async function getAllReferrals(token, period = 'ALL', customFrom = null, customTo = null) {
-        console.log('\n🔍 Fetching Referrals (get-my)...');
+    // types: array of type strings to filter, or null / [] for ALL types
+    async function getAllReferrals(token, period = 'ALL', customFrom = null, customTo = null, types = null) {
+        const typeLabel = (types && types.length) ? types.join(', ') : 'ALL';
+        console.log(`\n🔍 Fetching Referrals (get-my) [types: ${typeLabel}]...`);
         
-        // Reset stop flag
         globalThis.stopReferralExport = false;
         
-        // Calculate date range
+        // Build date range
         let startDate, endDate;
-        let filterByDate = false;
         
         if (customFrom && customTo) {
-            // Custom date range
             startDate = new Date(customFrom);
             startDate.setHours(0, 0, 0, 0);
             endDate = new Date(customTo);
             endDate.setHours(23, 59, 59, 999);
-            filterByDate = true;
-            console.log(`   📅 Custom Range: ${customFrom} to ${customTo}`);
-            console.log(`   🎯 API will filter results (efficient!)`);
+            console.log(`   📅 Range: ${customFrom} to ${customTo}`);
         } else {
-            // Predefined periods
             endDate = new Date();
             endDate.setHours(23, 59, 59, 999);
-            
             startDate = new Date();
             if (period === '3M') {
                 startDate.setMonth(startDate.getMonth() - 3);
             } else if (period === '1Y') {
                 startDate.setFullYear(startDate.getFullYear() - 1);
-            } else if (period === 'ALL') {
-                startDate.setFullYear(2024, 4, 4); // 2024-05-04
+            } else {
+                startDate.setFullYear(2024, 4, 4); // 2024-05-04 (platform start)
             }
             startDate.setHours(0, 0, 0, 0);
+            console.log(`   📅 Range: ${startDate.toISOString().split('T')[0]} to ${endDate.toISOString().split('T')[0]}`);
         }
         
         let allReferrals = [];
         let skip = 0;
-        const limit = 20;
+        const limit = 100;
         let hasMore = true;
         let totalCount = null;
+        let rewardsGmtTotal = null;
 
         while (hasMore) {
-            // Check stop flag
             if (globalThis.stopReferralExport) {
                 console.log('\n🛑 Export stopped by user!');
-                hasMore = false;
                 break;
             }
             
             try {
-                // Build request body with filters (if date range specified)
+                // Always send full filters object – matches exact API payload format
                 const requestBody = {
-                    pagination: {
-                        skip: skip,
-                        limit: limit
-                    }
-                };
-                
-                // Add date filter if custom range (CORRECT nested structure!)
-                if (filterByDate) {
-                    requestBody.filters = {
+                    filters: {
                         createdAt: {
                             range: {
                                 start: startDate.toISOString(),
@@ -158,9 +166,13 @@
                             }
                         },
                         status: [],
-                        type: []
-                    };
-                }
+                        type: (types && types.length) ? types : ALL_TYPES
+                    },
+                    pagination: {
+                        skip: skip,
+                        limit: limit
+                    }
+                };
 
                 const response = await fetch(`${REFERRAL_API_BASE}/ref-program/get-my`, {
                     method: 'POST',
@@ -177,32 +189,32 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    // Response structure: { data: { array: [...], count: 52314 } }
                     const items = data.data?.array || data.data?.items || data.data || [];
                     const count = data.data?.count || items.length;
+
+                    // Capture GMT total (API returns it on every page – same value)
+                    if (rewardsGmtTotal === null && data.data?.rewardsGmtTotalWithFilters != null) {
+                        rewardsGmtTotal = data.data.rewardsGmtTotalWithFilters;
+                    }
                     
                     if (totalCount === null) {
                         totalCount = count;
+                        const gmtInfo = rewardsGmtTotal != null ? ` | GMT Total: ${rewardsGmtTotal.toFixed(8)}` : '';
+                        console.log(`   📊 Total matching: ${totalCount}${gmtInfo}`);
                     }
                     
-                    console.log(`   Batch ${Math.floor(skip/limit)+1}: Loaded ${items.length} items (${allReferrals.length + items.length}/${totalCount} total)`);
+                    console.log(`   Batch ${Math.floor(skip/limit)+1}: +${items.length} (${allReferrals.length + items.length}/${totalCount})`);
                     
                     if (items.length === 0) {
                         hasMore = false;
                     } else {
                         allReferrals.push(...items);
                         skip += limit;
-                        
-                        if (skip >= totalCount) {
-                            hasMore = false;
-                        }
+                        if (skip >= totalCount) hasMore = false;
                     }
                 } else {
                     console.error(`   ❌ Failed: ${response.status}`);
-                    try {
-                        const errorData = await response.json();
-                        console.error(`   Error:`, errorData);
-                    } catch (e) {}
+                    try { console.error(`   Error:`, await response.json()); } catch (e) {}
                     hasMore = false;
                 }
 
@@ -214,7 +226,12 @@
             }
         }
 
-        console.log(`✅ Loaded ${allReferrals.length} referral transactions`);
+        const gmtSuffix = rewardsGmtTotal != null ? ` | GMT (filter): ${rewardsGmtTotal.toFixed(8)}` : '';
+        console.log(`✅ Loaded ${allReferrals.length} transactions${gmtSuffix}`);
+
+        // Attach metadata for callers
+        allReferrals._rewardsGmtTotal = rewardsGmtTotal;
+        allReferrals._totalCount = totalCount;
         return allReferrals;
     }
 
@@ -248,8 +265,9 @@
         // 2. Get total rewards
         results.totalRewards = await getTotalRewards(token);
 
-        // 3. Get all transactions from get-my (includes ALL types)
+        // 3. Get all transactions from get-my (all types, full history)
         results.transactions = await getAllReferrals(token, 'ALL');
+        results.rewardsGmtTotal = results.transactions._rewardsGmtTotal;
 
         // Summary
         console.log(`\n\n${'═'.repeat(60)}`);
@@ -265,32 +283,39 @@
             console.log(`   • kW Rewards: $${results.summary.totalKwRewardInUsd || 0}`);
         }
 
-        console.log(`\n✅ Total Rewards:`);
+        console.log(`\n✅ Total Rewards (all-time):`);
         if (results.totalRewards) {
             console.log(`   • Total USD: $${results.totalRewards.totalRewardsSumUsd || 0}`);
             console.log(`   • GMT: ${results.totalRewards.totalRewardsGmt || 0} ($${results.totalRewards.totalRewardsGmtInUsd || 0})`);
             console.log(`   • USDT: ${results.totalRewards.totalRewardsUsdt || 0}`);
         }
 
-        console.log(`\n✅ Transactions Loaded:`);
-        console.log(`   • Total: ${results.transactions.length}`);
-        
-        // Count by type
+        if (results.rewardsGmtTotal != null) {
+            console.log(`\n✅ GMT Total (filtered period): ${results.rewardsGmtTotal.toFixed(8)} GMT`);
+        }
+
+        console.log(`\n✅ Transactions Loaded: ${results.transactions.length}`);
         const byType = {};
         results.transactions.forEach(t => {
             const type = t.type || 'unknown';
             byType[type] = (byType[type] || 0) + 1;
         });
-        Object.entries(byType).forEach(([type, count]) => {
+        Object.entries(byType).sort((a, b) => b[1] - a[1]).forEach(([type, count]) => {
             console.log(`   • ${type}: ${count}`);
         });
 
-        // Store globally
         globalThis.referralExportData = results;
 
         console.log(`\n💾 All data stored in: globalThis.referralExportData`);
         console.log(`\n💡 To export to CSV:`);
         console.log(`   exportTransactionsToCSV()`);
+        console.log(`\n💡 Type-specific exports:`);
+        console.log(`   exportRoyalties()           → income-kw-consumed-royalty`);
+        console.log(`   exportNftPayments()          → nft-payment`);
+        console.log(`   exportRegistrations()        → registration`);
+        console.log(`   exportInternalPayments()     → internal-payment`);
+        console.log(`   exportSimpleEarnRewards()    → simple-earn-reward`);
+        console.log(`   exportCardTransactions()     → card-transaction + card-issued`);
 
         return results;
     }
@@ -303,15 +328,19 @@
         return num.toString().replace('.', ',');
     }
 
-    // Export all transactions to CSV (improved German format)
-    function exportTransactionsToCSV() {
+    // Export all transactions to CSV – optionally pre-filtered by type(s)
+    function exportTransactionsToCSV(filterTypes = null) {
         const data = globalThis.referralExportData;
         if (!data || !data.transactions) {
-            console.error('❌ Run exportAllReferralData() first!');
+            console.error('❌ Run exportAllReferralData() or exportReferralDataRange() first!');
             return;
         }
 
-        const transactions = data.transactions;
+        let transactions = data.transactions;
+        if (filterTypes && filterTypes.length) {
+            transactions = transactions.filter(t => filterTypes.includes(t.type));
+            console.log(`🔍 Filtered to types [${filterTypes.join(', ')}]: ${transactions.length} transactions`);
+        }
         if (transactions.length === 0) {
             console.log('⚠️ No transactions to export');
             return;
@@ -320,17 +349,18 @@
         // German CSV headers
         const headers = [
             'Nr',
+            'Serial ID',
             'Datum',
             'Zeit',
             'User ID',
             'Typ',
             'Währung',
-            'Betrag',
+            'Betrag (GMT/USDT)',
             'Betrag USD',
             'Status',
             'Reward Koeffizient',
             'kW Verbraucht',
-            'Power (TH)',
+            'Power gesamt (TH)',
             'Effizienz (W/TH)',
             'Kaufpreis',
             'Kaufpreis USD',
@@ -345,13 +375,14 @@
             const timeStr = date.toTimeString().split(' ')[0]; // HH:MM:SS
             
             const row = [
-                index + 1, // Fortlaufende Nummer
+                index + 1,
+                item.serial_id || '',
                 dateStr,
                 timeStr,
                 item.userId || '',
                 item.type || '',
                 item.currency || '',
-                formatNumberDE(item.reward || item.rewardInUsd),
+                formatNumberDE(item.reward),          // raw reward amount (GMT or USDT)
                 formatNumberDE(item.rewardInUsd),
                 item.status || '',
                 formatNumberDE(item.rewardCoefficient),
@@ -366,7 +397,8 @@
             csv += row.map(val => `"${val}"`).join(';') + '\n';
         });
 
-        const filename = `gomining_referral_transactions_${new Date().toISOString().split('T')[0]}.csv`;
+        const typeTag = filterTypes && filterTypes.length ? `_${filterTypes[0].replace(/-/g, '_')}${filterTypes.length > 1 ? '_etc' : ''}` : '';
+        const filename = `gomining_referral${typeTag}_${new Date().toISOString().split('T')[0]}.csv`;
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -407,70 +439,128 @@
             transactions: []
         };
 
-        // Get data for date range (smart filtering during download)
         results.transactions = await getAllReferrals(token, 'CUSTOM', fromDate, toDate);
+        results.rewardsGmtTotal = results.transactions._rewardsGmtTotal;
 
-        console.log(`\n✅ Filtered Transactions: ${results.transactions.length}`);
-
-        // Count by type
+        console.log(`\n✅ Transactions: ${results.transactions.length}`);
+        if (results.rewardsGmtTotal != null) {
+            console.log(`   GMT Total (period): ${results.rewardsGmtTotal.toFixed(8)} GMT`);
+        }
         const byType = {};
-        results.transactions.forEach(t => {
-            const type = t.type || 'unknown';
-            byType[type] = (byType[type] || 0) + 1;
-        });
-        Object.entries(byType).forEach(([type, count]) => {
-            console.log(`   • ${type}: ${count}`);
-        });
+        results.transactions.forEach(t => { byType[t.type || 'unknown'] = (byType[t.type || 'unknown'] || 0) + 1; });
+        Object.entries(byType).sort((a,b) => b[1]-a[1]).forEach(([type, count]) => console.log(`   • ${type}: ${count}`));
 
-        // Store globally
         globalThis.referralExportData = results;
 
         console.log(`\n💾 Data stored in: globalThis.referralExportData`);
-        console.log(`💡 To export to CSV: exportTransactionsToCSV()`);
+        console.log(`💡 To export: exportTransactionsToCSV()`);
 
         return results;
     }
 
+    // ──────────────────────────────────────────────────────
+    // TYPE-SPECIFIC EXPORT FUNCTIONS
+    // Each fetches only its type(s) from the API (efficient)
+    // ──────────────────────────────────────────────────────
+
+    async function _exportByTypesInternal(types, label, fromDate = null, toDate = null) {
+        const token = (globalThis.goMiningToken || findToken() || '').replace('Bearer ', '').trim();
+        if (!token) { console.error('❌ No token found!'); return; }
+        console.log(`\n📊 Fetching [${label}]...`);
+        const txs = await getAllReferrals(token, 'ALL', fromDate, toDate, types);
+        const results = { transactions: txs, rewardsGmtTotal: txs._rewardsGmtTotal };
+        globalThis.referralExportData = results;
+        console.log(`\n💡 Now run: exportTransactionsToCSV()  (${txs.length} transactions)`);
+        if (txs._rewardsGmtTotal != null) console.log(`   GMT Total: ${txs._rewardsGmtTotal.toFixed(8)} GMT`);
+        return results;
+    }
+
+    // Royalty rewards (kW consumed royalty – most frequent type)
+    async function exportRoyalties(fromDate = null, toDate = null) {
+        return _exportByTypesInternal(['income-kw-consumed-royalty'], 'income-kw-consumed-royalty', fromDate, toDate);
+    }
+
+    // NFT purchase payments from referrals
+    async function exportNftPayments(fromDate = null, toDate = null) {
+        return _exportByTypesInternal(['nft-payment'], 'nft-payment', fromDate, toDate);
+    }
+
+    // New user registrations
+    async function exportRegistrations(fromDate = null, toDate = null) {
+        return _exportByTypesInternal(['registration'], 'registration', fromDate, toDate);
+    }
+
+    // Internal payments (upgrade payments etc.)
+    async function exportInternalPayments(fromDate = null, toDate = null) {
+        return _exportByTypesInternal(['internal-payment'], 'internal-payment', fromDate, toDate);
+    }
+
+    // Simple earn rewards
+    async function exportSimpleEarnRewards(fromDate = null, toDate = null) {
+        return _exportByTypesInternal(['simple-earn-reward'], 'simple-earn-reward', fromDate, toDate);
+    }
+
+    // Card transactions (card-issued + card-transaction)
+    async function exportCardTransactions(fromDate = null, toDate = null) {
+        return _exportByTypesInternal(['card-issued', 'card-transaction'], 'card-issued + card-transaction', fromDate, toDate);
+    }
+
+    // Generic: pass any array of types
+    async function exportByTypes(types, fromDate = null, toDate = null) {
+        if (!Array.isArray(types) || !types.length) {
+            console.error('❌ Pass an array of types, e.g. exportByTypes(["nft-payment","registration"])');
+            console.log('   Available types:', ALL_TYPES.join(', '));
+            return;
+        }
+        return _exportByTypesInternal(types, types.join(', '), fromDate, toDate);
+    }
+
     // Expose globally
-    globalThis.exportAllReferralData = exportAllReferralData;
+    globalThis.exportAllReferralData   = exportAllReferralData;
     globalThis.exportReferralDataRange = exportReferralDataRange;
     globalThis.exportTransactionsToCSV = exportTransactionsToCSV;
-    globalThis.stopExport = stopExport;
+    globalThis.stopExport              = stopExport;
+    // Type-specific
+    globalThis.exportRoyalties         = exportRoyalties;
+    globalThis.exportNftPayments       = exportNftPayments;
+    globalThis.exportRegistrations     = exportRegistrations;
+    globalThis.exportInternalPayments  = exportInternalPayments;
+    globalThis.exportSimpleEarnRewards = exportSimpleEarnRewards;
+    globalThis.exportCardTransactions  = exportCardTransactions;
+    globalThis.exportByTypes           = exportByTypes;
 
     // Show help
     console.log(`
 ╔══════════════════════════════════════════════════════════════╗
-║                                                              ║
 ║       📊 GoMining Referral Complete Export 📊               ║
-║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝
 
-📚 Exports ALL your referral transaction data
+Full export (all types):
+  exportAllReferralData()                               - All data since start
+  exportReferralDataRange("2026-01-01", "2026-12-31")  - Custom date range
+  exportTransactionsToCSV()                             - Download CSV
 
-How to use:
+Type-specific exports (faster – fetch only what you need):
+  exportRoyalties()                                     - income-kw-consumed-royalty
+  exportNftPayments()                                   - nft-payment
+  exportRegistrations()                                 - registration
+  exportInternalPayments()                              - internal-payment
+  exportSimpleEarnRewards()                             - simple-earn-reward
+  exportCardTransactions()                              - card-issued + card-transaction
+  exportByTypes(["nft-payment","registration"])         - custom type array
 
-  1. exportAllReferralData()                        - Fetch ALL data
-  2. exportReferralDataRange("2024-05-01", "2024-12-31") - Date range
-  3. exportTransactionsToCSV()                      - Export to CSV
-  4. stopExport()                                   - Stop running export
+  All type functions accept optional (fromDate, toDate):
+    exportRoyalties("2026-01-01", "2026-05-22")
+    exportNftPayments("2025-01-01", "2025-12-31")
 
-📋 Copy-Paste Examples (Year Exports):
+Available types: ${ALL_TYPES.join(', ')}
 
-  exportReferralDataRange("2024-01-01", "2024-12-31")  // Ganzes Jahr 2024
-  exportReferralDataRange("2025-01-01", "2025-12-31")  // Ganzes Jahr 2025
-  exportReferralDataRange("2026-01-01", "2026-05-18")  // 2026 bis heute
-  
-  // Then export to CSV:
-  exportTransactionsToCSV()
-
-What gets exported:
-  • Referral Summary (445 referrals, $5,019 kW rewards)
-  • Total Rewards ($12,858 total: GMT + USDT)
-  • All Transactions (registration, payments, rewards, etc.)
+Utility:
+  stopExport()   - Stop a running export
 
 Token: ${globalThis.goMiningToken ? '✅ Found' : '❌ Not found'}
 
-💡 Run: exportAllReferralData()
+💡 Quick start: exportRoyalties()  or  exportAllReferralData()
     `);
 
 })();
