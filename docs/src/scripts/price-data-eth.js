@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-07-27T04:18:10.963926Z
+// Auto-generiert am 2026-07-28T04:03:38.406479Z
 // Quelle: data/price_lists/ethereum_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -20958,6 +20958,58 @@ const ethPriceData = {
     "price_xag": 32.21959021,
     "price_xau": 0.4619863,
     "price_zar": 31548.01220177
+  },
+  "2026-07-27": {
+    "date_iso": "2026-07-27",
+    "time_berlin": "00:00",
+    "symbol": "ETH",
+    "price_eur": 1712.84441336,
+    "price_usd": 1951.78817741,
+    "price_gbp": 1461.89324845,
+    "price_aed": 7168.11774246,
+    "price_ars": 2918115.57635824,
+    "price_aud": 2790.54767698,
+    "price_bdt": 240828.26627442,
+    "price_bhd": 736.28866847,
+    "price_bmd": 1951.78817741,
+    "price_brl": 9922.89109393,
+    "price_cad": 2749.44496975,
+    "price_chf": 1593.20760524,
+    "price_clp": 1847347.99203351,
+    "price_cny": 13217.89989503,
+    "price_czk": 41349.57134847,
+    "price_dkk": 12804.74927722,
+    "price_gel": 5123.44396569,
+    "price_hkd": 15306.02047663,
+    "price_huf": 617971.78247439,
+    "price_idr": 35063497.26985177,
+    "price_ils": 5945.84943212,
+    "price_inr": 188479.40631469,
+    "price_jpy": 319356.13575316,
+    "price_krw": 2847671.37201609,
+    "price_kwd": 604.66007378,
+    "price_lkr": 656107.93952652,
+    "price_mmk": 4098111.08245517,
+    "price_mxn": 34042.85517574,
+    "price_myr": 7985.74132786,
+    "price_ngn": 2669167.9220123,
+    "price_nok": 18696.17895138,
+    "price_nzd": 3366.3271411,
+    "price_php": 120439.00087038,
+    "price_pkr": 542320.72449879,
+    "price_pln": 7393.40094105,
+    "price_rub": 152373.44857821,
+    "price_sar": 7335.12835323,
+    "price_sek": 18891.68957311,
+    "price_sgd": 2516.51271329,
+    "price_thb": 65619.11852441,
+    "price_try": 92428.87702569,
+    "price_twd": 63115.56373282,
+    "price_uah": 87497.12598405,
+    "price_vnd": 51369628.17271257,
+    "price_xag": 32.71253587,
+    "price_xau": 0.47672426,
+    "price_zar": 32620.07966594
   }
 };
 
