@@ -113,7 +113,7 @@ const priceMatrixdatei = { 03.03.2026
         {"minTH":2560,"pricePerTH":15.8},
         {"minTH":3584,"pricePerTH":15.7},
     ],
-};*/
+};
 const priceMatrixdatei = {
     "15": [
         {"minTH":1,"pricePerTH":15.65,"minerCost":16.99},
@@ -135,5 +135,28 @@ const priceMatrixdatei = {
         {"minTH":1536,"pricePerTH":14.15},
         {"minTH":2560,"pricePerTH":14.06},
         {"minTH":3584,"pricePerTH":13.98},
+    ],
+};*/
+const priceMatrixdatei = {
+    "15": [
+        {"minTH":1,"pricePerTH":10.28},
+        {"minTH":2,"pricePerTH":10.25},
+        {"minTH":4,"pricePerTH":10.22},
+        {"minTH":8,"pricePerTH":10.2},
+        {"minTH":16,"pricePerTH":10.17},
+        {"minTH":32,"pricePerTH":10.14},
+        {"minTH":48,"pricePerTH":10.12},
+        {"minTH":64,"pricePerTH":10.09},
+        {"minTH":96,"pricePerTH":10.06},
+        {"minTH":128,"pricePerTH":10.04},
+        {"minTH":192,"pricePerTH":10.01},
+        {"minTH":256,"pricePerTH":9.98},
+        {"minTH":384,"pricePerTH":9.96},
+        {"minTH":512,"pricePerTH":9.93},
+        {"minTH":768,"pricePerTH":9.91},
+        {"minTH":1024,"pricePerTH":9.88},
+        {"minTH":1536,"pricePerTH":9.85},
+        {"minTH":2560,"pricePerTH":9.83},
+        {"minTH":3584,"pricePerTH":9.8},
     ],
 };
