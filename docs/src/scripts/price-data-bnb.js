@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-08-05T04:03:19.428640Z
+// Auto-generiert am 2026-08-06T05:48:48.807763Z
 // Quelle: data/price_lists/bnb_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -21426,6 +21426,58 @@ const bnbPriceData = {
     "price_xag": 10.10242469,
     "price_xau": 0.14517784,
     "price_zar": 9726.14408051
+  },
+  "2026-08-05": {
+    "date_iso": "2026-08-05",
+    "time_berlin": "00:00",
+    "symbol": "BNB",
+    "price_eur": 513.98222622,
+    "price_usd": 592.73679295,
+    "price_gbp": 440.68083798,
+    "price_aed": 2176.82587211,
+    "price_ars": 887040.8649953,
+    "price_aud": 841.18479066,
+    "price_bdt": 73350.38326745,
+    "price_bhd": 223.46651284,
+    "price_bmd": 592.73679295,
+    "price_brl": 3049.74934708,
+    "price_cad": 833.74357296,
+    "price_chf": 479.61001233,
+    "price_clp": 542330.45607699,
+    "price_cny": 4003.04793118,
+    "price_czk": 12430.66856386,
+    "price_dkk": 3842.06121096,
+    "price_gel": 1550.00671356,
+    "price_hkd": 4648.50866187,
+    "price_huf": 185702.58196489,
+    "price_idr": 10651213.43774393,
+    "price_ils": 1785.05352512,
+    "price_inr": 56367.75515972,
+    "price_jpy": 93476.39325516,
+    "price_krw": 847275.69111556,
+    "price_kwd": 183.42180784,
+    "price_lkr": 198945.98928797,
+    "price_mmk": 1244551.66205207,
+    "price_mxn": 10229.46994756,
+    "price_myr": 2428.50191439,
+    "price_ngn": 808131.41613929,
+    "price_nok": 5654.08603837,
+    "price_nzd": 1008.82438865,
+    "price_php": 36153.53672609,
+    "price_pkr": 164590.93928094,
+    "price_pln": 2208.35235665,
+    "price_rub": 47787.98195598,
+    "price_sar": 2223.01962859,
+    "price_sek": 5641.08080039,
+    "price_sgd": 759.81210551,
+    "price_thb": 19704.35335717,
+    "price_try": 28198.64561706,
+    "price_twd": 19210.6575477,
+    "price_uah": 26495.42770451,
+    "price_vnd": 15567611.37690098,
+    "price_xag": 9.9710124,
+    "price_xau": 0.14554652,
+    "price_zar": 9713.16537859
   }
 };
 

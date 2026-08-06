@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-08-05T04:03:19.591799Z
+// Auto-generiert am 2026-08-06T05:48:48.983110Z
 // Quelle: data/price_lists/usdc_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -21010,6 +21010,58 @@ const usdcPriceData = {
     "price_xag": 0.01715791,
     "price_xau": 0.00024657,
     "price_zar": 16.51883856
+  },
+  "2026-08-05": {
+    "date_iso": "2026-08-05",
+    "time_berlin": "00:00",
+    "symbol": "USDC",
+    "price_eur": 0.86687861,
+    "price_usd": 0.99970548,
+    "price_gbp": 0.74324903,
+    "price_aed": 3.67141837,
+    "price_ars": 1496.0765416,
+    "price_aud": 1.41873603,
+    "price_bdt": 123.7122122,
+    "price_bhd": 0.37689696,
+    "price_bmd": 0.99970548,
+    "price_brl": 5.14368462,
+    "price_cad": 1.40618572,
+    "price_chf": 0.80890669,
+    "price_clp": 914.69052346,
+    "price_cny": 6.75151094,
+    "price_czk": 20.96547337,
+    "price_dkk": 6.47999193,
+    "price_gel": 2.61422982,
+    "price_hkd": 7.84014022,
+    "price_huf": 313.20459694,
+    "price_idr": 17964.25755863,
+    "price_ils": 3.01065803,
+    "price_inr": 95.06943764,
+    "price_jpy": 157.65659133,
+    "price_krw": 1429.00889437,
+    "price_kwd": 0.30935786,
+    "price_lkr": 335.54082948,
+    "price_mmk": 2099.05159941,
+    "price_mxn": 17.25294812,
+    "price_myr": 4.09589331,
+    "price_ngn": 1362.98845062,
+    "price_nok": 9.53613956,
+    "price_nzd": 1.70147573,
+    "price_php": 60.97628681,
+    "price_pkr": 277.59785703,
+    "price_pln": 3.7245907,
+    "price_rub": 80.59885581,
+    "price_sar": 3.74932841,
+    "price_sek": 9.51420502,
+    "price_sgd": 1.28149346,
+    "price_thb": 33.23321618,
+    "price_try": 47.55962648,
+    "price_twd": 32.40055249,
+    "price_uah": 44.68699179,
+    "price_vnd": 26256.21784615,
+    "price_xag": 0.01681704,
+    "price_xau": 0.00024548,
+    "price_zar": 16.38215266
   }
 };
 
