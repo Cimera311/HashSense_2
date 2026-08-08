@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-08-07T04:54:36.758284Z
+// Auto-generiert am 2026-08-08T04:10:28.721263Z
 // Quelle: data/price_lists/toncoin_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -21374,6 +21374,58 @@ const tonPriceData = {
     "price_xag": 0.02254419,
     "price_xau": 0.00032786,
     "price_zar": 22.87646395
+  },
+  "2026-08-07": {
+    "date_iso": "2026-08-07",
+    "time_berlin": "00:00",
+    "symbol": "TON",
+    "price_eur": 1.18681017,
+    "price_usd": 1.36768674,
+    "price_gbp": 1.01650992,
+    "price_aed": 5.02282956,
+    "price_ars": 2051.19844959,
+    "price_aud": 1.94462898,
+    "price_bdt": 169.25773636,
+    "price_bhd": 0.51567398,
+    "price_bmd": 1.36768674,
+    "price_brl": 7.00706949,
+    "price_cad": 1.91669808,
+    "price_chf": 1.11116068,
+    "price_clp": 1252.63693364,
+    "price_cny": 9.23065459,
+    "price_czk": 28.77236655,
+    "price_dkk": 8.87211551,
+    "price_gel": 3.57650083,
+    "price_hkd": 10.72888704,
+    "price_huf": 433.49838055,
+    "price_idr": 24507.95133349,
+    "price_ils": 4.11361193,
+    "price_inr": 130.35717489,
+    "price_jpy": 216.67235295,
+    "price_krw": 1946.62565192,
+    "price_kwd": 0.42351924,
+    "price_lkr": 459.30390358,
+    "price_mmk": 2871.69082245,
+    "price_mxn": 23.53327973,
+    "price_myr": 5.59589031,
+    "price_ngn": 1864.02026124,
+    "price_nok": 13.0426027,
+    "price_nzd": 2.3309704,
+    "price_php": 83.0869696,
+    "price_pkr": 379.61191816,
+    "price_pln": 5.10401271,
+    "price_rub": 113.51607939,
+    "price_sar": 5.13584425,
+    "price_sek": 13.01252043,
+    "price_sgd": 1.75545329,
+    "price_thb": 45.28410804,
+    "price_try": 65.19051914,
+    "price_twd": 44.06933004,
+    "price_uah": 61.22672362,
+    "price_vnd": 35878.45599141,
+    "price_xag": 0.02218309,
+    "price_xau": 0.00032163,
+    "price_zar": 22.35786239
   }
 };
 
