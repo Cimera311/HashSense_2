@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-08-12T04:46:45.243650Z
+// Auto-generiert am 2026-08-13T04:49:47.390953Z
 // Quelle: data/price_lists/ethereum_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -21790,6 +21790,58 @@ const ethPriceData = {
     "price_xag": 28.41002572,
     "price_xau": 0.42482386,
     "price_zar": 30281.330515
+  },
+  "2026-08-12": {
+    "date_iso": "2026-08-12",
+    "time_berlin": "00:00",
+    "symbol": "ETH",
+    "price_eur": 1628.39112433,
+    "price_usd": 1879.7276254,
+    "price_gbp": 1391.4476977,
+    "price_aed": 6903.29970427,
+    "price_ars": 2802665.99461263,
+    "price_aud": 2661.07212772,
+    "price_bdt": 231982.0791814,
+    "price_bhd": 708.67987151,
+    "price_bmd": 1879.7276254,
+    "price_brl": 9727.59046144,
+    "price_cad": 2616.8628137,
+    "price_chf": 1524.75986062,
+    "price_clp": 1724520.75788409,
+    "price_cny": 12679.51472436,
+    "price_czk": 39491.10369561,
+    "price_dkk": 12173.59543262,
+    "price_gel": 4915.48774042,
+    "price_hkd": 14749.58732856,
+    "price_huf": 594609.85433765,
+    "price_idr": 33513186.56474047,
+    "price_ils": 5634.10761161,
+    "price_inr": 179288.71790744,
+    "price_jpy": 299393.61753529,
+    "price_krw": 2656392.17361028,
+    "price_kwd": 580.62718648,
+    "price_lkr": 628380.98634345,
+    "price_mmk": 3946807.70321975,
+    "price_mxn": 32096.3304064,
+    "price_myr": 7692.78530694,
+    "price_ngn": 2562557.48260029,
+    "price_nok": 17841.35392818,
+    "price_nzd": 3197.28323014,
+    "price_php": 115123.90713914,
+    "price_pkr": 522141.34114497,
+    "price_pln": 7003.52678126,
+    "price_rub": 154982.30397357,
+    "price_sar": 7041.18900396,
+    "price_sek": 17894.40548095,
+    "price_sgd": 2405.82955265,
+    "price_thb": 62289.02869118,
+    "price_try": 89766.76493696,
+    "price_twd": 60572.53097359,
+    "price_uah": 84312.67696031,
+    "price_vnd": 49123942.44091203,
+    "price_xag": 29.0170358,
+    "price_xau": 0.42998769,
+    "price_zar": 30429.87667738
   }
 };
 
