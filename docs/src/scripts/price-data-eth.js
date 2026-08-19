@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-08-18T03:44:01.127281Z
+// Auto-generiert am 2026-08-19T03:45:50.039400Z
 // Quelle: data/price_lists/ethereum_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -22102,6 +22102,58 @@ const ethPriceData = {
     "price_xag": 28.91305652,
     "price_xau": 0.428846,
     "price_zar": 30353.66156502
+  },
+  "2026-08-18": {
+    "date_iso": "2026-08-18",
+    "time_berlin": "00:00",
+    "symbol": "ETH",
+    "price_eur": 1650.19655516,
+    "price_usd": 1911.38104016,
+    "price_gbp": 1410.56862554,
+    "price_aed": 7020.23496715,
+    "price_ars": 2843955.50907531,
+    "price_aud": 2688.89070829,
+    "price_bdt": 234571.38255011,
+    "price_bhd": 720.80090405,
+    "price_bmd": 1911.38104016,
+    "price_brl": 9946.82693298,
+    "price_cad": 2651.20974247,
+    "price_chf": 1549.47824263,
+    "price_clp": 1749467.95224614,
+    "price_cny": 12884.4284536,
+    "price_czk": 39926.02621092,
+    "price_dkk": 12336.31700376,
+    "price_gel": 4988.70451481,
+    "price_hkd": 14993.47496403,
+    "price_huf": 600507.75028126,
+    "price_idr": 34082504.31041988,
+    "price_ils": 5669.3281894,
+    "price_inr": 182908.27067118,
+    "price_jpy": 304544.35502855,
+    "price_krw": 2704788.33912082,
+    "price_kwd": 590.14080753,
+    "price_lkr": 634301.13909555,
+    "price_mmk": 4013269.42858837,
+    "price_mxn": 32558.05942527,
+    "price_myr": 7761.73612787,
+    "price_ngn": 2587474.74168258,
+    "price_nok": 18001.57777431,
+    "price_nzd": 3236.59312259,
+    "price_php": 117884.41036069,
+    "price_pkr": 530547.34513316,
+    "price_pln": 7118.82591259,
+    "price_rub": 162371.88817113,
+    "price_sar": 7160.964219,
+    "price_sek": 18175.76383988,
+    "price_sgd": 2441.68033008,
+    "price_thb": 63137.69420902,
+    "price_try": 91569.67831947,
+    "price_twd": 60908.07013705,
+    "price_uah": 85514.49581673,
+    "price_vnd": 50088605.12033447,
+    "price_xag": 28.97238887,
+    "price_xau": 0.43185743,
+    "price_zar": 31010.43713363
   }
 };
 
