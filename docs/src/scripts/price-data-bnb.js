@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-08-19T03:45:50.080212Z
+// Auto-generiert am 2026-08-20T03:46:03.294143Z
 // Quelle: data/price_lists/bnb_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -22154,6 +22154,58 @@ const bnbPriceData = {
     "price_xag": 9.17477632,
     "price_xau": 0.13675763,
     "price_zar": 9820.17139203
+  },
+  "2026-08-19": {
+    "date_iso": "2026-08-19",
+    "time_berlin": "00:00",
+    "symbol": "BNB",
+    "price_eur": 520.90101469,
+    "price_usd": 603.00915299,
+    "price_gbp": 445.46999673,
+    "price_aed": 2214.55111437,
+    "price_ars": 901499.88069899,
+    "price_aud": 851.54721452,
+    "price_bdt": 73579.70387831,
+    "price_bhd": 227.40017868,
+    "price_bmd": 603.00915299,
+    "price_brl": 3145.17514019,
+    "price_cad": 838.15016017,
+    "price_chf": 489.79418452,
+    "price_clp": 558341.80837232,
+    "price_cny": 4066.3319223,
+    "price_czk": 12602.83099666,
+    "price_dkk": 3894.2107987,
+    "price_gel": 1570.83884355,
+    "price_hkd": 4729.99113289,
+    "price_huf": 190446.37397559,
+    "price_idr": 10753801.32331567,
+    "price_ils": 1805.7410591,
+    "price_inr": 57778.31515018,
+    "price_jpy": 96210.35156383,
+    "price_krw": 852488.30256292,
+    "price_kwd": 186.18390006,
+    "price_lkr": 200185.90947567,
+    "price_mmk": 1266120.22826662,
+    "price_mxn": 10288.73030724,
+    "price_myr": 2448.09655932,
+    "price_ngn": 814092.50699936,
+    "price_nok": 5672.96237412,
+    "price_nzd": 1026.78830748,
+    "price_php": 37274.1074846,
+    "price_pkr": 167377.21682799,
+    "price_pln": 2251.7959747,
+    "price_rub": 51194.18303154,
+    "price_sar": 2259.22625349,
+    "price_sek": 5750.03900406,
+    "price_sgd": 770.86097179,
+    "price_thb": 19972.86916546,
+    "price_try": 28901.50328298,
+    "price_twd": 19234.12265213,
+    "price_uah": 27016.61305149,
+    "price_vnd": 15785579.92118217,
+    "price_xag": 9.58014511,
+    "price_xau": 0.13916245,
+    "price_zar": 9802.43538483
   }
 };
 
