@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-08-22T03:17:44.106625Z
+// Auto-generiert am 2026-08-23T03:22:21.228752Z
 // Quelle: data/price_lists/solana_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -22258,6 +22258,58 @@ const solPriceData = {
     "price_xag": 1.28492932,
     "price_xau": 0.01936148,
     "price_zar": 1412.10037837
+  },
+  "2026-08-22": {
+    "date_iso": "2026-08-22",
+    "time_berlin": "00:00",
+    "symbol": "SOL",
+    "price_eur": 80.3674884,
+    "price_usd": 93.86532165,
+    "price_gbp": 68.81116546,
+    "price_aed": 344.76263316,
+    "price_ars": 140733.13092638,
+    "price_aud": 130.95047772,
+    "price_bdt": 11466.05876185,
+    "price_bhd": 35.39004222,
+    "price_bmd": 93.86532165,
+    "price_brl": 482.42082063,
+    "price_cad": 129.29478731,
+    "price_chf": 75.21747366,
+    "price_clp": 85883.01469817,
+    "price_cny": 630.90637295,
+    "price_czk": 1938.18748065,
+    "price_dkk": 600.83192389,
+    "price_gel": 244.5191629,
+    "price_hkd": 736.0214534,
+    "price_huf": 29144.71304615,
+    "price_idr": 1656704.15408296,
+    "price_ils": 280.40387537,
+    "price_inr": 8982.9116575,
+    "price_jpy": 14921.30815153,
+    "price_krw": 130097.43464903,
+    "price_kwd": 28.92929213,
+    "price_lkr": 31006.57938469,
+    "price_mmk": 197070.24280712,
+    "price_mxn": 1587.94311271,
+    "price_myr": 379.16896681,
+    "price_ngn": 126295.79028196,
+    "price_nok": 872.59427615,
+    "price_nzd": 156.96543934,
+    "price_php": 5788.2051535,
+    "price_pkr": 26057.01329043,
+    "price_pln": 346.61178,
+    "price_rub": 7760.53379827,
+    "price_sar": 352.16644814,
+    "price_sek": 888.20060613,
+    "price_sgd": 119.1807989,
+    "price_thb": 3062.85942473,
+    "price_try": 4509.29033373,
+    "price_twd": 2989.14116799,
+    "price_uah": 4193.02427357,
+    "price_vnd": 2452072.81277241,
+    "price_xag": 1.36033848,
+    "price_xau": 0.02038849,
+    "price_zar": 1503.63046484
   }
 };
 
