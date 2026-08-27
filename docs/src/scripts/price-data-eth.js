@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-08-26T03:24:04.743190Z
+// Auto-generiert am 2026-08-27T04:50:39.908645Z
 // Quelle: data/price_lists/ethereum_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -22518,6 +22518,58 @@ const ethPriceData = {
     "price_xag": 35.57806895,
     "price_xau": 0.52997966,
     "price_zar": 39716.59859926
+  },
+  "2026-08-26": {
+    "date_iso": "2026-08-26",
+    "time_berlin": "00:00",
+    "symbol": "ETH",
+    "price_eur": 2091.76566835,
+    "price_usd": 2442.0111121,
+    "price_gbp": 1789.55946719,
+    "price_aed": 8968.2858092,
+    "price_ars": 3691675.1337623,
+    "price_aud": 3408.58353039,
+    "price_bdt": 300187.99863052,
+    "price_bhd": 919.7444132,
+    "price_bmd": 2442.0111121,
+    "price_brl": 12571.229004,
+    "price_cad": 3379.09624621,
+    "price_chf": 1958.03625583,
+    "price_clp": 2220010.10169018,
+    "price_cny": 16411.29147778,
+    "price_czk": 50368.4938463,
+    "price_dkk": 15637.32047591,
+    "price_gel": 6361.43894703,
+    "price_hkd": 19140.64182739,
+    "price_huf": 755188.864368,
+    "price_idr": 43229064.35687816,
+    "price_ils": 7275.11740462,
+    "price_inr": 232467.32596104,
+    "price_jpy": 388808.8692402,
+    "price_krw": 3373954.35493478,
+    "price_kwd": 753.53136886,
+    "price_lkr": 801268.31734549,
+    "price_mmk": 5127002.32986108,
+    "price_mxn": 41382.18111107,
+    "price_myr": 9869.63211068,
+    "price_ngn": 3288436.58366955,
+    "price_nok": 22753.06490932,
+    "price_nzd": 4087.11585397,
+    "price_php": 150514.566132,
+    "price_pkr": 676781.4138295,
+    "price_pln": 9001.9977726,
+    "price_rub": 204274.29790376,
+    "price_sar": 9162.31580211,
+    "price_sek": 23088.96109578,
+    "price_sgd": 3099.32968516,
+    "price_thb": 79829.34325466,
+    "price_try": 117507.98740719,
+    "price_twd": 77794.65959606,
+    "price_uah": 109137.25439109,
+    "price_vnd": 63768407.19904624,
+    "price_xag": 35.5212006,
+    "price_xau": 0.52461725,
+    "price_zar": 38892.25285693
   }
 };
 
