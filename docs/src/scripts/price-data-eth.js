@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-09-19T07:50:33.907643Z
+// Auto-generiert am 2026-09-20T08:19:38.110302Z
 // Quelle: data/price_lists/ethereum_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -23766,6 +23766,58 @@ const ethPriceData = {
     "price_xag": 37.38907946,
     "price_xau": 0.56280864,
     "price_zar": 39768.0271545
+  },
+  "2026-09-19": {
+    "date_iso": "2026-09-19",
+    "time_berlin": "00:00",
+    "symbol": "ETH",
+    "price_eur": 2273.19197292,
+    "price_usd": 2611.55555712,
+    "price_gbp": 1949.6489665,
+    "price_aed": 9592.2435613,
+    "price_ars": 3963989.68975217,
+    "price_aud": 3661.23113997,
+    "price_bdt": 320810.68991838,
+    "price_bhd": 984.55644503,
+    "price_bmd": 2611.55555712,
+    "price_brl": 13428.61867471,
+    "price_cad": 3655.78604663,
+    "price_chf": 2146.9546004,
+    "price_clp": 2505683.09483421,
+    "price_cny": 17496.37761048,
+    "price_czk": 55357.66545538,
+    "price_dkk": 16996.26472129,
+    "price_gel": 6790.04444851,
+    "price_hkd": 20488.04507894,
+    "price_huf": 828254.84494056,
+    "price_idr": 46517288.73897446,
+    "price_ils": 7930.32795142,
+    "price_inr": 250690.13855016,
+    "price_jpy": 409694.21046732,
+    "price_krw": 3619720.4643904,
+    "price_kwd": 804.77696048,
+    "price_lkr": 864731.35806285,
+    "price_mmk": 5482960.89217312,
+    "price_mxn": 44994.36011584,
+    "price_myr": 10664.80942861,
+    "price_ngn": 3477886.88208322,
+    "price_nok": 24574.7377925,
+    "price_nzd": 4566.45636185,
+    "price_php": 164292.9548753,
+    "price_pkr": 724116.68275018,
+    "price_pln": 9920.88693572,
+    "price_rub": 220395.20877024,
+    "price_sar": 9732.25950094,
+    "price_sek": 25670.54650427,
+    "price_sgd": 3332.60604644,
+    "price_thb": 87217.79449669,
+    "price_try": 127357.72985406,
+    "price_twd": 82993.40751638,
+    "price_uah": 116722.84624058,
+    "price_vnd": 67965012.39667831,
+    "price_xag": 39.42328534,
+    "price_xau": 0.5965054,
+    "price_zar": 42489.48660323
   }
 };
 

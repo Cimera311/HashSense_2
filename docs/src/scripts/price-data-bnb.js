@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-09-19T07:50:33.940666Z
+// Auto-generiert am 2026-09-20T08:19:38.136702Z
 // Quelle: data/price_lists/bnb_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -23766,6 +23766,58 @@ const bnbPriceData = {
     "price_xag": 11.27731397,
     "price_xau": 0.16975464,
     "price_zar": 11994.85343868
+  },
+  "2026-09-19": {
+    "date_iso": "2026-09-19",
+    "time_berlin": "00:00",
+    "symbol": "BNB",
+    "price_eur": 662.52565102,
+    "price_usd": 761.14229079,
+    "price_gbp": 568.22849376,
+    "price_aed": 2795.67563406,
+    "price_ars": 1155311.50960533,
+    "price_aud": 1067.07201743,
+    "price_bdt": 93500.81899186,
+    "price_bhd": 286.95064363,
+    "price_bmd": 761.14229079,
+    "price_brl": 3913.79365923,
+    "price_cad": 1065.48503576,
+    "price_chf": 625.73355497,
+    "price_clp": 730285.58231857,
+    "price_cny": 5099.34889136,
+    "price_czk": 16134.08536627,
+    "price_dkk": 4953.59014267,
+    "price_gel": 1978.96995605,
+    "price_hkd": 5971.27544257,
+    "price_huf": 241396.27752312,
+    "price_idr": 13557542.59772847,
+    "price_ils": 2311.30751447,
+    "price_inr": 73064.06551972,
+    "price_jpy": 119406.07161396,
+    "price_krw": 1054973.66072252,
+    "price_kwd": 234.55360833,
+    "price_lkr": 252027.41905949,
+    "price_mmk": 1598018.23950747,
+    "price_mxn": 13113.68247086,
+    "price_myr": 3108.27677289,
+    "price_ngn": 1013636.02290987,
+    "price_nok": 7162.34895631,
+    "price_nzd": 1330.90144169,
+    "price_php": 47883.45999113,
+    "price_pkr": 211045.03375507,
+    "price_pln": 2891.45930222,
+    "price_rub": 64234.55691936,
+    "price_sar": 2836.48351684,
+    "price_sek": 7481.72426152,
+    "price_sgd": 971.29367727,
+    "price_thb": 25419.77394263,
+    "price_try": 37118.62609481,
+    "price_twd": 24188.56920161,
+    "price_uah": 34019.07125144,
+    "price_vnd": 19808517.98765915,
+    "price_xag": 11.48998329,
+    "price_xau": 0.17385251,
+    "price_zar": 12383.63284265
   }
 };
 
