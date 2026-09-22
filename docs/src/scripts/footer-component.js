@@ -1,4 +1,16 @@
 // filepath: src/scripts/footer-component.js
+const FOOTER_COMPONENT_URL = (() => {
+    if (document.currentScript?.src) {
+        return document.currentScript.src;
+    }
+
+    const matchingScripts = Array.from(document.scripts)
+        .filter((script) => script.src.includes('src/scripts/footer-component.js'));
+
+    return matchingScripts[matchingScripts.length - 1]?.src
+        || new URL('src/scripts/footer-component.js', window.location.href).href;
+})();
+
 function renderFooter() {
     // Festes Datum - wird manuell aktualisiert wenn Preise geändert werden
     const PRICE_UPDATE_DATE = '2026-09-08'; // Format: YYYY-MM-DD
@@ -113,6 +125,17 @@ function renderFooter() {
         </div>
     </footer>
     `;
+}
+
+function getLegalLink(fileName) {
+    const docsRootUrl = new URL(FOOTER_COMPONENT_URL);
+    const pathSegments = docsRootUrl.pathname.split('/').filter(Boolean);
+    const rootSegments = pathSegments.slice(0, -3);
+    docsRootUrl.pathname = `/${rootSegments.join('/')}${rootSegments.length ? '/' : ''}`;
+    docsRootUrl.search = '';
+    docsRootUrl.hash = '';
+
+    return new URL(fileName, docsRootUrl).href;
 }
 
 // Auto-render footer on page load
