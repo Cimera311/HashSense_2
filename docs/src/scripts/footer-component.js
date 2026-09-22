@@ -1,7 +1,15 @@
 // filepath: src/scripts/footer-component.js
-const FOOTER_COMPONENT_URL = document.currentScript?.src
-    || document.querySelector('script[src*="src/scripts/footer-component.js"]')?.src
-    || window.location.href;
+const FOOTER_COMPONENT_URL = (() => {
+    if (document.currentScript?.src) {
+        return document.currentScript.src;
+    }
+
+    const matchingScripts = Array.from(document.scripts)
+        .filter((script) => script.src.includes('src/scripts/footer-component.js'));
+
+    return matchingScripts[matchingScripts.length - 1]?.src
+        || new URL('src/scripts/footer-component.js', window.location.href).href;
+})();
 
 function renderFooter() {
     // Festes Datum - wird manuell aktualisiert wenn Preise geändert werden
@@ -118,7 +126,7 @@ function renderFooter() {
 function getLegalLink(fileName) {
     const docsRootUrl = new URL('../../', FOOTER_COMPONENT_URL);
 
-    return new URL(fileName, docsRootUrl).pathname;
+    return new URL(fileName, docsRootUrl).href;
 }
 
 // Auto-render footer on page load
