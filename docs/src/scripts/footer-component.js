@@ -100,9 +100,9 @@ function renderFooter() {
                         &copy; ${new Date().getFullYear()} HashSense. Made with ❤️ for the Gomining community.
                     </p>
                     <div class="flex items-center gap-4 text-sm">
-                        <a href="#" class="text-gray-400 hover:text-purple-400 transition-colors">Privacy</a>
-                        <a href="#" class="text-gray-400 hover:text-purple-400 transition-colors">Terms</a>
-                        <a href="#" class="text-gray-400 hover:text-purple-400 transition-colors">Contact</a>
+                        <a href="privacy-policy.html" class="text-gray-400 hover:text-purple-400 transition-colors">Privacy Policy</a>
+                        <a href="terms-of-service.html" class="text-gray-400 hover:text-purple-400 transition-colors">Terms of Service</a>
+                        <a href="imprint.html" class="text-gray-400 hover:text-purple-400 transition-colors">Imprint</a>
                     </div>
                 </div>
             </div>
