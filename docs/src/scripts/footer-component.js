@@ -2,7 +2,6 @@
 function renderFooter() {
     // Festes Datum - wird manuell aktualisiert wenn Preise geändert werden
     const PRICE_UPDATE_DATE = '2026-09-08'; // Format: YYYY-MM-DD
-    const legalBasePath = getLegalBasePath();
     
     const updateDate = new Date(PRICE_UPDATE_DATE + 'T00:00:00');
     const updateTimeString = updateDate.toLocaleString('de-DE', {
@@ -101,9 +100,9 @@ function renderFooter() {
                         &copy; ${new Date().getFullYear()} HashSense. Made with ❤️ for the Gomining community.
                     </p>
                     <div class="flex items-center gap-4 text-sm">
-                        <a href="${legalBasePath}privacy-policy.html" class="text-gray-400 hover:text-purple-400 transition-colors">Privacy Policy</a>
-                        <a href="${legalBasePath}terms-of-service.html" class="text-gray-400 hover:text-purple-400 transition-colors">Terms of Service</a>
-                        <a href="${legalBasePath}imprint.html" class="text-gray-400 hover:text-purple-400 transition-colors">Imprint</a>
+                        <a href="${getLegalLink('privacy-policy.html')}" class="text-gray-400 hover:text-purple-400 transition-colors">Privacy Policy</a>
+                        <a href="${getLegalLink('terms-of-service.html')}" class="text-gray-400 hover:text-purple-400 transition-colors">Terms of Service</a>
+                        <a href="${getLegalLink('imprint.html')}" class="text-gray-400 hover:text-purple-400 transition-colors">Imprint</a>
                     </div>
                 </div>
             </div>
@@ -112,16 +111,13 @@ function renderFooter() {
     `;
 }
 
-function getLegalBasePath() {
-    const pathSegments = window.location.pathname.split('/').filter(Boolean);
-    const lastSegment = pathSegments[pathSegments.length - 1] || '';
-    const directorySegments = lastSegment.includes('.') ? pathSegments.slice(0, -1) : pathSegments;
-    const docsIndex = directorySegments.indexOf('docs');
-    const relativeDepth = docsIndex >= 0
-        ? Math.max(directorySegments.length - docsIndex - 1, 0)
-        : directorySegments.length;
+function getLegalLink(fileName) {
+    const footerScript = document.querySelector('script[src$="src/scripts/footer-component.js"]');
+    const docsRootUrl = footerScript
+        ? new URL('../../', footerScript.src)
+        : new URL('./', window.location.href);
 
-    return '../'.repeat(relativeDepth);
+    return new URL(fileName, docsRootUrl).pathname;
 }
 
 // Auto-render footer on page load
