@@ -125,7 +125,9 @@ function renderFooter() {
 
 function getLegalLink(fileName) {
     const docsRootUrl = new URL(FOOTER_COMPONENT_URL);
-    docsRootUrl.pathname = docsRootUrl.pathname.replace(/src\/scripts\/footer-component\.js$/, '');
+    const pathSegments = docsRootUrl.pathname.split('/').filter(Boolean);
+    const rootSegments = pathSegments.slice(0, -3);
+    docsRootUrl.pathname = `/${rootSegments.join('/')}${rootSegments.length ? '/' : ''}`;
     docsRootUrl.search = '';
     docsRootUrl.hash = '';
 
