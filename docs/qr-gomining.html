@@ -5,22 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
     
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VQ2RT4JL4L"></script>
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-VQ2RT4JL4L');
-        
-        // Track QR Code Scan
-        gtag('event', 'qr_code_scan', {
-            'event_category': 'QR Code',
-            'event_label': 'Sticker Scan',
-            'value': 1
-        });
-        
-        // Redirect immediately
+        // Redirect immediately (no consent UI possible on a redirect page, so no analytics here)
         window.location.href = 'https://gomining.com/?ref=ICjK3';
     </script>
     

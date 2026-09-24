@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HashSense - Mining Calculator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="vendor/tailwind.js"></script>
     <script src="priceMatrix.js"></script>
     <script src="src/scripts/skript.js"></script>
     <script src="src/scripts/skript-prices.js"></script>
@@ -194,7 +194,7 @@
     <link rel="manifest" href="assets/site.webmanifest">
 
     <!-- Google Material Icons -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="vendor/fonts/material-icons.css">
     
     <style>
         /* RANGE SLIDER ANTI-SCROLL FIX */
@@ -284,15 +284,8 @@
             }
         });
     </script>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-VQ2RT4JL4L"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-VQ2RT4JL4L');
-</script>
+      <!-- Cookie Consent + gated Analytics (GA only loads after consent) -->
+  <script src="src/scripts/cookie-consent.js"></script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
 

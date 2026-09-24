@@ -14,11 +14,9 @@ const FOOTER_COMPONENT_URL = (() => {
 function renderFooter() {
     // Festes Datum - wird manuell aktualisiert wenn Preise geändert werden
     const PRICE_UPDATE_DATE = '2026-09-08'; // Format: YYYY-MM-DD
-    const pathAfterDocs = window.location.pathname.split('/docs/')[1] || '';
-    const pageDirectory = pathAfterDocs.includes('/') ? pathAfterDocs.slice(0, pathAfterDocs.lastIndexOf('/') + 1) : '';
-    const depth = pageDirectory ? pageDirectory.split('/').filter(Boolean).length : 0;
-    const legalBasePath = '../'.repeat(depth);
-    
+    // Resolve links relative to the script's own location so this also works from subfolders (e.g. exports/)
+    const link = getLegalLink;
+
     const updateDate = new Date(PRICE_UPDATE_DATE + 'T00:00:00');
     const updateTimeString = updateDate.toLocaleString('de-DE', {
         year: 'numeric',
@@ -35,7 +33,7 @@ function renderFooter() {
                 <!-- Brand -->
                 <div>
                     <div class="flex items-center gap-3 mb-4">
-                        <img src="assets/favicon.ico" alt="HashFarm" class="w-8 h-8">
+                        <img src="${link('assets/favicon.ico')}" alt="HashFarm" class="w-8 h-8">
                         <span class="text-xl font-bold text-white">HashFarm</span>
                     </div>
                     <p class="text-gray-400">Calculators and tools for GoMining</p>
@@ -45,10 +43,10 @@ function renderFooter() {
                 <div>
                     <h3 class="text-lg font-semibold text-white mb-4">Tools</h3>
                     <ul class="space-y-2">
-                        <li><a href="HashSense.html" class="text-gray-400 hover:text-purple-400 transition-colors">Mining Calculators</a></li>
-                        <li><a href="reinvest-calculator.html" class="text-gray-400 hover:text-purple-400 transition-colors">Reinvest Calculator</a></li>
+                        <li><a href="${link('HashSense.html')}" class="text-gray-400 hover:text-purple-400 transition-colors">Mining Calculators</a></li>
+                        <li><a href="${link('reinvest-calculator.html')}" class="text-gray-400 hover:text-purple-400 transition-colors">Reinvest Calculator</a></li>
                         <li><span class="text-gray-500">Hashfarm (closed till rework)</span></li>
-                        <li><a href="gomining-promocode.html" class="text-gray-400 hover:text-purple-400 transition-colors">Promo Codes</a></li>
+                        <li><a href="${link('gomining-promocode.html')}" class="text-gray-400 hover:text-purple-400 transition-colors">Promo Codes</a></li>
                     </ul>
                 </div>
                 
@@ -67,7 +65,7 @@ function renderFooter() {
                         </h4>
                         <ul class="space-y-2">
                             <li>
-                                <a href="support.html" class="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2">
+                                <a href="${link('support.html')}" class="text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2">
                                     <span class="material-icons text-sm">card_giftcard</span>
                                     Ways to Support
                                 </a>
@@ -116,9 +114,9 @@ function renderFooter() {
                         &copy; ${new Date().getFullYear()} HashSense. Made with ❤️ for the Gomining community.
                     </p>
                     <div class="flex items-center gap-4 text-sm">
-                        <a href="${legalBasePath}privacy-policy.html" class="text-gray-400 hover:text-purple-400 transition-colors">Privacy</a>
-                        <a href="${legalBasePath}terms-of-service.html" class="text-gray-400 hover:text-purple-400 transition-colors">Terms</a>
-                        <a href="${legalBasePath}imprint.html" class="text-gray-400 hover:text-purple-400 transition-colors">Imprint</a>
+                        <a href="${link('privacy-policy.html')}" class="text-gray-400 hover:text-purple-400 transition-colors">Privacy</a>
+                        <a href="${link('terms-of-service.html')}" class="text-gray-400 hover:text-purple-400 transition-colors">Terms</a>
+                        <a href="${link('imprint.html')}" class="text-gray-400 hover:text-purple-400 transition-colors">Imprint</a>
                     </div>
                 </div>
             </div>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GoMining Reinvestment Calculator - HashSense</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="vendor/tailwind.js"></script>
     <script src="priceMatrix.js"></script>
     <script src="src/scripts/skript.js"></script>
     <script src="src/scripts/greedy-scripts.js"></script>
@@ -184,16 +184,9 @@
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
 
     <!-- Google Material Icons -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-VQ2RT4JL4L"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-VQ2RT4JL4L');
-</script>
+    <link rel="stylesheet" href="vendor/fonts/material-icons.css">
+    <!-- Cookie Consent + gated Analytics (GA only loads after consent) -->
+    <script src="src/scripts/cookie-consent.js"></script>
     <style>
         /* Range Slider Styling */
         input[type="range"] {

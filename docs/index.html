@@ -6,10 +6,10 @@
   <title>HashFarm – Bitcoin Mining ROI Calculator & Tools</title>
   
   <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="vendor/tailwind.js"></script>
   
   <!-- Material Icons -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="vendor/fonts/material-icons.css" rel="stylesheet">
   
   
   <!-- SEO Meta -->
@@ -43,7 +43,7 @@
     function gtag(){dataLayer.push(arguments);}
     
     // Prüfe Cookie-Consent
-    const cookieConsent = localStorage.getItem('cookieConsent');
+    const cookieConsent = localStorage.getItem('cookie_consent');
     if (cookieConsent === 'accepted') {
       // Lade Google Analytics
       const gaScript = document.createElement('script');
@@ -267,21 +267,21 @@
   <script>
     // Cookie Consent Funktionen
     function acceptCookies() {
-      localStorage.setItem('cookieConsent', 'accepted');
+      localStorage.setItem('cookie_consent', 'accepted');
       document.getElementById('cookieBanner').style.display = 'none';
       console.log('✅ Cookies akzeptiert - Seite wird neu geladen für Analytics');
       location.reload(); // Reload um Analytics zu laden
     }
     
     function rejectCookies() {
-      localStorage.setItem('cookieConsent', 'rejected');
+      localStorage.setItem('cookie_consent', 'rejected');
       document.getElementById('cookieBanner').style.display = 'none';
       console.log('ℹ️ Nur notwendige Cookies - Analytics deaktiviert');
     }
     
     // Prüfe beim Laden ob Cookie-Banner angezeigt werden muss
     window.addEventListener('DOMContentLoaded', () => {
-      const cookieConsent = localStorage.getItem('cookieConsent');
+      const cookieConsent = localStorage.getItem('cookie_consent');
       if (!cookieConsent) {
         document.getElementById('cookieBanner').style.display = 'block';
       }

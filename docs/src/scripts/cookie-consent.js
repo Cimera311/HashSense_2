@@ -1,12 +1,14 @@
-// Cookie Consent Banner
+// Cookie Consent Banner + gated Google Analytics loader
+// GDPR/TTDSG: gtag.js is only requested from Google after explicit consent, never by default.
+const GA_MEASUREMENT_ID = 'G-VQ2RT4JL4L';
+
 function initCookieConsent() {
-    // Check if user already made a choice
     const consent = localStorage.getItem('cookie_consent');
-    
-    if (!consent) {
-        showCookieBanner();
-    } else if (consent === 'accepted') {
+
+    if (consent === 'accepted') {
         loadAnalytics();
+    } else if (consent !== 'rejected') {
+        showCookieBanner();
     }
 }
 
@@ -22,7 +24,7 @@ function showCookieBanner() {
                         <p style="color: #fff; font-weight: 600; margin: 0; font-size: 1rem;">We use cookies</p>
                     </div>
                     <p style="color: #9ca3af; margin: 0; font-size: 0.875rem; line-height: 1.4;">
-                        We use Google Analytics to understand how you use our tools and improve your experience. No personal data is collected.
+                        We use Google Analytics to understand how visitors use our tools. This is only activated if you click "Accept". See our <a href="privacy-policy.html" style="color:#a78bfa;">Privacy Policy</a> for details.
                     </p>
                 </div>
                 <div style="display: flex; gap: 0.75rem; align-items: center; flex-shrink: 0;">
@@ -43,25 +45,11 @@ function acceptCookies() {
     localStorage.setItem('cookie_consent', 'accepted');
     hideCookieBanner();
     loadAnalytics();
-    
-    // Track consent acceptance
-    if (typeof gtag !== 'undefined') {
-        gtag('event', 'cookie_consent_accepted', {
-            'event_category': 'Cookie Consent',
-            'event_label': 'User Accepted Cookies',
-            'value': 1
-        });
-    }
 }
 
 function rejectCookies() {
     localStorage.setItem('cookie_consent', 'rejected');
     hideCookieBanner();
-    
-    // Disable GA if already loaded
-    if (typeof gtag !== 'undefined') {
-        window['ga-disable-G-VQ2RT4JL4L'] = true;
-    }
 }
 
 function hideCookieBanner() {
@@ -73,13 +61,20 @@ function hideCookieBanner() {
 }
 
 function loadAnalytics() {
-    // GA4 is already loaded in HTML, just enable it
-    if (typeof gtag !== 'undefined') {
-        window['ga-disable-G-VQ2RT4JL4L'] = false;
-        gtag('consent', 'update', {
-            'analytics_storage': 'granted'
-        });
-    }
+    if (window.gtag || document.getElementById('ga-script')) return;
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function gtag() { dataLayer.push(arguments); };
+
+    const script = document.createElement('script');
+    script.id = 'ga-script';
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+    script.onload = () => {
+        gtag('js', new Date());
+        gtag('config', GA_MEASUREMENT_ID, { anonymize_ip: true });
+    };
+    document.head.appendChild(script);
 }
 
 // Add slide animation
