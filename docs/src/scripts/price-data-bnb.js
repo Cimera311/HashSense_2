@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-09-23T03:15:44.965050Z
+// Auto-generiert am 2026-09-24T03:15:03.149865Z
 // Quelle: data/price_lists/bnb_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -23974,6 +23974,58 @@ const bnbPriceData = {
     "price_xag": 11.98847241,
     "price_xau": 0.1829064,
     "price_zar": 12980.34325741
+  },
+  "2026-09-23": {
+    "date_iso": "2026-09-23",
+    "time_berlin": "00:00",
+    "symbol": "BNB",
+    "price_eur": 688.45998414,
+    "price_usd": 788.13908703,
+    "price_gbp": 590.65192344,
+    "price_aed": 2894.44079712,
+    "price_ars": 1193444.18374199,
+    "price_aud": 1108.13222589,
+    "price_bdt": 96817.78679361,
+    "price_bhd": 297.18833438,
+    "price_bmd": 788.13908703,
+    "price_brl": 4020.92799421,
+    "price_cad": 1108.71466068,
+    "price_chf": 646.93293564,
+    "price_clp": 746564.75018924,
+    "price_cny": 5280.37425528,
+    "price_czk": 16763.40233736,
+    "price_dkk": 5146.59552665,
+    "price_gel": 2045.22093084,
+    "price_hkd": 6181.45367349,
+    "price_huf": 249142.39046174,
+    "price_idr": 14040232.84204894,
+    "price_ils": 2376.04231262,
+    "price_inr": 75418.16967517,
+    "price_jpy": 124101.95692193,
+    "price_krw": 1064901.88194116,
+    "price_kwd": 243.18189158,
+    "price_lkr": 259478.07009322,
+    "price_mmk": 1655052.6758088,
+    "price_mxn": 13634.69980684,
+    "price_myr": 3211.82440746,
+    "price_ngn": 1043338.52341041,
+    "price_nok": 7440.99845195,
+    "price_nzd": 1376.85455273,
+    "price_php": 49287.45922792,
+    "price_pkr": 218483.46629691,
+    "price_pln": 2994.25624807,
+    "price_rub": 66399.89132438,
+    "price_sar": 2959.59467916,
+    "price_sek": 7751.66396471,
+    "price_sgd": 1004.88679363,
+    "price_thb": 26103.16656244,
+    "price_try": 38495.78754113,
+    "price_twd": 24976.99540912,
+    "price_uah": 35320.98911983,
+    "price_vnd": 20503097.99752773,
+    "price_xag": 11.69328862,
+    "price_xau": 0.18060207,
+    "price_zar": 12747.91329099
   }
 };
 

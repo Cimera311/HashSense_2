@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-09-23T03:15:44.919575Z
+// Auto-generiert am 2026-09-24T03:15:03.122337Z
 // Quelle: data/price_lists/ethereum_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -23974,6 +23974,58 @@ const ethPriceData = {
     "price_xag": 41.63247004,
     "price_xau": 0.63518061,
     "price_zar": 45076.94835554
+  },
+  "2026-09-23": {
+    "date_iso": "2026-09-23",
+    "time_berlin": "00:00",
+    "symbol": "ETH",
+    "price_eur": 2404.49308126,
+    "price_usd": 2752.6290932,
+    "price_gbp": 2062.8918108,
+    "price_aed": 10109.03034477,
+    "price_ars": 4168184.56962382,
+    "price_aud": 3870.22678396,
+    "price_bdt": 338142.67183651,
+    "price_bhd": 1037.95036795,
+    "price_bmd": 2752.6290932,
+    "price_brl": 14043.36310768,
+    "price_cad": 3872.26097686,
+    "price_chf": 2259.45705434,
+    "price_clp": 2607427.90853181,
+    "price_cny": 18442.06439861,
+    "price_czk": 58547.31700806,
+    "price_dkk": 17974.83313633,
+    "price_gel": 7143.07249685,
+    "price_hkd": 21589.14524086,
+    "price_huf": 870146.65763901,
+    "price_idr": 49036463.27443637,
+    "price_ils": 8298.48855872,
+    "price_inr": 263403.06098241,
+    "price_jpy": 433434.48227314,
+    "price_krw": 3719241.88239213,
+    "price_kwd": 849.32921196,
+    "price_lkr": 906244.71814609,
+    "price_mmk": 5780383.46426115,
+    "price_mxn": 47620.1117074,
+    "price_myr": 11217.5140806,
+    "price_ngn": 3643930.39357552,
+    "price_nok": 25988.19061043,
+    "price_nzd": 4808.75769432,
+    "price_php": 172139.78653415,
+    "price_pkr": 763068.29036723,
+    "price_pln": 10457.64256154,
+    "price_rub": 231906.11359401,
+    "price_sar": 10336.58468665,
+    "price_sek": 27073.21093587,
+    "price_sgd": 3509.63512538,
+    "price_thb": 91167.07556672,
+    "price_try": 134449.14291788,
+    "price_twd": 87233.84660808,
+    "price_uah": 123360.94459945,
+    "price_vnd": 71608457.1586932,
+    "price_xag": 40.83960175,
+    "price_xau": 0.63076496,
+    "price_zar": 44522.94979375
   }
 };
 
