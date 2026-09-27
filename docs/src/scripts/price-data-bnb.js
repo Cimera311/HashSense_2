@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-09-26T03:14:13.194455Z
+// Auto-generiert am 2026-09-27T03:15:49.418170Z
 // Quelle: data/price_lists/bnb_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -24130,6 +24130,58 @@ const bnbPriceData = {
     "price_xag": 12.20790428,
     "price_xau": 0.18204042,
     "price_zar": 12767.40410564
+  },
+  "2026-09-26": {
+    "date_iso": "2026-09-26",
+    "time_berlin": "00:00",
+    "symbol": "BNB",
+    "price_eur": 682.04258902,
+    "price_usd": 776.95546913,
+    "price_gbp": 586.33721434,
+    "price_aed": 2853.75743813,
+    "price_ars": 1187964.99000027,
+    "price_aud": 1104.75298156,
+    "price_bdt": 95525.62759396,
+    "price_bhd": 292.91221186,
+    "price_bmd": 776.95546913,
+    "price_brl": 4025.56167667,
+    "price_cad": 1099.04235886,
+    "price_chf": 643.55376899,
+    "price_clp": 747252.46154827,
+    "price_cny": 5215.85745539,
+    "price_czk": 16614.72653413,
+    "price_dkk": 5099.00335283,
+    "price_gel": 2031.73855178,
+    "price_hkd": 6094.01137437,
+    "price_huf": 249103.57773615,
+    "price_idr": 13918457.96959973,
+    "price_ils": 2368.22631113,
+    "price_inr": 74446.20259809,
+    "price_jpy": 122211.23304902,
+    "price_krw": 1052580.42180825,
+    "price_kwd": 239.79953599,
+    "price_lkr": 256307.41638826,
+    "price_mmk": 1631567.63740634,
+    "price_mxn": 13739.71936393,
+    "price_myr": 3165.3942768,
+    "price_ngn": 1030538.19514894,
+    "price_nok": 7387.1760572,
+    "price_nzd": 1371.74362811,
+    "price_php": 48440.84108014,
+    "price_pkr": 215104.68080423,
+    "price_pln": 2982.96047091,
+    "price_rub": 65565.27215678,
+    "price_sar": 2913.43305684,
+    "price_sek": 7705.99973396,
+    "price_sgd": 992.94908955,
+    "price_thb": 26003.30491682,
+    "price_try": 38026.14770979,
+    "price_twd": 24651.78699349,
+    "price_uah": 34761.72424281,
+    "price_vnd": 20182195.26620498,
+    "price_xag": 12.08429919,
+    "price_xau": 0.18130256,
+    "price_zar": 12658.81114571
   }
 };
 
