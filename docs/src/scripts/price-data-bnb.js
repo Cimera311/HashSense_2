@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-09-28T03:19:09.916153Z
+// Auto-generiert am 2026-09-29T03:15:22.864352Z
 // Quelle: data/price_lists/bnb_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -24234,6 +24234,58 @@ const bnbPriceData = {
     "price_xag": 12.02697282,
     "price_xau": 0.18044248,
     "price_zar": 12607.57850458
+  },
+  "2026-09-28": {
+    "date_iso": "2026-09-28",
+    "time_berlin": "00:00",
+    "symbol": "BNB",
+    "price_eur": 684.23685512,
+    "price_usd": 778.52919739,
+    "price_gbp": 588.52836824,
+    "price_aed": 2859.22633033,
+    "price_ars": 1191970.16392799,
+    "price_aud": 1110.76030414,
+    "price_bdt": 95834.22713182,
+    "price_bhd": 293.5958168,
+    "price_bmd": 778.52919739,
+    "price_brl": 4039.71015234,
+    "price_cad": 1102.00185067,
+    "price_chf": 645.96124566,
+    "price_clp": 748594.74975046,
+    "price_cny": 5226.42220792,
+    "price_czk": 16678.30720955,
+    "price_dkk": 5114.95784714,
+    "price_gel": 2035.80713942,
+    "price_hkd": 6106.77913168,
+    "price_huf": 249978.74498918,
+    "price_idr": 13979872.6459609,
+    "price_ils": 2373.00759804,
+    "price_inr": 74574.18684331,
+    "price_jpy": 122566.34283856,
+    "price_krw": 1055647.17747333,
+    "price_kwd": 240.62079757,
+    "price_lkr": 257143.21520374,
+    "price_mmk": 1634872.38805936,
+    "price_mxn": 13815.71841161,
+    "price_myr": 3172.50647936,
+    "price_ngn": 1033668.78595879,
+    "price_nok": 7413.46487217,
+    "price_nzd": 1377.87678588,
+    "price_php": 48563.86735429,
+    "price_pkr": 215806.0793795,
+    "price_pln": 2991.85267176,
+    "price_rub": 65753.51876892,
+    "price_sar": 2924.08871189,
+    "price_sek": 7734.33568087,
+    "price_sgd": 995.34490769,
+    "price_thb": 26034.01636073,
+    "price_try": 38130.96029267,
+    "price_twd": 24752.55808035,
+    "price_uah": 34874.02387891,
+    "price_vnd": 20224164.45091323,
+    "price_xag": 12.21679694,
+    "price_xau": 0.18273637,
+    "price_zar": 12723.45206855
   }
 };
 
