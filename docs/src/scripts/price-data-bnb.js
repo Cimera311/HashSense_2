@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-10-02T03:15:43.799911Z
+// Auto-generiert am 2026-10-03T03:23:06.874087Z
 // Quelle: data/price_lists/bnb_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
@@ -24442,6 +24442,58 @@ const bnbPriceData = {
     "price_xag": 12.73106648,
     "price_xau": 0.18498854,
     "price_zar": 12626.31985558
+  },
+  "2026-10-02": {
+    "date_iso": "2026-10-02",
+    "time_berlin": "00:00",
+    "symbol": "BNB",
+    "price_eur": 685.81637579,
+    "price_usd": 771.42356282,
+    "price_gbp": 584.51689063,
+    "price_aed": 2833.05303447,
+    "price_ars": 1176229.08026736,
+    "price_aud": 1113.41337097,
+    "price_bdt": 94925.70442092,
+    "price_bhd": 290.98482502,
+    "price_bmd": 771.42356282,
+    "price_brl": 4029.76240748,
+    "price_cad": 1097.03913442,
+    "price_chf": 640.74672555,
+    "price_clp": 757314.22586049,
+    "price_cny": 5172.16356167,
+    "price_czk": 16777.92249494,
+    "price_dkk": 5126.78534201,
+    "price_gel": 2001.84414553,
+    "price_hkd": 6052.81684387,
+    "price_huf": 252919.40604742,
+    "price_idr": 13844082.58858629,
+    "price_ils": 2380.80597077,
+    "price_inr": 74230.19376161,
+    "price_jpy": 121836.91386684,
+    "price_krw": 1049891.79830596,
+    "price_kwd": 238.24645314,
+    "price_lkr": 255131.52868482,
+    "price_mmk": 1619950.91075341,
+    "price_mxn": 14127.93752901,
+    "price_myr": 3152.0366777,
+    "price_ngn": 1024620.20461482,
+    "price_nok": 7431.06995246,
+    "price_nzd": 1377.22711525,
+    "price_php": 48460.44019059,
+    "price_pkr": 213838.52058698,
+    "price_pln": 3002.13905094,
+    "price_rub": 64319.46453735,
+    "price_sar": 2898.08404082,
+    "price_sek": 7747.90055253,
+    "price_sgd": 987.60884492,
+    "price_thb": 25965.81472664,
+    "price_try": 37887.38752372,
+    "price_twd": 24607.79451525,
+    "price_uah": 34667.37145881,
+    "price_vnd": 20044785.65250986,
+    "price_xag": 12.61733437,
+    "price_xau": 0.18447052,
+    "price_zar": 12885.3184255
   }
 };
 
