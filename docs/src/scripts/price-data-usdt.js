@@ -1,4 +1,4 @@
-// Auto-generiert am 2026-10-11T03:19:44.202583Z
+// Auto-generiert am 2026-10-12T03:26:49.423581Z
 // Quelle: data/price_lists/usdt_prices.csv
 // Nicht manuell bearbeiten – stattdessen CSV neu konvertieren.
 
