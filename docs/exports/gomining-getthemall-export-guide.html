@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Anleitung für den umfassenden GoMining-GetThemAll-Export: Miner, Einnahmen, Transaktionen, Referrals, Wallets und Kreditkarten mit einem Konsolenskript exportieren.">
+    <title>GoMining GetThemAll-Export - HashFarm</title>
+    <script src="../vendor/tailwind.js"></script>
+    <link rel="stylesheet" href="../vendor/fonts/material-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        .step-number { width: 2.5rem; height: 2.5rem; flex-shrink: 0; }
+        .code-panel { position: relative; }
+        .module-card { transition: transform .2s ease, border-color .2s ease; }
+        .module-card:hover { transform: translateY(-2px); }
+        .toast { animation: slide-in .2s ease-out; }
+        @keyframes slide-in { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+    <div class="fixed top-4 right-4 z-[90]">
+        <button id="language-toggle" onclick="toggleLanguage()" type="button" aria-label="Sprache wechseln"
+                class="inline-flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-900/95 px-4 py-2 font-bold shadow-lg backdrop-blur hover:bg-slate-800 transition-colors">
+            <span class="material-icons text-lg text-emerald-400">language</span>
+            <span id="current-language">DE</span>
+            <span class="text-slate-500">|</span>
+            <span id="other-language" class="text-slate-400">EN</span>
+        </button>
+    </div>
+    <div id="header-container"></div>
+
+    <main class="container mx-auto px-4 py-10 max-w-6xl">
+        <section class="mb-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-400/10 border border-emerald-400/30 text-emerald-300 text-sm font-semibold mb-5">
+                <span class="material-icons text-base">auto_awesome</span>
+                Der zentrale Export für alle unterstützten GoMining-Daten
+            </div>
+            <h1 class="text-4xl md:text-6xl font-black mb-5 bg-gradient-to-r from-emerald-300 via-cyan-300 to-violet-400 bg-clip-text text-transparent">
+                GoMining GetThemAll
+            </h1>
+            <p class="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto">
+                Ein Skript bündelt Wallets, Miner, Einnahmen, Miner Wars, Referrals, Transaktionen und Kreditkarten in einem kontrollierten Export-Ablauf.
+            </p>
+            <div class="mt-7 flex flex-wrap justify-center gap-3">
+                <button onclick="copyScript()" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-5 py-3 rounded-xl transition-colors">
+                    <span class="material-icons">content_copy</span>
+                    Komplettes Skript kopieren
+                </button>
+                <a href="../src/scripts/console_scripts/gomining-getthemall-export.js" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-5 py-3 rounded-xl transition-colors">
+                    <span class="material-icons">code</span>
+                    Skript öffnen
+                </a>
+            </div>
+        </section>
+
+        <section class="mb-10 grid md:grid-cols-3 gap-4">
+            <article class="bg-slate-900 rounded-2xl p-6 border border-slate-800">
+                <span class="material-icons text-4xl text-emerald-400 mb-3">hub</span>
+                <h2 class="font-bold text-xl mb-2">Ein gemeinsamer Ablauf</h2>
+                <p class="text-slate-400">Acht bestehende Exporte werden nacheinander ausgeführt und ihre Dateien gesammelt.</p>
+            </article>
+            <article class="bg-slate-900 rounded-2xl p-6 border border-slate-800">
+                <span class="material-icons text-4xl text-cyan-400 mb-3">tune</span>
+                <h2 class="font-bold text-xl mb-2">Steuerbar</h2>
+                <p class="text-slate-400">Status, Pause, Fortsetzen, Stop und erneute Downloads sind direkt per Konsole verfügbar.</p>
+            </article>
+            <article class="bg-slate-900 rounded-2xl p-6 border border-slate-800">
+                <span class="material-icons text-4xl text-violet-400 mb-3">shield</span>
+                <h2 class="font-bold text-xl mb-2">Im Browser</h2>
+                <p class="text-slate-400">Die Daten werden über die angemeldete GoMining-Sitzung abgefragt; die Dateien entstehen lokal.</p>
+            </article>
+        </section>
+
+        <section class="bg-slate-900 rounded-2xl p-6 md:p-8 mb-10 border border-slate-800">
+            <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                <span class="material-icons text-4xl text-emerald-400">format_list_numbered</span>
+                Schnellstart
+            </h2>
+
+            <ol class="space-y-8">
+                <li class="flex gap-5">
+                    <span class="step-number bg-emerald-500 rounded-full flex items-center justify-center text-xl font-black text-slate-950">1</span>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Bei GoMining anmelden</h3>
+                        <p class="text-slate-400">Öffne <a href="https://app.gomining.com" target="_blank" rel="noopener" class="text-emerald-300 underline hover:text-emerald-200">app.gomining.com</a>, melde dich an und bleibe während des Exports in diesem Tab.</p>
+                    </div>
+                </li>
+                <li class="flex gap-5">
+                    <span class="step-number bg-cyan-500 rounded-full flex items-center justify-center text-xl font-black text-slate-950">2</span>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Browser-Konsole öffnen</h3>
+                        <p class="text-slate-400">Drücke <kbd class="px-2 py-1 bg-slate-800 border border-slate-700 rounded">F12</kbd> und wechsle zum Reiter <strong>Konsole</strong>. Bei einer Einfüge-Warnung musst du nur Code verwenden, dessen Herkunft du geprüft hast.</p>
+                    </div>
+                </li>
+                <li class="flex gap-5">
+                    <span class="step-number bg-violet-500 rounded-full flex items-center justify-center text-xl font-black text-white">3</span>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-xl font-bold mb-2">Skript einfügen</h3>
+                        <p class="text-slate-400 mb-3">Kopiere den vollständigen Inhalt von <code class="text-violet-300">gomining-getthemall-export.js</code> und füge ihn in die Konsole ein. Das Einfügen registriert die Befehle, startet aber noch keinen Export.</p>
+                        <button onclick="copyScript()" class="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 px-4 py-2 rounded-lg font-semibold">
+                            <span class="material-icons text-sm">content_copy</span>Skript kopieren
+                        </button>
+                    </div>
+                </li>
+                <li class="flex gap-5">
+                    <span class="step-number bg-amber-500 rounded-full flex items-center justify-center text-xl font-black text-slate-950">4</span>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-xl font-bold mb-2">Export starten</h3>
+                        <div class="code-panel bg-slate-950 rounded-xl border border-slate-800 overflow-hidden">
+                            <button onclick="copyCode('await getthemall();')" class="absolute right-3 top-3 z-10 bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg text-sm inline-flex items-center gap-1"><span class="material-icons text-sm">content_copy</span>Kopieren</button>
+                            <pre class="language-javascript p-5 overflow-x-auto"><code>await getthemall();</code></pre>
+                        </div>
+                        <p class="text-slate-400 mt-3">Alle acht Module werden in der unten dargestellten Reihenfolge ausgeführt.</p>
+                    </div>
+                </li>
+            </ol>
+        </section>
+
+        <section class="mb-10">
+            <div class="flex items-end justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-3xl font-bold">Enthaltene Module</h2>
+                    <p class="text-slate-400 mt-2">Die Standardreihenfolge deckt die kompletten verfügbaren Exportbereiche ab.</p>
+                </div>
+                <span class="hidden md:inline text-xs font-mono text-slate-500">8 MODULE / 1 STARTER</span>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <article class="module-card bg-slate-900 rounded-xl p-5 border border-slate-800 hover:border-emerald-400/50"><code class="text-emerald-300">balances</code><h3 class="font-bold mt-2">Wallet-Guthaben</h3><p class="text-sm text-slate-400 mt-1">CSV und JSON</p></article>
+                <article class="module-card bg-slate-900 rounded-xl p-5 border border-slate-800 hover:border-cyan-400/50"><code class="text-cyan-300">miners</code><h3 class="font-bold mt-2">Miner & Historie</h3><p class="text-sm text-slate-400 mt-1">Bestand, Käufe, Upgrades, Verkäufe</p></article>
+                <article class="module-card bg-slate-900 rounded-xl p-5 border border-slate-800 hover:border-violet-400/50"><code class="text-violet-300">income</code><h3 class="font-bold mt-2">Mining-Einnahmen</h3><p class="text-sm text-slate-400 mt-1">Details und Tagesübersicht</p></article>
+                <article class="module-card bg-slate-900 rounded-xl p-5 border border-slate-800 hover:border-amber-400/50"><code class="text-amber-300">wars</code><h3 class="font-bold mt-2">Miner Wars</h3><p class="text-sm text-slate-400 mt-1">Gesamter Verlauf</p></article>
+                <article class="module-card bg-slate-900 rounded-xl p-5 border border-slate-800 hover:border-emerald-400/50"><code class="text-emerald-300">referrals</code><h3 class="font-bold mt-2">Referral-Einnahmen</h3><p class="text-sm text-slate-400 mt-1">Provisionen und Transaktionen</p></article>
+                <article class="module-card bg-slate-900 rounded-xl p-5 border border-slate-800 hover:border-cyan-400/50"><code class="text-cyan-300">referralUsers</code><h3 class="font-bold mt-2">Geworbene Nutzer</h3><p class="text-sm text-slate-400 mt-1">Nutzerliste als CSV</p></article>
+                <article class="module-card bg-slate-900 rounded-xl p-5 border border-slate-800 hover:border-violet-400/50"><code class="text-violet-300">transactions</code><h3 class="font-bold mt-2">Wallet-Transaktionen</h3><p class="text-sm text-slate-400 mt-1">BTC, GMT und weitere Assets</p></article>
+                <article class="module-card bg-slate-900 rounded-xl p-5 border border-slate-800 hover:border-amber-400/50"><code class="text-amber-300">cards</code><h3 class="font-bold mt-2">Kreditkarten</h3><p class="text-sm text-slate-400 mt-1">Zahlungen, Karten, Kartenguthaben</p></article>
+            </div>
+        </section>
+
+        <section class="grid lg:grid-cols-2 gap-6 mb-10">
+            <article class="bg-slate-900 rounded-2xl p-6 border border-slate-800">
+                <h2 class="text-2xl font-bold mb-5 flex items-center gap-2"><span class="material-icons text-emerald-400">play_circle</span>Auswahl und Test</h2>
+                <p class="text-slate-400 mb-3">Nur ein kleines Modul testen:</p>
+                <div class="code-panel"><button onclick="copyCodeFromElement(this)" data-copy="await getthemall({ modules: ['balances'] });" class="absolute right-2 top-2 text-sm bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded">Kopieren</button><pre class="language-javascript"><code>await getthemall({ modules: ['balances'] });</code></pre></div>
+                <p class="text-slate-400 mb-3 mt-5">Eigene Auswahl und Reihenfolge:</p>
+                <div class="code-panel"><button onclick="copyCodeFromElement(this)" data-copy="await getthemall({ modules: ['income', 'wars', 'transactions'] });" class="absolute right-2 top-2 text-sm bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded">Kopieren</button><pre class="language-javascript"><code>await getthemall({
+  modules: ['income', 'wars', 'transactions']
+});</code></pre></div>
+                <p class="text-slate-400 mb-3 mt-5">Daten vorbereiten, aber noch nicht automatisch herunterladen:</p>
+                <pre class="language-javascript"><code>await getthemall({ download: false });</code></pre>
+            </article>
+
+            <article class="bg-slate-900 rounded-2xl p-6 border border-slate-800">
+                <h2 class="text-2xl font-bold mb-5 flex items-center gap-2"><span class="material-icons text-cyan-400">gamepad</span>Steuerung</h2>
+                <div class="space-y-3 text-sm">
+                    <div class="flex gap-3 items-start bg-slate-950 rounded-lg p-3"><code class="text-cyan-300 min-w-36">gmExport.status()</code><span class="text-slate-400">Fortschritt, Requests, Fehler und Dateien</span></div>
+                    <div class="flex gap-3 items-start bg-slate-950 rounded-lg p-3"><code class="text-cyan-300 min-w-36">gmExport.pause()</code><span class="text-slate-400">Vor der nächsten Anfrage pausieren</span></div>
+                    <div class="flex gap-3 items-start bg-slate-950 rounded-lg p-3"><code class="text-cyan-300 min-w-36">gmExport.resume()</code><span class="text-slate-400">Pausierten Export fortsetzen</span></div>
+                    <div class="flex gap-3 items-start bg-slate-950 rounded-lg p-3"><code class="text-rose-300 min-w-36">gmExport.stop()</code><span class="text-slate-400">Lauf abbrechen; fertige Dateien bleiben verfügbar</span></div>
+                    <div class="flex gap-3 items-start bg-slate-950 rounded-lg p-3"><code class="text-emerald-300 min-w-36">gmExport.downloadAll()</code><span class="text-slate-400">Gesammelte Dateien erneut herunterladen</span></div>
+                    <div class="bg-slate-950 rounded-lg p-3"><code class="text-emerald-300">gmExport.download('DATEINAME.csv')</code><p class="text-slate-400 mt-2">Eine einzelne Datei aus der Statusliste herunterladen.</p></div>
+                </div>
+            </article>
+        </section>
+
+        <section class="bg-gradient-to-br from-emerald-950/50 to-cyan-950/40 rounded-2xl p-6 md:p-8 border border-emerald-700/40 mb-10">
+            <h2 class="text-2xl font-bold mb-5 flex items-center gap-2"><span class="material-icons text-emerald-300">download_done</span>Downloads und Dateiformate</h2>
+            <ul class="space-y-3 text-slate-300">
+                <li>• Erfolgreiche Module sammeln ihre Dateien im Arbeitsspeicher; am Ende werden die Browser-Downloads angefordert.</li>
+                <li>• Der Browser kann eine Freigabe für mehrere Downloads von GoMining verlangen.</li>
+                <li>• CSV-Dateien sind semikolongetrennt und verwenden Dezimalkommas.</li>
+                <li>• Einige Module schreiben zusätzlich eine UTF-8-BOM, damit Sonderzeichen in Tabellenprogrammen korrekt erscheinen.</li>
+                <li>• Ein leeres Ergebnis kann als <code class="text-emerald-300">fertig, keine Datei</code> erscheinen.</li>
+            </ul>
+        </section>
+
+        <section class="bg-slate-900 rounded-2xl p-6 md:p-8 border border-slate-800 mb-10">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-2"><span class="material-icons text-amber-400">help_outline</span>Wichtige Hinweise & Hilfe</h2>
+            <div class="space-y-3">
+                <details class="bg-slate-950 rounded-xl border border-slate-800 p-5">
+                    <summary class="cursor-pointer font-bold">Die Anfrage wurde wegen 401 pausiert. Was jetzt?</summary>
+                    <p class="text-slate-400 mt-3">Verwende GoMining im selben Tab, damit sich die Sitzung erneuern kann, und führe danach <code class="text-cyan-300">gmExport.resume()</code> aus. Lade den Tab nicht neu und schließe ihn nicht: Pause und Fortschritt gehen dabei verloren.</p>
+                </details>
+                <details class="bg-slate-950 rounded-xl border border-slate-800 p-5">
+                    <summary class="cursor-pointer font-bold">Warum sehe ich keinen Download?</summary>
+                    <p class="text-slate-400 mt-3">Prüfe die Download-Freigabe des Browsers. Der Export kann die Downloads erneut anfordern: <code class="text-cyan-300">await gmExport.downloadAll()</code>. Der Starter kann nicht feststellen, ob der Browser eine Datei tatsächlich auf der Festplatte gespeichert hat.</p>
+                </details>
+                <details class="bg-slate-950 rounded-xl border border-slate-800 p-5">
+                    <summary class="cursor-pointer font-bold">Was passiert bei einem Fehler in einem Modul?</summary>
+                    <p class="text-slate-400 mt-3">Das betroffene Modul wird als fehlgeschlagen markiert und gibt keine Teil-Dateien frei. Danach werden die übrigen Module weiter ausgeführt. Bereits erfolgreiche Module und ihre Dateien bleiben verfügbar.</p>
+                </details>
+                <details class="bg-slate-950 rounded-xl border border-slate-800 p-5">
+                    <summary class="cursor-pointer font-bold">Welche Bereiche sind nicht enthalten?</summary>
+                    <p class="text-slate-400 mt-3">Marketplace-Export, Preismatrix und Diagnosewerkzeuge sind nicht Teil von GetThemAll. Die acht oben aufgeführten Module bilden den aktuellen Umfang.</p>
+                </details>
+                <details class="bg-slate-950 rounded-xl border border-slate-800 p-5">
+                    <summary class="cursor-pointer font-bold">Ist ein erfolgreicher Lauf eine unabhängige Vollständigkeitsprüfung?</summary>
+                    <p class="text-slate-400 mt-3">Nein. GetThemAll übernimmt vorhandene Seitennavigation und API-Abfragen. Prüfe bei kritischer Nutzung die erzeugten Dateien und gleiche Summen oder Zeiträume mit deinem GoMining-Konto ab.</p>
+                </details>
+            </div>
+        </section>
+
+        <section class="bg-slate-900 rounded-2xl p-6 md:p-8 border border-slate-800">
+            <h2 class="text-2xl font-bold mb-5 flex items-center gap-2"><span class="material-icons text-violet-400">link</span>Weitere Export-Anleitungen</h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <a href="gomining-export-guide.html" class="rounded-xl bg-slate-950 border border-slate-800 hover:border-purple-500 p-5 transition-colors"><span class="material-icons text-purple-400">receipt_long</span><h3 class="font-bold mt-2">Transaktionen</h3><p class="text-sm text-slate-400">Einzelner Wallet-Export</p></a>
+                <a href="gomining-miner-export-guide.html" class="rounded-xl bg-slate-950 border border-slate-800 hover:border-blue-500 p-5 transition-colors"><span class="material-icons text-blue-400">inventory_2</span><h3 class="font-bold mt-2">Miner</h3><p class="text-sm text-slate-400">Bestand und Historie einzeln</p></a>
+                <a href="gomining-referral-export-guide.html" class="rounded-xl bg-slate-950 border border-slate-800 hover:border-green-500 p-5 transition-colors"><span class="material-icons text-green-400">group</span><h3 class="font-bold mt-2">Referrals</h3><p class="text-sm text-slate-400">Referrals einzeln exportieren</p></a>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script src="header.js"></script>
+    <script src="../src/scripts/footer-component.js"></script>
+    <script>
+        const scriptPath = '../src/scripts/console_scripts/gomining-getthemall-export.js';
+        const translations = {
+            'Der zentrale Export für alle unterstützten GoMining-Daten': 'The central export for all supported GoMining data',
+            'Ein Skript bündelt Wallets, Miner, Einnahmen, Miner Wars, Referrals, Transaktionen und Kreditkarten in einem kontrollierten Export-Ablauf.': 'One script combines wallets, miners, income, Miner Wars, referrals, transactions, and credit cards in one controlled export workflow.',
+            'Komplettes Skript kopieren': 'Copy complete script',
+            'Skript öffnen': 'Open script',
+            'Ein gemeinsamer Ablauf': 'One unified workflow',
+            'Acht bestehende Exporte werden nacheinander ausgeführt und ihre Dateien gesammelt.': 'Eight existing exports run sequentially and their files are collected.',
+            'Steuerbar': 'Controllable',
+            'Status, Pause, Fortsetzen, Stop und erneute Downloads sind direkt per Konsole verfügbar.': 'Status, pause, resume, stop, and repeat downloads are available directly from the console.',
+            'Im Browser': 'In your browser',
+            'Die Daten werden über die angemeldete GoMining-Sitzung abgefragt; die Dateien entstehen lokal.': 'Data is requested through your signed-in GoMining session; files are created locally.',
+            'Schnellstart': 'Quick start',
+            'Bei GoMining anmelden': 'Sign in to GoMining',
+            'Öffne': 'Open',
+            ', melde dich an und bleibe während des Exports in diesem Tab.': ', sign in, and stay in this tab during the export.',
+            'Browser-Konsole öffnen': 'Open the browser console',
+            'Drücke': 'Press',
+            'und wechsle zum Reiter': 'and switch to the',
+            'Konsole': 'Console',
+            '. Bei einer Einfüge-Warnung musst du nur Code verwenden, dessen Herkunft du geprüft hast.': ' tab. If a paste warning appears, only use code whose source you have reviewed.',
+            'Skript einfügen': 'Paste the script',
+            'Kopiere den vollständigen Inhalt von': 'Copy the complete contents of',
+            'und füge ihn in die Konsole ein. Das Einfügen registriert die Befehle, startet aber noch keinen Export.': 'and paste it into the console. Pasting registers the commands but does not start an export yet.',
+            'Skript kopieren': 'Copy script',
+            'Export starten': 'Start export',
+            'Kopieren': 'Copy',
+            'Alle acht Module werden in der unten dargestellten Reihenfolge ausgeführt.': 'All eight modules run in the order shown below.',
+            'Enthaltene Module': 'Included modules',
+            'Die Standardreihenfolge deckt die kompletten verfügbaren Exportbereiche ab.': 'The default order covers all currently available export areas.',
+            'Wallet-Guthaben': 'Wallet balances',
+            'CSV und JSON': 'CSV and JSON',
+            'Miner & Historie': 'Miners and history',
+            'Bestand, Käufe, Upgrades, Verkäufe': 'Inventory, purchases, upgrades, sales',
+            'Mining-Einnahmen': 'Mining income',
+            'Details und Tagesübersicht': 'Details and daily summary',
+            'Gesamter Verlauf': 'Complete history',
+            'Referral-Einnahmen': 'Referral earnings',
+            'Provisionen und Transaktionen': 'Commissions and transactions',
+            'Geworbene Nutzer': 'Referred users',
+            'Nutzerliste als CSV': 'User list as CSV',
+            'Wallet-Transaktionen': 'Wallet transactions',
+            'BTC, GMT und weitere Assets': 'BTC, GMT, and other assets',
+            'Kreditkarten': 'Credit cards',
+            'Zahlungen, Karten, Kartenguthaben': 'Payments, cards, card balances',
+            'Auswahl und Test': 'Selection and testing',
+            'Nur ein kleines Modul testen:': 'Test a small module only:',
+            'Eigene Auswahl und Reihenfolge:': 'Choose your own modules and order:',
+            'Daten vorbereiten, aber noch nicht automatisch herunterladen:': 'Prepare the data without downloading it automatically:',
+            'Steuerung': 'Controls',
+            'Fortschritt, Requests, Fehler und Dateien': 'Progress, requests, errors, and files',
+            'Vor der nächsten Anfrage pausieren': 'Pause before the next request',
+            'Pausierten Export fortsetzen': 'Resume the paused export',
+            'Lauf abbrechen; fertige Dateien bleiben verfügbar': 'Stop the run; completed files remain available',
+            'Gesammelte Dateien erneut herunterladen': 'Download the collected files again',
+            'Eine einzelne Datei aus der Statusliste herunterladen.': 'Download one file from the status list.',
+            'Downloads und Dateiformate': 'Downloads and file formats',
+            '• Erfolgreiche Module sammeln ihre Dateien im Arbeitsspeicher; am Ende werden die Browser-Downloads angefordert.': '• Successful modules collect their files in memory; browser downloads are requested at the end.',
+            '• Der Browser kann eine Freigabe für mehrere Downloads von GoMining verlangen.': '• Your browser may ask you to allow multiple downloads from GoMining.',
+            '• CSV-Dateien sind semikolongetrennt und verwenden Dezimalkommas.': '• CSV files are separated by semicolons and use decimal commas.',
+            '• Einige Module schreiben zusätzlich eine UTF-8-BOM, damit Sonderzeichen in Tabellenprogrammen korrekt erscheinen.': '• Some modules also write a UTF-8 BOM so special characters display correctly in spreadsheet applications.',
+            '• Ein leeres Ergebnis kann als': '• An empty result may appear as',
+            'fertig, keine Datei': 'finished, no file',
+            'erscheinen.': '.',
+            'Wichtige Hinweise & Hilfe': 'Important notes and help',
+            'Die Anfrage wurde wegen 401 pausiert. Was jetzt?': 'The request paused because of a 401 response. What now?',
+            'Verwende GoMining im selben Tab, damit sich die Sitzung erneuern kann, und führe danach': 'Use GoMining in the same tab so the session can refresh, then run',
+            'aus. Lade den Tab nicht neu und schließe ihn nicht: Pause und Fortschritt gehen dabei verloren.': '. Do not reload or close the tab: its pause state and progress will be lost.',
+            'Warum sehe ich keinen Download?': 'Why can I not see a download?',
+            'Prüfe die Download-Freigabe des Browsers. Der Export kann die Downloads erneut anfordern:': 'Check your browser’s download permissions. The export can request the downloads again:',
+            '. Der Starter kann nicht feststellen, ob der Browser eine Datei tatsächlich auf der Festplatte gespeichert hat.': '. The starter cannot determine whether the browser actually saved a file to disk.',
+            'Was passiert bei einem Fehler in einem Modul?': 'What happens if a module fails?',
+            'Das betroffene Modul wird als fehlgeschlagen markiert und gibt keine Teil-Dateien frei. Danach werden die übrigen Module weiter ausgeführt. Bereits erfolgreiche Module und ihre Dateien bleiben verfügbar.': 'The affected module is marked as failed and does not release partial files. The remaining modules continue to run. Previously successful modules and their files remain available.',
+            'Welche Bereiche sind nicht enthalten?': 'Which areas are not included?',
+            'Marketplace-Export, Preismatrix und Diagnosewerkzeuge sind nicht Teil von GetThemAll. Die acht oben aufgeführten Module bilden den aktuellen Umfang.': 'Marketplace export, the price matrix, and diagnostic tools are not part of GetThemAll. The eight modules listed above make up the current scope.',
+            'Ist ein erfolgreicher Lauf eine unabhängige Vollständigkeitsprüfung?': 'Is a successful run an independent completeness check?',
+            'Nein. GetThemAll übernimmt vorhandene Seitennavigation und API-Abfragen. Prüfe bei kritischer Nutzung die erzeugten Dateien und gleiche Summen oder Zeiträume mit deinem GoMining-Konto ab.': 'No. GetThemAll uses existing pagination and API requests. For critical use, verify the generated files and compare totals or date ranges with your GoMining account.',
+            'Weitere Export-Anleitungen': 'More export guides',
+            'Transaktionen': 'Transactions',
+            'Einzelner Wallet-Export': 'Individual wallet export',
+            'Miner': 'Miners',
+            'Bestand und Historie einzeln': 'Inventory and history individually',
+            'Referrals einzeln exportieren': 'Export referrals individually'
+        };
+
+        let currentLanguage = localStorage.getItem('getthemall-lang') || 'de';
+        const translatableNodes = [];
+        const ignoredElements = new Set(['SCRIPT', 'STYLE', 'PRE', 'CODE', 'KBD']);
+
+        function prepareTranslations() {
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+            while (walker.nextNode()) {
+                const node = walker.currentNode;
+                if (!node.parentElement || ignoredElements.has(node.parentElement.tagName) || node.parentElement.closest('.material-icons')) continue;
+                const normalized = node.textContent.trim();
+                if (translations[normalized]) translatableNodes.push({ node, original: node.textContent, english: node.textContent.replace(normalized, translations[normalized]) });
+            }
+        }
+
+        function applyLanguage() {
+            document.documentElement.lang = currentLanguage;
+            translatableNodes.forEach(({ node, original, english }) => { node.textContent = currentLanguage === 'en' ? english : original; });
+            document.title = currentLanguage === 'en' ? 'GoMining GetThemAll Export - HashFarm' : 'GoMining GetThemAll-Export - HashFarm';
+            document.querySelector('meta[name="description"]').content = currentLanguage === 'en'
+                ? 'Guide for the comprehensive GoMining GetThemAll export: export miners, income, transactions, referrals, wallets, and credit cards with one console script.'
+                : 'Anleitung für den umfassenden GoMining-GetThemAll-Export: Miner, Einnahmen, Transaktionen, Referrals, Wallets und Kreditkarten mit einem Konsolenskript exportieren.';
+            document.getElementById('current-language').textContent = currentLanguage.toUpperCase();
+            document.getElementById('other-language').textContent = currentLanguage === 'de' ? 'EN' : 'DE';
+            document.getElementById('language-toggle').setAttribute('aria-label', currentLanguage === 'de' ? 'Sprache wechseln' : 'Change language');
+            localStorage.setItem('getthemall-lang', currentLanguage);
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'de' ? 'en' : 'de';
+            applyLanguage();
+        }
+
+        async function copyText(text, successMessage) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showNotification(successMessage);
+            } catch (error) {
+                showNotification(currentLanguage === 'de' ? 'Kopieren nicht möglich. Bitte den Code manuell markieren.' : 'Copying is not possible. Please select and copy the code manually.', true);
+            }
+        }
+
+        async function copyScript() {
+            try {
+                const response = await fetch(scriptPath);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const code = await response.text();
+                await copyText(code, currentLanguage === 'de' ? 'Komplettes Skript kopiert.' : 'Complete script copied.');
+            } catch (error) {
+                showNotification(currentLanguage === 'de' ? 'Skript konnte nicht geladen werden. Öffne die Seite über einen Webserver.' : 'The script could not be loaded. Open the page through a web server.', true);
+            }
+        }
+
+        function copyCode(code) {
+            copyText(code, currentLanguage === 'de' ? 'Befehl kopiert.' : 'Command copied.');
+        }
+
+        function copyCodeFromElement(element) {
+            copyCode(element.dataset.copy || '');
+        }
+
+        function showNotification(message, error = false) {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = `toast fixed top-20 right-4 z-[100] max-w-sm px-5 py-3 rounded-xl shadow-2xl border ${error ? 'bg-rose-950 border-rose-600' : 'bg-emerald-950 border-emerald-600'}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        prepareTranslations();
+        applyLanguage();
+    </script>
+</body>
+</html>

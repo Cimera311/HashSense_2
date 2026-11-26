@@ -420,6 +420,15 @@
                 </a>
 
                 <!-- Export Guides -->
+                <a href="exports/gomining-getthemall-export-guide.html"
+                   class="w-full flex items-center gap-3 p-3 rounded-lg bg-emerald-950/30 border border-emerald-700/40 hover:bg-emerald-900/40 transition-colors duration-200 text-left">
+                    <span class="material-icons text-emerald-400">all_inclusive</span>
+                    <div class="flex-1">
+                        <span class="block text-white font-semibold">GetThemAll Export</span>
+                        <span class="block text-xs text-emerald-300">Zentraler Gesamt-Export</span>
+                    </div>
+                </a>
+
                 <a href="exports/gomining-export-guide.html"
                    class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200 text-left">
                     <span class="material-icons text-teal-400">file_download</span>
@@ -1173,49 +1182,36 @@
                                 <div class="bg-gray-700 rounded-lg p-6">
                                     <div class="space-y-4">
                                         <div class="flex justify-between items-center py-3 border-b border-gray-600">
-                                            <span class="text-gray-300">Weekly Solo Reward:</span>
-                                            <span id="Weekly-Solo-Reward_MW" class="text-right text-blue-400 font-mono font-bold">90097 SAT</span>
+                                            <span class="text-gray-300" data-i18n="roi.total_investment">Total Investment:</span>
+                                            <span id="total-investment_ROI" class="text-right text-orange-400 font-mono font-bold">$0.00</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-3 border-b border-gray-600">
+                                            <span class="text-gray-300" data-i18n="roi.daily_profit">Daily Profit:</span>
+                                            <span id="daily-profit_ROI" class="text-right text-green-400 font-mono font-bold">$0.00</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-3 border-b border-gray-600">
+                                            <span class="text-gray-300" data-i18n="roi.monthly_profit">Monthly Profit:</span>
+                                            <span id="monthly-profit_ROI" class="text-right text-green-400 font-mono font-bold">$0.00</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-3 border-b border-gray-600">
+                                            <span class="text-gray-300" data-i18n="roi.yearly_profit">Yearly Profit:</span>
+                                            <span id="yearly-profit_ROI" class="text-right text-green-400 font-mono font-bold">$0.00</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-3 border-b border-gray-600">
+                                            <span class="text-gray-300" data-i18n="roi.days_of_roi">Days of ROI:</span>
+                                            <span id="days-of-roi_ROI" class="text-right text-yellow-400 font-mono font-bold">0 Days</span>
+                                        </div>
+                                        <div class="flex justify-between items-center py-3 border-b border-gray-600">
+                                            <span class="text-gray-300" data-i18n="roi.roi_pct_label">ROI % (per year):</span>
+                                            <span id="roi-percentage_ROI" class="text-right text-yellow-400 font-mono font-bold">0%</span>
                                         </div>
                                         <div class="flex justify-between items-center py-3">
-                                            <span class="text-gray-300">Weekly Miner Wars Reward:</span>
-                                            <span id="Weekly-mw-Reward_MW" class="text-right text-red-400 font-mono font-bold">12400 SAT</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Manual Input Fields -->
-                                <div class="bg-gray-700 rounded-lg p-6">
-                                    <h4 class="text-lg font-semibold mb-4 text-gray-200">Manual Override</h4>
-                                    <div class="space-y-4">
-                                        <div>
-                                            <label for="Weekly-Solo-Reward_MW_Input" class="block text-sm font-medium mb-2">Manual Weekly Solo Reward</label>
-                                            <input type="number" id="Weekly-Solo-Reward_MW_Input" value="90097" placeholder="90097"
-                                                   oninput="highlightLargerInput();"
-                                                   class="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                        </div>
-                                        <div>
-                                            <label for="Weekly-mw-Reward_MW_Input" class="block text-sm font-medium mb-2">Manual Weekly MW Reward</label>
-                                            <input type="number" id="Weekly-mw-Reward_MW_Input" value="12400" placeholder="12400"
-                                                   oninput="highlightLargerInput();"
-                                                   class="w-full bg-gray-600 border border-gray-500 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                            <span class="text-gray-300" data-i18n="roi.yearly_net_btc">Yearly Net BTC:</span>
+                                            <span id="yearly-net-btc_ROI" class="text-right text-orange-400 font-mono font-bold">0.00000000 BTC</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Formulas Footer -->
-                    <div class="mt-8 bg-gray-700 rounded-lg p-6">
-                        <h3 class="text-lg font-semibold mb-4 text-red-400 flex items-center gap-2">
-                            <span class="material-icons">functions</span>
-                            Formulas Used
-                        </h3>
-                        <div class="space-y-2 text-sm text-gray-300">
-                            <div><strong class="text-white">Weekly Solo Reward:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-blue-400">(SAT/TH × My TH × 7 days)</code></div>
-                            <div><strong class="text-white">Weekly Miner Wars Reward:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-red-400">((Reward Fund in Satoshi × Block Share %) ÷ Clan TH) × My TH</code></div>
-                            <div><strong class="text-white">Block Share:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-yellow-400">My TH ÷ Clan TH</code></div>
-                            <div><strong class="text-white">Reward Fund Conversion:</strong> <code class="bg-gray-800 px-2 py-1 rounded text-green-400">Reward Fund (Satoshi) × 0.00000001 = Reward Fund in BTC</code></div>
                         </div>
                     </div>
                 </div>
@@ -1330,7 +1326,7 @@
                                             <span class="text-gray-300" title="Return of investment" data-i18n="invest.roi_pct">ROI %:</span>
                                             <span id="roi-percentage-I" class="text-right text-green-400 font-mono font-bold">0%</span>
                                         </div>
-                                        <div class="flex justify-between items-center py-2">
+                                        <div class="flex justify-between items-center py-2 border-b border-gray-600">
                                             <span class="text-gray-300" title="Return of investment in days" data-i18n="invest.roi_days">ROI in Days:</span>
                                             <span id="roi-days-I" class="text-right text-green-400 font-mono font-bold">0 days</span>
                                         </div>
@@ -1699,48 +1695,48 @@
                 'calc.period_day': 'Day', 'calc.period_week': 'Week', 'calc.period_month': 'Month', 'calc.period_year': 'Year',
                 'calc.revenue_label': 'Revenue', 'calc.maintenance_label': 'Maintenance', 'calc.electricity_label': 'Electricity', 'calc.service_label': 'Service',
                 'calc.incl_discount': 'incl. discount', 'calc.your_miner': 'Your Miner', 'calc.hashrate_label': 'Hashrate',
-                'calc.power_consumption_suffix': '· Power consumption', 'calc.discount_suffix': 'Discount · On electricity costs',
+                'calc.power_consumption_suffix': '· Power consumption', 'calc.discount_suffix': 'Rabatt · Auf Stromkosten',
                 'calc.all_results': 'All Results', 'calc.profit_analysis': 'Profit Analysis', 'calc.formulas_title': 'Formulas & Assumptions', 'calc.calculate_button': 'Calculate',
                 'calc.period_label_daily': 'per day', 'calc.period_label_weekly': 'per week', 'calc.period_label_monthly': 'per month', 'calc.period_label_yearly': 'per year',
-                'calc.sat_day_suffix': 'sat/TH/day', 'calc.sat_per_day_suffix': 'sat/day', 'calc.th_range_max': '2,000 TH',
-                'results.description': 'Description', 'results.value_usd': 'Value ($)', 'results.value_btc': 'Value (₿)', 'results.value_gmt': 'Value (GMT)',
-                'results.daily_revenue': 'Daily Revenue', 'results.daily_electricity': 'Daily Electricity Cost', 'results.daily_service': 'Daily Service Cost',
-                'results.daily_total_maintenance': 'Daily Total Maintenance Cost', 'results.daily_net_profit': 'Daily Net Profit',
-                'results.weekly_revenue': 'Weekly Revenue', 'results.weekly_total_maintenance': 'Weekly Total Maintenance Cost', 'results.weekly_net_profit': 'Weekly Net Profit',
-                'results.monthly_revenue': 'Monthly Revenue', 'results.monthly_total_maintenance': 'Monthly Total Maintenance Cost', 'results.monthly_net_profit': 'Monthly Net Profit',
-                'results.yearly_revenue': 'Yearly Revenue', 'results.yearly_total_maintenance': 'Yearly Total Maintenance Cost', 'results.yearly_net_profit': 'Yearly Net Profit',
-                'results.maintenance_pct': 'Maintenance Cost (%)',
-                'formulas.revenue': 'Revenue:', 'formulas.electricity_cost': 'Electricity Cost:', 'formulas.electricity_cost_wth': 'Electricity Cost:',
-                'formulas.service_cost': 'Service Cost:', 'formulas.net_revenue': 'Net Revenue:', 'formulas.net_revenue_pct': 'Net Revenue %:',
-                'roi.title': 'ROI Calculator', 'roi.subtitle': 'Calculate return on investment for mining hardware',
-                'roi.secondary_market_label': 'Secondary Market Miner TH Power', 'roi.quick_selection': 'Quick Miner Selection', 'roi.price_per_th_label': 'Price per TH ($)',
-                'roi.calculate_button': 'Calculate ROI', 'roi.analysis_title': 'ROI Analysis', 'roi.total_investment': 'Total Investment:', 'roi.daily_profit': 'Daily Profit:',
-                'roi.monthly_profit': 'Monthly Profit:', 'roi.yearly_profit': 'Yearly Profit:', 'roi.days_of_roi': 'Days of ROI:', 'roi.roi_pct_label': 'ROI % (per year):',
-                'roi.yearly_net_btc': 'Yearly Net BTC:',
-                'shared.th_power_controls': 'TH Power Controls', 'shared.efficiency_wth_label': 'Energy Efficiency (W/TH)', 'shared.gomining_discount_label': 'GoMining Maintenance Discount (%)',
-                'invest.title': 'Investment Planner', 'invest.subtitle': 'Optimize TH purchases based on your available budget',
-                'invest.price_note': 'Calculated by buying a new 1TH miner and upgrading it. Price updated 19.12.2025',
-                'invest.efficiency_select_label': 'Secondary NFT Miner Energy Efficiency Level', 'invest.amount_label': 'Investment Amount ($)',
-                'invest.discount_code_label': 'Discount Code (%)', 'invest.th_bonus_label': 'TH Bonus (5%) ', 'invest.calculate_button': 'Calculate Investment',
-                'invest.analysis_title': 'Investment Analysis', 'invest.overview_title': 'Investment Overview', 'invest.final_th': 'Final TH Level:',
-                'invest.total_invest_used': 'Total Investment Used:', 'invest.unused_budget': 'Unused Budget:', 'invest.avg_price_th': 'Ø Price per TH:',
-                'invest.roi_pct': 'ROI %:', 'invest.roi_days': 'ROI in Days:', 'invest.daily_breakdown_title': 'Daily Breakdown',
-                'invest.electricity_cost': 'Electricity Cost (C1):', 'invest.service_cost': 'Service Cost (C2):', 'invest.daily_revenue': 'Daily Revenue (PR):',
-                'invest.daily_net_profit': 'Daily Net Profit:', 'invest.formulas_title': 'Formulas Used - Investment',
-                'seo.title': 'About HashSense Mining Dashboard',
-                'seo.intro': "HashSense is your comprehensive <strong>GoMining calculator toolkit</strong> designed to help miners analyze profitability, calculate ROI, and optimize investments. Whether you're planning your first mining operation or scaling an existing farm, our tools provide detailed insights into your mining economics.",
-                'seo.card_mining_desc': 'Calculate daily, weekly, monthly, and yearly profits. Factor in your TH power, energy efficiency, and maintenance discounts for accurate net profit projections.',
-                'seo.card_roi_desc': 'Analyze return on investment for different miner efficiency levels (12-35 W/TH). See break-even timelines and yearly ROI percentages based on current market conditions.',
-                'seo.card_invest_desc': 'Optimize TH purchases based on your budget. Compare 12 W/TH to 20 W/TH efficiency levels and see how discount codes and TH bonuses affect your average cost per TH.',
-                'seo.features_title': 'Key Features',
-                'seo.feature_1': '<strong>Real-time Bitcoin price</strong> integration with manual override options',
-                'seo.feature_2': '<strong>GMT token price</strong> calculator for maintenance cost planning',
-                'seo.feature_3': '<strong>Multi-currency display</strong> (USD, BTC, GMT) for all calculations',
-                'seo.feature_4': '<strong>Energy efficiency</strong> comparison across different miner types',
-                'seo.feature_5': '<strong>Maintenance discount</strong> calculator (up to 30.5%)',
-                'seo.feature_6': '<strong>Detailed cost breakdown</strong>: electricity, service, and net profit',
-                'seo.feature_7': '<strong>Investment budget</strong> allocation with unused budget tracking',
-                'seo.warning': '<strong class="text-yellow-400">⚠️ Important:</strong> All calculations are estimates based on current market conditions. Bitcoin price volatility, network difficulty changes, and GoMining parameter adjustments can affect actual results. Always conduct your own research (DYOR) before making investment decisions.'
+                'calc.sat_day_suffix': 'sat/TH/Tag', 'calc.sat_per_day_suffix': 'sat/Tag', 'calc.th_range_max': '2.000 TH',
+                'results.description': 'Beschreibung', 'results.value_usd': 'Wert ($)', 'results.value_btc': 'Wert (₿)', 'results.value_gmt': 'Wert (GMT)',
+                'results.daily_revenue': 'Täglicher Ertrag', 'results.daily_electricity': 'Tägliche Stromkosten', 'results.daily_service': 'Tägliche Servicekosten',
+                'results.daily_total_maintenance': 'Tägliche Gesamt-Wartungskosten', 'results.daily_net_profit': 'Täglicher Nettogewinn',
+                'results.weekly_revenue': 'Wöchentlicher Ertrag', 'results.weekly_total_maintenance': 'Wöchentliche Gesamt-Wartungskosten', 'results.weekly_net_profit': 'Wöchentlicher Nettogewinn',
+                'results.monthly_revenue': 'Monatlicher Ertrag', 'results.monthly_total_maintenance': 'Monatliche Gesamt-Wartungskosten', 'results.monthly_net_profit': 'Monatlicher Nettogewinn',
+                'results.yearly_revenue': 'Jährlicher Ertrag', 'results.yearly_total_maintenance': 'Jährliche Gesamt-Wartungskosten', 'results.yearly_net_profit': 'Jährlicher Nettogewinn',
+                'results.maintenance_pct': 'Wartungskosten (%)',
+                'formulas.revenue': 'Ertrag:', 'formulas.electricity_cost': 'Stromkosten:', 'formulas.electricity_cost_wth': 'Stromkosten:',
+                'formulas.service_cost': 'Servicekosten:', 'formulas.net_revenue': 'Nettoertrag:', 'formulas.net_revenue_pct': 'Nettoertrag %:',
+                'roi.title': 'ROI Rechner', 'roi.subtitle': 'Kapitalrendite für Mining-Hardware berechnen',
+                'roi.secondary_market_label': 'Zweitmarkt-Miner TH-Leistung', 'roi.quick_selection': 'Schnellauswahl Miner', 'roi.price_per_th_label': 'Preis pro TH ($)',
+                'roi.calculate_button': 'ROI berechnen', 'roi.analysis_title': 'ROI-Analyse', 'roi.total_investment': 'Gesamtinvestition:', 'roi.daily_profit': 'Täglicher Gewinn:',
+                'roi.monthly_profit': 'Monatlicher Gewinn:', 'roi.yearly_profit': 'Jährlicher Gewinn:', 'roi.days_of_roi': 'Tage bis ROI:', 'roi.roi_pct_label': 'ROI % (pro Jahr):',
+                'roi.yearly_net_btc': 'Jährliches Netto-BTC:',
+                'shared.th_power_controls': 'TH-Leistungssteuerung', 'shared.efficiency_wth_label': 'Energieeffizienz (W/TH)', 'shared.gomining_discount_label': 'GoMining Wartungsrabatt (%)',
+                'invest.title': 'Investitionsplaner', 'invest.subtitle': 'TH-Käufe basierend auf deinem verfügbaren Budget optimieren',
+                'invest.price_note': 'Berechnet durch Kauf eines neuen 1TH-Miners und dessen Upgrade. Preis aktualisiert am 19.12.2025',
+                'invest.efficiency_select_label': 'Energieeffizienzstufe des Zweitmarkt-NFT-Miners', 'invest.amount_label': 'Investitionsbetrag ($)',
+                'invest.discount_code_label': 'Rabattcode (%)', 'invest.th_bonus_label': 'TH-Bonus (5%) ', 'invest.calculate_button': 'Investition berechnen',
+                'invest.analysis_title': 'Investitionsanalyse', 'invest.overview_title': 'Investitionsübersicht', 'invest.final_th': 'Finale TH-Stufe:',
+                'invest.total_invest_used': 'Verwendete Investition:', 'invest.unused_budget': 'Ungenutztes Budget:', 'invest.avg_price_th': 'Ø Preis pro TH:',
+                'invest.roi_pct': 'ROI %:', 'invest.roi_days': 'ROI in Tagen:', 'invest.daily_breakdown_title': 'Tägliche Aufschlüsselung',
+                'invest.electricity_cost': 'Stromkosten (C1):', 'invest.service_cost': 'Servicekosten (C2):', 'invest.daily_revenue': 'Täglicher Ertrag (PR):',
+                'invest.daily_net_profit': 'Täglicher Nettogewinn:', 'invest.formulas_title': 'Verwendete Formeln - Investition',
+                'seo.title': 'Über HashSense Mining Dashboard',
+                'seo.intro': 'HashSense ist dein umfassendes <strong>GoMining Rechner-Toolkit</strong>, das Minern hilft, die Rentabilität zu analysieren, den ROI zu berechnen und Investitionen zu optimieren. Egal, ob du deinen ersten Mining-Betrieb planst oder eine bestehende Farm skalierst – unsere Tools liefern detaillierte Einblicke in deine Mining-Ökonomie.',
+                'seo.card_mining_desc': 'Berechne tägliche, wöchentliche, monatliche und jährliche Gewinne. Berücksichtige TH-Leistung, Energieeffizienz und Wartungsrabatte für genaue Nettogewinn-Prognosen.',
+                'seo.card_roi_desc': 'Analysiere die Kapitalrendite für verschiedene Miner-Effizienzstufen (12-35 W/TH). Sieh dir Break-Even-Zeiträume und jährliche ROI-Prozentsätze basierend auf aktuellen Marktbedingungen an.',
+                'seo.card_invest_desc': 'Optimiere TH-Käufe basierend auf deinem Budget. Vergleiche Effizienzstufen von 12 W/TH bis 20 W/TH und sieh, wie Rabattcodes und TH-Boni deinen durchschnittlichen Preis pro TH beeinflussen.',
+                'seo.features_title': 'Hauptfunktionen',
+                'seo.feature_1': '<strong>Echtzeit-Bitcoin-Preis</strong>-Integration mit manuellen Override-Optionen',
+                'seo.feature_2': '<strong>GMT-Token-Preis</strong>-Rechner für die Wartungskostenplanung',
+                'seo.feature_3': '<strong>Mehrwährungsanzeige</strong> (USD, BTC, GMT) für alle Berechnungen',
+                'seo.feature_4': '<strong>Energieeffizienz</strong>-Vergleich zwischen verschiedenen Miner-Typen',
+                'seo.feature_5': '<strong>Wartungsrabatt</strong>-Rechner (bis zu 30,5%)',
+                'seo.feature_6': '<strong>Detaillierte Kostenaufschlüsselung</strong>: Strom, Service und Nettogewinn',
+                'seo.feature_7': '<strong>Investitionsbudget</strong>-Zuweisung mit Verfolgung des ungenutzten Budgets',
+                'seo.warning': '<strong class="text-yellow-400">⚠️ Wichtig:</strong> Alle Berechnungen sind Schätzungen basierend auf aktuellen Marktbedingungen. Bitcoin-Preisvolatilität, Änderungen der Netzwerkschwierigkeit und Anpassungen der GoMining-Parameter können die tatsächlichen Ergebnisse beeinflussen. Führe immer deine eigene Recherche (DYOR) durch, bevor du Investitionsentscheidungen triffst.'
             },
             de: {
                 'nav.mining': 'Mining', 'nav.roi': 'ROI', 'nav.reinvest': 'Reinvest', 'nav.discount': 'Rabatt', 'nav.goboxes': 'GOBoxes',
