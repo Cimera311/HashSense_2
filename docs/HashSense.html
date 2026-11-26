@@ -266,6 +266,14 @@
         .sidebar.open {
             transform: translateX(0);
         }
+
+        #sidebar {
+            height: 100vh;
+            height: 100dvh;
+            overflow-y: auto;
+            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch;
+        }
     </style>
 
     <script>
@@ -1163,9 +1171,10 @@
                                             <span id="daily-net-profit-I" class="text-right text-green-300 font-mono font-bold">$0</span>
                                         </div>
                                     </div>
-                                </div>
+                                                               </div>
                             </div>
                         </div>
+                        
                     </div>
                     
                     <!-- Formulas Footer -->
